@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>采购退货 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">采购执行</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">采购退货</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理采购退货流程，包括退货申请、审批、退货执行、退款处理等。退货单由不合格处理会审确定后自动创建，或手工创建，并同步至供应链协同应用。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="退货单号、订单编号、供应商">
+                </div>
+                <div class="filter-item">
+                    <label>退货状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="draft">草稿</option>
+                        <option value="pending">待审批</option>
+                        <option value="approved">已批准</option>
+                        <option value="returning">退货中</option>
+                        <option value="returned">已退货</option>
+                        <option value="refunded">已退款</option>
+                        <option value="cancelled">已取消</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>来源</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="review">会审创建</option>
+                        <option value="manual">手工创建</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>退货原因</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="quality">质量问题</option>
+                        <option value="wrong">错发</option>
+                        <option value="damaged">损坏</option>
+                        <option value="overstock">超量</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary">+ 新建退货单</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">退货单号</th>
+                            <th width="120">订单编号</th>
+                            <th width="120">处理单号</th>
+                            <th width="150">供应商</th>
+                            <th width="150">物料名称</th>
+                            <th width="100">退货数量</th>
+                            <th width="120">退货金额</th>
+                            <th width="100">退货原因</th>
+                            <th width="100">退货状态</th>
+                            <th width="100">来源</th>
+                            <th width="120">申请日期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="return-id" value="1"></td>
+                            <td>RET-2025-001</td>
+                            <td>PO-2025-001</td>
+                            <td>
+                                <a href="pages/procurement-unqualified-handle-detail.html?id=1" style="color:#1890ff;">UH-2025-001</a>
+                            </td>
+                            <td>深圳市电子科技</td>
+                            <td>电子元器件A</td>
+                            <td>50个</td>
+                            <td>¥125.00</td>
+                            <td>质量问题</td>
+                            <td><span class="status-badge status-warning">待审批</span></td>
+                            <td><span class="status-badge" style="background:#e6f7ff;color:#1890ff;">会审创建</span></td>
+                            <td>2025-01-22</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-return-detail.html" data-id="1">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="return-id" value="2"></td>
+                            <td>RET-2025-002</td>
+                            <td>PO-2025-002</td>
+                            <td>-</td>
+                            <td>上海精密机械</td>
+                            <td>PCB板</td>
+                            <td>10片</td>
+                            <td>¥150.00</td>
+                            <td>错发</td>
+                            <td><span class="status-badge status-success">已退款</span></td>
+                            <td><span class="status-badge" style="background:#f5f5f5;color:#8c8c8c;">手工创建</span></td>
+                            <td>2025-01-15</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-return-detail.html" data-id="2">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="return-id" value="3"></td>
+                            <td>RET-2025-003</td>
+                            <td>PO-2025-003</td>
+                            <td>-</td>
+                            <td>北京贸易有限公司</td>
+                            <td>包装材料</td>
+                            <td>20个</td>
+                            <td>¥80.00</td>
+                            <td>错发</td>
+                            <td><span class="status-badge status-warning">待审批</span></td>
+                            <td><span class="status-badge" style="background:#f5f5f5;color:#8c8c8c;">手工创建</span></td>
+                            <td>2025-01-24</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-return-detail.html" data-id="3">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-submit-return" data-id="3">提审</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 3 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 提审：选择审批人弹窗（手工创建） -->
+        <div id="return-submit-review-modal" class="modal-overlay">
+            <div class="modal" style="max-width:440px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">提审</span>
+                    <button type="button" class="modal-close" data-close-modal="return-submit-review-modal" aria-label="关闭">×</button>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-desc" style="margin-bottom:16px;">选择审批人后提交，审批人将在工作台待办事项中收到该退货单，可进行查看与审批；审批通过后将自动同步至对应供应商的供应链协同应用（退货单）。</p>
+                    <div class="form-item">
+                        <label class="form-label required">审批人</label>
+                        <select id="return-submit-approver" class="form-select">
+                            <option value="">请选择审批人</option>
+                            <option value="zhang">张经理</option>
+                            <option value="li">李主管</option>
+                            <option value="wang">王审批</option>
+                            <option value="zhao">赵工</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default modal-close" data-close-modal="return-submit-review-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="return-submit-review-ok">确定提审</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        console.log('采购退货 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+        (function() {
+            var submitModal = document.getElementById('return-submit-review-modal');
+            var approverSelect = document.getElementById('return-submit-approver');
+            var okBtn = document.getElementById('return-submit-review-ok');
+            var currentRow = null;
+
+            document.addEventListener('click', function(e) {
+                var btn = e.target && e.target.closest('.btn-submit-return');
+                if (btn) {
+                    currentRow = btn.closest('tr');
+                    if (approverSelect) approverSelect.value = '';
+                    if (submitModal) {
+                        submitModal.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    }
+                    return;
+                }
+            });
+
+            if (okBtn) okBtn.addEventListener('click', function() {
+                var v = approverSelect && approverSelect.value;
+                if (!v) {
+                    alert('请选择审批人。');
+                    return;
+                }
+                if (typeof PageInteractions !== 'undefined' && PageInteractions.closeModal) PageInteractions.closeModal('return-submit-review-modal');
+                document.body.style.overflow = '';
+                if (currentRow) {
+                    var statusTd = currentRow.querySelector('td:nth-child(10)');
+                    if (statusTd) statusTd.innerHTML = '<span class="status-badge status-processing">已提交</span>';
+                    var opTd = currentRow.querySelector('td:last-child');
+                    var submitBtn = currentRow.querySelector('.btn-submit-return');
+                    var id = submitBtn ? (submitBtn.getAttribute('data-id') || '') : '';
+                    if (opTd) opTd.innerHTML = '<button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-return-detail.html" data-id="' + id + '">查看</button>';
+                }
+                alert('已提交审批，审批人可在工作台待办事项中查看并审批；审批通过后将自动同步至对应供应商的供应链协同应用（退货单）。');
+            });
+        })();
+        </script>
+    </div>
+</body>
+</html>

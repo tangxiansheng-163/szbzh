@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>能效对标 - 能源管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/energy-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">能效优化分析</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">能效对标</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">进行能效对标分析，包括与行业标准对标、与历史数据对标、与标杆企业对标等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>对标类型</label>
+                    <select class="form-select">
+                        <option value="industry">行业标准</option>
+                        <option value="history">历史数据</option>
+                        <option value="benchmark">标杆企业</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>统计周期</label>
+                    <input type="month" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">能效对标分析</h3>
+            </div>
+            <div class="card-body">
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-label">当前能效</div>
+                        <div class="stat-value">0.85 kWh/元</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">行业标准</div>
+                        <div class="stat-value">0.80 kWh/元</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">差距</div>
+                        <div class="stat-value" style="color: #ff4d4f;">+6.25%</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">改进空间</div>
+                        <div class="stat-value" style="color: #52c41a;">5.9%</div>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; padding: 20px; background: #f5f5f5; border-radius: 4px; text-align: center; color: #999;">
+                    能效对标图表展示区域（可集成ECharts等图表库）
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('能效对标 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

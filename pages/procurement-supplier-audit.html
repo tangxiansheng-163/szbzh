@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>供应商审核 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">供应商管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">供应商审核</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">审核供应商资质，包括资质审核、能力审核、信用审核等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>供应商名称</label>
+                    <input type="text" class="form-input" placeholder="供应商名称">
+                </div>
+                <div class="filter-item">
+                    <label>审核状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待审核</option>
+                        <option value="approved">已通过</option>
+                        <option value="rejected">已拒绝</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button type="button" class="btn btn-default btn-batch-audit">批量审核</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="150">供应商名称</th>
+                            <th width="100">审核类型</th>
+                            <th width="100">审核状态</th>
+                            <th width="120">申请时间</th>
+                            <th width="120">审核时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="audit-id" value="1"></td>
+                            <td>深圳市电子科技</td>
+                            <td>资质审核</td>
+                            <td><span class="status-badge status-warning">待审核</span></td>
+                            <td>2025-01-20</td>
+                            <td>-</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-supplier-audit-detail.html" data-id="1">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-audit-supplier" data-id="1">审核</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 1 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            console.log('供应商审核 页面已加载');
+            if (typeof PageInteractions !== 'undefined') {
+                PageInteractions.initButtons();
+            }
+            document.querySelectorAll('.btn-audit-supplier').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    if (confirm('确定对该供应商执行审核？')) alert('审核操作已提交。');
+                });
+            });
+            document.querySelector('.btn-batch-audit') && document.querySelector('.btn-batch-audit').addEventListener('click', function() {
+                var selected = document.querySelectorAll('input[name="audit-id"]:checked');
+                if (selected.length === 0) { alert('请先勾选要审核的供应商。'); return; }
+                if (confirm('确定要批量审核通过选中的 ' + selected.length + ' 项吗？')) alert('批量审核已提交。');
+            });
+        </script>
+    </div>
+</body>
+</html>

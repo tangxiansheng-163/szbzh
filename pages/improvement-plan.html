@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>改进计划</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">考核与改进</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">改进计划</span>
+        </div>
+
+        <div class="page-header">
+            <h2 class="page-title">改进计划</h2>
+            <p class="page-description">按《BOM全生命周期管理体系》持续改进机制：问题收集（考核/日常反馈/跨部门会议）→原因分析→方案制定（改进措施、责任人、完成时限）→方案执行→效果验证（指标对比、业务反馈）→体系优化（固化到BOM管理体系）。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>改进项/责任人</label>
+                    <input type="text" class="form-input" placeholder="关键词搜索">
+                </div>
+                <div class="filter-item">
+                    <label>问题来源</label>
+                    <select class="form-select" id="imp-source">
+                        <option value="">全部</option>
+                        <option value="kpi">考核未达标</option>
+                        <option value="sync">同步异常</option>
+                        <option value="feedback">日常业务反馈</option>
+                        <option value="meeting">跨部门会议</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待启动</option>
+                        <option value="doing">进行中</option>
+                        <option value="done">已完成</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>问题级别</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="high">高</option>
+                        <option value="medium">中</option>
+                        <option value="low">低</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary" data-open-modal="improvement-add-modal">+ 新增改进计划</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="130">计划编号</th>
+                            <th>改进项</th>
+                            <th width="100">问题来源</th>
+                            <th width="100">关联考核指标</th>
+                            <th width="70">问题级别</th>
+                            <th width="80">责任人</th>
+                            <th width="100">计划完成时间</th>
+                            <th width="80">当前进度</th>
+                            <th width="80">状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>IMP-2025-001</td>
+                            <td>提升 EBOM 变更及时率至 98%</td>
+                            <td>1 月考核未达标</td>
+                            <td>EBOM 变更及时率</td>
+                            <td><span class="status-badge status-error">高</span></td>
+                            <td>张工</td>
+                            <td>2025-02-28</td>
+                            <td><span class="progress-bar"><span style="width:30%"></span></span> 30%</td>
+                            <td><span class="status-badge status-processing">进行中</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="improvement-view-modal">查看</button> <button class="btn btn-sm btn-default" data-open-modal="improvement-edit-modal">编辑</button></td>
+                        </tr>
+                        <tr>
+                            <td>IMP-2025-002</td>
+                            <td>优化 ERP 下发失败重试机制</td>
+                            <td>同步异常反馈</td>
+                            <td>跨系统同步成功率</td>
+                            <td><span class="status-badge status-warning">中</span></td>
+                            <td>李工</td>
+                            <td>2025-02-15</td>
+                            <td><span class="progress-bar"><span style="width:60%"></span></span> 60%</td>
+                            <td><span class="status-badge status-processing">进行中</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="improvement-view-modal">查看</button> <button class="btn btn-sm btn-default" data-open-modal="improvement-edit-modal">编辑</button></td>
+                        </tr>
+                        <tr>
+                            <td>IMP-2024-018</td>
+                            <td>完善 BOM 校验规则</td>
+                            <td>日常业务反馈</td>
+                            <td>EBOM 数据准确率</td>
+                            <td><span class="status-badge status-success">低</span></td>
+                            <td>王工</td>
+                            <td>2024-12-31</td>
+                            <td><span class="progress-bar"><span style="width:100%"></span></span> 100%</td>
+                            <td><span class="status-badge status-success">已完成</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="improvement-view-modal">查看</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 3 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="improvement-view-modal" class="modal-overlay">
+            <div class="modal" style="max-width:620px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">改进计划详情</span><button type="button" class="modal-close" data-close-modal="improvement-view-modal">×</button></div>
+                <div class="modal-body">
+                    <div class="section-title" style="margin-bottom:12px;">基本信息</div>
+                    <div class="form-info-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div class="form-info-item"><span class="form-info-label">计划编号</span><span class="form-info-value">IMP-2025-001</span></div>
+                        <div class="form-info-item"><span class="form-info-label">关联考核指标</span><span class="form-info-value">EBOM 变更及时率</span></div>
+                        <div class="form-info-item"><span class="form-info-label">问题级别</span><span class="form-info-value">高</span></div>
+                        <div class="form-info-item"><span class="form-info-label">责任人</span><span class="form-info-value">张工</span></div>
+                        <div class="form-info-item"><span class="form-info-label">计划完成时间</span><span class="form-info-value">2025-02-28</span></div>
+                        <div class="form-info-item"><span class="form-info-label">状态</span><span class="form-info-value">进行中</span></div>
+                    </div>
+                    <div class="form-info-item" style="margin-top:16px;"><span class="form-info-label">改进项</span><span class="form-info-value">提升 EBOM 变更及时率至 98%</span></div>
+                    <div class="form-info-item"><span class="form-info-label">问题来源</span><span class="form-info-value">1 月考核未达标，EBOM 变更及时率 95% 低于目标 98%</span></div>
+                    <div class="section-title" style="margin:16px 0 8px;">原因分析</div>
+                    <div class="form-info-item"><span class="form-info-value">根因：1）变更会审等待时间偏长；2）评审提醒与催办不足；3）部分超时变更未及时根因复盘。责任部门主要为研发部。</span></div>
+                    <div class="section-title" style="margin:16px 0 8px;">改进措施</div>
+                    <div class="form-info-item"><span class="form-info-value">1. 优化变更会审流程，缩短评审等待时间<br>2. 增加变更提醒与催办机制<br>3. 对超时变更进行根因分析并制定对策</span></div>
+                    <div class="section-title" style="margin:16px 0 8px;">效果验证</div>
+                    <div class="form-info-item"><span class="form-info-value" style="color:#999;">待改进完成后填写。验证方式：指标数据对比（改进前后 EBOM 变更及时率）、业务反馈。</span></div>
+                    <div class="form-info-item" style="margin-top:8px;"><span class="form-info-label">体系优化</span><span class="form-info-value" style="color:#999;">有效改进措施将固化到 BOM 管理体系</span></div>
+                    <div class="form-info-item" style="margin-top:8px;"><span class="form-info-label">创建时间</span><span class="form-info-value">2025-01-31 10:00</span></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="improvement-view-modal">关闭</button><button type="button" class="btn btn-primary" data-close-modal="improvement-view-modal" data-open-modal="improvement-edit-modal">编辑</button></div>
+            </div>
+        </div>
+
+        <div id="improvement-add-modal" class="modal-overlay">
+            <div class="modal" style="max-width:600px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">新增改进计划</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <div class="form-item"><label class="form-label required">改进项</label><input type="text" class="form-input" placeholder="改进内容描述，如：提升变更及时率至 98%"></div>
+                    <div class="form-item"><label class="form-label required">问题来源</label><select class="form-select"><option value="">请选择</option><option value="kpi">考核未达标</option><option value="sync">同步异常反馈</option><option value="feedback">日常业务反馈</option><option value="meeting">跨部门会议</option><option value="other">其他</option></select></div>
+                    <div class="form-item"><label class="form-label">关联考核指标</label><select class="form-select"><option value="">请选择（可选）</option><option value="ebom-accuracy">EBOM 数据准确率</option><option value="ebom-timeliness">EBOM 变更及时率</option><option value="mbom-convert">MBOM 转化及时率</option><option value="mbom-integrity">MBOM 数据完整性</option><option value="bom-compliance">BOM 执行合规率</option><option value="sync-rate">跨系统同步成功率</option><option value="exception-handle">异常处理及时率</option></select></div>
+                    <div class="form-item"><label class="form-label">问题描述</label><textarea class="form-textarea" rows="2" placeholder="详细描述问题现象及影响"></textarea></div>
+                    <div class="form-item"><label class="form-label">原因分析</label><textarea class="form-textarea" rows="2" placeholder="问题根因分析，明确责任部门"></textarea></div>
+                    <div class="form-item"><label class="form-label required">责任人</label><select class="form-select"><option value="">请选择</option><option value="张工">张工</option><option value="李工">李工</option><option value="王工">王工</option></select></div>
+                    <div class="form-item"><label class="form-label required">计划完成时间</label><input type="date" class="form-input"></div>
+                    <div class="form-item"><label class="form-label">问题级别</label><select class="form-select"><option value="high">高</option><option value="medium" selected>中</option><option value="low">低</option></select></div>
+                    <div class="form-item"><label class="form-label">改进措施</label><textarea class="form-textarea" rows="3" placeholder="改进措施、执行步骤、完成时限"></textarea></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="improvement-add-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="improvement-add-modal" onclick="alert('✅ 改进计划已保存')">保存</button></div>
+            </div>
+        </div>
+
+        <div id="improvement-edit-modal" class="modal-overlay">
+            <div class="modal" style="max-width:600px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">编辑改进计划</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <div class="form-item"><label class="form-label">计划编号</label><input type="text" class="form-input" value="IMP-2025-001" readonly></div>
+                    <div class="form-item"><label class="form-label required">改进项</label><input type="text" class="form-input" value="提升 EBOM 变更及时率至 98%"></div>
+                    <div class="form-item"><label class="form-label">问题来源</label><input type="text" class="form-input" value="1 月考核未达标" readonly></div>
+                    <div class="form-item"><label class="form-label">关联考核指标</label><input type="text" class="form-input" value="EBOM 变更及时率" readonly></div>
+                    <div class="form-item"><label class="form-label">原因分析</label><textarea class="form-textarea" rows="2">根因：1）变更会审等待时间偏长；2）评审提醒与催办不足；3）部分超时变更未及时根因复盘。责任部门主要为研发部。</textarea></div>
+                    <div class="form-item"><label class="form-label required">责任人</label><select class="form-select"><option value="张工" selected>张工</option><option value="李工">李工</option></select></div>
+                    <div class="form-item"><label class="form-label required">计划完成时间</label><input type="date" class="form-input" value="2025-02-28"></div>
+                    <div class="form-item"><label class="form-label">当前进度(%)</label><input type="number" class="form-input" value="30" min="0" max="100"></div>
+                    <div class="form-item"><label class="form-label">状态</label><select class="form-select"><option value="pending">待启动</option><option value="doing" selected>进行中</option><option value="done">已完成</option></select></div>
+                    <div class="form-item"><label class="form-label">改进措施</label><textarea class="form-textarea" rows="3">1. 优化变更会审流程
+2. 增加变更提醒与催办机制
+3. 对超时变更进行根因分析</textarea></div>
+                    <div class="form-item"><label class="form-label">效果验证</label><textarea class="form-textarea" rows="2" placeholder="改进完成后的效果验证：指标数据对比、业务反馈；有效措施将固化到BOM管理体系"></textarea></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="improvement-edit-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="improvement-edit-modal" onclick="alert('✅ 已保存')">保存</button></div>
+            </div>
+        </div>
+    </div>
+    <style>
+        .page-title{font-size:18px;font-weight:600;margin:0 0 8px 0;color:#333;}
+        .page-description{font-size:13px;color:#666;margin:0;}
+        .progress-bar{display:inline-block;width:60px;height:6px;background:#e8e8e8;border-radius:3px;vertical-align:middle;margin-right:6px;overflow:hidden;}
+        .progress-bar span{display:block;height:100%;background:#1890ff;border-radius:3px;}
+    </style>
+    <script>
+(function(){
+    var params=new URLSearchParams(window.location.search);
+    var src=params.get('source');
+    var item=params.get('item');
+    if(src==='kpi'){
+        var sel=document.getElementById('imp-source');
+        if(sel){sel.value='kpi';}
+    }
+})();
+if(typeof PageInteractions!=='undefined')PageInteractions.initButtons();
+    </script>
+</body>
+</html>

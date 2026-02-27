@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订单编辑 - 采购</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <form id="order-edit-form">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">采购订单基本信息</h3>
+                </div>
+                <div class="card-body">
+                    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 24px;">
+                        <div class="form-item">
+                            <label class="form-label">订单编号</label>
+                            <input type="text" class="form-input" value="PO-2025-002" readonly>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">来源</label>
+                            <input type="text" class="form-input" value="需求申请" readonly>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">计划单号</label>
+                            <input type="text" class="form-input" value="REQ-2025-015" readonly>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">订单类型</label>
+                            <select class="form-select">
+                                <option value="normal">常规订单</option>
+                                <option value="urgent">紧急订单</option>
+                                <option value="supplement">补充协议</option>
+                                <option value="framework">框架合同</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">订单状态</label>
+                            <input type="text" class="form-input" value="审批中" readonly>
+                        </div>
+
+                        <div class="form-item">
+                            <label class="form-label">供应商</label>
+                            <input type="text" class="form-input" value="上海精密机械制造有限公司" readonly>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">供应商联系人</label>
+                            <input type="text" class="form-input" value="王经理">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">联系电话</label>
+                            <input type="tel" class="form-input" value="13800000002">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">采购员</label>
+                            <input type="text" class="form-input" value="李采购">
+                        </div>
+
+                        <div class="form-item">
+                            <label class="form-label">下单日期</label>
+                            <input type="date" class="form-input" value="2025-01-20">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">要求交期</label>
+                            <input type="date" class="form-input" value="2025-03-01">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">付款条件</label>
+                            <select class="form-select">
+                                <option value="prepay">预付款</option>
+                                <option value="net30" selected>货到30天</option>
+                                <option value="net60">货到60天</option>
+                                <option value="net90">货到90天</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">质保期</label>
+                            <input type="text" class="form-input" value="12个月">
+                        </div>
+
+                        <div class="form-item" style="grid-column:1 / span 2;">
+                            <label class="form-label">交货地点</label>
+                            <input type="text" class="form-input" value="上海市嘉定区工业园区1号仓库">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">物料明细</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-wrapper" style="max-height:360px;overflow:auto;">
+                        <table class="output-table">
+                            <thead>
+                                <tr>
+                                    <th width="50">序号</th>
+                                    <th width="140">物料编码</th>
+                                    <th width="200">物料名称</th>
+                                    <th width="150">规格型号</th>
+                                    <th width="90">数量</th>
+                                    <th width="70">单位</th>
+                                    <th width="100">单价</th>
+                                    <th width="110">金额</th>
+                                    <th width="110">要求到货日期</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>MAT-2001</td>
+                                    <td>机加工件</td>
+                                    <td>Φ20×50</td>
+                                    <td><input type="number" class="form-input form-input-sm" value="100" readonly></td>
+                                    <td>件</td>
+                                    <td><input type="number" class="form-input form-input-sm" value="550.00"></td>
+                                    <td>¥55,000.00</td>
+                                    <td><input type="date" class="form-input form-input-sm" value="2025-03-01"></td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>MAT-2002</td>
+                                    <td>轴承</td>
+                                    <td>6205</td>
+                                    <td><input type="number" class="form-input form-input-sm" value="40" readonly></td>
+                                    <td>套</td>
+                                    <td><input type="number" class="form-input form-input-sm" value="862.50"></td>
+                                    <td>¥34,500.00</td>
+                                    <td><input type="date" class="form-input form-input-sm" value="2025-03-05"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top:12px;text-align:right;font-size:13px;color:var(--text-secondary,#666);">
+                        当前合计金额 <strong>¥89,500.00</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">交付与质量要求</h3>
+                </div>
+                <div class="card-body">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px 24px;">
+                        <div class="form-item">
+                            <label class="form-label">交付要求</label>
+                            <textarea class="form-textarea" rows="3">整体到货不晚于2025-03-05，允许提前发货并集中收货。</textarea>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">质量标准</label>
+                            <textarea class="form-textarea" rows="3">按企业标准 Q/XXX-2025 与供方技术协议执行，来料需100%检验。</textarea>
+                        </div>
+                        <div class="form-item" style="grid-column:1 / span 2;">
+                            <label class="form-label">其他要求</label>
+                            <textarea class="form-textarea" rows="2">如交期有风险需提前5个工作日通知采购员。</textarea>
+                        </div>
+                        <div class="form-item" style="grid-column:1 / span 2;">
+                            <label class="form-label">备注</label>
+                            <textarea class="form-textarea" rows="2">编辑弹窗仅作为示例，不做真实持久化。</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        console.log('采购订单编辑 页面已加载');
+        // 这里不做真实提交逻辑，保存按钮由全局 edit-modal 统一处理，仅作展示
+    </script>
+</body>
+</html>

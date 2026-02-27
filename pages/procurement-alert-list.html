@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预警列表 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">预警与应急</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">预警列表</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理采购业务预警信息，包括价格异常、交付延期、质量风险、合同到期等预警；支持预警处理与跟踪。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="预警编号、供应商名称、订单编号">
+                </div>
+                <div class="filter-item">
+                    <label>预警类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="price">价格异常</option>
+                        <option value="delivery">交付延期</option>
+                        <option value="quality">质量风险</option>
+                        <option value="contract">合同到期</option>
+                        <option value="supplier">供应商风险</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>预警级别</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="urgent">紧急</option>
+                        <option value="important">重要</option>
+                        <option value="normal">一般</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>处理状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待处理</option>
+                        <option value="processing">处理中</option>
+                        <option value="resolved">已处理</option>
+                        <option value="closed">已关闭</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">批量处理</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">预警编号</th>
+                            <th width="100">预警类型</th>
+                            <th width="90">预警级别</th>
+                            <th width="150">预警对象</th>
+                            <th width="200">预警内容</th>
+                            <th width="120">触发时间</th>
+                            <th width="100">处理人</th>
+                            <th width="90">处理状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="alert-id" value="1"></td>
+                            <td>AL-2025-001</td>
+                            <td>交付延期</td>
+                            <td><span class="status-badge status-error">紧急</span></td>
+                            <td>PO-2025-001</td>
+                            <td>订单PO-2025-001预计交付延期3天</td>
+                            <td>2025-01-25 10:30</td>
+                            <td>张采购</td>
+                            <td><span class="status-badge status-warning">待处理</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-alert-detail.html" data-id="1">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-handle-alert" data-id="1">处理</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="alert-id" value="2"></td>
+                            <td>AL-2025-002</td>
+                            <td>合同到期</td>
+                            <td><span class="status-badge status-warning">重要</span></td>
+                            <td>CT-2024-015</td>
+                            <td>合同CT-2024-015将于30天后到期</td>
+                            <td>2025-01-20 09:15</td>
+                            <td>李采购</td>
+                            <td><span class="status-badge status-processing">处理中</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-alert-detail.html" data-id="2">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-handle-alert" data-id="2">处理</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="alert-id" value="3"></td>
+                            <td>AL-2025-003</td>
+                            <td>价格异常</td>
+                            <td><span class="status-badge status-warning">重要</span></td>
+                            <td>PO-2025-002</td>
+                            <td>订单PO-2025-002价格超出历史平均价格15%</td>
+                            <td>2025-01-22 14:20</td>
+                            <td>王采购</td>
+                            <td><span class="status-badge status-success">已处理</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-alert-detail.html" data-id="3">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 3 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            console.log('预警列表 页面已加载');
+            if (typeof PageInteractions !== 'undefined') {
+                PageInteractions.initButtons();
+                PageInteractions.toggleSelectAll('input[name="alert-id"]');
+            }
+            document.querySelectorAll('.btn-handle-alert').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    if (confirm('确定处理该预警？')) alert('处理操作已提交。');
+                });
+            });
+            var batchHandleBtn = document.querySelector('.action-left .btn-default');
+            if (batchHandleBtn && batchHandleBtn.textContent.indexOf('批量处理') !== -1) {
+                batchHandleBtn.addEventListener('click', function() {
+                    var selected = document.querySelectorAll('input[name="alert-id"]:checked');
+                    if (selected.length === 0) { alert('请先勾选要处理的预警。'); return; }
+                    if (confirm('确定要批量处理选中的 ' + selected.length + ' 项预警吗？')) alert('批量处理已提交。');
+                });
+            }
+        </script>
+    </div>
+</body>
+</html>

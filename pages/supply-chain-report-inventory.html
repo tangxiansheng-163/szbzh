@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>库存报表 - 供应链协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/supply-chain-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">报表管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">库存报表</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">库存统计分析报表，包括库存周转、库存结构、库存预警、库存成本等分析。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>报表类型</label>
+                    <select class="form-select">
+                        <option value="turnover">库存周转</option>
+                        <option value="structure">库存结构</option>
+                        <option value="warning">库存预警</option>
+                        <option value="cost">库存成本</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>统计周期</label>
+                    <select class="form-select">
+                        <option value="month">月度</option>
+                        <option value="quarter">季度</option>
+                        <option value="year">年度</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>周期</label>
+                    <input type="month" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">导出</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">库存周转分析</h3>
+            </div>
+            <div class="card-body">
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-label">平均库存金额</div>
+                        <div class="stat-value">¥2,580,000</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">库存周转率</div>
+                        <div class="stat-value">6.5次</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">库存周转天数</div>
+                        <div class="stat-value">56天</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">预警物料数</div>
+                        <div class="stat-value" style="color: #ff4d4f;">12</div>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; padding: 20px; background: #f5f5f5; border-radius: 4px; text-align: center; color: #999;">
+                    图表展示区域（可集成ECharts等图表库）
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('库存报表 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实时监控 - 设备管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/equipment-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">运行监控</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">实时监控</span>
+        </div>
+
+        <!-- 顶部统计卡片 -->
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 20px;">
+            <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div class="stat-value" style="color: white;">156</div>
+                <div class="stat-label" style="color: rgba(255,255,255,0.8);">监控设备总数</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white;">
+                <div class="stat-value" style="color: white;">142</div>
+                <div class="stat-label" style="color: rgba(255,255,255,0.8);">正常运行</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                <div class="stat-value" style="color: white;">8</div>
+                <div class="stat-label" style="color: rgba(255,255,255,0.8);">告警中</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                <div class="stat-value" style="color: white;">4</div>
+                <div class="stat-label" style="color: rgba(255,255,255,0.8);">停机维护</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
+                <div class="stat-value" style="color: white;">2</div>
+                <div class="stat-label" style="color: rgba(255,255,255,0.8);">离线设备</div>
+            </div>
+        </div>
+
+        <!-- 主内容区：左侧分类树 + 右侧详情 -->
+        <div style="display: flex; gap: 16px;">
+            <!-- 左侧用途分类树 -->
+            <div style="width: 240px; background: #fff; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); display: flex; flex-direction: column;">
+                <!-- 搜索框 -->
+                <div style="padding: 12px; border-bottom: 1px solid #f0f0f0;">
+                    <div style="position: relative;">
+                        <input type="text" placeholder="搜索设备" style="width: 100%; padding: 6px 10px 6px 28px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px;">
+                        <svg style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #8c8c8c;" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- 状态筛选标签 -->
+                <div style="display: flex; padding: 10px 12px; gap: 6px; border-bottom: 1px solid #f0f0f0;">
+                    <div class="status-filter active" data-filter="all" style="padding: 3px 10px; background: #1890ff; color: white; border-radius: 4px; font-size: 12px; cursor: pointer;">全部</div>
+                    <div class="status-filter" data-filter="running" style="padding: 3px 10px; background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; border-radius: 4px; font-size: 12px; cursor: pointer;">运行中</div>
+                    <div class="status-filter" data-filter="stopped" style="padding: 3px 10px; background: #fff2f0; color: #ff4d4f; border: 1px solid #ffccc7; border-radius: 4px; font-size: 12px; cursor: pointer;">停机</div>
+                </div>
+
+                <!-- 用途分类树 -->
+                <div style="flex: 1; overflow-y: auto; padding: 8px 0;">
+                    <!-- 生产设备分类 -->
+                    <div class="category-item">
+                        <div class="category-header active" style="padding: 10px 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; background: #e6f7ff;" onclick="toggleCategory(this)">
+                            <svg class="expand-icon" style="width: 10px; height: 10px; transition: transform 0.2s; transform: rotate(90deg); color: #1890ff;" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span style="font-weight: 500; flex: 1; font-size: 13px;">生产设备</span>
+                            <span style="background: #1890ff; color: white; padding: 1px 6px; border-radius: 8px; font-size: 10px;">86</span>
+                        </div>
+                        <div class="category-devices" style="display: block;">
+                            <div class="device-item active" data-device="EQ-001" style="padding: 8px 12px 8px 32px; cursor: pointer; display: flex; align-items: center; gap: 6px; background: #e6f7ff;" onclick="selectDevice(this, 'EQ-001')">
+                                <svg style="width: 14px; height: 14px; color: #1890ff;" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 12px; font-weight: 500;">EQ-001</div>
+                                    <div style="font-size: 10px; color: #8c8c8c;">数控车床-001</div>
+                                </div>
+                                <span class="status-dot" style="width: 6px; height: 6px; background: #52c41a; border-radius: 50%;"></span>
+                            </div>
+                            <div class="device-item" data-device="EQ-002" style="padding: 8px 12px 8px 32px; cursor: pointer; display: flex; align-items: center; gap: 6px;" onclick="selectDevice(this, 'EQ-002')">
+                                <svg style="width: 14px; height: 14px; color: #8c8c8c;" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 12px; font-weight: 500;">EQ-002</div>
+                                    <div style="font-size: 10px; color: #8c8c8c;">加工中心-003</div>
+                                </div>
+                                <span class="status-dot" style="width: 6px; height: 6px; background: #ff4d4f; border-radius: 50%;"></span>
+                            </div>
+                            <div class="device-item" data-device="EQ-003" style="padding: 8px 12px 8px 32px; cursor: pointer; display: flex; align-items: center; gap: 6px;" onclick="selectDevice(this, 'EQ-003')">
+                                <svg style="width: 14px; height: 14px; color: #8c8c8c;" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 12px; font-weight: 500;">EQ-003</div>
+                                    <div style="font-size: 10px; color: #8c8c8c;">铣床-005</div>
+                                </div>
+                                <span class="status-dot" style="width: 6px; height: 6px; background: #52c41a; border-radius: 50%;"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 能源设备分类 -->
+                    <div class="category-item">
+                        <div class="category-header" style="padding: 10px 12px; cursor: pointer; display: flex; align-items: center; gap: 6px;" onclick="toggleCategory(this)">
+                            <svg class="expand-icon" style="width: 10px; height: 10px; transition: transform 0.2s; color: #8c8c8c;" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span style="font-weight: 500; flex: 1; font-size: 13px;">能源设备</span>
+                            <span style="background: #f0f0f0; color: #595959; padding: 1px 6px; border-radius: 8px; font-size: 10px;">32</span>
+                        </div>
+                        <div class="category-devices" style="display: none;">
+                            <div class="device-item" data-device="EN-001" style="padding: 8px 12px 8px 32px; cursor: pointer; display: flex; align-items: center; gap: 6px;" onclick="selectDevice(this, 'EN-001')">
+                                <svg style="width: 14px; height: 14px; color: #8c8c8c;" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 12px; font-weight: 500;">EN-001</div>
+                                    <div style="font-size: 10px; color: #8c8c8c;">空压机-001</div>
+                                </div>
+                                <span class="status-dot" style="width: 6px; height: 6px; background: #52c41a; border-radius: 50%;"></span>
+                            </div>
+                            <div class="device-item" data-device="EN-002" style="padding: 8px 12px 8px 32px; cursor: pointer; display: flex; align-items: center; gap: 6px;" onclick="selectDevice(this, 'EN-002')">
+                                <svg style="width: 14px; height: 14px; color: #8c8c8c;" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 12px; font-weight: 500;">EN-002</div>
+                                    <div style="font-size: 10px; color: #8c8c8c;">循环水泵-002</div>
+                                </div>
+                                <span class="status-dot" style="width: 6px; height: 6px; background: #52c41a; border-radius: 50%;"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 安环设备分类 -->
+                    <div class="category-item">
+                        <div class="category-header" style="padding: 10px 12px; cursor: pointer; display: flex; align-items: center; gap: 6px;" onclick="toggleCategory(this)">
+                            <svg class="expand-icon" style="width: 10px; height: 10px; transition: transform 0.2s; color: #8c8c8c;" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span style="font-weight: 500; flex: 1; font-size: 13px;">安环设备</span>
+                            <span style="background: #f0f0f0; color: #595959; padding: 1px 6px; border-radius: 8px; font-size: 10px;">24</span>
+                        </div>
+                        <div class="category-devices" style="display: none;">
+                            <div class="device-item" data-device="SF-001" style="padding: 8px 12px 8px 32px; cursor: pointer; display: flex; align-items: center; gap: 6px;" onclick="selectDevice(this, 'SF-001')">
+                                <svg style="width: 14px; height: 14px; color: #8c8c8c;" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 12px; font-weight: 500;">SF-001</div>
+                                    <div style="font-size: 10px; color: #8c8c8c;">烟雾探测器-001</div>
+                                </div>
+                                <span class="status-dot" style="width: 6px; height: 6px; background: #52c41a; border-radius: 50%;"></span>
+                            </div>
+                            <div class="device-item" data-device="SF-002" style="padding: 8px 12px 8px 32px; cursor: pointer; display: flex; align-items: center; gap: 6px;" onclick="selectDevice(this, 'SF-002')">
+                                <svg style="width: 14px; height: 14px; color: #8c8c8c;" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 12px; font-weight: 500;">SF-002</div>
+                                    <div style="font-size: 10px; color: #8c8c8c;">气体检测仪-002</div>
+                                </div>
+                                <span class="status-dot" style="width: 6px; height: 6px; background: #faad14; border-radius: 50%;"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 辅助设备分类 -->
+                    <div class="category-item">
+                        <div class="category-header" style="padding: 10px 12px; cursor: pointer; display: flex; align-items: center; gap: 6px;" onclick="toggleCategory(this)">
+                            <svg class="expand-icon" style="width: 10px; height: 10px; transition: transform 0.2s; color: #8c8c8c;" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span style="font-weight: 500; flex: 1; font-size: 13px;">辅助设备</span>
+                            <span style="background: #f0f0f0; color: #595959; padding: 1px 6px; border-radius: 8px; font-size: 10px;">14</span>
+                        </div>
+                        <div class="category-devices" style="display: none;">
+                            <div class="device-item" data-device="AU-001" style="padding: 8px 12px 8px 32px; cursor: pointer; display: flex; align-items: center; gap: 6px;" onclick="selectDevice(this, 'AU-001')">
+                                <svg style="width: 14px; height: 14px; color: #8c8c8c;" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 12px; font-weight: 500;">AU-001</div>
+                                    <div style="font-size: 10px; color: #8c8c8c;">行车-001</div>
+                                </div>
+                                <span class="status-dot" style="width: 6px; height: 6px; background: #52c41a; border-radius: 50%;"></span>
+                            </div>
+                            <div class="device-item" data-device="AU-002" style="padding: 8px 12px 8px 32px; cursor: pointer; display: flex; align-items: center; gap: 6px;" onclick="selectDevice(this, 'AU-002')">
+                                <svg style="width: 14px; height: 14px; color: #8c8c8c;" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 12px; font-weight: 500;">AU-002</div>
+                                    <div style="font-size: 10px; color: #8c8c8c;">叉车-003</div>
+                                </div>
+                                <span class="status-dot" style="width: 6px; height: 6px; background: #8c8c8c; border-radius: 50%;"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧详情面板 -->
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+                <!-- 设备标题栏 -->
+                <div style="background: #fff; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h2 id="device-name" style="font-size: 18px; font-weight: 600; margin-bottom: 6px;">数控车床-001</h2>
+                            <div id="device-info" style="color: #8c8c8c; font-size: 13px;">设备编码：EQ-001 | 用途分类：生产设备 | 所属部门：生产部A</div>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <span id="device-status" style="background: #52c41a; color: white; padding: 4px 12px; border-radius: 4px; font-size: 13px; font-weight: 500;">● 运行中</span>
+                        </div>
+                    </div>
+                    <!-- 运行信息卡片 -->
+                    <div style="display: flex; gap: 12px; margin-top: 16px;">
+                        <div style="flex: 1; padding: 12px; background: #f6ffed; border-radius: 6px; text-align: center;">
+                            <div id="runtime-current" style="font-size: 18px; font-weight: 600; color: #52c41a;">128 <span style="font-size: 11px;">h</span></div>
+                            <div style="font-size: 11px; color: #8c8c8c; margin-top: 2px;">本次运行</div>
+                        </div>
+                        <div style="flex: 1; padding: 12px; background: #e6f7ff; border-radius: 6px; text-align: center;">
+                            <div id="runtime-total" style="font-size: 18px; font-weight: 600; color: #1890ff;">2560 <span style="font-size: 11px;">h</span></div>
+                            <div style="font-size: 11px; color: #8c8c8c; margin-top: 2px;">累计运行</div>
+                        </div>
+                        <div style="flex: 1; padding: 12px; background: #f9f0ff; border-radius: 6px; text-align: center;">
+                            <div id="uptime-rate" style="font-size: 18px; font-weight: 600; color: #722ed1;">94.5%</div>
+                            <div style="font-size: 11px; color: #8c8c8c; margin-top: 2px;">开机率</div>
+                        </div>
+                        <div style="flex: 1; padding: 12px; background: #fff7e6; border-radius: 6px; text-align: center;">
+                            <div id="maintenance-days" style="font-size: 18px; font-weight: 600; color: #fa8c16;">15 <span style="font-size: 11px;">天</span></div>
+                            <div style="font-size: 11px; color: #8c8c8c; margin-top: 2px;">保养剩余</div>
+                        </div>
+                        <div style="flex: 1; padding: 12px; background: #f6ffed; border-radius: 6px; text-align: center;">
+                            <div id="alarm-status" style="font-size: 18px; font-weight: 600; color: #52c41a;">● 正常</div>
+                            <div style="font-size: 11px; color: #8c8c8c; margin-top: 2px;">故障报警</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 标签切换模块 -->
+                <div style="background: #fff; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); padding: 20px;">
+                    <!-- 标签页头 -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #f0f0f0; padding-bottom: 12px;">
+                        <div style="display: flex; gap: 4px;">
+                            <div class="tab-item active" data-tab="params" onclick="switchTab('params')" style="padding: 6px 16px; cursor: pointer; font-size: 14px; font-weight: 500; color: #1890ff; border-bottom: 2px solid #1890ff; margin-bottom: -13px;">核心参数</div>
+                            <div class="tab-item" data-tab="scada" onclick="switchTab('scada')" style="padding: 6px 16px; cursor: pointer; font-size: 14px; font-weight: 500; color: #595959; border-bottom: 2px solid transparent; margin-bottom: -13px;">组态监控</div>
+                            <div class="tab-item" data-tab="alarms" onclick="switchTab('alarms')" style="padding: 6px 16px; cursor: pointer; font-size: 14px; font-weight: 500; color: #595959; border-bottom: 2px solid transparent; margin-bottom: -13px;">告警记录</div>
+                        </div>
+                        <div id="params-tools" style="display: flex; gap: 8px;">
+                            <button class="btn btn-default" style="padding: 3px 10px; font-size: 12px;">趋势图</button>
+                            <button class="btn btn-default" style="padding: 3px 10px; font-size: 12px;">导出</button>
+                        </div>
+                        <div id="alarms-tools" style="display: none; gap: 8px;">
+                            <button class="btn btn-default" style="padding: 3px 10px; font-size: 12px;">筛选</button>
+                            <button class="btn btn-default" style="padding: 3px 10px; font-size: 12px;">导出</button>
+                        </div>
+                    </div>
+
+                    <!-- 核心参数面板 -->
+                    <div id="tab-params" class="tab-panel" style="display: block;">
+                        <div id="param-grid" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px;">
+                            <!-- 参数卡片将由JS动态生成 -->
+                        </div>
+                    </div>
+
+                    <!-- 组态监控面板 -->
+                    <div id="tab-scada" class="tab-panel" style="display: none;">
+                        <div style="display: flex; gap: 16px; height: 520px;">
+                            <!-- 左侧2.5D设备组态图 -->
+                            <div style="flex: 3; background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 50%, #0d1b2a 100%); border-radius: 8px; padding: 16px; position: relative; overflow: hidden;">
+                                <div id="scada-title" style="position: absolute; top: 12px; left: 16px; font-size: 13px; color: #00d4ff; font-weight: 500; text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);">
+                                    <span style="display: inline-block; width: 8px; height: 8px; background: #00d4ff; border-radius: 50%; margin-right: 8px; animation: pulse-dot 1.5s infinite;"></span>
+                                    智能工厂设备组态监控 - 生产线A区
+                                </div>
+                                
+                                <!-- 2.5D组态图容器 -->
+                                <div class="scada-container" style="position: relative; width: 100%; height: 100%; margin-top: 30px;">
+                                    
+                                    <!-- 背景网格 -->
+                                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: 
+                                        linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                                        linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+                                        background-size: 30px 30px;"></div>
+                                    
+                                    <!-- 原料仓 (左上) -->
+                                    <div class="device-box" style="position: absolute; top: 20px; left: 30px; transform: perspective(800px) rotateX(20deg);">
+                                        <div style="width: 80px; height: 100px; background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%); border-radius: 8px 8px 20px 20px; border: 2px solid #5a6578; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 2px 10px rgba(255,255,255,0.1); position: relative;">
+                                            <!-- 顶部盖子 -->
+                                            <div style="position: absolute; top: -8px; left: 10px; right: 10px; height: 16px; background: linear-gradient(180deg, #5a6a7a 0%, #4a5a6a 100%); border-radius: 4px; border: 1px solid #6a7a8a;"></div>
+                                            <!-- 仓体内容 -->
+                                            <div style="position: absolute; top: 20px; left: 8px; right: 8px; bottom: 15px; background: linear-gradient(180deg, rgba(0, 212, 255, 0.3) 0%, rgba(0, 212, 255, 0.1) 100%); border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                                                <span style="color: #00d4ff; font-size: 10px; font-weight: 600;">原料仓</span>
+                                            </div>
+                                            <!-- 液位指示 -->
+                                            <div style="position: absolute; bottom: 15px; left: 8px; right: 8px; height: 8px; background: rgba(0,0,0,0.3); border-radius: 4px; overflow: hidden;">
+                                                <div style="width: 75%; height: 100%; background: linear-gradient(90deg, #00d4ff, #0099cc); animation: flow-animation 2s linear infinite;"></div>
+                                            </div>
+                                        </div>
+                                        <!-- 数据标签 -->
+                                        <div style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.8); border: 1px solid #00d4ff; border-radius: 4px; padding: 4px 8px; white-space: nowrap;">
+                                            <div style="color: #00d4ff; font-size: 10px; font-weight: 600;">液位: 75%</div>
+                                            <div style="color: #52c41a; font-size: 9px;">温度: 28°C</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 输送管道1 -->
+                                    <svg style="position: absolute; top: 60px; left: 110px; width: 120px; height: 40px;" class="pipe-flow">
+                                        <defs>
+                                            <linearGradient id="pipeGradient1" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                <stop offset="0%" style="stop-color:#4a5568"/>
+                                                <stop offset="50%" style="stop-color:#5a6a7a"/>
+                                                <stop offset="100%" style="stop-color:#4a5568"/>
+                                            </linearGradient>
+                                        </defs>
+                                        <path d="M 0 20 L 120 20" stroke="url(#pipeGradient1)" stroke-width="12" fill="none"/>
+                                        <path d="M 0 20 L 120 20" stroke="#00d4ff" stroke-width="4" fill="none" stroke-dasharray="8,4" opacity="0.8">
+                                            <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1s" repeatCount="indefinite"/>
+                                        </path>
+                                    </svg>
+                                    
+                                    <!-- 反应釜 (中上) -->
+                                    <div class="device-box" style="position: absolute; top: 10px; left: 240px; transform: perspective(800px) rotateX(15deg);">
+                                        <div style="width: 100px; height: 120px; background: linear-gradient(135deg, #3d4a5c 0%, #2a3545 100%); border-radius: 50% 50% 20px 20px; border: 2px solid #4a5a6c; box-shadow: 0 15px 40px rgba(0,0,0,0.6), inset 0 -20px 40px rgba(0,0,0,0.3), inset 0 5px 15px rgba(255,255,255,0.1); position: relative;">
+                                            <!-- 顶部搅拌器 -->
+                                            <div style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; background: linear-gradient(180deg, #5a6a7a 0%, #4a5a6a 100%); border-radius: 50%; border: 2px solid #6a7a8a; display: flex; align-items: center; justify-content: center; animation: rotate-slow 3s linear infinite;">
+                                                <svg style="width: 16px; height: 16px; color: #00d4ff;" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </div>
+                                            <!-- 反应釜标签 -->
+                                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                                                <div style="color: #00d4ff; font-size: 11px; font-weight: 600;">反应釜-01</div>
+                                                <div style="color: #52c41a; font-size: 10px; margin-top: 4px;">运行中</div>
+                                            </div>
+                                            <!-- 温度指示环 -->
+                                            <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); width: 60px; height: 6px; background: rgba(0,0,0,0.5); border-radius: 3px; overflow: hidden;">
+                                                <div style="width: 82%; height: 100%; background: linear-gradient(90deg, #52c41a, #faad14); border-radius: 3px;"></div>
+                                            </div>
+                                        </div>
+                                        <!-- 数据标签 -->
+                                        <div style="position: absolute; top: -35px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.85); border: 1px solid #faad14; border-radius: 6px; padding: 6px 10px; white-space: nowrap; box-shadow: 0 4px 15px rgba(250, 173, 20, 0.3);">
+                                            <div style="color: #faad14; font-size: 11px; font-weight: 600;">温度: 82°C</div>
+                                            <div style="color: #00d4ff; font-size: 10px;">压力: 0.45MPa</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 输送管道2 -->
+                                    <svg style="position: absolute; top: 70px; left: 340px; width: 100px; height: 40px;" class="pipe-flow">
+                                        <path d="M 0 20 L 100 20" stroke="url(#pipeGradient1)" stroke-width="12" fill="none"/>
+                                        <path d="M 0 20 L 100 20" stroke="#00d4ff" stroke-width="4" fill="none" stroke-dasharray="8,4" opacity="0.8">
+                                            <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1.2s" repeatCount="indefinite"/>
+                                        </path>
+                                    </svg>
+                                    
+                                    <!-- 离心机 (右上) -->
+                                    <div class="device-box" style="position: absolute; top: 25px; left: 450px; transform: perspective(800px) rotateX(20deg);">
+                                        <div style="width: 90px; height: 90px; background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%); border-radius: 50%; border: 3px solid #5a6578; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,0,0,0.3); position: relative; animation: rotate-device 4s linear infinite;">
+                                            <!-- 中心 -->
+                                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; background: radial-gradient(circle, #00d4ff 0%, #0099cc 100%); border-radius: 50%; border: 2px solid #00d4ff; display: flex; align-items: center; justify-content: center;">
+                                                <span style="color: #fff; font-size: 9px; font-weight: 600;">离心</span>
+                                            </div>
+                                            <!-- 叶片 -->
+                                            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 4px; height: 25px; background: #5a6a7a; border-radius: 2px;"></div>
+                                            <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); width: 4px; height: 25px; background: #5a6a7a; border-radius: 2px;"></div>
+                                            <div style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 25px; height: 4px; background: #5a6a7a; border-radius: 2px;"></div>
+                                            <div style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 25px; height: 4px; background: #5a6a7a; border-radius: 2px;"></div>
+                                        </div>
+                                        <!-- 底座 -->
+                                        <div style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 60px; height: 15px; background: linear-gradient(180deg, #3a4a5a 0%, #2a3a4a 100%); border-radius: 4px; border: 1px solid #4a5a6a;"></div>
+                                        <!-- 数据标签 -->
+                                        <div style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.8); border: 1px solid #52c41a; border-radius: 4px; padding: 4px 8px; white-space: nowrap;">
+                                            <div style="color: #52c41a; font-size: 10px; font-weight: 600;">转速: 3500rpm</div>
+                                            <div style="color: #00d4ff; font-size: 9px;">分离率: 98%</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 垂直管道 -->
+                                    <svg style="position: absolute; top: 110px; left: 485px; width: 40px; height: 80px;" class="pipe-flow">
+                                        <path d="M 20 0 L 20 80" stroke="url(#pipeGradient1)" stroke-width="12" fill="none"/>
+                                        <path d="M 20 0 L 20 80" stroke="#52c41a" stroke-width="4" fill="none" stroke-dasharray="8,4" opacity="0.8">
+                                            <animate attributeName="stroke-dashoffset" from="0" to="24" dur="1s" repeatCount="indefinite"/>
+                                        </path>
+                                    </svg>
+                                    
+                                    <!-- 储液罐 (右中) -->
+                                    <div class="device-box" style="position: absolute; top: 180px; left: 460px; transform: perspective(800px) rotateX(15deg);">
+                                        <div style="width: 70px; height: 100px; background: linear-gradient(180deg, #4a5a6a 0%, #3a4a5a 50%, #2a3a4a 100%); border-radius: 10px 10px 30px 30px; border: 2px solid #5a6a7a; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 5px 15px rgba(255,255,255,0.05); position: relative;">
+                                            <!-- 罐体液位 -->
+                                            <div style="position: absolute; bottom: 10px; left: 5px; right: 5px; top: 30px; background: linear-gradient(180deg, rgba(82, 196, 26, 0.4) 0%, rgba(82, 196, 26, 0.2) 100%); border-radius: 4px 4px 20px 20px; display: flex; align-items: center; justify-content: center;">
+                                                <span style="color: #52c41a; font-size: 10px; font-weight: 600;">储液罐</span>
+                                            </div>
+                                            <!-- 液位线 -->
+                                            <div style="position: absolute; top: 35px; left: 0; right: 0; height: 2px; background: rgba(82, 196, 26, 0.8);"></div>
+                                        </div>
+                                        <!-- 数据标签 -->
+                                        <div style="position: absolute; top: -28px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.8); border: 1px solid #52c41a; border-radius: 4px; padding: 4px 8px; white-space: nowrap;">
+                                            <div style="color: #52c41a; font-size: 10px; font-weight: 600;">液位: 68%</div>
+                                            <div style="color: #00d4ff; font-size: 9px;">pH: 7.2</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 水平管道到干燥机 -->
+                                    <svg style="position: absolute; top: 220px; left: 380px; width: 80px; height: 40px;" class="pipe-flow">
+                                        <path d="M 0 20 L 80 20" stroke="url(#pipeGradient1)" stroke-width="12" fill="none"/>
+                                        <path d="M 0 20 L 80 20" stroke="#faad14" stroke-width="4" fill="none" stroke-dasharray="8,4" opacity="0.8">
+                                            <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="0.8s" repeatCount="indefinite"/>
+                                        </path>
+                                    </svg>
+                                    
+                                    <!-- 干燥机 (中右) -->
+                                    <div class="device-box" style="position: absolute; top: 170px; left: 280px; transform: perspective(800px) rotateX(15deg);">
+                                        <div style="width: 100px; height: 80px; background: linear-gradient(135deg, #5a4a3a 0%, #4a3a2a 100%); border-radius: 20px; border: 2px solid #6a5a4a; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(250, 173, 20, 0.2); position: relative;">
+                                            <!-- 加热指示 -->
+                                            <div style="position: absolute; top: 5px; left: 50%; transform: translateX(-50%); width: 80%; height: 6px; background: linear-gradient(90deg, #ff4d4f, #faad14, #ff4d4f); border-radius: 3px; animation: heat-glow 1.5s ease-in-out infinite;"></div>
+                                            <!-- 主体 -->
+                                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                                                <div style="color: #faad14; font-size: 11px; font-weight: 600;">干燥机</div>
+                                                <div style="color: #ff4d4f; font-size: 10px; margin-top: 2px;">● 加热中</div>
+                                            </div>
+                                            <!-- 底部支撑 -->
+                                            <div style="position: absolute; bottom: -8px; left: 15px; width: 8px; height: 15px; background: #3a3a4a; border-radius: 2px;"></div>
+                                            <div style="position: absolute; bottom: -8px; right: 15px; width: 8px; height: 15px; background: #3a3a4a; border-radius: 2px;"></div>
+                                        </div>
+                                        <!-- 数据标签 -->
+                                        <div style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.8); border: 1px solid #ff4d4f; border-radius: 4px; padding: 4px 8px; white-space: nowrap;">
+                                            <div style="color: #ff4d4f; font-size: 10px; font-weight: 600;">温度: 125°C</div>
+                                            <div style="color: #faad14; font-size: 9px;">湿度: 12%</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 管道到包装机 -->
+                                    <svg style="position: absolute; top: 210px; left: 180px; width: 100px; height: 40px;" class="pipe-flow">
+                                        <path d="M 0 20 L 100 20" stroke="url(#pipeGradient1)" stroke-width="12" fill="none"/>
+                                        <path d="M 0 20 L 100 20" stroke="#00d4ff" stroke-width="4" fill="none" stroke-dasharray="8,4" opacity="0.8">
+                                            <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1s" repeatCount="indefinite"/>
+                                        </path>
+                                    </svg>
+                                    
+                                    <!-- 包装机 (中左) -->
+                                    <div class="device-box" style="position: absolute; top: 160px; left: 60px; transform: perspective(800px) rotateX(15deg);">
+                                        <div style="width: 120px; height: 70px; background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%); border-radius: 8px; border: 2px solid #5a6578; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative;">
+                                            <!-- 传送带 -->
+                                            <div style="position: absolute; bottom: 10px; left: 10px; right: 10px; height: 20px; background: linear-gradient(180deg, #3a4a5a 0%, #2a3a4a 100%); border-radius: 4px; border: 1px solid #4a5a6a; overflow: hidden;">
+                                                <div style="width: 200%; height: 100%; background: repeating-linear-gradient(90deg, #5a6a7a 0px, #5a6a7a 10px, #4a5a6a 10px, #4a5a6a 20px); animation: conveyor-move 2s linear infinite;"></div>
+                                            </div>
+                                            <!-- 包装产品 -->
+                                            <div style="position: absolute; bottom: 35px; left: 20px; width: 20px; height: 20px; background: linear-gradient(135deg, #d4a574 0%, #b8935f 100%); border-radius: 2px; border: 1px solid #c49a6c; animation: package-move 3s linear infinite;"></div>
+                                            <div style="position: absolute; bottom: 35px; left: 60px; width: 20px; height: 20px; background: linear-gradient(135deg, #d4a574 0%, #b8935f 100%); border-radius: 2px; border: 1px solid #c49a6c; animation: package-move 3s linear infinite 1s;"></div>
+                                            <!-- 标签 -->
+                                            <div style="position: absolute; top: 8px; left: 50%; transform: translateX(-50%); color: #00d4ff; font-size: 10px; font-weight: 600;">自动包装机</div>
+                                        </div>
+                                        <!-- 数据标签 -->
+                                        <div style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.8); border: 1px solid #00d4ff; border-radius: 4px; padding: 4px 8px; white-space: nowrap;">
+                                            <div style="color: #00d4ff; font-size: 10px; font-weight: 600;">速度: 120包/min</div>
+                                            <div style="color: #52c41a; font-size: 9px;">良品率: 99.2%</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 底部管道回流 -->
+                                    <svg style="position: absolute; top: 230px; left: 30px; width: 40px; height: 60px;" class="pipe-flow">
+                                        <path d="M 20 0 L 20 60" stroke="url(#pipeGradient1)" stroke-width="10" fill="none"/>
+                                        <path d="M 20 0 L 20 60" stroke="#722ed1" stroke-width="3" fill="none" stroke-dasharray="6,3" opacity="0.7">
+                                            <animate attributeName="stroke-dashoffset" from="0" to="18" dur="1.5s" repeatCount="indefinite"/>
+                                        </path>
+                                    </svg>
+                                    
+                                    <!-- 回收处理单元 (左下) -->
+                                    <div class="device-box" style="position: absolute; top: 280px; left: 20px; transform: perspective(800px) rotateX(20deg);">
+                                        <div style="width: 80px; height: 70px; background: linear-gradient(135deg, #3a4a5a 0%, #2a3a4a 100%); border-radius: 12px; border: 2px solid #4a5a6a; box-shadow: 0 8px 25px rgba(0,0,0,0.5); position: relative;">
+                                            <!-- 过滤网效果 -->
+                                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 40px; background: repeating-linear-gradient(0deg, transparent, transparent 3px, #5a6a7a 3px, #5a6a7a 4px), repeating-linear-gradient(90deg, transparent, transparent 3px, #5a6a7a 3px, #5a6a7a 4px); border-radius: 4px; opacity: 0.5;"></div>
+                                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #722ed1; font-size: 10px; font-weight: 600;">回收处理</div>
+                                        </div>
+                                        <!-- 数据标签 -->
+                                        <div style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.8); border: 1px solid #722ed1; border-radius: 4px; padding: 3px 6px; white-space: nowrap;">
+                                            <div style="color: #722ed1; font-size: 9px;">回收率: 85%</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 连接管道网络 -->
+                                    <svg style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;">
+                                        <!-- 管道连接点 -->
+                                        <circle cx="110" cy="60" r="6" fill="#4a5568" stroke="#00d4ff" stroke-width="2"/>
+                                        <circle cx="340" cy="70" r="6" fill="#4a5568" stroke="#00d4ff" stroke-width="2"/>
+                                        <circle cx="485" cy="110" r="6" fill="#4a5568" stroke="#52c41a" stroke-width="2"/>
+                                        <circle cx="380" cy="220" r="6" fill="#4a5568" stroke="#faad14" stroke-width="2"/>
+                                        <circle cx="180" cy="210" r="6" fill="#4a5568" stroke="#00d4ff" stroke-width="2"/>
+                                    </svg>
+                                    
+                                    <!-- 动画样式 -->
+                                    <style>
+                                        @keyframes pulse-dot {
+                                            0%, 100% { opacity: 1; transform: scale(1); }
+                                            50% { opacity: 0.5; transform: scale(1.2); }
+                                        }
+                                        @keyframes rotate-slow {
+                                            from { transform: translateX(-50%) rotate(0deg); }
+                                            to { transform: translateX(-50%) rotate(360deg); }
+                                        }
+                                        @keyframes rotate-device {
+                                            from { transform: perspective(800px) rotateX(20deg) rotate(0deg); }
+                                            to { transform: perspective(800px) rotateX(20deg) rotate(360deg); }
+                                        }
+                                        @keyframes flow-animation {
+                                            0% { background-position: 0% 50%; }
+                                            100% { background-position: 200% 50%; }
+                                        }
+                                        @keyframes conveyor-move {
+                                            from { transform: translateX(0); }
+                                            to { transform: translateX(-50%); }
+                                        }
+                                        @keyframes package-move {
+                                            0% { left: 10px; opacity: 0; }
+                                            10% { opacity: 1; }
+                                            90% { opacity: 1; }
+                                            100% { left: 90px; opacity: 0; }
+                                        }
+                                        @keyframes heat-glow {
+                                            0%, 100% { opacity: 0.8; box-shadow: 0 0 5px #faad14; }
+                                            50% { opacity: 1; box-shadow: 0 0 15px #ff4d4f; }
+                                        }
+                                        .device-box:hover {
+                                            transform: perspective(800px) rotateX(10deg) scale(1.05) !important;
+                                            transition: transform 0.3s ease;
+                                            z-index: 10;
+                                        }
+                                    </style>
+                                </div>
+                            </div>
+                            
+                            <!-- 右侧实时数据面板 -->
+                            <div style="flex: 1; display: flex; flex-direction: column; gap: 10px; overflow-y: auto;">
+                                <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 8px; padding: 14px; border: 1px solid rgba(0, 212, 255, 0.2);">
+                                    <div style="font-size: 11px; color: #00d4ff; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;">系统运行状态</div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span style="width: 10px; height: 10px; background: #52c41a; border-radius: 50%; box-shadow: 0 0 10px #52c41a; animation: pulse-dot 1.5s infinite;"></span>
+                                        <span style="font-size: 15px; font-weight: 600; color: #52c41a;">全线正常运行</span>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 8px; padding: 14px; border: 1px solid rgba(0, 212, 255, 0.2);">
+                                    <div style="font-size: 11px; color: #00d4ff; margin-bottom: 6px;">当前批次</div>
+                                    <div style="font-size: 15px; font-weight: 600; color: #fff;">BATCH-2025-0214</div>
+                                    <div style="font-size: 10px; color: #8c8c8c; margin-top: 4px;">产品: 高纯度化工原料</div>
+                                </div>
+                                
+                                <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 8px; padding: 14px; border: 1px solid rgba(0, 212, 255, 0.2);">
+                                    <div style="font-size: 11px; color: #00d4ff; margin-bottom: 6px;">生产进度</div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                        <span style="font-size: 15px; font-weight: 600; color: #1890ff;">68%</span>
+                                        <span style="font-size: 10px; color: #8c8c8c;">1360/2000 kg</span>
+                                    </div>
+                                    <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                                        <div style="width: 68%; height: 100%; background: linear-gradient(90deg, #1890ff, #00d4ff); border-radius: 3px; box-shadow: 0 0 10px rgba(24, 144, 255, 0.5);"></div>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 8px; padding: 14px; border: 1px solid rgba(250, 173, 20, 0.3);">
+                                    <div style="font-size: 11px; color: #faad14; margin-bottom: 6px;">能耗监控</div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                        <div>
+                                            <div style="font-size: 13px; font-weight: 600; color: #fff;">245.8</div>
+                                            <div style="font-size: 9px; color: #8c8c8c;">kW·h (实时)</div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 13px; font-weight: 600; color: #52c41a;">-12%</div>
+                                            <div style="font-size: 9px; color: #8c8c8c;">环比昨日</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 8px; padding: 14px; border: 1px solid rgba(0, 212, 255, 0.2);">
+                                    <div style="font-size: 11px; color: #00d4ff; margin-bottom: 8px;">设备健康度</div>
+                                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <span style="font-size: 10px; color: #ccc;">反应釜-01</span>
+                                            <div style="display: flex; align-items: center; gap: 6px;">
+                                                <div style="width: 60px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden;">
+                                                    <div style="width: 95%; height: 100%; background: #52c41a; border-radius: 2px;"></div>
+                                                </div>
+                                                <span style="font-size: 10px; color: #52c41a;">95%</span>
+                                            </div>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <span style="font-size: 10px; color: #ccc;">离心机</span>
+                                            <div style="display: flex; align-items: center; gap: 6px;">
+                                                <div style="width: 60px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden;">
+                                                    <div style="width: 88%; height: 100%; background: #52c41a; border-radius: 2px;"></div>
+                                                </div>
+                                                <span style="font-size: 10px; color: #52c41a;">88%</span>
+                                            </div>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <span style="font-size: 10px; color: #ccc;">干燥机</span>
+                                            <div style="display: flex; align-items: center; gap: 6px;">
+                                                <div style="width: 60px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden;">
+                                                    <div style="width: 92%; height: 100%; background: #52c41a; border-radius: 2px;"></div>
+                                                </div>
+                                                <span style="font-size: 10px; color: #52c41a;">92%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 8px; padding: 14px; border: 1px solid rgba(0, 212, 255, 0.2);">
+                                    <div style="font-size: 11px; color: #00d4ff; margin-bottom: 6px;">网络通讯状态</div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <svg style="width: 16px; height: 16px; color: #52c41a;" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
+                                        </svg>
+                                        <div>
+                                            <div style="font-size: 12px; color: #52c41a; font-weight: 500;">信号优良</div>
+                                            <div style="font-size: 9px; color: #8c8c8c;">延迟: 12ms | 丢包: 0%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 告警记录面板 -->
+                    <div id="tab-alarms" class="tab-panel" style="display: none;">
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <!-- 告警统计 -->
+                            <div style="display: flex; gap: 16px; margin-bottom: 8px;">
+                                <div id="alarm-unhandled" style="flex: 1; padding: 12px; background: #fff2f0; border: 1px solid #ffccc7; border-radius: 6px; text-align: center;">
+                                    <div id="alarm-unhandled-count" style="font-size: 24px; font-weight: 600; color: #ff4d4f;">3</div>
+                                    <div style="font-size: 12px; color: #8c8c8c;">未处理告警</div>
+                                </div>
+                                <div id="alarm-today" style="flex: 1; padding: 12px; background: #fff7e6; border: 1px solid #ffd591; border-radius: 6px; text-align: center;">
+                                    <div id="alarm-today-count" style="font-size: 24px; font-weight: 600; color: #fa8c16;">5</div>
+                                    <div style="font-size: 12px; color: #8c8c8c;">今日告警</div>
+                                </div>
+                                <div id="alarm-thismonth" style="flex: 1; padding: 12px; background: #f6ffed; border: 1px solid #b7eb8f; border-radius: 6px; text-align: center;">
+                                    <div id="alarm-thismonth-count" style="font-size: 24px; font-weight: 600; color: #52c41a;">28</div>
+                                    <div style="font-size: 12px; color: #8c8c8c;">本月告警</div>
+                                </div>
+                            </div>
+                            <!-- 告警列表 -->
+                            <div style="border: 1px solid #f0f0f0; border-radius: 6px; overflow: hidden;">
+                                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                    <thead>
+                                        <tr style="background: #fafafa;">
+                                            <th style="padding: 12px 16px; text-align: left; font-weight: 500; color: #262626; border-bottom: 1px solid #f0f0f0;">告警时间</th>
+                                            <th style="padding: 12px 16px; text-align: left; font-weight: 500; color: #262626; border-bottom: 1px solid #f0f0f0;">告警级别</th>
+                                            <th style="padding: 12px 16px; text-align: left; font-weight: 500; color: #262626; border-bottom: 1px solid #f0f0f0;">告警内容</th>
+                                            <th style="padding: 12px 16px; text-align: left; font-weight: 500; color: #262626; border-bottom: 1px solid #f0f0f0;">参数值</th>
+                                            <th style="padding: 12px 16px; text-align: left; font-weight: 500; color: #262626; border-bottom: 1px solid #f0f0f0;">状态</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="alarm-list">
+                                        <tr style="border-bottom: 1px solid #f0f0f0;">
+                                            <td style="padding: 12px 16px; color: #595959;">2025-02-14 14:32:18</td>
+                                            <td style="padding: 12px 16px;"><span style="background: #ff4d4f; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">紧急</span></td>
+                                            <td style="padding: 12px 16px; color: #262626;">主轴温度过高</td>
+                                            <td style="padding: 12px 16px; color: #ff4d4f; font-weight: 500;">85.6°C</td>
+                                            <td style="padding: 12px 16px;"><span style="color: #ff4d4f;">● 未处理</span></td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid #f0f0f0;">
+                                            <td style="padding: 12px 16px; color: #595959;">2025-02-14 13:15:42</td>
+                                            <td style="padding: 12px 16px;"><span style="background: #faad14; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">警告</span></td>
+                                            <td style="padding: 12px 16px; color: #262626;">冷却液流量偏低</td>
+                                            <td style="padding: 12px 16px; color: #faad14; font-weight: 500;">8.2 L/min</td>
+                                            <td style="padding: 12px 16px;"><span style="color: #52c41a;">● 已处理</span></td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid #f0f0f0;">
+                                            <td style="padding: 12px 16px; color: #595959;">2025-02-14 11:28:05</td>
+                                            <td style="padding: 12px 16px;"><span style="background: #faad14; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">警告</span></td>
+                                            <td style="padding: 12px 16px; color: #262626;">刀具磨损严重</td>
+                                            <td style="padding: 12px 16px; color: #faad14; font-weight: 500;">0.35mm</td>
+                                            <td style="padding: 12px 16px;"><span style="color: #52c41a;">● 已处理</span></td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid #f0f0f0;">
+                                            <td style="padding: 12px 16px; color: #595959;">2025-02-13 16:45:30</td>
+                                            <td style="padding: 12px 16px;"><span style="background: #1890ff; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">提示</span></td>
+                                            <td style="padding: 12px 16px; color: #262626;">润滑油脂不足</td>
+                                            <td style="padding: 12px 16px; color: #1890ff; font-weight: 500;">15%</td>
+                                            <td style="padding: 12px 16px;"><span style="color: #52c41a;">● 已处理</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 12px 16px; color: #595959;">2025-02-13 09:12:18</td>
+                                            <td style="padding: 12px 16px;"><span style="background: #ff4d4f; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">紧急</span></td>
+                                            <td style="padding: 12px 16px; color: #262626;">急停按钮触发</td>
+                                            <td style="padding: 12px 16px; color: #ff4d4f; font-weight: 500;">-</td>
+                                            <td style="padding: 12px 16px;"><span style="color: #52c41a;">● 已处理</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- 分页 -->
+                            <div style="display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 8px;">
+                                <span style="font-size: 13px; color: #8c8c8c;">共 28 条</span>
+                                <button style="padding: 4px 12px; border: 1px solid #d9d9d9; background: #fff; border-radius: 4px; font-size: 13px; cursor: pointer;">上一页</button>
+                                <button style="padding: 4px 12px; border: 1px solid #1890ff; background: #1890ff; color: white; border-radius: 4px; font-size: 13px; cursor: pointer;">1</button>
+                                <button style="padding: 4px 12px; border: 1px solid #d9d9d9; background: #fff; border-radius: 4px; font-size: 13px; cursor: pointer;">2</button>
+                                <button style="padding: 4px 12px; border: 1px solid #d9d9d9; background: #fff; border-radius: 4px; font-size: 13px; cursor: pointer;">3</button>
+                                <button style="padding: 4px 12px; border: 1px solid #d9d9d9; background: #fff; border-radius: 4px; font-size: 13px; cursor: pointer;">下一页</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <style>
+                        @keyframes data-update {
+                            0% { background-color: #e6f7ff; box-shadow: 0 0 0 2px #1890ff; }
+                            50% { background-color: #e6f7ff; box-shadow: 0 0 0 2px #1890ff; }
+                            100% { background-color: transparent; box-shadow: none; }
+                        }
+                        .param-updating {
+                            animation: data-update 0.8s ease-out;
+                        }
+                        @keyframes value-change {
+                            0% { transform: scale(1.1); color: #1890ff; }
+                            100% { transform: scale(1); }
+                        }
+                        .value-updating {
+                            animation: value-change 0.5s ease-out;
+                        }
+                    </style>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            console.log('实时监控页面已加载');
+
+            // 设备数据
+            const deviceData = {
+                'EQ-001': {
+                    name: '数控车床-001',
+                    code: 'EQ-001',
+                    category: '生产设备',
+                    department: '生产部A',
+                    status: 'running',
+                    statusText: '● 运行中',
+                    statusColor: '#52c41a',
+                    runtimeCurrent: 128,
+                    runtimeTotal: 2560,
+                    uptimeRate: '94.5%',
+                    maintenanceDays: 15,
+                    alarmStatus: '● 正常',
+                    alarmColor: '#52c41a',
+                    params: [
+                        { name: '主轴温度', value: 65.2, unit: '°C', warn: false },
+                        { name: '主轴转速', value: 2500, unit: 'rpm', warn: false },
+                        { name: '主轴电流', value: 15.2, unit: 'A', warn: false },
+                        { name: '进给速度', value: 120, unit: 'mm/min', warn: false },
+                        { name: '切削力', value: 850, unit: 'N', warn: false },
+                        { name: '振动', value: 2.1, unit: 'mm/s', warn: false },
+                        { name: '电机电流', value: 15.2, unit: 'A', warn: false },
+                        { name: '电机电压', value: 380, unit: 'V', warn: false },
+                        { name: '电机功率', value: 7.5, unit: 'kW', warn: false },
+                        { name: '冷却液温度', value: 28.5, unit: '°C', warn: false },
+                        { name: '冷却液压力', value: 0.45, unit: 'MPa', warn: false },
+                        { name: '冷却液流量', value: 12.5, unit: 'L/min', warn: false },
+                        { name: '刀具磨损', value: 0.12, unit: 'mm', warn: false },
+                        { name: '刀具寿命', value: 78, unit: '%', warn: false },
+                        { name: '刀具编号', value: 'T-015', unit: '', warn: false },
+                        { name: '运行效率', value: 94.5, unit: '%', warn: false },
+                        { name: '能耗统计', value: 856.3, unit: 'kWh', warn: false },
+                        { name: '环境温度', value: 32.8, unit: '°C', warn: true },
+                        { name: '功率因数', value: 0.92, unit: '', warn: false },
+                        { name: '负载率', value: 85.6, unit: '%', warn: false },
+                        { name: '加工件数', value: 1256, unit: '', warn: false }
+                    ],
+                    scada: {
+                        title: '智能工厂设备组态监控 - 生产线A区',
+                        devices: [
+                            { id: 'tank1', name: '原料仓', top: 20, left: 30, level: 75, temp: 28, color: '#00d4ff' },
+                            { id: 'reactor', name: '反应釜-01', top: 10, left: 240, temp: 82, pressure: 0.45, status: '运行中', color: '#faad14' },
+                            { id: 'centrifuge', name: '离心机', top: 25, left: 450, speed: 3500, efficiency: 98, color: '#52c41a' },
+                            { id: 'storage', name: '储液罐', top: 180, left: 460, level: 68, color: '#52c41a' },
+                            { id: 'dryer', name: '干燥机', top: 185, left: 120, level: 92, color: '#faad14' }
+                        ]
+                    },
+                    alarms: {
+                        unhandled: 3,
+                        today: 5,
+                        thisMonth: 28,
+                        list: [
+                            { time: '2025-02-14 14:32:18', level: '紧急', content: '主轴温度过高', value: '85.6°C', status: '未处理' },
+                            { time: '2025-02-14 13:15:42', level: '警告', content: '冷却液流量偏低', value: '8.2 L/min', status: '已处理' },
+                            { time: '2025-02-14 11:28:05', level: '警告', content: '刀具磨损严重', value: '0.35mm', status: '已处理' },
+                            { time: '2025-02-13 16:45:30', level: '提示', content: '润滑油脂不足', value: '15%', status: '已处理' },
+                            { time: '2025-02-13 09:12:18', level: '紧急', content: '急停按钮触发', value: '-', status: '已处理' }
+                        ]
+                    }
+                },
+                'EQ-002': {
+                    name: '加工中心-003',
+                    code: 'EQ-002',
+                    category: '生产设备',
+                    department: '生产部B',
+                    status: 'stopped',
+                    statusText: '● 停机',
+                    statusColor: '#ff4d4f',
+                    runtimeCurrent: 0,
+                    runtimeTotal: 1890,
+                    uptimeRate: '78.2%',
+                    maintenanceDays: 3,
+                    alarmStatus: '● 故障',
+                    alarmColor: '#ff4d4f',
+                    params: [
+                        { name: '主轴温度', value: 25.0, unit: '°C', warn: false },
+                        { name: '主轴转速', value: 0, unit: 'rpm', warn: false },
+                        { name: '主轴电流', value: 0, unit: 'A', warn: false },
+                        { name: '进给速度', value: 0, unit: 'mm/min', warn: false },
+                        { name: '切削力', value: 0, unit: 'N', warn: false },
+                        { name: '振动', value: 0.1, unit: 'mm/s', warn: false },
+                        { name: '电机电流', value: 0.5, unit: 'A', warn: false },
+                        { name: '电机电压', value: 380, unit: 'V', warn: false },
+                        { name: '电机功率', value: 0, unit: 'kW', warn: false },
+                        { name: '冷却液温度', value: 22.0, unit: '°C', warn: false },
+                        { name: '冷却液压力', value: 0.2, unit: 'MPa', warn: false },
+                        { name: '冷却液流量', value: 0, unit: 'L/min', warn: false },
+                        { name: '刀具磨损', value: 0.35, unit: 'mm', warn: true },
+                        { name: '刀具寿命', value: 45, unit: '%', warn: true },
+                        { name: '刀具编号', value: 'T-008', unit: '', warn: false },
+                        { name: '运行效率', value: 0, unit: '%', warn: false },
+                        { name: '能耗统计', value: 623.5, unit: 'kWh', warn: false },
+                        { name: '环境温度', value: 26.5, unit: '°C', warn: false },
+                        { name: '功率因数', value: 0.88, unit: '', warn: false },
+                        { name: '负载率', value: 0, unit: '%', warn: false },
+                        { name: '加工件数', value: 892, unit: '', warn: false }
+                    ],
+                    scada: {
+                        title: '智能工厂设备组态监控 - 生产线B区',
+                        devices: [
+                            { id: 'tank1', name: '原料仓', top: 20, left: 30, level: 45, temp: 25, color: '#ff4d4f' },
+                            { id: 'reactor', name: '加工中心-003', top: 10, left: 240, temp: 25, pressure: 0, status: '停机', color: '#ff4d4f' },
+                            { id: 'centrifuge', name: '清洗机', top: 25, left: 450, speed: 0, efficiency: 0, color: '#8c8c8c' },
+                            { id: 'storage', name: '成品仓', top: 180, left: 460, level: 55, color: '#8c8c8c' }
+                        ]
+                    },
+                    alarms: {
+                        unhandled: 1,
+                        today: 3,
+                        thisMonth: 15,
+                        list: [
+                            { time: '2025-02-14 15:20:00', level: '警告', content: '刀具寿命即将耗尽', value: '45%', status: '未处理' },
+                            { time: '2025-02-14 10:15:30', level: '提示', content: '设备待料超时', value: '-', status: '已处理' },
+                            { time: '2025-02-13 14:30:00', level: '警告', content: '设备停机保养', value: '-', status: '已处理' }
+                        ]
+                    }
+                },
+                'EQ-003': {
+                    name: '铣床-005',
+                    code: 'EQ-003',
+                    category: '生产设备',
+                    department: '生产部A',
+                    status: 'running',
+                    statusText: '● 运行中',
+                    statusColor: '#52c41a',
+                    runtimeCurrent: 56,
+                    runtimeTotal: 1240,
+                    uptimeRate: '85.3%',
+                    maintenanceDays: 22,
+                    alarmStatus: '● 正常',
+                    alarmColor: '#52c41a',
+                    params: [
+                        { name: '主轴温度', value: 58.5, unit: '°C', warn: false },
+                        { name: '主轴转速', value: 1800, unit: 'rpm', warn: false },
+                        { name: '主轴电流', value: 12.8, unit: 'A', warn: false },
+                        { name: '进给速度', value: 80, unit: 'mm/min', warn: false },
+                        { name: '切削力', value: 620, unit: 'N', warn: false },
+                        { name: '振动', value: 1.8, unit: 'mm/s', warn: false },
+                        { name: '电机电流', value: 12.5, unit: 'A', warn: false },
+                        { name: '电机电压', value: 380, unit: 'V', warn: false },
+                        { name: '电机功率', value: 5.5, unit: 'kW', warn: false },
+                        { name: '冷却液温度', value: 26.2, unit: '°C', warn: false },
+                        { name: '冷却液压力', value: 0.38, unit: 'MPa', warn: false },
+                        { name: '冷却液流量', value: 10.2, unit: 'L/min', warn: false },
+                        { name: '刀具磨损', value: 0.08, unit: 'mm', warn: false },
+                        { name: '刀具寿命', value: 85, unit: '%', warn: false },
+                        { name: '刀具编号', value: 'T-022', unit: '', warn: false },
+                        { name: '运行效率', value: 88.2, unit: '%', warn: false },
+                        { name: '能耗统计', value: 445.2, unit: 'kWh', warn: false },
+                        { name: '环境温度', value: 28.3, unit: '°C', warn: false },
+                        { name: '功率因数', value: 0.90, unit: '', warn: false },
+                        { name: '负载率', value: 72.5, unit: '%', warn: false },
+                        { name: '加工件数', value: 567, unit: '', warn: false }
+                    ]
+                },
+                'EN-001': {
+                    name: '空压机-001',
+                    code: 'EN-001',
+                    category: '能源设备',
+                    department: '动力部',
+                    status: 'running',
+                    statusText: '● 运行中',
+                    statusColor: '#52c41a',
+                    runtimeCurrent: 720,
+                    runtimeTotal: 8760,
+                    uptimeRate: '98.5%',
+                    maintenanceDays: 45,
+                    alarmStatus: '● 正常',
+                    alarmColor: '#52c41a',
+                    params: [
+                        { name: '排气压力', value: 0.8, unit: 'MPa', warn: false },
+                        { name: '排气温度', value: 85.2, unit: '°C', warn: false },
+                        { name: '电机电流', value: 45.2, unit: 'A', warn: false },
+                        { name: '电机电压', value: 380, unit: 'V', warn: false },
+                        { name: '电机功率', value: 22.0, unit: 'kW', warn: false },
+                        { name: '运行频率', value: 50, unit: 'Hz', warn: false },
+                        { name: '油压', value: 0.35, unit: 'MPa', warn: false },
+                        { name: '油温', value: 55.0, unit: '°C', warn: false },
+                        { name: '空气流量', value: 3.2, unit: 'm³/min', warn: false },
+                        { name: '露点温度', value: 8.5, unit: '°C', warn: false },
+                        { name: '过滤器压差', value: 0.05, unit: 'MPa', warn: false },
+                        { name: '运行时间', value: 720, unit: 'h', warn: false },
+                        { name: '加载时间', value: 580, unit: 'h', warn: false },
+                        { name: '卸载次数', value: 245, unit: '次', warn: false },
+                        { name: '能耗统计', value: 15840, unit: 'kWh', warn: false },
+                        { name: '功率因数', value: 0.92, unit: '', warn: false },
+                        { name: '负载率', value: 88.5, unit: '%', warn: false },
+                        { name: '环境温度', value: 30.2, unit: '°C', warn: false },
+                        { name: '振动', value: 2.5, unit: 'mm/s', warn: false },
+                        { name: '噪音', value: 72, unit: 'dB', warn: false },
+                        { name: '油位', value: 85, unit: '%', warn: false }
+                    ]
+                },
+                'EN-002': {
+                    name: '循环水泵-002',
+                    code: 'EN-002',
+                    category: '能源设备',
+                    department: '动力部',
+                    status: 'running',
+                    statusText: '● 运行中',
+                    statusColor: '#52c41a',
+                    runtimeCurrent: 168,
+                    runtimeTotal: 4320,
+                    uptimeRate: '96.2%',
+                    maintenanceDays: 60,
+                    alarmStatus: '● 正常',
+                    alarmColor: '#52c41a',
+                    params: [
+                        { name: '出水压力', value: 0.45, unit: 'MPa', warn: false },
+                        { name: '进水压力', value: 0.05, unit: 'MPa', warn: false },
+                        { name: '出水温度', value: 32.5, unit: '°C', warn: false },
+                        { name: '进水温度', value: 28.0, unit: '°C', warn: false },
+                        { name: '流量', value: 120, unit: 'm³/h', warn: false },
+                        { name: '电机电流', value: 28.5, unit: 'A', warn: false },
+                        { name: '电机电压', value: 380, unit: 'V', warn: false },
+                        { name: '电机功率', value: 15.0, unit: 'kW', warn: false },
+                        { name: '转速', value: 1450, unit: 'rpm', warn: false },
+                        { name: '轴承温度', value: 45.2, unit: '°C', warn: false },
+                        { name: '振动', value: 1.5, unit: 'mm/s', warn: false },
+                        { name: '运行时间', value: 168, unit: 'h', warn: false },
+                        { name: '启动次数', value: 52, unit: '次', warn: false },
+                        { name: '能耗统计', value: 2520, unit: 'kWh', warn: false },
+                        { name: '功率因数', value: 0.89, unit: '', warn: false },
+                        { name: '负载率', value: 82.0, unit: '%', warn: false },
+                        { name: '环境温度', value: 29.5, unit: '°C', warn: false },
+                        { name: '水池液位', value: 78, unit: '%', warn: false },
+                        { name: '水质PH', value: 7.2, unit: '', warn: false },
+                        { name: '浊度', value: 12, unit: 'NTU', warn: false },
+                        { name: '电导率', value: 450, unit: 'μS/cm', warn: false }
+                    ]
+                },
+                'SF-001': {
+                    name: '烟雾探测器-001',
+                    code: 'SF-001',
+                    category: '安环设备',
+                    department: '安全部',
+                    status: 'running',
+                    statusText: '● 正常',
+                    statusColor: '#52c41a',
+                    runtimeCurrent: 2160,
+                    runtimeTotal: 8760,
+                    uptimeRate: '99.8%',
+                    maintenanceDays: 180,
+                    alarmStatus: '● 正常',
+                    alarmColor: '#52c41a',
+                    params: [
+                        { name: '烟雾浓度', value: 0.02, unit: '%/m', warn: false },
+                        { name: '温度', value: 26.5, unit: '°C', warn: false },
+                        { name: '湿度', value: 55, unit: '%RH', warn: false },
+                        { name: '电池电压', value: 3.6, unit: 'V', warn: false },
+                        { name: '信号强度', value: -65, unit: 'dBm', warn: false },
+                        { name: '探测距离', value: 100, unit: 'm', warn: false },
+                        { name: '灵敏度', value: 85, unit: '%', warn: false },
+                        { name: '误报率', value: 0.01, unit: '%', warn: false },
+                        { name: '响应时间', value: 3.2, unit: 's', warn: false },
+                        { name: '自检状态', value: '正常', unit: '', warn: false },
+                        { name: '通讯状态', value: '在线', unit: '', warn: false },
+                        { name: '运行时间', value: 2160, unit: 'h', warn: false },
+                        { name: '报警次数', value: 0, unit: '次', warn: false },
+                        { name: '故障次数', value: 1, unit: '次', warn: false },
+                        { name: '维护次数', value: 2, unit: '次', warn: false },
+                        { name: '环境温度', value: 27.0, unit: '°C', warn: false },
+                        { name: '安装位置', value: 'A区-1F', unit: '', warn: false },
+                        { name: '防护等级', value: 'IP65', unit: '', warn: false },
+                        { name: '防爆等级', value: 'ExdIICT6', unit: '', warn: false },
+                        { name: '认证编号', value: 'CNEx12345', unit: '', warn: false },
+                        { name: '有效期至', value: '2026-08', unit: '', warn: false }
+                    ]
+                },
+                'SF-002': {
+                    name: '气体检测仪-002',
+                    code: 'SF-002',
+                    category: '安环设备',
+                    department: '安全部',
+                    status: 'warning',
+                    statusText: '● 告警',
+                    statusColor: '#faad14',
+                    runtimeCurrent: 1440,
+                    runtimeTotal: 7200,
+                    uptimeRate: '97.5%',
+                    maintenanceDays: 90,
+                    alarmStatus: '● 告警',
+                    alarmColor: '#faad14',
+                    params: [
+                        { name: 'CO浓度', value: 25, unit: 'ppm', warn: true },
+                        { name: 'H2S浓度', value: 8, unit: 'ppm', warn: false },
+                        { name: 'O2浓度', value: 20.8, unit: '%', warn: false },
+                        { name: 'LEL浓度', value: 15, unit: '%LEL', warn: false },
+                        { name: '温度', value: 28.5, unit: '°C', warn: false },
+                        { name: '湿度', value: 62, unit: '%RH', warn: false },
+                        { name: '电池电压', value: 3.4, unit: 'V', warn: false },
+                        { name: '信号强度', value: -72, unit: 'dBm', warn: false },
+                        { name: '采样流量', value: 0.5, unit: 'L/min', warn: false },
+                        { name: '响应时间', value: 15, unit: 's', warn: false },
+                        { name: '校准日期', value: '2025-01', unit: '', warn: false },
+                        { name: '运行时间', value: 1440, unit: 'h', warn: false },
+                        { name: '报警次数', value: 3, unit: '次', warn: true },
+                        { name: '故障次数', value: 2, unit: '次', warn: false },
+                        { name: '传感器寿命', value: 65, unit: '%', warn: false },
+                        { name: '环境温度', value: 29.0, unit: '°C', warn: false },
+                        { name: '安装位置', value: 'B区-2F', unit: '', warn: false },
+                        { name: '防护等级', value: 'IP66', unit: '', warn: false },
+                        { name: '防爆等级', value: 'ExiaIICT4', unit: '', warn: false },
+                        { name: '量程范围', value: '0-100', unit: 'ppm', warn: false },
+                        { name: '分辨率', value: 1, unit: 'ppm', warn: false }
+                    ]
+                },
+                'AU-001': {
+                    name: '行车-001',
+                    code: 'AU-001',
+                    category: '辅助设备',
+                    department: '物流部',
+                    status: 'running',
+                    statusText: '● 运行中',
+                    statusColor: '#52c41a',
+                    runtimeCurrent: 48,
+                    runtimeTotal: 3200,
+                    uptimeRate: '75.3%',
+                    maintenanceDays: 30,
+                    alarmStatus: '● 正常',
+                    alarmColor: '#52c41a',
+                    params: [
+                        { name: '起重量', value: 5.0, unit: 't', warn: false },
+                        { name: '起升高度', value: 12.5, unit: 'm', warn: false },
+                        { name: '起升速度', value: 8, unit: 'm/min', warn: false },
+                        { name: '运行速度', value: 20, unit: 'm/min', warn: false },
+                        { name: '电机电流', value: 18.5, unit: 'A', warn: false },
+                        { name: '电机电压', value: 380, unit: 'V', warn: false },
+                        { name: '电机功率', value: 11.0, unit: 'kW', warn: false },
+                        { name: '制动器温度', value: 45.0, unit: '°C', warn: false },
+                        { name: '钢丝绳张力', value: 2500, unit: 'N', warn: false },
+                        { name: '钢丝绳磨损', value: 12, unit: '%', warn: false },
+                        { name: '限位状态', value: '正常', unit: '', warn: false },
+                        { name: '运行时间', value: 48, unit: 'h', warn: false },
+                        { name: '吊运次数', value: 1256, unit: '次', warn: false },
+                        { name: '能耗统计', value: 528, unit: 'kWh', warn: false },
+                        { name: '功率因数', value: 0.87, unit: '', warn: false },
+                        { name: '负载率', value: 65.0, unit: '%', warn: false },
+                        { name: '环境温度', value: 28.0, unit: '°C', warn: false },
+                        { name: '振动', value: 2.0, unit: 'mm/s', warn: false },
+                        { name: '噪音', value: 68, unit: 'dB', warn: false },
+                        { name: '润滑状态', value: '良好', unit: '', warn: false },
+                        { name: '年检日期', value: '2025-06', unit: '', warn: false }
+                    ]
+                },
+                'AU-002': {
+                    name: '叉车-003',
+                    code: 'AU-002',
+                    category: '辅助设备',
+                    department: '物流部',
+                    status: 'offline',
+                    statusText: '● 离线',
+                    statusColor: '#8c8c8c',
+                    runtimeCurrent: 0,
+                    runtimeTotal: 1850,
+                    uptimeRate: '45.2%',
+                    maintenanceDays: 0,
+                    alarmStatus: '● 离线',
+                    alarmColor: '#8c8c8c',
+                    params: [
+                        { name: '电池电量', value: 0, unit: '%', warn: false },
+                        { name: '电池电压', value: 0, unit: 'V', warn: false },
+                        { name: '行驶速度', value: 0, unit: 'km/h', warn: false },
+                        { name: '载重', value: 0, unit: 'kg', warn: false },
+                        { name: '起升高度', value: 0, unit: 'm', warn: false },
+                        { name: '电机电流', value: 0, unit: 'A', warn: false },
+                        { name: '电机温度', value: 22.0, unit: '°C', warn: false },
+                        { name: '控制器温度', value: 25.0, unit: '°C', warn: false },
+                        { name: '轮胎气压', value: 0.65, unit: 'MPa', warn: false },
+                        { name: '刹车状态', value: '未知', unit: '', warn: false },
+                        { name: '运行时间', value: 0, unit: 'h', warn: false },
+                        { name: '行驶里程', value: 125, unit: 'km', warn: false },
+                        { name: '搬运次数', value: 0, unit: '次', warn: false },
+                        { name: '能耗统计', value: 0, unit: 'kWh', warn: false },
+                        { name: '充电次数', value: 45, unit: '次', warn: false },
+                        { name: '环境温度', value: 25.0, unit: '°C', warn: false },
+                        { name: 'GPS信号', value: '离线', unit: '', warn: false },
+                        { name: '通讯状态', value: '离线', unit: '', warn: false },
+                        { name: '上次在线', value: '2小时前', unit: '', warn: false },
+                        { name: '保养日期', value: '2025-01-15', unit: '', warn: false },
+                        { name: '年检日期', value: '2025-08', unit: '', warn: false }
+                    ]
+                }
+            };
+
+            // 检查页面是否仍然有效
+            function isPageValid() {
+                return document.getElementById('device-name') !== null;
+            }
+            
+            // 标签切换
+            window.switchTab = function(tabName) {
+                if (!isPageValid()) return;
+                // 更新标签样式
+                document.querySelectorAll('.tab-item').forEach(tab => {
+                    tab.classList.remove('active');
+                    tab.style.color = '#595959';
+                    tab.style.borderBottomColor = 'transparent';
+                });
+                const activeTab = document.querySelector(`.tab-item[data-tab="${tabName}"]`);
+                if (activeTab) {
+                    activeTab.classList.add('active');
+                    activeTab.style.color = '#1890ff';
+                    activeTab.style.borderBottomColor = '#1890ff';
+                }
+
+                // 显示对应面板
+                document.querySelectorAll('.tab-panel').forEach(panel => {
+                    panel.style.display = 'none';
+                });
+                const activePanel = document.getElementById(`tab-${tabName}`);
+                if (activePanel) {
+                    activePanel.style.display = 'block';
+                }
+
+                // 切换工具按钮
+                const paramsTools = document.getElementById('params-tools');
+                const alarmsTools = document.getElementById('alarms-tools');
+                if (tabName === 'params') {
+                    if (paramsTools) paramsTools.style.display = 'flex';
+                    if (alarmsTools) alarmsTools.style.display = 'none';
+                } else if (tabName === 'alarms') {
+                    if (paramsTools) paramsTools.style.display = 'none';
+                    if (alarmsTools) alarmsTools.style.display = 'flex';
+                } else {
+                    if (paramsTools) paramsTools.style.display = 'none';
+                    if (alarmsTools) alarmsTools.style.display = 'none';
+                }
+            };
+
+            // 展开/收起分类
+            window.toggleCategory = function(header) {
+                if (!isPageValid()) return;
+                const devicesDiv = header.nextElementSibling;
+                const icon = header.querySelector('.expand-icon');
+
+                if (devicesDiv.style.display === 'none') {
+                    devicesDiv.style.display = 'block';
+                    icon.style.transform = 'rotate(90deg)';
+                    icon.style.color = '#1890ff';
+                } else {
+                    devicesDiv.style.display = 'none';
+                    icon.style.transform = 'rotate(0deg)';
+                    icon.style.color = '#8c8c8c';
+                }
+            };
+
+            // 选择设备
+            window.selectDevice = function(element, deviceId) {
+                if (!isPageValid()) return;
+                // 移除所有active状态
+                document.querySelectorAll('.device-item').forEach(item => {
+                    item.classList.remove('active');
+                    item.style.background = '';
+                    item.querySelector('svg').style.color = '#8c8c8c';
+                });
+
+                // 添加active状态
+                element.classList.add('active');
+                element.style.background = '#e6f7ff';
+                element.querySelector('svg').style.color = '#1890ff';
+
+                console.log('选中设备：', deviceId);
+                
+                // 加载设备详情数据
+                loadDeviceData(deviceId);
+            };
+
+            // 加载设备数据
+            window.loadDeviceData = function(deviceId) {
+                if (!isPageValid()) return;
+                const data = deviceData[deviceId];
+                if (!data) return;
+
+                // 更新设备标题 - 先检查元素是否存在
+                const deviceNameEl = document.getElementById('device-name');
+                const deviceInfoEl = document.getElementById('device-info');
+                if (deviceNameEl) deviceNameEl.textContent = data.name;
+                if (deviceInfoEl) deviceInfoEl.textContent = `设备编码：${data.code} | 用途分类：${data.category} | 所属部门：${data.department}`;
+                
+                // 更新状态 - 先检查元素是否存在
+                const statusEl = document.getElementById('device-status');
+                if (statusEl) {
+                    statusEl.textContent = data.statusText;
+                    statusEl.style.background = data.statusColor;
+                }
+
+                // 更新运行信息 - 先检查元素是否存在
+                const runtimeCurrentEl = document.getElementById('runtime-current');
+                const runtimeTotalEl = document.getElementById('runtime-total');
+                const uptimeRateEl = document.getElementById('uptime-rate');
+                const maintenanceDaysEl = document.getElementById('maintenance-days');
+                
+                if (runtimeCurrentEl) runtimeCurrentEl.innerHTML = `${data.runtimeCurrent} <span style="font-size: 11px;">h</span>`;
+                if (runtimeTotalEl) runtimeTotalEl.innerHTML = `${data.runtimeTotal} <span style="font-size: 11px;">h</span>`;
+                if (uptimeRateEl) uptimeRateEl.textContent = data.uptimeRate;
+                if (maintenanceDaysEl) maintenanceDaysEl.innerHTML = `${data.maintenanceDays} <span style="font-size: 11px;">天</span>`;
+                
+                const alarmEl = document.getElementById('alarm-status');
+                if (alarmEl) {
+                    alarmEl.textContent = data.alarmStatus;
+                    alarmEl.style.color = data.alarmColor;
+                }
+
+                // 更新核心参数 - 先检查元素是否存在
+                const paramGrid = document.getElementById('param-grid');
+                if (paramGrid) {
+                    paramGrid.innerHTML = data.params.map(param => {
+                        const warnStyle = param.warn ? 'border: 1px solid #ffccc7; background: #fff2f0;' : 'border: 1px solid #f0f0f0;';
+                        const nameColor = param.warn ? '#ff4d4f' : '#8c8c8c';
+                        const valueColor = param.warn ? '#ff4d4f' : '#262626';
+                        const unitColor = param.warn ? '#ff4d4f' : '#8c8c8c';
+                        return `
+                            <div class="param-card" style="padding: 14px; border-radius: 6px; ${warnStyle}">
+                                <div style="color: ${nameColor}; font-size: 11px; margin-bottom: 6px;">${param.name}</div>
+                                <div style="font-size: 18px; font-weight: 600; color: ${valueColor};">${param.value} ${param.unit ? `<span style="font-size: 11px; color: ${unitColor};">${param.unit}</span>` : ''}</div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                // 更新告警记录 - 先检查元素是否存在
+                if (data.alarms) {
+                    const alarmList = document.getElementById('alarm-list');
+                    if (alarmList) {
+                        alarmList.innerHTML = data.alarms.list.map(alarm => {
+                            let levelColor = '#1890ff';
+                            if (alarm.level === '紧急') levelColor = '#ff4d4f';
+                            if (alarm.level === '警告') levelColor = '#faad14';
+                            let statusColor = '#52c41a';
+                            if (alarm.status === '未处理') statusColor = '#ff4d4f';
+                            return `
+                                <tr style="border-bottom: 1px solid #f0f0f0;">
+                                    <td style="padding: 12px 16px; color: #595959;">${alarm.time}</td>
+                                    <td style="padding: 12px 16px;"><span style="background: ${levelColor}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">${alarm.level}</span></td>
+                                    <td style="padding: 12px 16px; color: #262626;">${alarm.content}</td>
+                                    <td style="padding: 12px 16px; color: ${levelColor}; font-weight: 500;">${alarm.value}</td>
+                                    <td style="padding: 12px 16px;"><span style="color: ${statusColor};">● ${alarm.status}</span></td>
+                                </tr>
+                            `;
+                        }).join('');
+                    }
+
+                    const unhandledEl = document.getElementById('alarm-unhandled-count');
+                    const todayEl = document.getElementById('alarm-today-count');
+                    const thisMonthEl = document.getElementById('alarm-thismonth-count');
+                    
+                    if (unhandledEl) unhandledEl.textContent = data.alarms.unhandled;
+                    if (todayEl) todayEl.textContent = data.alarms.today;
+                    if (thisMonthEl) thisMonthEl.textContent = data.alarms.thisMonth;
+                }
+
+                // 更新组态监控标题 - 先检查元素是否存在
+                if (data.scada) {
+                    const scadaTitleEl = document.getElementById('scada-title');
+                    if (scadaTitleEl) {
+                        scadaTitleEl.innerHTML = `
+                            <span style="display: inline-block; width: 8px; height: 8px; background: #00d4ff; border-radius: 50%; margin-right: 8px; animation: pulse-dot 1.5s infinite;"></span>
+                            ${data.scada.title}
+                        `;
+                    }
+                }
+            };
+
+            // 状态筛选
+            document.querySelectorAll('.status-filter').forEach(filter => {
+                filter.addEventListener('click', function() {
+                    document.querySelectorAll('.status-filter').forEach(f => {
+                        f.classList.remove('active');
+                        f.style.background = '#f5f5f5';
+                        f.style.color = '#595959';
+                    });
+                    this.classList.add('active');
+                    this.style.background = '#1890ff';
+                    this.style.color = 'white';
+                });
+            });
+
+            // 当前选中的设备ID
+            let currentDeviceId = 'EQ-001';
+
+            // 页面加载时初始化默认设备数据
+            loadDeviceData('EQ-001');
+
+            // 模拟实时数据更新
+            const realtimeInterval = setInterval(function() {
+                updateRealTimeData();
+            }, 3000); // 每3秒更新一次
+            
+            // 注册页面清理函数
+            if (window.registerPageCleanup) {
+                window.registerPageCleanup(function() {
+                    clearInterval(realtimeInterval);
+                    console.log('✅ 实时监控定时器已清理');
+                });
+            }
+
+            // 不同设备类型的动态参数索引
+            const deviceParamIndices = {
+                '生产设备': [0, 1, 2, 3, 4, 5, 9, 10, 11], // 主轴温度、转速、电流、进给速度、切削力、振动、冷却液参数
+                '能源设备': [0, 1, 2, 4, 6, 7, 8, 10], // 压力、温度、电流、功率、流量等
+                '安环设备': [0, 1, 2, 3, 4, 6, 7, 11], // 浓度、温度、湿度、电压、信号等
+                '辅助设备': [0, 2, 4, 5, 6, 7, 8, 16] // 起升、运行、电流、功率、温度等
+            };
+
+            // 更新实时数据
+            function updateRealTimeData() {
+                if (!isPageValid()) return;
+                const data = deviceData[currentDeviceId];
+                if (!data || data.status !== 'running') return;
+
+                // 根据设备类型获取动态参数索引
+                const paramIndices = deviceParamIndices[data.category] || [0, 1, 2, 3, 4, 5];
+                const paramCards = document.querySelectorAll('.param-card');
+
+                paramIndices.forEach((index, i) => {
+                    if (index < data.params.length && paramCards[index]) {
+                        const param = data.params[index];
+                        const card = paramCards[index];
+                        
+                        // 跳过非数值参数
+                        if (typeof param.value !== 'number') return;
+                        
+                        // 根据参数类型生成合适的变化幅度
+                        let variationRange = 0.05; // 默认±5%
+                        if (param.name.includes('温度')) variationRange = 0.02; // 温度变化小
+                        if (param.name.includes('电流') || param.name.includes('电压')) variationRange = 0.08; // 电流电压变化大
+                        if (param.name.includes('压力')) variationRange = 0.03; // 压力变化小
+                        if (param.name.includes('浓度')) variationRange = 0.1; // 浓度变化大
+                        
+                        const variation = (Math.random() - 0.5) * variationRange * 2;
+                        let newValue = param.value * (1 + variation);
+                        
+                        // 根据数值大小决定小数位
+                        let decimals = 1;
+                        if (param.value < 1) decimals = 2;
+                        if (param.value > 100) decimals = 0;
+                        newValue = parseFloat(newValue.toFixed(decimals));
+                        
+                        data.params[index].value = newValue;
+
+                        // 添加更新动画 - 先检查元素是否还在DOM中
+                        if (!card.isConnected) return;
+                        card.classList.add('param-updating');
+                        
+                        // 更新数值显示
+                        const valueDiv = card.querySelector('div:last-child');
+                        if (valueDiv && valueDiv.isConnected) {
+                            valueDiv.classList.add('value-updating');
+                            setTimeout(() => {
+                                // 再次检查元素是否还存在
+                                if (valueDiv && valueDiv.isConnected) {
+                                    const unitHtml = param.unit ? `<span style="font-size: 11px; color: ${param.warn ? '#ff4d4f' : '#8c8c8c'};">${param.unit}</span>` : '';
+                                    valueDiv.innerHTML = `${newValue} ${unitHtml}`;
+                                }
+                            }, 100);
+                        }
+
+                        // 移除动画类
+                        setTimeout(() => {
+                            if (card && card.isConnected) {
+                                card.classList.remove('param-updating');
+                            }
+                            if (valueDiv && valueDiv.isConnected) {
+                                valueDiv.classList.remove('value-updating');
+                            }
+                        }, 800);
+                    }
+                });
+
+                // 更新运行时间 - 先检查元素是否存在
+                if (data.runtimeCurrent) {
+                    data.runtimeCurrent += 0.01;
+                    const runtimeEl = document.getElementById('runtime-current');
+                    if (runtimeEl && runtimeEl.isConnected) {
+                        runtimeEl.innerHTML = `${Math.floor(data.runtimeCurrent)} <span style="font-size: 11px;">h</span>`;
+                    }
+                }
+
+                console.log('数据已更新:', new Date().toLocaleTimeString());
+            }
+
+            // 修改selectDevice函数，记录当前设备
+            const originalSelectDevice = window.selectDevice;
+            window.selectDevice = function(element, deviceId) {
+                currentDeviceId = deviceId;
+                originalSelectDevice(element, deviceId);
+            };
+        </script>
+    </div>
+</body>
+</html>

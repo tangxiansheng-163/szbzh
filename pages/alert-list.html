@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预警列表</title>
+</head>
+<body>
+    <div class="content-wrapper alert-list-page">
+        <style>
+            .alert-page-title{font-size:18px;font-weight:600;margin:0 0 8px 0;color:#262626;}
+            .alert-page-desc{font-size:13px;color:#595959;margin:0;line-height:1.6;}
+            .alert-hero{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:20px;}
+            .alert-hero-c{background:#fff;border-radius:8px;padding:20px 24px;box-shadow:0 1px 4px rgba(0,0,0,0.04);border:1px solid #e8e8e8;}
+            .alert-hero-c.urgent{border-left:4px solid #ff4d4f;background:linear-gradient(135deg,#fff2f0 0%,#fff 50%);}
+            .alert-hero-c.important{border-left:4px solid #faad14;background:linear-gradient(135deg,#fffbe6 0%,#fff 50%);}
+            .alert-hero-c.normal{border-left:4px solid #52c41a;}
+            .alert-hero-c.pending{border-left:4px solid #1890ff;background:linear-gradient(135deg,#e6f7ff 0%,#fff 50%);}
+            .alert-hero-l{font-size:12px;color:#8c8c8c;margin-bottom:8px;font-weight:500;}
+            .alert-hero-v{font-size:28px;font-weight:700;color:#262626;line-height:1.2;}
+            .alert-hero-c.urgent .alert-hero-v{color:#ff4d4f;}
+            .alert-hero-c.important .alert-hero-v{color:#faad14;}
+            .alert-hero-c.pending .alert-hero-v{color:#1890ff;}
+            .alert-hero-d{font-size:12px;color:#8c8c8c;margin-top:8px;line-height:1.5;}
+            .alert-row-urgent{background:#fff2f0!important;}
+            .alert-row-urgent:hover{background:#ffe7e4!important;}
+            .alert-row-important{background:#fffbe6!important;}
+            .alert-row-important:hover{background:#fff7cc!important;}
+            .alert-row-normal{background:#f6ffed!important;}
+            .alert-row-normal:hover{background:#d9f7be!important;}
+            .alert-time-limit{font-size:11px;color:#faad14;}
+            .alert-time-limit.over{color:#ff4d4f;}
+            .alert-form-section{margin-bottom:20px;}
+            .alert-form-section:last-child{margin-bottom:0;}
+            .alert-form-section-title{font-size:14px;font-weight:600;color:#262626;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #e8e8e8;}
+            .form-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+            .form-info-item{display:flex;flex-direction:column;gap:4px;}
+            .form-info-item.full{grid-column:1/-1;}
+            .form-info-label{font-size:12px;color:#8c8c8c;}
+            .form-info-value{font-size:14px;color:#262626;}
+            /* 预警列表页：筛选区紧凑化 */
+            .alert-list-page .filter-bar{padding:12px 20px;margin-bottom:16px;border-radius:8px;background:#fff;border:1px solid #e8e8e8;box-shadow:0 1px 2px rgba(0,0,0,0.03);}
+            .alert-list-page .filter-row{flex-wrap:wrap;align-items:center;gap:12px 16px;}
+            .alert-list-page .filter-item{flex-direction:row;align-items:center;gap:6px;}
+            .alert-list-page .filter-item label{flex-shrink:0;margin-bottom:0;font-size:13px;}
+            .alert-list-page .filter-item .form-select,.alert-list-page .filter-item .form-input{min-width:100px;width:auto;}
+            .alert-list-page .filter-item input[type="date"]{min-width:120px;}
+            .alert-list-page .filter-item input[type="text"]{min-width:90px;}
+            .alert-list-page .filter-date-range{display:flex;align-items:center;gap:6px;}
+            .alert-list-page .filter-date-range span{color:#8c8c8c;font-size:13px;white-space:nowrap;}
+            .alert-list-page .action-bar{margin-bottom:12px;min-height:32px;}
+            .alert-list-page .card.alert-table-card{margin-bottom:0;}
+            .alert-list-page .card.alert-table-card .table-wrapper{min-height:120px;}
+            @media (max-width:1200px){.alert-hero{grid-template-columns:repeat(3,1fr);}.alert-list-page .filter-row{flex-wrap:wrap;}}
+            @media (max-width:768px){.alert-hero{grid-template-columns:1fr 1fr;}.alert-list-page .filter-item{flex-direction:column;align-items:stretch;}}
+        </style>
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">预警管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">预警列表</span>
+        </div>
+
+        <div class="page-header">
+            <h2 class="alert-page-title">预警列表</h2>
+            <p class="alert-page-desc">按《设计协同详细设计》预警管理模块，统一展示预警记录：支持按类型、级别、状态、时间筛选；可进行预警确认、处理或忽略；紧急 30 分钟响应 / 1 小时处理，重要 1 小时响应 / 4 小时处理，一般 1 工作日处理；支持处理时效监控与升级。</p>
+        </div>
+
+        <!-- 预警看板 -->
+        <div class="alert-hero">
+            <div class="alert-hero-c pending">
+                <div class="alert-hero-l">待处理</div>
+                <div class="alert-hero-v">5</div>
+                <div class="alert-hero-d">需及时响应的预警</div>
+            </div>
+            <div class="alert-hero-c urgent">
+                <div class="alert-hero-l">紧急</div>
+                <div class="alert-hero-v">2</div>
+                <div class="alert-hero-d">30 分钟响应、1 小时处理</div>
+            </div>
+            <div class="alert-hero-c important">
+                <div class="alert-hero-l">重要</div>
+                <div class="alert-hero-v">3</div>
+                <div class="alert-hero-d">1 小时响应、4 小时处理</div>
+            </div>
+            <div class="alert-hero-c normal">
+                <div class="alert-hero-l">一般</div>
+                <div class="alert-hero-v">1</div>
+                <div class="alert-hero-d">1 个工作日处理</div>
+            </div>
+            <div class="alert-hero-c">
+                <div class="alert-hero-l">本月处理率</div>
+                <div class="alert-hero-v">92%</div>
+                <div class="alert-hero-d">已处理 46 / 50 条</div>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label for="alert-filter-type">预警类型</label>
+                    <select id="alert-filter-type" name="alertType" class="form-select">
+                        <option value="">全部</option>
+                        <option value="timeout">超时预警</option>
+                        <option value="data">数据异常</option>
+                        <option value="sync">同步失败</option>
+                        <option value="process">流程异常</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="alert-filter-level">预警级别</label>
+                    <select id="alert-filter-level" name="alertLevel" class="form-select">
+                        <option value="">全部</option>
+                        <option value="urgent">紧急</option>
+                        <option value="important">重要</option>
+                        <option value="normal">一般</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="alert-filter-status">处理状态</label>
+                    <select id="alert-filter-status" name="alertStatus" class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待处理</option>
+                        <option value="handling">处理中</option>
+                        <option value="handled">已处理</option>
+                        <option value="ignored">已忽略</option>
+                        <option value="escalated">已升级</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="alert-filter-date-from">触发时间</label>
+                    <div class="filter-date-range">
+                        <input type="date" id="alert-filter-date-from" name="dateFrom" class="form-input" aria-label="触发时间起">
+                        <span>至</span>
+                        <input type="date" id="alert-filter-date-to" name="dateTo" class="form-input" aria-label="触发时间止">
+                    </div>
+                </div>
+                <div class="filter-item">
+                    <label for="alert-filter-receiver">接收人</label>
+                    <input type="text" id="alert-filter-receiver" name="receiver" class="form-input" placeholder="接收人">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card alert-table-card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="120">预警编号</th>
+                            <th width="90">预警类型</th>
+                            <th width="80">预警级别</th>
+                            <th width="90">检测对象</th>
+                            <th>预警内容</th>
+                            <th width="140">触发时间</th>
+                            <th width="100">接收人</th>
+                            <th width="80">状态</th>
+                            <th width="100">响应时限</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="alert-row-urgent">
+                            <td>ALT-2025-001</td>
+                            <td>同步失败</td>
+                            <td><span class="status-badge status-error">紧急</span></td>
+                            <td>ERP 下发</td>
+                            <td>MBOM-002 下发 ERP 失败：物料 M003 在 ERP 中不存在</td>
+                            <td>2025-01-28 14:00</td>
+                            <td>张工</td>
+                            <td><span class="status-badge status-pending">待处理</span></td>
+                            <td><span class="alert-time-limit over">超 1 小时</span></td>
+                            <td><button class="btn btn-sm btn-primary" data-open-modal="alert-detail-modal">处理</button> <button class="btn btn-sm btn-default" data-open-modal="alert-view-modal">查看</button></td>
+                        </tr>
+                        <tr class="alert-row-important">
+                            <td>ALT-2025-002</td>
+                            <td>超时预警</td>
+                            <td><span class="status-badge status-warning">重要</span></td>
+                            <td>会审单</td>
+                            <td>会审单 BG-HS-2025-001 工艺部审批超时 4 小时</td>
+                            <td>2025-01-28 12:30</td>
+                            <td>李工</td>
+                            <td><span class="status-badge status-pending">待处理</span></td>
+                            <td><span class="alert-time-limit">1 小时内响应</span></td>
+                            <td><button class="btn btn-sm btn-primary" data-open-modal="alert-detail-modal">处理</button> <button class="btn btn-sm btn-default" data-open-modal="alert-view-modal">查看</button></td>
+                        </tr>
+                        <tr class="alert-row-important">
+                            <td>ALT-2025-003</td>
+                            <td>数据异常</td>
+                            <td><span class="status-badge status-warning">重要</span></td>
+                            <td>EBOM/MBOM</td>
+                            <td>EBOM PROD-001 V1.0 与 MBOM 版本不一致</td>
+                            <td>2025-01-28 09:00</td>
+                            <td>张工</td>
+                            <td><span class="status-badge status-success">已处理</span></td>
+                            <td>—</td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="alert-view-modal">查看</button></td>
+                        </tr>
+                        <tr>
+                            <td>ALT-2025-004</td>
+                            <td>流程异常</td>
+                            <td><span class="status-badge status-processing">一般</span></td>
+                            <td>变更审批</td>
+                            <td>变更单 BG-BG-2025-008 审批流程中断 2 天</td>
+                            <td>2025-01-27 16:00</td>
+                            <td>王工</td>
+                            <td><span class="status-badge status-success">已处理</span></td>
+                            <td>—</td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="alert-view-modal">查看</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 4 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 预警详情/处理弹窗 -->
+        <div id="alert-detail-modal" class="modal-overlay">
+            <div class="modal" style="max-width:640px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">预警处理</span><button type="button" class="modal-close" data-close-modal="alert-detail-modal">×</button></div>
+                <div class="modal-body">
+                    <div class="alert-form-section">
+                        <div class="alert-form-section-title">预警信息</div>
+                        <div class="form-info-grid">
+                            <div class="form-info-item"><span class="form-info-label">预警编号</span><span class="form-info-value">ALT-2025-001</span></div>
+                            <div class="form-info-item"><span class="form-info-label">预警类型</span><span class="form-info-value">同步失败</span></div>
+                            <div class="form-info-item"><span class="form-info-label">预警级别</span><span class="form-info-value"><span class="status-badge status-error">紧急</span></span></div>
+                            <div class="form-info-item"><span class="form-info-label">检测对象</span><span class="form-info-value">MBOM-002 / ERP 下发</span></div>
+                            <div class="form-info-item full"><span class="form-info-label">预警内容</span><span class="form-info-value">MBOM-002 下发 ERP 失败：物料 M003 在 ERP 中不存在。建议：补充物料至 ERP 后重新下发。</span></div>
+                            <div class="form-info-item"><span class="form-info-label">触发时间</span><span class="form-info-value">2025-01-28 14:00</span></div>
+                            <div class="form-info-item"><span class="form-info-label">接收人</span><span class="form-info-value">张工</span></div>
+                        </div>
+                    </div>
+                    <div class="alert-form-section">
+                        <div class="alert-form-section-title">处理操作</div>
+                        <div class="form-item"><label class="form-label required" for="alert-handle-action">处理方式</label><select id="alert-handle-action" name="handleAction" class="form-select"><option value="">请选择</option><option value="confirm">确认（待后续处理）</option><option value="handle">处理完成</option><option value="ignore">忽略</option></select></div>
+                        <div class="form-item"><label class="form-label" for="alert-handle-result">处理结果</label><select id="alert-handle-result" name="handleResult" class="form-select"><option value="">请选择</option><option value="fixed">已修复问题</option><option value="remind">已提醒相关人员</option><option value="other">其他</option></select></div>
+                        <div class="form-item"><label class="form-label" for="alert-handle-desc">处理说明</label><textarea id="alert-handle-desc" name="handleDesc" class="form-textarea" rows="3" placeholder="如：已补充物料 M003 至 ERP，重新下发成功"></textarea></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="alert-detail-modal">取消</button><button type="button" class="btn btn-default" data-close-modal="alert-detail-modal">忽略</button><button type="button" class="btn btn-primary" data-close-modal="alert-detail-modal" onclick="alert('✅ 处理完成')">提交</button></div>
+            </div>
+        </div>
+
+        <!-- 预警查看弹窗 -->
+        <div id="alert-view-modal" class="modal-overlay">
+            <div class="modal" style="max-width:600px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">预警详情</span><button type="button" class="modal-close" data-close-modal="alert-view-modal">×</button></div>
+                <div class="modal-body">
+                    <div class="alert-form-section">
+                        <div class="alert-form-section-title">基本信息</div>
+                        <div class="form-info-grid">
+                            <div class="form-info-item"><span class="form-info-label">预警编号</span><span class="form-info-value">ALT-2025-003</span></div>
+                            <div class="form-info-item"><span class="form-info-label">预警类型</span><span class="form-info-value">数据异常</span></div>
+                            <div class="form-info-item"><span class="form-info-label">预警级别</span><span class="form-info-value">重要</span></div>
+                            <div class="form-info-item"><span class="form-info-label">处理状态</span><span class="form-info-value"><span class="status-badge status-success">已处理</span></span></div>
+                            <div class="form-info-item"><span class="form-info-label">检测对象</span><span class="form-info-value">EBOM PROD-001 / MBOM</span></div>
+                            <div class="form-info-item"><span class="form-info-label">检测对象ID</span><span class="form-info-value">PROD-001-V1.0</span></div>
+                            <div class="form-info-item full"><span class="form-info-label">预警内容</span><span class="form-info-value">EBOM PROD-001 V1.0 与 MBOM 版本不一致</span></div>
+                            <div class="form-info-item"><span class="form-info-label">触发时间</span><span class="form-info-value">2025-01-28 09:00</span></div>
+                            <div class="form-info-item"><span class="form-info-label">接收人</span><span class="form-info-value">张工</span></div>
+                            <div class="form-info-item"><span class="form-info-label">处理人</span><span class="form-info-value">张工</span></div>
+                            <div class="form-info-item"><span class="form-info-label">处理时间</span><span class="form-info-value">2025-01-28 11:30</span></div>
+                            <div class="form-info-item full"><span class="form-info-label">处理结果</span><span class="form-info-value">已同步 MBOM 版本至 V1.0，数据已一致</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="alert-view-modal">关闭</button></div>
+            </div>
+        </div>
+        <script>
+            if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+            document.querySelectorAll('.action-left .btn-default').forEach(function(btn) {
+                if (btn.textContent.indexOf('导出') !== -1) {
+                    btn.addEventListener('click', function() {
+                        if (confirm('确定导出当前预警列表？')) alert('导出成功，文件已下载。');
+                    });
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>

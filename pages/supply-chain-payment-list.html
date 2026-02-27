@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>付款管理 - 供应链协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/supply-chain-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">结算协同</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">付款管理</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理供应链付款流程，包括付款申请、审批、付款执行、付款跟踪等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="付款单号、供应商、发票号">
+                </div>
+                <div class="filter-item">
+                    <label>付款状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待审批</option>
+                        <option value="approved">已批准</option>
+                        <option value="paid">已付款</option>
+                        <option value="cancelled">已取消</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>付款日期</label>
+                    <input type="date" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary">+ 新建付款单</button>
+                <button class="btn btn-default">批量付款</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">付款单号</th>
+                            <th width="150">供应商</th>
+                            <th width="120">发票号码</th>
+                            <th width="120">付款金额</th>
+                            <th width="100">付款方式</th>
+                            <th width="100">付款状态</th>
+                            <th width="120">申请日期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="payment-id" value="1"></td>
+                            <td>PAY-2025-003</td>
+                            <td>深圳市电子科技</td>
+                            <td>INV-2025-010</td>
+                            <td>¥125,000.00</td>
+                            <td>银行转账</td>
+                            <td><span class="status-badge status-warning">待审批</span></td>
+                            <td>2025-01-21</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/supply-chain-payment-detail.html" data-id="1">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-approve-payment-sc" data-id="1">审批</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 1 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            console.log('付款管理 页面已加载');
+            if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+            document.querySelectorAll('.btn-approve-payment-sc').forEach(function(btn) {
+                btn.addEventListener('click', function() { if (confirm('确定对该付款单执行审批？')) alert('审批操作已提交。'); });
+            });
+            document.querySelectorAll('.action-left .btn-default').forEach(function(btn) {
+                var t = btn.textContent;
+                if (t.indexOf('批量付款') !== -1) btn.addEventListener('click', function() { if (confirm('确定对选中的付款单执行批量付款？')) alert('批量付款已提交。'); });
+                else if (t.indexOf('导出') !== -1) btn.addEventListener('click', function() { if (confirm('确定导出当前列表？')) alert('导出成功，文件已下载。'); });
+            });
+        </script>
+    </div>
+</body>
+</html>

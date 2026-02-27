@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据字典 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">系统配置</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">数据字典</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理系统数据字典，包括字典分类、字典项、字典值等基础数据配置。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="字典编码、字典名称">
+                </div>
+                <div class="filter-item">
+                    <label>字典分类</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="order-status">订单状态</option>
+                        <option value="plan-status">计划状态</option>
+                        <option value="supplier-status">供应商状态</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button type="button" class="btn btn-primary" data-open-modal="dict-add-modal">+ 新建字典</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">字典编码</th>
+                            <th width="150">字典名称</th>
+                            <th width="100">字典分类</th>
+                            <th width="100">字典项数</th>
+                            <th width="100">状态</th>
+                            <th width="120">创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="dict-id" value="1"></td>
+                            <td>DICT-001</td>
+                            <td>订单状态</td>
+                            <td>订单状态</td>
+                            <td>12</td>
+                            <td><span class="status-badge status-success">已启用</span></td>
+                            <td>2025-01-10</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="dict-view-modal" data-row-index="0">查看</button>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="dict-edit-modal" data-row-index="0">编辑</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="dict-id" value="2"></td>
+                            <td>DICT-002</td>
+                            <td>计划状态</td>
+                            <td>计划状态</td>
+                            <td>5</td>
+                            <td><span class="status-badge status-success">已启用</span></td>
+                            <td>2025-01-10</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="dict-view-modal" data-row-index="1">查看</button>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="dict-edit-modal" data-row-index="1">编辑</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 2 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 字典查看弹窗 -->
+        <div id="dict-view-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:560px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">字典详情</span><button type="button" class="modal-close" data-close-modal="dict-view-modal">×</button></div>
+                <div class="modal-body">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:13px;">
+                        <div><span style="color:#666;">字典编码：</span><span id="view-dict-code">-</span></div>
+                        <div><span style="color:#666;">字典名称：</span><span id="view-dict-name">-</span></div>
+                        <div><span style="color:#666;">字典分类：</span><span id="view-dict-category">-</span></div>
+                        <div><span style="color:#666;">字典项数：</span><span id="view-dict-items">-</span></div>
+                        <div><span style="color:#666;">状态：</span><span id="view-dict-status">-</span></div>
+                        <div><span style="color:#666;">创建时间：</span><span id="view-dict-time">-</span></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="dict-view-modal">关闭</button></div>
+            </div>
+        </div>
+
+        <!-- 字典编辑弹窗 -->
+        <div id="dict-edit-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:640px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">编辑字典</span><button type="button" class="modal-close" data-close-modal="dict-edit-modal">×</button></div>
+                <div class="modal-body">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label">字典编码</label><input type="text" id="edit-dict-code" class="form-input" readonly></div>
+                        <div class="form-item"><label class="form-label required">字典名称</label><input type="text" id="edit-dict-name" class="form-input" placeholder="如：供应商状态"></div>
+                        <div class="form-item"><label class="form-label required">字典分类</label><select id="edit-dict-category" class="form-select"><option value="">请选择</option><option value="order-status">订单状态</option><option value="plan-status">计划状态</option><option value="supplier-status">供应商状态</option></select></div>
+                        <div class="form-item" style="grid-column:1/-1;"><label class="form-label">备注</label><input type="text" id="edit-dict-remark" class="form-input" placeholder="选填"></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="dict-edit-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="dict-edit-modal" onclick="alert('✅ 字典已保存')">保存</button></div>
+            </div>
+        </div>
+
+        <div id="dict-add-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:640px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">新建字典</span><button type="button" class="modal-close" data-close-modal="dict-add-modal">×</button></div>
+                <div class="modal-body">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label required">字典编码</label><input type="text" class="form-input" placeholder="如：DICT-003"></div>
+                        <div class="form-item"><label class="form-label required">字典名称</label><input type="text" class="form-input" placeholder="如：供应商状态"></div>
+                        <div class="form-item"><label class="form-label required">字典分类</label><select class="form-select"><option value="">请选择</option><option value="order-status">订单状态</option><option value="plan-status">计划状态</option><option value="supplier-status">供应商状态</option></select></div>
+                        <div class="form-item" style="grid-column:1/-1;"><label class="form-label">备注</label><input type="text" class="form-input" placeholder="选填"></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="dict-add-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="dict-add-modal" onclick="alert('✅ 字典已保存')">保存</button></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('数据字典 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+        (function() {
+            document.addEventListener('click', function(e) {
+                var viewBtn = e.target && e.target.closest ? e.target.closest('[data-open-modal="dict-view-modal"]') : null;
+                if (viewBtn) {
+                    var row = viewBtn.closest('tr');
+                    var cells = row ? row.querySelectorAll('td') : [];
+                    if (cells.length >= 8) {
+                        document.getElementById('view-dict-code').textContent = (cells[1] && cells[1].textContent) || '-';
+                        document.getElementById('view-dict-name').textContent = (cells[2] && cells[2].textContent) || '-';
+                        document.getElementById('view-dict-category').textContent = (cells[3] && cells[3].textContent) || '-';
+                        document.getElementById('view-dict-items').textContent = (cells[4] && cells[4].textContent) || '-';
+                        document.getElementById('view-dict-status').textContent = (cells[5] && cells[5].textContent) || '-';
+                        document.getElementById('view-dict-time').textContent = (cells[6] && cells[6].textContent) || '-';
+                    }
+                    return;
+                }
+                var editBtn = e.target && e.target.closest ? e.target.closest('[data-open-modal="dict-edit-modal"]') : null;
+                if (editBtn) {
+                    var row = editBtn.closest('tr');
+                    var cells = row ? row.querySelectorAll('td') : [];
+                    if (cells.length >= 8) {
+                        var codeEl = document.getElementById('edit-dict-code'); if (codeEl) codeEl.value = (cells[1] && cells[1].textContent) || '';
+                        var nameEl = document.getElementById('edit-dict-name'); if (nameEl) nameEl.value = (cells[2] && cells[2].textContent) || '';
+                        var catText = (cells[3] && cells[3].textContent.trim()) || '';
+                        var catEl = document.getElementById('edit-dict-category'); if (catEl) catEl.value = catText === '订单状态' ? 'order-status' : (catText === '计划状态' ? 'plan-status' : 'supplier-status');
+                    }
+                    return;
+                }
+            }, true);
+        })();
+    </script>
+</body>
+</html>

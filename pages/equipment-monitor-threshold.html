@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阈值配置 - 设备管理协同系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #1890ff;
+            --primary-hover: #40a9ff;
+            --primary-bg: #e6f7ff;
+            --success: #52c41a;
+            --success-bg: #f6ffed;
+            --warning: #faad14;
+            --warning-bg: #fffbe6;
+            --danger: #ff4d4f;
+            --danger-bg: #fff2f0;
+            --text-primary: #262626;
+            --text-secondary: #595959;
+            --text-muted: #8c8c8c;
+            --border: #d9d9d9;
+            --border-light: #f0f0f0;
+            --bg-white: #ffffff;
+            --bg-gray: #fafafa;
+            --bg-hover: #f5f5f5;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --radius-sm: 4px;
+            --radius: 6px;
+            --radius-lg: 8px;
+        }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; 
+            background: var(--bg-gray);
+            color: var(--text-primary);
+            min-height: 100vh;
+            font-size: 14px;
+            line-height: 1.5715;
+        }
+        
+        .content-wrapper { 
+            background: var(--bg-white);
+            padding: 24px;
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+        
+        .breadcrumb { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            margin-bottom: 16px; 
+            font-size: 14px; 
+            color: var(--text-secondary);
+        }
+        .breadcrumb-item { 
+            color: var(--text-secondary); 
+            cursor: pointer; 
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .breadcrumb-item:hover { 
+            color: var(--primary); 
+        }
+        .breadcrumb-item.active { 
+            color: var(--text-primary); 
+            cursor: default; 
+        }
+        .breadcrumb-separator { 
+            color: var(--text-muted); 
+        }
+        
+        .page-header { 
+            margin-bottom: 24px; 
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .page-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .page-description { 
+            font-size: 14px; 
+            color: var(--text-secondary); 
+        }
+        
+        .filter-bar { 
+            background: var(--bg-white); 
+            padding: 16px 24px; 
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+        }
+        .filter-row { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 16px; 
+            align-items: flex-end; 
+        }
+        .filter-item { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 6px; 
+        }
+        .filter-item label { 
+            font-size: 13px; 
+            color: var(--text-secondary);
+        }
+        
+        .form-input, .form-select { 
+            padding: 6px 11px; 
+            border: 1px solid var(--border); 
+            border-radius: var(--radius); 
+            font-size: 14px; 
+            min-width: 180px;
+            transition: all 0.2s;
+            background: var(--bg-white);
+            color: var(--text-primary);
+            font-family: inherit;
+            height: 32px;
+        }
+        .form-input:focus, .form-select:focus { 
+            outline: none; 
+            border-color: var(--primary); 
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+        .form-input.small { 
+            min-width: 80px; 
+            padding: 4px 8px;
+            height: 28px;
+        }
+        .form-input:disabled, .form-select:disabled { 
+            background: var(--bg-gray); 
+            cursor: not-allowed;
+            color: var(--text-muted);
+        }
+        
+        .btn { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+            padding: 6px 16px; 
+            border: 1px solid var(--border); 
+            border-radius: var(--radius); 
+            background: var(--bg-white); 
+            color: var(--text-primary); 
+            font-size: 14px; 
+            font-weight: 400;
+            cursor: pointer; 
+            transition: all 0.2s;
+            height: 32px;
+        }
+        .btn:hover { 
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        .btn-primary { 
+            background: var(--primary); 
+            border-color: var(--primary);
+            color: #fff; 
+        }
+        .btn-primary:hover { 
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
+            color: #fff;
+        }
+        .btn-danger { 
+            background: var(--danger); 
+            border-color: var(--danger);
+            color: #fff; 
+        }
+        .btn-danger:hover { 
+            background: #ff7875;
+            border-color: #ff7875;
+            color: #fff;
+        }
+        .btn-success { 
+            background: var(--success); 
+            border-color: var(--success);
+            color: #fff; 
+        }
+        .btn-success:hover { 
+            background: #73d13d;
+            border-color: #73d13d;
+            color: #fff;
+        }
+        .btn-ghost { 
+            background: transparent; 
+            border-color: var(--border);
+            color: var(--text-secondary);
+        }
+        .btn-ghost:hover { 
+            background: var(--bg-gray);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .btn-sm { 
+            padding: 2px 8px; 
+            font-size: 12px; 
+            height: 24px;
+        }
+        .btn-lg {
+            padding: 8px 20px;
+            font-size: 14px;
+            height: 40px;
+        }
+        
+        .action-bar { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 16px; 
+        }
+        .action-left { 
+            display: flex; 
+            gap: 8px; 
+        }
+        
+        .card { 
+            background: var(--bg-white); 
+            border-radius: var(--radius);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+        }
+        
+        .table-wrapper { 
+            overflow-x: auto; 
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 14px; 
+        }
+        th, td { 
+            padding: 12px 16px; 
+            text-align: left; 
+        }
+        th { 
+            background: var(--bg-gray); 
+            font-weight: 500; 
+            color: var(--text-primary); 
+            font-size: 13px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        td { 
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-primary);
+        }
+        tr:hover td { 
+            background: var(--bg-gray); 
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .status-badge { 
+            display: inline-flex; 
+            align-items: center;
+            gap: 6px;
+            padding: 2px 8px; 
+            border-radius: var(--radius-sm); 
+            font-size: 12px; 
+            font-weight: 400;
+        }
+        .status-success { 
+            background: var(--success-bg); 
+            color: var(--success); 
+        }
+        .status-warning { 
+            background: var(--warning-bg); 
+            color: var(--warning); 
+        }
+        .status-error { 
+            background: var(--danger-bg); 
+            color: var(--danger); 
+        }
+        
+        .pagination { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 12px 16px; 
+            background: var(--bg-white);
+            border-top: 1px solid var(--border-light);
+        }
+        .pagination-info { 
+            font-size: 13px; 
+            color: var(--text-secondary); 
+        }
+        .pagination-controls { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
+        .pagination-page { 
+            font-size: 13px; 
+            color: var(--text-primary);
+        }
+        
+        .modal-overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background: rgba(0, 0, 0, 0.45); 
+            z-index: 1000; 
+            overflow-y: auto;
+            padding: 40px 24px;
+        }
+        .modal-overlay.show { 
+            display: block; 
+        }
+        .modal { 
+            position: relative; 
+            background: var(--bg-white); 
+            border-radius: var(--radius-lg); 
+            max-width: 1200px; 
+            width: 100%; 
+            max-height: calc(100vh - 80px); 
+            margin: 0 auto;
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: var(--shadow-lg);
+        }
+        .modal.large { 
+            max-width: 1400px; 
+        }
+        .modal-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 16px 24px; 
+            border-bottom: 1px solid var(--border-light);
+        }
+        .modal-title { 
+            font-size: 16px; 
+            font-weight: 500; 
+            color: var(--text-primary);
+        }
+        .modal-close { 
+            background: none; 
+            border: none; 
+            font-size: 20px; 
+            color: var(--text-secondary); 
+            cursor: pointer; 
+            line-height: 1;
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .modal-close:hover { 
+            background: var(--bg-gray);
+            color: var(--text-primary);
+        }
+        .modal-body { 
+            padding: 24px; 
+            overflow-y: auto; 
+            flex: 1; 
+        }
+        .modal-footer { 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: 8px; 
+            padding: 12px 24px; 
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .form-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 16px; 
+        }
+        .form-grid.full { 
+            grid-template-columns: 1fr; 
+        }
+        .form-grid.triple { 
+            grid-template-columns: repeat(3, 1fr); 
+        }
+        .form-item { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 6px; 
+        }
+        .form-item.full { 
+            grid-column: 1 / -1; 
+        }
+        .form-label { 
+            font-size: 14px; 
+            color: var(--text-primary);
+        }
+        .form-label.required::after { 
+            content: ' *'; 
+            color: var(--danger); 
+        }
+        .form-textarea { 
+            padding: 6px 11px; 
+            border: 1px solid var(--border); 
+            border-radius: var(--radius); 
+            font-size: 14px; 
+            resize: vertical; 
+            min-height: 80px; 
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .form-textarea:focus { 
+            outline: none; 
+            border-color: var(--primary); 
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+        
+        .info-label { 
+            color: var(--text-secondary); 
+            font-size: 13px; 
+            margin-bottom: 4px;
+        }
+        .info-value { 
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        .section-title { 
+            font-size: 15px; 
+            font-weight: 500; 
+            color: var(--text-primary); 
+            margin-bottom: 16px; 
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .section-subtitle { 
+            font-size: 14px; 
+            font-weight: 500; 
+            color: var(--text-primary); 
+            margin-bottom: 12px; 
+        }
+        
+        .radio-group { 
+            display: flex; 
+            gap: 16px; 
+            flex-wrap: wrap; 
+        }
+        .radio-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            cursor: pointer;
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: all 0.2s;
+            background: var(--bg-white);
+        }
+        .radio-item:hover {
+            border-color: var(--primary);
+        }
+        .radio-item:has(input:checked) {
+            border-color: var(--primary);
+            background: var(--primary-bg);
+        }
+        .radio-item input[type="radio"] { 
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary);
+        }
+        
+        .checkbox-group { 
+            display: flex; 
+            gap: 16px; 
+            flex-wrap: wrap; 
+        }
+        .checkbox-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            cursor: pointer; 
+        }
+        .checkbox-item input[type="checkbox"] { 
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary);
+        }
+        
+        .person-selector { 
+            background: var(--bg-gray); 
+            border: 1px solid var(--border-light); 
+            border-radius: var(--radius); 
+            padding: 16px; 
+            max-height: 240px; 
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .person-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            padding: 12px; 
+            border-radius: var(--radius); 
+            cursor: pointer; 
+            background: var(--bg-white);
+            border: 1px solid var(--border-light);
+            transition: all 0.2s;
+        }
+        .person-item:hover { 
+            border-color: var(--primary);
+        }
+        .person-item.selected { 
+            background: var(--primary-bg);
+            border-color: var(--primary);
+        }
+        .person-avatar { 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            background: var(--primary);
+            color: #fff; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 16px; 
+            font-weight: 500;
+        }
+        .person-info { 
+            flex: 1; 
+        }
+        .person-name { 
+            font-size: 14px; 
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        .person-role { 
+            font-size: 12px; 
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        
+        .notification-methods { 
+            display: flex; 
+            gap: 8px; 
+            flex-wrap: wrap; 
+        }
+        .notification-btn { 
+            padding: 8px 16px; 
+            border: 1px solid var(--border); 
+            background: var(--bg-white); 
+            border-radius: var(--radius); 
+            font-size: 14px; 
+            font-weight: 400;
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            transition: all 0.2s;
+            color: var(--text-primary);
+        }
+        .notification-btn:hover { 
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .notification-btn.selected { 
+            background: var(--primary); 
+            border-color: var(--primary); 
+            color: #fff;
+        }
+        .notification-btn.selected:hover { 
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+        .notification-icon { 
+            font-size: 18px; 
+        }
+        
+        .threshold-card { 
+            background: var(--bg-white); 
+            border: 1px solid var(--border-light); 
+            border-radius: var(--radius); 
+            padding: 16px;
+        }
+        .threshold-card.warning { 
+            border-color: var(--warning); 
+            background: var(--warning-bg);
+        }
+        .threshold-card.alarm { 
+            border-color: var(--danger); 
+            background: var(--danger-bg);
+        }
+        .threshold-card-title { 
+            font-size: 14px; 
+            font-weight: 500; 
+            margin-bottom: 16px;
+        }
+        .threshold-card.warning .threshold-card-title { 
+            color: var(--warning); 
+        }
+        .threshold-card.alarm .threshold-card-title { 
+            color: var(--danger); 
+        }
+        
+        .rule-editor { 
+            background: var(--bg-gray); 
+            border: 1px dashed var(--border); 
+            border-radius: var(--radius); 
+            padding: 16px;
+        }
+        .rule-group { 
+            background: var(--bg-white); 
+            border: 1px solid var(--border-light); 
+            border-radius: var(--radius); 
+            padding: 16px; 
+            margin-bottom: 16px;
+        }
+        .rule-group-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .rule-group-title { 
+            font-size: 14px; 
+            font-weight: 500; 
+            color: var(--text-primary); 
+        }
+        .rule-group-logic { 
+            display: flex; 
+            gap: 8px; 
+            align-items: center; 
+        }
+        .logic-btn { 
+            padding: 4px 12px; 
+            border: 1px solid var(--border); 
+            background: var(--bg-white); 
+            border-radius: var(--radius-sm); 
+            font-size: 13px; 
+            font-weight: 400;
+            cursor: pointer; 
+            transition: all 0.2s;
+            color: var(--text-primary);
+            height: 28px;
+        }
+        .logic-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .logic-btn.active { 
+            background: var(--primary); 
+            border-color: var(--primary); 
+            color: #fff; 
+        }
+        .rule-item { 
+            display: flex; 
+            gap: 8px; 
+            align-items: center; 
+            margin-bottom: 12px; 
+            flex-wrap: wrap; 
+            padding: 12px;
+            background: var(--bg-gray);
+            border-radius: var(--radius);
+        }
+        .rule-item:last-child { 
+            margin-bottom: 0; 
+        }
+        .rule-item label { 
+            font-size: 13px; 
+            color: var(--text-secondary);
+        }
+        .add-rule-btn { 
+            margin-top: 12px; 
+        }
+        
+        .rule-preview { 
+            background: var(--primary-bg); 
+            border: 1px solid #91d5ff; 
+            border-radius: var(--radius); 
+            padding: 16px; 
+            margin-top: 16px;
+        }
+        .rule-preview-title { 
+            font-size: 13px; 
+            font-weight: 500;
+            color: var(--primary); 
+            margin-bottom: 8px;
+        }
+        .rule-preview-text { 
+            font-size: 14px; 
+            color: var(--text-primary); 
+            line-height: 1.8;
+        }
+        
+        .condition-display { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+            padding: 4px 12px; 
+            background: var(--primary-bg); 
+            border: 1px solid #91d5ff; 
+            border-radius: var(--radius-sm); 
+            font-size: 13px;
+        }
+        .condition-tag { 
+            padding: 2px 8px; 
+            background: var(--primary); 
+            color: #fff; 
+            border-radius: var(--radius-sm); 
+            font-size: 12px;
+        }
+        .condition-tag.warning { 
+            background: var(--warning); 
+        }
+        .condition-tag.error { 
+            background: var(--danger); 
+        }
+        
+        .help-text { 
+            font-size: 12px; 
+            color: var(--text-muted); 
+            margin-top: 4px;
+        }
+        
+        .divider {
+            height: 1px;
+            background: var(--border-light);
+            margin: 24px 0;
+        }
+        
+        .inline-flex {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="equipment-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">运行监控</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">阈值配置</span>
+        </div>
+        <div class="page-header">
+            <h1 class="page-title">阈值配置管理</h1>
+            <p class="page-description">配置设备监控阈值，支持多参数组合条件和时间条件，灵活管理预警和告警规则</p>
+        </div>
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>设备</label>
+                    <select class="form-select">
+                        <option value="">全部设备</option>
+                        <option value="EQ-001">生产设备A-001</option>
+                        <option value="EQ-002">安全设备B-002</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>告警类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="warning">预警</option>
+                        <option value="alarm">告警</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="enabled">已启用</option>
+                        <option value="disabled">已停用</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: flex-end; gap: 8px;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-ghost">重置</button>
+                </div>
+            </div>
+        </div>
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary" onclick="openModal('create-modal')">
+                    <span>➕</span>
+                    <span>新建阈值</span>
+                </button>
+                <button class="btn btn-ghost">批量配置</button>
+                <button class="btn btn-ghost">导出</button>
+            </div>
+        </div>
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="50"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="200">设备名称</th>
+                            <th width="100">类型</th>
+                            <th width="280">触发条件</th>
+                            <th width="220">通知方式</th>
+                            <th width="120">状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="threshold-id" value="1"></td>
+                            <td><strong>生产设备A-001</strong></td>
+                            <td><span class="condition-tag warning">预警</span></td>
+                            <td>温度 > 75°C 持续30秒</td>
+                            <td>📬 站内信、📱 短信</td>
+                            <td><span class="status-badge status-success">已启用</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-ghost" onclick="openModal('view-modal')">查看</button>
+                                <button class="btn btn-sm btn-primary" onclick="openModal('edit-modal')">编辑</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="threshold-id" value="2"></td>
+                            <td><strong>生产设备A-001</strong></td>
+                            <td><span class="condition-tag error">告警</span></td>
+                            <td>
+                                <div class="condition-display">
+                                    温度>85°C AND 压力>0.6MPa 持续60秒
+                                </div>
+                            </td>
+                            <td>📬 站内信、📱 短信、🔔 钉钉、📞 语音</td>
+                            <td><span class="status-badge status-success">已启用</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-ghost" onclick="openModal('view-modal')">查看</button>
+                                <button class="btn btn-sm btn-primary" onclick="openModal('edit-modal')">编辑</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 2 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-ghost" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-ghost" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="create-modal" class="modal-overlay large" onclick="closeModal('create-modal')">
+            <div class="modal" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">新建阈值配置</span>
+                    <button type="button" class="modal-close" onclick="closeModal('create-modal')">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-grid full" style="margin-bottom: 16px;">
+                        <div class="form-item">
+                            <label class="form-label required">选择设备</label>
+                            <select class="form-select" id="createEquipment" onchange="onCreateEquipmentChange()">
+                                <option value="">请选择设备</option>
+                                <option value="EQ-001">生产设备A-001</option>
+                                <option value="EQ-002">安全设备B-002</option>
+                                <option value="EQ-003">加工中心-001</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="section-title">告警类型选择（二选一）</div>
+                    <div class="form-grid full" style="margin-bottom: 16px;">
+                        <div class="form-item">
+                            <div class="radio-group">
+                                <label class="radio-item">
+                                    <input type="radio" name="alertType" value="warning" onchange="onAlertTypeChange()" checked>
+                                    <span>⚠️ 预警配置</span>
+                                </label>
+                                <label class="radio-item">
+                                    <input type="radio" name="alertType" value="alarm" onchange="onAlertTypeChange()">
+                                    <span>🚨 告警配置</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="warningSection" class="threshold-card warning" style="margin-bottom: 24px;">
+                        <div class="threshold-card-title">⚠️ 预警配置</div>
+                        <div class="form-grid">
+                            <div class="form-item">
+                                <label class="form-label required">预警类型</label>
+                                <select class="form-select" id="warningType">
+                                    <option value="">请选择预警类型</option>
+                                    <option value="temp_high">温度过高预警</option>
+                                    <option value="pressure_high">压力过高预警</option>
+                                    <option value="vibration_high">振动超标预警</option>
+                                    <option value="custom">自定义预警</option>
+                                </select>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label required">预警等级</label>
+                                <select class="form-select" id="warningLevel">
+                                    <option value="low">低级</option>
+                                    <option value="medium" selected>中级</option>
+                                    <option value="high">高级</option>
+                                </select>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">预警代码</label>
+                                <input type="text" class="form-input" id="warningCode" placeholder="例如：WARN-001">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="alarmSection" class="threshold-card alarm" style="display: none; margin-bottom: 24px;">
+                        <div class="threshold-card-title">🚨 告警配置</div>
+                        <div class="form-grid">
+                            <div class="form-item">
+                                <label class="form-label required">告警类型</label>
+                                <select class="form-select" id="alarmType">
+                                    <option value="">请选择告警类型</option>
+                                    <option value="temp_critical">温度超高告警</option>
+                                    <option value="pressure_critical">压力超高告警</option>
+                                    <option value="vibration_critical">振动严重超标告警</option>
+                                    <option value="custom">自定义告警</option>
+                                </select>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label required">告警等级</label>
+                                <select class="form-select" id="alarmLevel">
+                                    <option value="medium">中级</option>
+                                    <option value="high" selected>高级</option>
+                                    <option value="emergency">紧急</option>
+                                </select>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">告警代码</label>
+                                <input type="text" class="form-input" id="alarmCode" placeholder="例如：ALARM-001">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="section-title">触发条件配置</div>
+                    <div class="form-grid" style="margin-bottom: 16px;">
+                        <div class="form-item">
+                            <label class="form-label required">规则类型</label>
+                            <select class="form-select" id="ruleType" onchange="toggleRuleEditor()">
+                                <option value="single">单参数阈值</option>
+                                <option value="multi">多参数组合条件</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="singleParamSection" style="margin-bottom: 24px;">
+                        <div class="rule-editor">
+                            <div class="form-grid">
+                                <div class="form-item">
+                                    <label class="form-label required">参数类型</label>
+                                    <select class="form-select" id="singleParamSelect" onchange="onSingleParamChange()">
+                                        <option value="">请先选择设备</option>
+                                    </select>
+                                </div>
+                                <div class="form-item">
+                                    <label class="form-label">单位</label>
+                                    <input type="text" class="form-input" id="singleUnitInput" placeholder="单位">
+                                </div>
+                                <div class="form-item">
+                                    <label class="form-label required">正常范围最小值</label>
+                                    <input type="number" class="form-input" id="singleMinInput" placeholder="请输入最小值" onchange="updateAutoLevel()">
+                                </div>
+                                <div class="form-item">
+                                    <label class="form-label required">正常范围最大值</label>
+                                    <input type="number" class="form-input" id="singleMaxInput" placeholder="请输入最大值" onchange="updateAutoLevel()">
+                                </div>
+                            </div>
+                            <div class="form-grid" style="margin-top: 16px;">
+                                <div class="form-item">
+                                    <label class="form-label required">预警/告警阈值</label>
+                                    <input type="number" class="form-input" id="thresholdInput" placeholder="请输入阈值" onchange="updateAutoLevel()">
+                                </div>
+                                <div class="form-item">
+                                    <label class="form-label required">持续时间</label>
+                                    <div class="inline-flex">
+                                        <input type="number" class="form-input small" id="durationInput" value="30" min="1">
+                                        <select class="form-select small" id="durationUnit">
+                                            <option value="seconds">秒</option>
+                                            <option value="minutes">分钟</option>
+                                            <option value="hours">小时</option>
+                                        </select>
+                                    </div>
+                                    <div class="help-text">参数达到阈值后持续此时间才触发</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rule-editor" id="multiRuleEditor" style="display: none; margin-bottom: 24px;">
+                        <div class="form-grid full">
+                            <div class="form-item">
+                                <label class="form-label">条件规则编辑器</label>
+                                <div class="rule-group" id="ruleGroup">
+                                    <div class="rule-group-header">
+                                        <span class="rule-group-title">条件组 1</span>
+                                        <div class="rule-group-logic">
+                                            <span style="font-size: 13px; color: var(--text-secondary);">组内逻辑：</span>
+                                            <button class="logic-btn active" onclick="setGroupLogic('AND', this)">AND</button>
+                                            <button class="logic-btn" onclick="setGroupLogic('OR', this)">OR</button>
+                                        </div>
+                                    </div>
+                                    <div id="ruleItemsContainer">
+                                    </div>
+                                    <button class="btn btn-primary add-rule-btn" onclick="addRuleItem()">+ 添加条件</button>
+                                </div>
+                                
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="form-item">
+                                        <label class="form-label required">持续时间条件</label>
+                                        <div class="inline-flex">
+                                            <span style="font-size: 14px; color: var(--text-secondary);">满足条件持续</span>
+                                            <input type="number" class="form-input small" id="multiDurationInput" value="30" min="1">
+                                            <select class="form-select small" id="multiDurationUnit">
+                                                <option value="seconds">秒</option>
+                                                <option value="minutes">分钟</option>
+                                                <option value="hours">小时</option>
+                                            </select>
+                                            <span style="font-size: 14px; color: var(--text-secondary);">后触发</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="rule-preview">
+                                    <div class="rule-preview-title">📋 规则预览</div>
+                                    <div class="rule-preview-text" id="rulePreviewText">
+                                        请先选择设备
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="section-title">通知人配置</div>
+                    <div class="form-grid full" style="margin-bottom: 24px;">
+                        <div class="form-item">
+                            <label class="form-label required">选择通知人</label>
+                            <div class="person-selector" id="personSelector">
+                                <div class="person-item" data-person-id="1" onclick="togglePerson(this)">
+                                    <div class="person-avatar">张</div>
+                                    <div class="person-info">
+                                        <div class="person-name">张三</div>
+                                        <div class="person-role">设备维护工程师</div>
+                                    </div>
+                                </div>
+                                <div class="person-item" data-person-id="2" onclick="togglePerson(this)">
+                                    <div class="person-avatar">李</div>
+                                    <div class="person-info">
+                                        <div class="person-name">李四</div>
+                                        <div class="person-role">生产主管</div>
+                                    </div>
+                                </div>
+                                <div class="person-item" data-person-id="3" onclick="togglePerson(this)">
+                                    <div class="person-avatar">王</div>
+                                    <div class="person-info">
+                                        <div class="person-name">王五</div>
+                                        <div class="person-role">安全管理员</div>
+                                    </div>
+                                </div>
+                                <div class="person-item" data-person-id="4" onclick="togglePerson(this)">
+                                    <div class="person-avatar">赵</div>
+                                    <div class="person-info">
+                                        <div class="person-name">赵六</div>
+                                        <div class="person-role">技术总监</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-title">通知方式配置</div>
+                    <div class="form-grid full" style="margin-bottom: 24px;">
+                        <div class="form-item">
+                            <label class="form-label required">选择通知方式（可多选）</label>
+                            <div class="notification-methods" id="notificationMethods">
+                                <button type="button" class="notification-btn" data-method="inbox" onclick="toggleNotificationMethod(this)">
+                                    <span class="notification-icon">📬</span>
+                                    <span>站内信</span>
+                                </button>
+                                <button type="button" class="notification-btn" data-method="sms" onclick="toggleNotificationMethod(this)">
+                                    <span class="notification-icon">📱</span>
+                                    <span>短信</span>
+                                </button>
+                                <button type="button" class="notification-btn" data-method="wechat" onclick="toggleNotificationMethod(this)">
+                                    <span class="notification-icon">💬</span>
+                                    <span>微信</span>
+                                </button>
+                                <button type="button" class="notification-btn" data-method="dingtalk" onclick="toggleNotificationMethod(this)">
+                                    <span class="notification-icon">🔔</span>
+                                    <span>钉钉</span>
+                                </button>
+                                <button type="button" class="notification-btn" data-method="voice" onclick="toggleNotificationMethod(this)">
+                                    <span class="notification-icon">📞</span>
+                                    <span>语音电话</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-title">频率控制配置</div>
+                    <div class="form-grid" style="margin-bottom: 24px;">
+                        <div class="form-item">
+                            <label class="form-label required">通知频率</label>
+                            <div class="inline-flex">
+                                <span style="font-size: 14px; color: var(--text-secondary);">每</span>
+                                <input type="number" class="form-input small" id="notificationFreq" value="5" min="1">
+                                <select class="form-select small" id="notificationFreqUnit">
+                                    <option value="minutes">分钟</option>
+                                    <option value="hours">小时</option>
+                                </select>
+                                <span style="font-size: 14px; color: var(--text-secondary);">最多通知一次</span>
+                            </div>
+                            <div class="help-text">避免重复通知打扰</div>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">工单生成频率</label>
+                            <div class="inline-flex">
+                                <span style="font-size: 14px; color: var(--text-secondary);">每</span>
+                                <input type="number" class="form-input small" id="ticketFreq" value="30" min="1">
+                                <select class="form-select small" id="ticketFreqUnit">
+                                    <option value="minutes">分钟</option>
+                                    <option value="hours">小时</option>
+                                </select>
+                                <span style="font-size: 14px; color: var(--text-secondary);">最多生成一次</span>
+                            </div>
+                            <div class="help-text">避免重复生成工单</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-item">
+                            <label class="form-label">状态</label>
+                            <select class="form-select" id="thresholdStatus">
+                                <option value="enabled" selected>已启用</option>
+                                <option value="disabled">已停用</option>
+                            </select>
+                        </div>
+                        <div class="form-item full">
+                            <label class="form-label">备注</label>
+                            <textarea class="form-textarea" rows="3" placeholder="请输入备注信息"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost" onclick="closeModal('create-modal')">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveThreshold()">保存配置</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-modal" class="modal-overlay large" onclick="closeModal('view-modal')">
+            <div class="modal" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">查看阈值配置</span>
+                    <button type="button" class="modal-close" onclick="closeModal('view-modal')">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-grid">
+                        <div class="form-item">
+                            <div class="info-label">设备名称</div>
+                            <div class="info-value"><strong>生产设备A-001</strong></div>
+                        </div>
+                        <div class="form-item">
+                            <div class="info-label">告警类型</div>
+                            <div class="info-value"><span class="condition-tag error">告警</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="section-title">告警信息</div>
+                    <div class="threshold-card alarm" style="margin-bottom: 24px;">
+                        <div class="threshold-card-title">🚨 告警配置</div>
+                        <div class="form-grid">
+                            <div class="form-item">
+                                <div class="info-label">告警类型</div>
+                                <div class="info-value">温度超高告警</div>
+                            </div>
+                            <div class="form-item">
+                                <div class="info-label">告警等级</div>
+                                <div class="info-value">高级</div>
+                            </div>
+                            <div class="form-item">
+                                <div class="info-label">告警代码</div>
+                                <div class="info-value">ALARM-001</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-title">触发条件规则</div>
+                    <div class="rule-preview" style="margin-bottom: 24px;">
+                        <div class="rule-preview-title">📋 触发条件</div>
+                        <div class="rule-preview-text">
+                            <strong>条件组 1（AND逻辑）：</strong><br>
+                            • 温度 > 85 °C<br>
+                            • 压力 > 0.6 MPa<br>
+                            <br>
+                            <strong>持续时间：</strong>满足条件持续 60秒 后触发
+                        </div>
+                    </div>
+                    
+                    <div class="section-title">通知配置</div>
+                    <div class="form-grid" style="margin-bottom: 24px;">
+                        <div class="form-item full">
+                            <div class="info-label">通知人</div>
+                            <div class="info-value">张三（设备维护工程师）、李四（生产主管）、王五（安全管理员）</div>
+                        </div>
+                        <div class="form-item full">
+                            <div class="info-label">通知方式</div>
+                            <div class="info-value">📬 站内信、📱 短信、🔔 钉钉、📞 语音电话</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-title">频率控制</div>
+                    <div class="form-grid" style="margin-bottom: 24px;">
+                        <div class="form-item">
+                            <div class="info-label">通知频率</div>
+                            <div class="info-value">每 5 分钟最多通知一次</div>
+                        </div>
+                        <div class="form-item">
+                            <div class="info-label">工单生成频率</div>
+                            <div class="info-value">每 30 分钟最多生成一次</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-item">
+                            <div class="info-label">状态</div>
+                            <div class="info-value"><span class="status-badge status-success">已启用</span></div>
+                        </div>
+                        <div class="form-item full">
+                            <div class="info-label">备注</div>
+                            <div class="info-value">设备主轴温度和压力组合监控，两个参数同时超标持续60秒后触发告警。</div>
+                        </div>
+                        <div class="form-item">
+                            <div class="info-label">创建时间</div>
+                            <div class="info-value">2025-01-15 10:30:00</div>
+                        </div>
+                        <div class="form-item">
+                            <div class="info-label">更新时间</div>
+                            <div class="info-value">2025-02-10 14:20:00</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost" onclick="closeModal('view-modal')">关闭</button>
+                    <button type="button" class="btn btn-primary" onclick="closeModal('view-modal');openModal('edit-modal');">编辑配置</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="edit-modal" class="modal-overlay large" onclick="closeModal('edit-modal')">
+            <div class="modal" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">编辑阈值配置</span>
+                    <button type="button" class="modal-close" onclick="closeModal('edit-modal')">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-grid">
+                        <div class="form-item">
+                            <label class="form-label">设备编码</label>
+                            <input type="text" class="form-input" value="EQ-001" disabled>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">设备名称</label>
+                            <input type="text" class="form-input" value="生产设备A-001" disabled>
+                        </div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="section-title">告警类型</div>
+                    <div class="form-grid full" style="margin-bottom: 16px;">
+                        <div class="form-item">
+                            <div class="info-value"><span class="condition-tag error">告警</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="threshold-card alarm" style="margin-bottom: 24px;">
+                        <div class="threshold-card-title">🚨 告警配置</div>
+                        <div class="form-grid">
+                            <div class="form-item">
+                                <label class="form-label required">告警类型</label>
+                                <select class="form-select">
+                                    <option value="temp_critical" selected>温度超高告警</option>
+                                    <option value="pressure_critical">压力超高告警</option>
+                                    <option value="vibration_critical">振动严重超标告警</option>
+                                    <option value="custom">自定义告警</option>
+                                </select>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label required">告警等级</label>
+                                <select class="form-select">
+                                    <option value="medium">中级</option>
+                                    <option value="high" selected>高级</option>
+                                    <option value="emergency">紧急</option>
+                                </select>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">告警代码</label>
+                                <input type="text" class="form-input" value="ALARM-001">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-item">
+                            <label class="form-label">状态</label>
+                            <select class="form-select">
+                                <option value="enabled" selected>已启用</option>
+                                <option value="disabled">已停用</option>
+                            </select>
+                        </div>
+                        <div class="form-item full">
+                            <label class="form-label">备注</label>
+                            <textarea class="form-textarea" rows="3">设备主轴温度和压力组合监控，两个参数同时超标持续60秒后触发告警。</textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost" onclick="closeModal('edit-modal')">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="updateThreshold()">保存修改</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const equipmentParams = {
+            'EQ-001': {
+                name: '生产设备A-001',
+                params: [
+                    { value: 'temperature', label: '温度', unit: '°C' },
+                    { value: 'pressure', label: '压力', unit: 'MPa' },
+                    { value: 'vibration', label: '振动', unit: 'mm/s' },
+                    { value: 'current', label: '电流', unit: 'A' },
+                    { value: 'voltage', label: '电压', unit: 'V' }
+                ]
+            },
+            'EQ-002': {
+                name: '安全设备B-002',
+                params: [
+                    { value: 'temperature', label: '温度', unit: '°C' },
+                    { value: 'smoke', label: '烟雾浓度', unit: '%' },
+                    { value: 'humidity', label: '湿度', unit: '%' },
+                    { value: 'co2', label: 'CO2浓度', unit: 'ppm' }
+                ]
+            },
+            'EQ-003': {
+                name: '加工中心-001',
+                params: [
+                    { value: 'spindle_speed', label: '主轴转速', unit: 'rpm' },
+                    { value: 'feed_rate', label: '进给速度', unit: 'mm/min' },
+                    { value: 'tool_wear', label: '刀具磨损', unit: 'mm' },
+                    { value: 'cutting_force', label: '切削力', unit: 'N' },
+                    { value: 'temperature', label: '温度', unit: '°C' }
+                ]
+            }
+        };
+
+        window.openModal = function(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+        };
+        window.closeModal = function(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        };
+        window.saveThreshold = function() {
+            alert('✅ 阈值配置已保存！');
+            closeModal('create-modal');
+        };
+        window.updateThreshold = function() {
+            alert('✅ 阈值配置已更新！');
+            closeModal('edit-modal');
+        };
+        
+        window.onCreateEquipmentChange = function() {
+            const equipmentId = document.getElementById('createEquipment').value;
+            const equipment = equipmentParams[equipmentId];
+            if (!equipment) {
+                return;
+            }
+            
+            const singleParamSelect = document.getElementById('singleParamSelect');
+            updateParamSelect(singleParamSelect, equipment.params);
+            
+            const singleUnitInput = document.getElementById('singleUnitInput');
+            if (equipment.params.length > 0) {
+                singleUnitInput.value = equipment.params[0].unit;
+            }
+            
+            const ruleItemsContainer = document.getElementById('ruleItemsContainer');
+            ruleItemsContainer.innerHTML = '';
+            addRuleItem();
+            
+            updateRulePreview();
+        };
+        
+        function updateParamSelect(select, params) {
+            select.innerHTML = '';
+            params.forEach(param => {
+                const option = document.createElement('option');
+                option.value = param.value;
+                option.textContent = param.label;
+                option.dataset.unit = param.unit;
+                select.appendChild(option);
+            });
+        }
+        
+        window.onSingleParamChange = function() {
+            const singleParamSelect = document.getElementById('singleParamSelect');
+            const singleUnitInput = document.getElementById('singleUnitInput');
+            if (singleParamSelect.selectedOptions.length > 0) {
+                const unit = singleParamSelect.selectedOptions[0].dataset.unit;
+                if (unit) {
+                    singleUnitInput.value = unit;
+                }
+            }
+        };
+        
+        window.onParamChange = function(paramSelect) {
+            const ruleItem = paramSelect.closest('.rule-item');
+            const unitInput = ruleItem.querySelector('input[data-unit-input]');
+            if (unitInput && paramSelect.selectedOptions.length > 0) {
+                const unit = paramSelect.selectedOptions[0].dataset.unit;
+                if (unit) {
+                    unitInput.value = unit;
+                }
+            }
+            updateRulePreview();
+        };
+        
+        window.onAlertTypeChange = function() {
+            const alertType = document.querySelector('input[name="alertType"]:checked').value;
+            const warningSection = document.getElementById('warningSection');
+            const alarmSection = document.getElementById('alarmSection');
+            
+            if (alertType === 'warning') {
+                warningSection.style.display = 'block';
+                alarmSection.style.display = 'none';
+            } else {
+                warningSection.style.display = 'none';
+                alarmSection.style.display = 'block';
+            }
+        };
+        
+        window.updateAutoLevel = function() {
+            const minVal = parseFloat(document.getElementById('singleMinInput')?.value) || 0;
+            const maxVal = parseFloat(document.getElementById('singleMaxInput')?.value) || 0;
+            const thresholdVal = parseFloat(document.getElementById('thresholdInput')?.value) || 0;
+            
+            if (minVal > 0 && maxVal > 0 && thresholdVal > 0) {
+                const range = maxVal - minVal;
+                const warningThreshold = minVal + range * 0.7;
+                const alarmThreshold = minVal + range * 0.9;
+                
+                const alertType = document.querySelector('input[name="alertType"]:checked').value;
+                if (alertType === 'warning' && thresholdVal >= warningThreshold && thresholdVal < alarmThreshold) {
+                    document.getElementById('warningLevel').value = 'medium';
+                } else if (alertType === 'alarm') {
+                    if (thresholdVal >= alarmThreshold) {
+                        document.getElementById('alarmLevel').value = 'emergency';
+                    } else if (thresholdVal >= warningThreshold) {
+                        document.getElementById('alarmLevel').value = 'high';
+                    } else {
+                        document.getElementById('alarmLevel').value = 'medium';
+                    }
+                }
+            }
+        };
+        
+        window.togglePerson = function(el) {
+            el.classList.toggle('selected');
+        };
+        
+        window.toggleNotificationMethod = function(el) {
+            el.classList.toggle('selected');
+        };
+        
+        window.toggleRuleEditor = function() {
+            const ruleType = document.getElementById('ruleType').value;
+            const singleParamSection = document.getElementById('singleParamSection');
+            const multiEditor = document.getElementById('multiRuleEditor');
+            
+            if (ruleType === 'single') {
+                singleParamSection.style.display = 'block';
+                multiEditor.style.display = 'none';
+            } else {
+                singleParamSection.style.display = 'none';
+                multiEditor.style.display = 'block';
+            }
+            updateRulePreview();
+        };
+        
+        window.toggleEditRuleEditor = function() {
+            const ruleType = document.getElementById('editRuleType').value;
+            const multiEditor = document.getElementById('editMultiRuleEditor');
+            
+            if (ruleType === 'single') {
+                multiEditor.style.display = 'none';
+            } else {
+                multiEditor.style.display = 'block';
+            }
+        };
+        
+        window.setGroupLogic = function(logic, btn) {
+            const buttons = btn.parentElement.querySelectorAll('.logic-btn');
+            buttons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            updateRulePreview();
+        };
+        
+        window.setEditGroupLogic = function(logic, btn) {
+            const buttons = btn.parentElement.querySelectorAll('.logic-btn');
+            buttons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        };
+        
+        window.addRuleItem = function() {
+            const equipmentId = document.getElementById('createEquipment').value;
+            const equipment = equipmentParams[equipmentId];
+            if (!equipment) {
+                alert('请先选择设备');
+                return;
+            }
+            
+            const container = document.getElementById('ruleItemsContainer');
+            let optionsHtml = '';
+            equipment.params.forEach(param => {
+                optionsHtml += `<option value="${param.value}" data-unit="${param.unit}">${param.label}</option>`;
+            });
+            
+            const template = `
+                <div class="rule-item">
+                    <label>参数：</label>
+                    <select class="form-select small" data-param-select onchange="onParamChange(this)">
+                        ${optionsHtml}
+                    </select>
+                    <label>运算符：</label>
+                    <select class="form-select small">
+                        <option value=">">></option>
+                        <option value=">=">>=</option>
+                        <option value="<"><</option>
+                        <option value="<="><=</option>
+                        <option value="==">=</option>
+                        <option value="!=">≠</option>
+                    </select>
+                    <label>阈值：</label>
+                    <input type="number" class="form-input small" placeholder="阈值" onchange="updateRulePreview()">
+                    <label>单位：</label>
+                    <input type="text" class="form-input small" data-unit-input placeholder="单位" style="min-width: 60px;" value="${equipment.params[0].unit}">
+                    <label>持续：</label>
+                    <input type="number" class="form-input small" value="10" min="1" style="width: 60px;">
+                    <select class="form-select small" style="width: 70px;">
+                        <option value="seconds">秒</option>
+                        <option value="minutes">分钟</option>
+                    </select>
+                    <button class="btn btn-sm btn-danger" onclick="removeRuleItem(this)">×</button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', template);
+            updateRulePreview();
+        };
+        
+        window.addEditRuleItem = function() {
+            const container = document.getElementById('editRuleItemsContainer');
+            const template = `
+                <div class="rule-item">
+                    <label>参数：</label>
+                    <select class="form-select small">
+                        <option value="temperature">温度</option>
+                        <option value="pressure">压力</option>
+                        <option value="vibration">振动</option>
+                        <option value="current">电流</option>
+                        <option value="voltage">电压</option>
+                    </select>
+                    <label>运算符：</label>
+                    <select class="form-select small">
+                        <option value=">">></option>
+                        <option value=">=">>=</option>
+                        <option value="<"><</option>
+                        <option value="<="><=</option>
+                        <option value="==">=</option>
+                        <option value="!=">≠</option>
+                    </select>
+                    <label>阈值：</label>
+                    <input type="number" class="form-input small" placeholder="阈值">
+                    <label>单位：</label>
+                    <input type="text" class="form-input small" placeholder="单位" style="min-width: 60px;">
+                    <button class="btn btn-sm btn-danger" onclick="removeRuleItem(this)">×</button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', template);
+        };
+        
+        window.removeRuleItem = function(btn) {
+            const ruleItem = btn.closest('.rule-item');
+            const container = ruleItem.parentElement;
+            if (container.querySelectorAll('.rule-item').length > 1) {
+                ruleItem.remove();
+                updateRulePreview();
+            } else {
+                alert('至少需要保留一个条件！');
+            }
+        };
+        
+        function updateRulePreview() {
+            const previewText = document.getElementById('rulePreviewText');
+            const equipmentId = document.getElementById('createEquipment').value;
+            const equipment = equipmentParams[equipmentId];
+            
+            if (!equipment) {
+                previewText.textContent = '请先选择设备';
+                return;
+            }
+            
+            const ruleItems = document.querySelectorAll('#ruleItemsContainer .rule-item');
+            const logicBtn = document.querySelector('.rule-group-logic .logic-btn.active');
+            const logic = logicBtn ? logicBtn.textContent : 'AND';
+            
+            let preview = `<strong>条件组 1（${logic}逻辑）：</strong><br>`;
+            
+            ruleItems.forEach((item, index) => {
+                const paramSelect = item.querySelector('[data-param-select]');
+                const operatorSelect = item.querySelectorAll('select')[1];
+                const valueInput = item.querySelector('input[type="number"]');
+                const unitInput = item.querySelector('[data-unit-input]');
+                
+                const paramLabel = paramSelect.selectedOptions[0].text;
+                const operator = operatorSelect.value;
+                const value = valueInput.value || '?';
+                const unit = unitInput.value || '';
+                
+                preview += `• ${paramLabel} ${operator} ${value} ${unit}<br>`;
+            });
+            
+            const duration = document.getElementById('multiDurationInput').value;
+            const durationUnit = document.getElementById('multiDurationUnit').value;
+            const durationUnitText = durationUnit === 'seconds' ? '秒' : durationUnit === 'minutes' ? '分钟' : '小时';
+            
+            preview += `<br><strong>持续时间：</strong>满足条件持续 ${duration}${durationUnitText} 后触发`;
+            
+            previewText.innerHTML = preview;
+        }
+    </script>
+</body>
+</html>

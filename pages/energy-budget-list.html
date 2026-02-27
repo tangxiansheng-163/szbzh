@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预算编制 - 能源管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/energy-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">能源预算管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">预算编制</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">编制能源预算，包括年度、季度、月度能源预算的制定、审批、调整等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="预算编号、预算名称">
+                </div>
+                <div class="filter-item">
+                    <label>预算类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="annual">年度预算</option>
+                        <option value="quarterly">季度预算</option>
+                        <option value="monthly">月度预算</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>预算状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="draft">草稿</option>
+                        <option value="pending">待审批</option>
+                        <option value="approved">已批准</option>
+                        <option value="executing">执行中</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary">+ 新建预算</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">预算编号</th>
+                            <th width="150">预算名称</th>
+                            <th width="100">预算类型</th>
+                            <th width="120">预算周期</th>
+                            <th width="120">预算金额</th>
+                            <th width="100">预算状态</th>
+                            <th width="120">创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="budget-id" value="1"></td>
+                            <td>BUDGET-2025-001</td>
+                            <td>2025年年度能源预算</td>
+                            <td>年度预算</td>
+                            <td>2025</td>
+                            <td>¥15,000,000</td>
+                            <td><span class="status-badge status-success">已批准</span></td>
+                            <td>2025-01-10</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/energy-budget-detail.html" data-id="1">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/energy-budget-edit.html" data-id="1">编辑</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 1 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            console.log('预算编制 页面已加载');
+            if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+            document.querySelectorAll('.action-left .btn-default').forEach(function(btn) {
+                if (btn.textContent.indexOf('导出') !== -1) btn.addEventListener('click', function() { if (confirm('确定导出当前列表？')) alert('导出成功，文件已下载。'); });
+            });
+        </script>
+    </div>
+</body>
+</html>

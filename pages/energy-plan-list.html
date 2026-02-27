@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>能源计划 - 能源管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/energy-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">能源计划与单耗管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">能源计划</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理能源计划，包括年度、季度、月度能源计划的制定、审批、执行跟踪；支持计划与实际能耗对比分析。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="计划编号、计划名称、ECC层级">
+                </div>
+                <div class="filter-item">
+                    <label>计划类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="annual">年度计划</option>
+                        <option value="quarterly">季度计划</option>
+                        <option value="monthly">月度计划</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>计划状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="draft">草稿</option>
+                        <option value="pending">待审批</option>
+                        <option value="approved">已审批</option>
+                        <option value="executing">执行中</option>
+                        <option value="completed">已完成</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>能源类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="electricity">电</option>
+                        <option value="water">水</option>
+                        <option value="steam">蒸汽</option>
+                        <option value="gas">天然气</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary btn-create-modal"
+                        data-modal="plan-create-modal"
+                        data-title="新建能源计划"
+                        data-url="pages/energy-plan-create.html">
+                    + 新建计划
+                </button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">计划编号</th>
+                            <th width="180">计划名称</th>
+                            <th width="100">计划类型</th>
+                            <th width="120">计划周期</th>
+                            <th width="120">ECC层级</th>
+                            <th width="80">能源类型</th>
+                            <th width="100">计划值</th>
+                            <th width="100">实绩值</th>
+                            <th width="80">完成率</th>
+                            <th width="100">责任部门</th>
+                            <th width="90">计划状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="plan-id" value="1"></td>
+                            <td>EP-2025-001</td>
+                            <td>2025年Q1季度用电计划</td>
+                            <td>季度计划</td>
+                            <td>2025-01 ~ 2025-03</td>
+                            <td>工厂</td>
+                            <td>电</td>
+                            <td>3,500 MWh</td>
+                            <td>1,245.6 MWh</td>
+                            <td>35.6%</td>
+                            <td>生产部</td>
+                            <td><span class="status-badge status-processing">执行中</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/energy-plan-detail.html" data-id="1">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/energy-plan-edit.html" data-id="1">编辑</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="plan-id" value="2"></td>
+                            <td>EP-2025-002</td>
+                            <td>2025年1月用电计划</td>
+                            <td>月度计划</td>
+                            <td>2025-01</td>
+                            <td>车间A</td>
+                            <td>电</td>
+                            <td>1,200 MWh</td>
+                            <td>1,245.6 MWh</td>
+                            <td>103.8%</td>
+                            <td><span class="status-badge status-processing">执行中</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/energy-plan-detail.html" data-id="2">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/energy-plan-edit.html" data-id="2">编辑</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="plan-id" value="3"></td>
+                            <td>EP-2025-003</td>
+                            <td>2025年度用水计划</td>
+                            <td>年度计划</td>
+                            <td>2025</td>
+                            <td>工厂</td>
+                            <td>水</td>
+                            <td>15,000 m³</td>
+                            <td>1,245.5 m³</td>
+                            <td>8.3%</td>
+                            <td>生产部</td>
+                            <td><span class="status-badge status-processing">执行中</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/energy-plan-detail.html" data-id="3">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/energy-plan-edit.html" data-id="3">编辑</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 3 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            console.log('能源计划列表 页面已加载');
+            if (typeof PageInteractions !== 'undefined') {
+                PageInteractions.initButtons();
+                PageInteractions.toggleSelectAll('input[name="plan-id"]');
+            }
+            document.querySelectorAll('.action-left .btn-default').forEach(function(btn) {
+                if (btn.textContent.indexOf('导出') !== -1) btn.addEventListener('click', function() { if (confirm('确定导出当前列表？')) alert('导出成功，文件已下载。'); });
+            });
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>需求预测 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">需求管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">需求预测</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">基于历史数据和趋势分析进行采购需求预测，支持多种预测模型和算法。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>物料</label>
+                    <input type="text" class="form-input" placeholder="物料编码、物料名称">
+                </div>
+                <div class="filter-item">
+                    <label>预测周期</label>
+                    <select class="form-select">
+                        <option value="month">月度</option>
+                        <option value="quarter">季度</option>
+                        <option value="year">年度</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary">+ 新建预测</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">需求预测结果</h3>
+            </div>
+            <div class="card-body">
+<div class="table-wrapper">
+                <table class="list-table-nowrap">
+                        <thead>
+                            <tr>
+                                <th width="120">物料编码</th>
+                                <th width="200">物料名称</th>
+                                <th width="100">历史需求</th>
+                                <th width="100">预测需求</th>
+                                <th width="100">预测准确率</th>
+                                <th width="120">预测周期</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>MAT-001</td>
+                                <td>电子元器件A</td>
+                                <td>1,000个</td>
+                                <td>1,200个</td>
+                                <td>92.5%</td>
+                                <td>2025-02</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 20px; padding: 20px; background: #f5f5f5; border-radius: 4px; text-align: center; color: #999;">
+                    需求预测趋势图表展示区域（可集成ECharts等图表库）
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('需求预测 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

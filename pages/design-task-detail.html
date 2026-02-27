@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设计任务详情</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">任务管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/design-task-list.html" class="breadcrumb-item">设计任务列表</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">设计任务详情</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">查看设计任务基本信息、BOM 结构、图纸附件与审核情况；需编辑或上传请进入「设计工作台」。</p>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default btn-back" data-url="pages/design-task-list.html">← 返回列表</button>
+                <a href="pages/design-workbench.html?id=1" class="btn btn-primary dt-detail-workbench" id="dt-detail-workbench" style="display: none;">设计工作台</a>
+                <a href="pages/design-task-review.html?id=2" class="btn btn-primary dt-detail-review" id="dt-detail-review" style="display: none;">审核</a>
+                <button type="button" class="btn btn-primary dt-detail-publish" id="dt-detail-publish" style="display: none;">发布</button>
+            </div>
+            <div class="action-right">
+                <button class="btn btn-default" id="dt-detail-export">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="section-title">基本信息</div>
+                <div class="form-info-grid">
+                    <div class="form-info-item">
+                        <span class="form-info-label">任务编号</span>
+                        <span class="form-info-value" id="dt-code">DT-2025-001</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">任务名称</span>
+                        <span class="form-info-value" id="dt-name">智能控制器电气设计</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">技术任务编号</span>
+                        <span class="form-info-value" id="dt-tech"><a href="pages/tech-task-detail.html?id=1">TT-2025-001</a></span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">设计类型</span>
+                        <span class="form-info-value" id="dt-type">电气设计</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">设计人员</span>
+                        <span class="form-info-value" id="dt-designer">张设计师</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">任务状态</span>
+                        <span class="form-info-value" id="dt-status"><span class="status-badge status-processing">执行中</span></span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">性质</span>
+                        <span class="form-info-value" id="dt-nature">正式</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">计划完成日期</span>
+                        <span class="form-info-value" id="dt-plan">2025-02-28</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">实际完成日期</span>
+                        <span class="form-info-value" id="dt-actual">—</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">创建人 / 创建时间</span>
+                        <span class="form-info-value" id="dt-created">系统 / 2025-01-18 10:00</span>
+                    </div>
+                </div>
+                <div style="margin-top: 16px;">
+                    <div class="form-info-label" style="margin-bottom: 6px;">设计说明</div>
+                    <div class="desc-box" id="dt-desc">完成智能控制器电气原理图、PCB 布局及物料选型，输出 BOM 初稿。</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="dt-bom-attach-card">
+            <div class="card-header card-header-with-tabs">
+                <span class="card-title">BOM 层级设计 / 图纸与附件</span>
+                <div class="dt-detail-tab-bar">
+                    <label class="dt-detail-tab"><input type="radio" name="dt-tab" value="bom" checked> BOM 层级设计</label>
+                    <label class="dt-detail-tab"><input type="radio" name="dt-tab" value="attach"> 图纸与附件</label>
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="section-note">本任务所属技术任务下的 BOM 结构与图纸附件（只读）；编辑与上传请进入设计工作台。</p>
+                <div class="dt-detail-tabs">
+                    <div id="dt-tab-pane-bom" class="dt-detail-tab-pane" data-tab="bom">
+                        <div class="table-wrapper">
+                            <table class="bom-structure-table bom-readonly">
+                                <thead>
+                                    <tr>
+                                        <th class="col-no">序号</th>
+                                        <th class="col-level">层级号</th>
+                                        <th>物料</th>
+                                        <th>物料编码</th>
+                                        <th>规格型号</th>
+                                        <th class="col-qty">数量</th>
+                                        <th class="col-unit">单位</th>
+                                        <th class="col-key">关键件</th>
+                                        <th class="col-loss">损耗率</th>
+                                        <th class="col-supplier">推荐供应商</th>
+                                        <th class="col-price">参考价格</th>
+                                        <th class="col-remark">备注</th>
+                                        <th class="col-owner">添加人</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dt-bom-tbody">
+                                    <tr><td class="col-no">1</td><td class="col-level">1</td><td>智能控制器</td><td>M000</td><td>—</td><td class="col-qty">1</td><td class="col-unit">台</td><td class="col-key">是</td><td class="col-loss">0</td><td class="col-supplier">—</td><td class="col-price">—</td><td class="col-remark">—</td><td class="col-owner">本人</td></tr>
+                                    <tr><td class="col-no">2</td><td class="col-level">1.1</td><td>主控板</td><td>M001</td><td>CTRL-MAIN-V1</td><td class="col-qty">1</td><td class="col-unit">件</td><td class="col-key">是</td><td class="col-loss">0</td><td class="col-supplier">—</td><td class="col-price">—</td><td class="col-remark">—</td><td class="col-owner">本人</td></tr>
+                                    <tr><td class="col-no">3</td><td class="col-level">1.2</td><td>传感器模块</td><td>M003</td><td>SN-温度-01</td><td class="col-qty">1</td><td class="col-unit">个</td><td class="col-key">是</td><td class="col-loss">—</td><td class="col-supplier">—</td><td class="col-price">—</td><td class="col-remark">—</td><td class="col-owner">李</td></tr>
+                                    <tr><td class="col-no">4</td><td class="col-level">1.3</td><td>不锈钢螺栓</td><td>M002</td><td>M8×20</td><td class="col-qty">4</td><td class="col-unit">个</td><td class="col-key">否</td><td class="col-loss">—</td><td class="col-supplier">—</td><td class="col-price">—</td><td class="col-remark">—</td><td class="col-owner">王</td></tr>
+                                    <tr><td class="col-no">5</td><td class="col-level">1.4</td><td>电源模块</td><td>M004</td><td>PSU-24V-5A</td><td class="col-qty">1</td><td class="col-unit">件</td><td class="col-key">否</td><td class="col-loss">0</td><td class="col-supplier">—</td><td class="col-price">—</td><td class="col-remark">—</td><td class="col-owner">本人</td></tr>
+                                    <tr><td class="col-no">6</td><td class="col-level">1.4.1</td><td>接线端子</td><td>M005</td><td>TB-10P</td><td class="col-qty">2</td><td class="col-unit">个</td><td class="col-key">否</td><td class="col-loss">0</td><td class="col-supplier">—</td><td class="col-price">—</td><td class="col-remark">—</td><td class="col-owner">本人</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="dt-tab-pane-attach" class="dt-detail-tab-pane" data-tab="attach">
+                        <div class="table-wrapper">
+                            <table class="output-table dt-attach-table">
+                                <thead>
+                                    <tr>
+                                        <th>类型</th>
+                                        <th>物料编码</th>
+                                        <th>物料名称</th>
+                                        <th>规格型号</th>
+                                        <th>文件名称</th>
+                                        <th>版本</th>
+                                        <th>格式</th>
+                                        <th>上传时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dt-attach-tbody">
+                                    <tr>
+                                        <td>图纸</td>
+                                        <td>M000</td>
+                                        <td>智能控制器</td>
+                                        <td>—</td>
+                                        <td>智能控制器原理图 V1.0</td>
+                                        <td>V1.0</td>
+                                        <td>DWG</td>
+                                        <td>2025-02-10 14:20</td>
+                                        <td><div class="cell-actions"><button class="btn btn-sm btn-default" type="button">预览</button><button class="btn btn-sm btn-default" type="button">下载</button></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>图纸</td>
+                                        <td>M001</td>
+                                        <td>主控板</td>
+                                        <td>CTRL-MAIN-V1</td>
+                                        <td>PCB 布局图</td>
+                                        <td>V1.0</td>
+                                        <td>DWG</td>
+                                        <td>2025-02-11 10:00</td>
+                                        <td><div class="cell-actions"><button class="btn btn-sm btn-default" type="button">预览</button><button class="btn btn-sm btn-default" type="button">下载</button></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>BOM 数据</td>
+                                        <td>M000</td>
+                                        <td>智能控制器</td>
+                                        <td>—</td>
+                                        <td>控制器 BOM 初稿</td>
+                                        <td>V1.0</td>
+                                        <td>Excel</td>
+                                        <td>2025-02-12 09:15</td>
+                                        <td><div class="cell-actions"><button class="btn btn-sm btn-default" type="button">预览</button><button class="btn btn-sm btn-default" type="button">下载</button></div></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">审核信息</span>
+            </div>
+            <div class="card-body">
+                <div class="form-info-grid">
+                    <div class="form-info-item">
+                        <span class="form-info-label">审核状态</span>
+                        <span class="form-info-value" id="dt-review-status">—</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">审核人</span>
+                        <span class="form-info-value" id="dt-reviewer">—</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">审核时间</span>
+                        <span class="form-info-value" id="dt-review-time">—</span>
+                    </div>
+                </div>
+                <div style="margin-top: 12px;">
+                    <div class="form-info-label" style="margin-bottom: 6px;">审核意见</div>
+                    <div class="desc-box" id="dt-review-desc">暂无审核意见。提交审核后，技术任务负责人可填写审核意见并通过/驳回。</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="dt-publish-ebom-modal" class="modal-overlay" data-wb-modal>
+            <div class="modal" style="max-width: 640px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">发布 EBOM</span>
+                    <div class="modal-close" data-close-modal="dt-publish-ebom-modal">×</div>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-desc">设计任务审核通过后，可发起 EBOM 发布。请设定会审部门及对应人员，<strong>全部通过后</strong>系统下推生成 EBOM。</p>
+                    <div class="form-item">
+                        <label class="form-label">关联设计任务</label>
+                        <div class="form-input" style="background: var(--bg-fill); color: var(--text-primary);" id="publish-dt-info" readonly>—</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label required">会审部门及人员</label>
+                        <div class="table-wrapper">
+                            <table class="output-table" style="font-size: 13px;">
+                                <thead>
+                                    <tr>
+                                        <th width="180">会审部门</th>
+                                        <th>会审人员</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="publish-review-tbody">
+                                    <tr class="publish-review-row">
+                                        <td>
+                                            <select class="form-select form-input publish-dept" style="width:100%;">
+                                                <option value="">请选择部门</option>
+                                                <option value="process">工艺</option>
+                                                <option value="quality">质量</option>
+                                                <option value="prod">生产</option>
+                                                <option value="purchase">采购</option>
+                                                <option value="rd">研发</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-select form-input publish-person" style="width:100%;">
+                                                <option value="">请选择人员</option>
+                                                <option value="li">李工</option>
+                                                <option value="wang">王工</option>
+                                                <option value="zhao">赵工</option>
+                                                <option value="sun">孙工</option>
+                                                <option value="zhou">周工</option>
+                                            </select>
+                                        </td>
+                                        <td><button type="button" class="btn btn-sm btn-default publish-row-del">删除</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-default" id="publish-add-row" style="margin-top: 8px;">+ 添加部门</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="dt-publish-ebom-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="publish-ebom-submit">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+
+            var MOCK = {
+                '1': { code: 'DT-2025-001', name: '智能控制器电气设计', techId: '1', tech: 'TT-2025-001', type: '电气设计', designer: '张设计师', status: 'running', statusClass: 'status-processing', statusText: '执行中', taskNature: 'formal', taskNatureText: '正式', plan: '2025-02-28', actual: '—', created: '系统 / 2025-01-18 10:00', desc: '完成智能控制器电气原理图、PCB 布局及物料选型，输出 BOM 初稿。', reviewStatus: '—', reviewer: '—', reviewTime: '—', reviewDesc: '暂无审核意见。设计任务提交审核后，技术任务负责人可填写审核意见并通过/驳回。', showWorkbench: true, showReview: false, showPublish: false },
+                '2': { code: 'DT-2025-002', name: '传感器模块结构设计', techId: '1', tech: 'TT-2025-001', type: '结构设计', designer: '李设计师', status: 'submitted', statusClass: 'status-warning', statusText: '待审核', taskNature: 'formal', taskNatureText: '正式', plan: '2025-03-15', actual: '2025-03-12', created: '系统 / 2025-01-18 10:00', desc: '完成传感器模块结构件设计与装配关系，输出 3D 模型与 BOM。', reviewStatus: '—', reviewer: '—', reviewTime: '—', reviewDesc: '待审核。技术任务负责人可在「待我审核」中处理。', showWorkbench: false, showReview: true, showPublish: false },
+                '3': { code: 'DT-2025-003', name: '执行器软件设计', techId: '3', tech: 'TT-2025-003', type: '软件设计', designer: '王设计师', status: 'approved', statusClass: 'status-success', statusText: '已通过', taskNature: 'sample', taskNatureText: '样品', plan: '2025-02-20', actual: '2025-02-18', created: '系统 / 2025-01-18 10:00', desc: '完成执行器控制固件与通信协议，输出软件包与 BOM 变更。', reviewStatus: '已通过', reviewer: '技术负责人', reviewTime: '2025-02-19 14:00', reviewDesc: '符合设计要求，同意发布。', showWorkbench: false, showReview: false, showPublish: true },
+                '4': { code: 'DT-2025-004', name: '控制面板热设计', techId: '2', tech: 'TT-2025-002', type: '其他', designer: '赵设计师', status: 'pending', statusClass: 'status-draft', statusText: '待执行', taskNature: 'formal', taskNatureText: '正式', plan: '2025-03-25', actual: '—', created: '系统 / 2025-01-20 09:00', desc: '完成控制面板散热与热仿真，输出热设计报告与 BOM 建议。', reviewStatus: '—', reviewer: '—', reviewTime: '—', reviewDesc: '暂无审核意见。', showWorkbench: true, showReview: false, showPublish: false },
+                '5': { code: 'DT-2025-005', name: '电源模块电气设计', techId: '2', tech: 'TT-2025-002', type: '电气设计', designer: '孙设计师', status: 'reviewing', statusClass: 'status-reviewing', statusText: '审核中', taskNature: 'formal', taskNatureText: '正式', plan: '2025-03-10', actual: '—', created: '系统 / 2025-01-20 09:00', desc: '完成电源模块原理图与 PCB，输出 BOM 与安规文档。', reviewStatus: '审核中', reviewer: '技术负责人', reviewTime: '—', reviewDesc: '审核中，请等待结论。', showWorkbench: false, showReview: true, showPublish: false },
+                '6': { code: 'DT-2025-006', name: '外壳结构设计', techId: '1', tech: 'TT-2025-001', type: '结构设计', designer: '周设计师', status: 'rejected', statusClass: 'status-rejected', statusText: '已驳回', taskNature: 'formal', taskNatureText: '正式', plan: '2025-03-05', actual: '—', created: '系统 / 2025-01-18 10:00', desc: '完成外壳结构、开孔与防护设计，输出 3D 与 2D 图纸。', reviewStatus: '已驳回', reviewer: '技术负责人', reviewTime: '2025-03-04 16:30', reviewDesc: '装配接口与 1.2 节尺寸不一致，请按最新接口规范修改后重新提交。', showWorkbench: true, showReview: false, showPublish: false }
+            };
+
+            var id = (function () {
+                var q = window.location.search || '';
+                var m = /[?&]id=(\d+)/.exec(q);
+                if (m && m[1]) return m[1];
+                var page = '';
+                try { page = new URLSearchParams(q).get('page') || ''; } catch (e) {}
+                m = /id=(\d+)/.exec(page);
+                return (m && m[1]) ? m[1] : '1';
+            })();
+
+            var d = MOCK[id] || MOCK['1'];
+
+            function byId(x) { return document.getElementById(x); }
+
+            byId('dt-code').textContent = d.code;
+            byId('dt-name').textContent = d.name;
+            var techEl = byId('dt-tech');
+            techEl.innerHTML = '';
+            var a = document.createElement('a');
+            a.href = 'pages/tech-task-detail.html?id=' + d.techId;
+            a.textContent = d.tech;
+            techEl.appendChild(a);
+            byId('dt-type').textContent = d.type;
+            byId('dt-designer').textContent = d.designer;
+            var statusEl = byId('dt-status');
+            statusEl.innerHTML = '<span class="status-badge ' + d.statusClass + '">' + d.statusText + '</span>';
+            byId('dt-nature').textContent = d.taskNatureText || '—';
+            byId('dt-plan').textContent = d.plan;
+            byId('dt-actual').textContent = d.actual;
+            byId('dt-created').textContent = d.created;
+            byId('dt-desc').textContent = d.desc;
+            byId('dt-review-status').textContent = d.reviewStatus;
+            byId('dt-reviewer').textContent = d.reviewer;
+            byId('dt-review-time').textContent = d.reviewTime;
+            byId('dt-review-desc').textContent = d.reviewDesc;
+
+            var wb = byId('dt-detail-workbench');
+            var rv = byId('dt-detail-review');
+            var pub = byId('dt-detail-publish');
+            if (wb) { wb.style.display = d.showWorkbench ? '' : 'none'; wb.href = 'pages/design-workbench.html?id=' + id; }
+            if (rv) { rv.style.display = d.showReview ? '' : 'none'; rv.href = 'pages/design-task-review.html?id=' + id; }
+            if (pub) pub.style.display = (d.showPublish === true) ? '' : 'none';
+
+            var exportBtn = byId('dt-detail-export');
+            if (exportBtn) exportBtn.addEventListener('click', function () { alert('导出功能（当前为原型演示）'); });
+
+            var publishModal = byId('dt-publish-ebom-modal');
+            var publishInfo = byId('publish-dt-info');
+            var publishTbody = byId('publish-review-tbody');
+            var publishAddRow = byId('publish-add-row');
+            var publishSubmit = byId('publish-ebom-submit');
+
+            function openPublishModal() {
+                if (publishInfo) publishInfo.textContent = d.code + ' ' + d.name;
+                if (publishModal) publishModal.classList.add('active');
+            }
+            function closePublishModal() {
+                if (publishModal) publishModal.classList.remove('active');
+            }
+
+            function addPublishRow() {
+                if (!publishTbody) return;
+                var tr = document.createElement('tr');
+                tr.className = 'publish-review-row';
+                tr.innerHTML = '<td><select class="form-select form-input publish-dept" style="width:100%;"><option value="">请选择部门</option><option value="process">工艺</option><option value="quality">质量</option><option value="prod">生产</option><option value="purchase">采购</option><option value="rd">研发</option></select></td><td><select class="form-select form-input publish-person" style="width:100%;"><option value="">请选择人员</option><option value="li">李工</option><option value="wang">王工</option><option value="zhao">赵工</option><option value="sun">孙工</option><option value="zhou">周工</option></select></td><td><button type="button" class="btn btn-sm btn-default publish-row-del">删除</button></td>';
+                publishTbody.appendChild(tr);
+            }
+            publishTbody && publishTbody.addEventListener('click', function (e) {
+                if (e.target && e.target.classList && e.target.classList.contains('publish-row-del')) {
+                    var row = e.target.closest('tr');
+                    if (row && publishTbody.querySelectorAll('tr').length > 1) row.remove();
+                }
+            });
+            if (publishAddRow) publishAddRow.addEventListener('click', addPublishRow);
+
+            document.querySelectorAll('[data-close-modal="dt-publish-ebom-modal"]').forEach(function (b) {
+                b.addEventListener('click', closePublishModal);
+            });
+            if (publishModal) {
+                publishModal.addEventListener('click', function (e) { if (e.target === publishModal) closePublishModal(); });
+            }
+            if (pub) pub.addEventListener('click', openPublishModal);
+
+            if (publishSubmit) {
+                publishSubmit.addEventListener('click', function () {
+                    var rows = publishTbody ? publishTbody.querySelectorAll('.publish-review-row') : [];
+                    var ok = true;
+                    rows.forEach(function (r) {
+                        var dept = r.querySelector('.publish-dept');
+                        var person = r.querySelector('.publish-person');
+                        if (!dept || !dept.value || !person || !person.value) ok = false;
+                    });
+                    if (!ok || rows.length === 0) {
+                        alert('请为每个会审部门选择对应人员，至少保留一行。');
+                        return;
+                    }
+                    alert('已发起 EBOM 发布会审。会审全部通过后，系统将下推生成 EBOM。');
+                    closePublishModal();
+                });
+            }
+
+            var openParam = (function () {
+                var q = window.location.search || '';
+                var m = /[?&]open=(\w+)/.exec(q);
+                if (m && m[1]) return m[1];
+                var page = '';
+                try { page = new URLSearchParams(q).get('page') || ''; } catch (e) {}
+                m = /open=(\w+)/.exec(page);
+                return (m && m[1]) ? m[1] : '';
+            })();
+            if (openParam === 'publish' && d.showPublish) { openPublishModal(); }
+        })();
+    </script>
+</body>
+</html>

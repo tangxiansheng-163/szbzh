@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EBOM详情</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">BOM管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/ebom-list.html" class="breadcrumb-item">EBOM列表</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">EBOM详情</span>
+        </div>
+        <div class="page-header">
+            <p class="page-description">EBOM、MBOM、SBOM 本质均为 BOM。本页为<strong>工程 BOM</strong>详情，展示当前<strong>版本</strong>的 BOM 树及<strong>设计阶段</strong>信息（物料、层级、数量、技术要求等）、图纸附件、版本历史与变更记录。</p>
+        </div>
+        <div class="action-bar">
+            <div class="action-left">
+                <button type="button" class="btn btn-default btn-back" data-url="pages/ebom-list.html">← 返回列表</button>
+                <button type="button" class="btn btn-primary ebom-detail-edit" id="ebom-detail-edit" style="display:none;">编辑</button>
+                <a href="pages/ebom-review.html" class="btn btn-default ebom-detail-review" id="ebom-detail-review" style="display:none;">提交评审</a>
+            </div>
+            <div class="action-right">
+                <button type="button" class="btn btn-default" id="ebom-detail-export">导出</button>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="section-title">基本信息</div>
+                <div class="form-info-grid">
+                    <div class="form-info-item">
+                        <span class="form-info-label">BOM编码</span>
+                        <span class="form-info-value" id="ebom-code">—</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">产品编码</span>
+                        <span class="form-info-value" id="ebom-product-code">—</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">产品名称</span>
+                        <span class="form-info-value" id="ebom-product-name">—</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">版本号</span>
+                        <span class="form-info-value" id="ebom-version">—</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">状态</span>
+                        <span class="form-info-value" id="ebom-status">—</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">当前版</span>
+                        <span class="form-info-value" id="ebom-current">—</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">创建人</span>
+                        <span class="form-info-value" id="ebom-creator">—</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">创建时间</span>
+                        <span class="form-info-value" id="ebom-created">—</span>
+                    </div>
+                </div>
+                <div style="margin-top:12px;">
+                    <div class="form-info-label" style="margin-bottom:6px;">技术要求</div>
+                    <div class="desc-box" id="ebom-tech">—</div>
+                </div>
+            </div>
+        </div>
+        <div class="card bom-detail-tabs-card" id="ebom-detail-tabs-card">
+            <div class="card-header card-header-with-tabs">
+                <span class="card-title">BOM 明细 / 图纸附件 / 版本历史 / 变更记录</span>
+                <div class="dt-detail-tab-bar">
+                    <label class="dt-detail-tab"><input type="radio" name="ebom-tab" value="bom" checked> BOM 明细</label>
+                    <label class="dt-detail-tab"><input type="radio" name="ebom-tab" value="attach"> 图纸与附件</label>
+                    <label class="dt-detail-tab"><input type="radio" name="ebom-tab" value="version"> 版本历史</label>
+                    <label class="dt-detail-tab"><input type="radio" name="ebom-tab" value="change"> 变更记录</label>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="dt-detail-tab-pane" data-tab="bom">
+                    <div class="table-wrapper">
+                        <table class="bom-structure-table bom-readonly">
+                            <thead>
+                                <tr>
+                                    <th class="col-no">序号</th>
+                                    <th class="col-level">层级号</th>
+                                    <th>物料</th>
+                                    <th>物料编码</th>
+                                    <th>规格型号</th>
+                                    <th class="col-qty">数量</th>
+                                    <th class="col-unit">单位</th>
+                                    <th class="col-key">关键件</th>
+                                    <th class="col-loss">损耗率</th>
+                                    <th class="col-supplier">推荐供应商</th>
+                                    <th class="col-price">参考价格</th>
+                                    <th class="col-remark">备注</th>
+                                    <th class="col-owner">添加人</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="col-no">1</td><td class="col-level">1</td><td>智能控制器</td><td>M000</td><td>—</td><td class="col-qty">1</td><td class="col-unit">台</td><td class="col-key">是</td><td class="col-loss">0</td><td class="col-supplier">—</td><td class="col-price">—</td><td class="col-remark">—</td><td class="col-owner">本人</td></tr>
+                                <tr><td class="col-no">2</td><td class="col-level">1.1</td><td>主控板</td><td>M001</td><td>CTRL-MAIN-V1</td><td class="col-qty">1</td><td class="col-unit">件</td><td class="col-key">是</td><td class="col-loss">0</td><td class="col-supplier">—</td><td class="col-price">—</td><td class="col-remark">—</td><td class="col-owner">本人</td></tr>
+                                <tr><td class="col-no">3</td><td class="col-level">1.2</td><td>传感器模块</td><td>M003</td><td>SN-温度-01</td><td class="col-qty">1</td><td class="col-unit">个</td><td class="col-key">是</td><td class="col-loss">—</td><td class="col-supplier">—</td><td class="col-price">—</td><td class="col-remark">—</td><td class="col-owner">李</td></tr>
+                                <tr><td class="col-no">4</td><td class="col-level">1.3</td><td>不锈钢螺栓</td><td>M002</td><td>M8×20</td><td class="col-qty">4</td><td class="col-unit">个</td><td class="col-key">否</td><td class="col-loss">—</td><td class="col-supplier">—</td><td class="col-price">—</td><td class="col-remark">—</td><td class="col-owner">王</td></tr>
+                                <tr><td class="col-no">5</td><td class="col-level">1.4</td><td>电源模块</td><td>M004</td><td>PSU-24V-5A</td><td class="col-qty">1</td><td class="col-unit">件</td><td class="col-key">否</td><td class="col-loss">0</td><td class="col-supplier">—</td><td class="col-price">—</td><td class="col-remark">—</td><td class="col-owner">本人</td></tr>
+                                <tr><td class="col-no">6</td><td class="col-level">1.4.1</td><td>接线端子</td><td>M005</td><td>TB-10P</td><td class="col-qty">2</td><td class="col-unit">个</td><td class="col-key">否</td><td class="col-loss">0</td><td class="col-supplier">—</td><td class="col-price">—</td><td class="col-remark">—</td><td class="col-owner">本人</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="dt-detail-tab-pane" data-tab="attach">
+                    <div class="table-wrapper">
+                        <table class="output-table dt-attach-table">
+                            <thead>
+                                <tr>
+                                    <th>类型</th>
+                                    <th>物料编码</th>
+                                    <th>物料名称</th>
+                                    <th>规格型号</th>
+                                    <th>文件名称</th>
+                                    <th>版本</th>
+                                    <th>格式</th>
+                                    <th>上传时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>图纸</td><td>M000</td><td>智能控制器</td><td>—</td>
+                                    <td>智能控制器原理图 V1.0</td><td>V1.0</td><td>DWG</td><td>2025-02-10 14:20</td>
+                                    <td><div class="cell-actions"><button type="button" class="btn btn-sm btn-default">预览</button><button type="button" class="btn btn-sm btn-default">下载</button></div></td>
+                                </tr>
+                                <tr>
+                                    <td>图纸</td><td>M001</td><td>主控板</td><td>CTRL-MAIN-V1</td>
+                                    <td>PCB 布局图</td><td>V1.0</td><td>DWG</td><td>2025-02-11 10:00</td>
+                                    <td><div class="cell-actions"><button type="button" class="btn btn-sm btn-default">预览</button><button type="button" class="btn btn-sm btn-default">下载</button></div></td>
+                                </tr>
+                                <tr>
+                                    <td>BOM 数据</td><td>M000</td><td>智能控制器</td><td>—</td>
+                                    <td>控制器 BOM 初稿</td><td>V1.0</td><td>Excel</td><td>2025-02-12 09:15</td>
+                                    <td><div class="cell-actions"><button type="button" class="btn btn-sm btn-default">预览</button><button type="button" class="btn btn-sm btn-default">下载</button></div></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="dt-detail-tab-pane" data-tab="version">
+                    <div class="table-wrapper">
+                        <table class="output-table">
+                            <thead>
+                                <tr>
+                                    <th>版本号</th>
+                                    <th>生效时间</th>
+                                    <th>失效时间</th>
+                                    <th>变更单号</th>
+                                    <th>说明</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>V1.0</td><td>2025-01-15</td><td>—</td><td>—</td><td>初始发布</td></tr>
+                                <tr><td>V0.9</td><td>—</td><td>2025-01-14</td><td>—</td><td>草稿</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="dt-detail-tab-pane" data-tab="change">
+                    <div class="table-wrapper">
+                        <table class="output-table">
+                            <thead>
+                                <tr>
+                                    <th>变更单号</th>
+                                    <th>变更类型</th>
+                                    <th>变更原因</th>
+                                    <th>申请人</th>
+                                    <th>申请时间</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>暂无变更记录</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            (function () {
+                if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+                var id = (function () {
+                    var q = window.location.search || '';
+                    var m = /[?&]id=(\d+)/.exec(q);
+                    if (m && m[1]) return m[1];
+                    try { var p = new URLSearchParams(q).get('page') || ''; m = /id=(\d+)/.exec(p); return (m && m[1]) ? m[1] : '1'; } catch (e) { return '1'; }
+                })();
+                var MOCK = {
+                    '1': { code: '01-02-1001-01-V1', productCode: 'PROD-001', productName: '智能控制器', version: 'V1.0', status: 'published', statusText: '已发布', isCurrent: true, creator: '张工', created: '2025-01-15 10:30', tech: '符合 GB/T 标准；防护等级 IP54。', showEdit: false, showReview: false, showChange: true },
+                    '2': { code: '01-02-1002-01-V2', productCode: 'PROD-002', productName: '传感器模块', version: 'V1.2', status: 'changing', statusText: '变更中', isCurrent: false, creator: '李工', created: '2025-01-20 14:20', tech: '—', showEdit: false, showReview: false, showChange: true },
+                    '3': { code: '01-02-1003-01-V1', productCode: 'PROD-003', productName: '执行器', version: 'V0.9', status: 'draft', statusText: '草稿', isCurrent: false, creator: '王工', created: '2025-01-25 09:15', tech: '—', showEdit: true, showReview: true, showChange: false },
+                    '4': { code: '01-02-1004-01-V1', productCode: 'PROD-004', productName: '电源模块', version: 'V0.5', status: 'reviewing', statusText: '评审中', isCurrent: false, creator: '赵工', created: '2025-01-26 15:40', tech: '—', showEdit: false, showReview: false, showChange: false },
+                    '5': { code: '01-02-1005-01-V2', productCode: 'PROD-005', productName: '控制器外壳', version: 'V2.0', status: 'archived', statusText: '已归档', isCurrent: false, creator: '孙工', created: '2025-01-10 09:20', tech: '—', showEdit: false, showReview: false, showChange: false }
+                };
+                var d = MOCK[id] || MOCK['1'];
+                function byId(x) { return document.getElementById(x); }
+                byId('ebom-code').textContent = d.code;
+                byId('ebom-product-code').textContent = d.productCode;
+                byId('ebom-product-name').textContent = d.productName;
+                byId('ebom-version').textContent = d.version;
+                byId('ebom-status').innerHTML = '<span class="status-badge status-published">' + d.statusText + '</span>';
+                byId('ebom-current').textContent = d.isCurrent ? '是' : '否';
+                byId('ebom-creator').textContent = d.creator;
+                byId('ebom-created').textContent = d.created;
+                byId('ebom-tech').textContent = d.tech;
+                var statusClass = { draft: 'status-draft', reviewing: 'status-reviewing', published: 'status-published', changing: 'status-processing', archived: 'status-archived' }[d.status] || '';
+                byId('ebom-status').innerHTML = '<span class="status-badge ' + statusClass + '">' + d.statusText + '</span>';
+                var editBtn = byId('ebom-detail-edit');
+                var reviewBtn = byId('ebom-detail-review');
+                if (editBtn) editBtn.style.display = d.showEdit ? '' : 'none';
+                if (reviewBtn) { reviewBtn.style.display = d.showReview ? '' : 'none'; reviewBtn.href = 'pages/ebom-review.html?id=' + id; }
+                var exportBtn = byId('ebom-detail-export');
+                if (exportBtn) exportBtn.addEventListener('click', function () { alert('导出（原型演示）'); });
+                if (editBtn && d.showEdit) editBtn.addEventListener('click', function () { PageInteractions && PageInteractions.navigateToEdit && PageInteractions.navigateToEdit('pages/ebom-create.html', id); });
+            })();
+        </script>
+    </div>
+</body>
+</html>

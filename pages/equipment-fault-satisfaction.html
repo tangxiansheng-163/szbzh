@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>满意度评价 - 设备管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/equipment-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">故障上报</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">满意度评价</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">评价故障处理满意度，包括响应速度、处理质量、服务态度等维度的评价。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="上报单号、设备名称">
+                </div>
+                <div class="filter-item">
+                    <label>满意度</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="excellent">非常满意</option>
+                        <option value="good">满意</option>
+                        <option value="average">一般</option>
+                        <option value="poor">不满意</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">上报单号</th>
+                            <th width="150">设备名称</th>
+                            <th width="120">处理人</th>
+                            <th width="100">响应速度</th>
+                            <th width="100">处理质量</th>
+                            <th width="100">服务态度</th>
+                            <th width="100">综合评分</th>
+                            <th width="120">评价时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="satisfaction-id" value="1"></td>
+                            <td>FAULT-2025-002</td>
+                            <td>安全设备B-002</td>
+                            <td>维修员B</td>
+                            <td>5分</td>
+                            <td>5分</td>
+                            <td>5分</td>
+                            <td>5.0分</td>
+                            <td>2025-01-21</td>
+                            <td>
+                                <button class="btn btn-sm btn-default">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 1 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('满意度评价 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

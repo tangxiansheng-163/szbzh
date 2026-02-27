@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>结算管理 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">财务结算</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">结算管理</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理采购结算，包括结算单生成、对账、结算确认、结算统计等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="结算单号、供应商">
+                </div>
+                <div class="filter-item">
+                    <label>结算状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="draft">草稿</option>
+                        <option value="reconciling">对账中</option>
+                        <option value="confirmed">已确认</option>
+                        <option value="settled">已结算</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>结算周期</label>
+                    <input type="month" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary">+ 生成结算单</button>
+                <button class="btn btn-default">批量结算</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">结算单号</th>
+                            <th width="150">供应商</th>
+                            <th width="120">结算周期</th>
+                            <th width="120">结算金额</th>
+                            <th width="100">订单数量</th>
+                            <th width="100">发票数量</th>
+                            <th width="100">结算状态</th>
+                            <th width="120">结算日期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="settlement-id" value="1"></td>
+                            <td>SET-2025-001</td>
+                            <td>深圳市电子科技</td>
+                            <td>2025-01</td>
+                            <td>¥450,000.00</td>
+                            <td>15笔</td>
+                            <td>12张</td>
+                            <td><span class="status-badge status-processing">对账中</span></td>
+                            <td>-</td>
+                            <td>
+                                <button class="btn btn-sm btn-default">查看</button>
+                                <button class="btn btn-sm btn-primary">对账</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="settlement-id" value="2"></td>
+                            <td>SET-2025-002</td>
+                            <td>上海精密机械</td>
+                            <td>2025-01</td>
+                            <td>¥320,000.00</td>
+                            <td>10笔</td>
+                            <td>8张</td>
+                            <td><span class="status-badge status-success">已结算</span></td>
+                            <td>2025-01-25</td>
+                            <td>
+                                <button class="btn btn-sm btn-default">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 2 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('结算管理 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

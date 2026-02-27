@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报表中心 - 供应链协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/supply-chain-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">报表管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">报表中心</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">供应链报表中心，提供各类供应链统计分析报表，包括订单报表、库存报表、供应商报表等。</p>
+        </div>
+
+        <div class="dashboard-stats">
+            <a href="pages/supply-chain-report-order.html" class="stat-card">
+                <div class="stat-icon blue">📋</div>
+                <div class="stat-content">
+                    <div class="stat-label">订单报表</div>
+                    <div class="stat-value">10种</div>
+                </div>
+            </a>
+            <a href="pages/supply-chain-report-inventory.html" class="stat-card">
+                <div class="stat-icon green">📦</div>
+                <div class="stat-content">
+                    <div class="stat-label">库存报表</div>
+                    <div class="stat-value">8种</div>
+                </div>
+            </a>
+            <a href="pages/supply-chain-report-supplier.html" class="stat-card">
+                <div class="stat-icon purple">⭐</div>
+                <div class="stat-content">
+                    <div class="stat-label">供应商报表</div>
+                    <div class="stat-value">6种</div>
+                </div>
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">常用报表</h3>
+            </div>
+            <div class="card-body">
+                <div class="report-list">
+                    <a href="pages/supply-chain-report-order.html" class="report-item">
+                        <div class="report-icon">📋</div>
+                        <div class="report-content">
+                            <div class="report-title">订单统计报表</div>
+                            <div class="report-desc">按时间、供应商、物料等维度统计订单数据</div>
+                        </div>
+                        <span class="report-arrow">→</span>
+                    </a>
+                    <a href="pages/supply-chain-report-inventory.html" class="report-item">
+                        <div class="report-icon">📦</div>
+                        <div class="report-content">
+                            <div class="report-title">库存分析报表</div>
+                            <div class="report-desc">库存周转、库存结构、库存预警分析</div>
+                        </div>
+                        <span class="report-arrow">→</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('报表中心 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

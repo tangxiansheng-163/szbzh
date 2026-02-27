@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>不合格处理单详情 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">采购执行</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/procurement-unqualified-handle-list.html" class="breadcrumb-item">不合格处理单</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">详情</span>
+        </div>
+
+        <div class="page-header">
+            <h2 class="page-title">不合格处理单详情</h2>
+            <p class="page-description">查看由质检提交的不合格物料明细、不合格项信息、会审信息及处理结果。发起会审后，可在此页面查看各参与人的反馈意见并确定最终处理方式。</p>
+        </div>
+
+        <!-- 基本信息 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">基本信息</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+                    <div class="form-item">
+                        <label class="form-label">处理单号</label>
+                        <div class="form-value">UH-2025-001</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">关联采购订单</label>
+                        <div class="form-value">
+                            <a href="pages/procurement-order-detail.html?id=1" style="color:#1890ff;">PO-2025-001</a>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">关联到货单</label>
+                        <div class="form-value">
+                            <a href="pages/procurement-receipt-detail.html?id=1" style="color:#1890ff;">DN-2025-001</a>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">供应商</label>
+                        <div class="form-value">深圳市电子科技有限公司</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">处理状态</label>
+                        <div class="form-value">
+                            <span class="status-badge status-processing" id="handle-status">会审中</span>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">质检提交时间</label>
+                        <div class="form-value">2025-01-22 10:30</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">提交人</label>
+                        <div class="form-value">质检-张三</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">会审发起时间</label>
+                        <div class="form-value" id="review-start-time">2025-01-22 14:00</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">会审发起人</label>
+                        <div class="form-value">采购-张采购</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">会审参与人</label>
+                        <div class="form-value" id="review-participants">质量-李质检、技术-王工、采购-张采购、生产-赵主管</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 不合格物料明细 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">不合格物料明细</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table class="list-table-nowrap">
+                        <thead>
+                            <tr>
+                                <th width="60">序号</th>
+                                <th width="120">物料编码</th>
+                                <th width="200">物料名称</th>
+                                <th width="100">规格型号</th>
+                                <th width="80">单位</th>
+                                <th width="100">到货数量</th>
+                                <th width="100">不合格数量</th>
+                                <th width="120">不合格率</th>
+                                <th>不合格项</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-material-code="MAT-001">
+                                <td>1</td>
+                                <td>MAT-001</td>
+                                <td>电子元件A</td>
+                                <td>规格A</td>
+                                <td>个</td>
+                                <td>1000</td>
+                                <td>
+                                    <a href="javascript:void(0);" class="btn-view-issues" data-material-code="MAT-001" style="color:#1890ff;text-decoration:none;cursor:pointer;">50</a>
+                                </td>
+                                <td>5%</td>
+                                <td>
+                                    <span class="status-badge" style="background:#fff7e6;color:#d46b08;margin-right:4px;">尺寸偏差</span>
+                                    <span class="status-badge" style="background:#fff1f0;color:#cf1322;">外观缺陷</span>
+                                </td>
+                            </tr>
+                            <tr data-material-code="MAT-002">
+                                <td>2</td>
+                                <td>MAT-002</td>
+                                <td>电子元件B</td>
+                                <td>规格B</td>
+                                <td>个</td>
+                                <td>500</td>
+                                <td>
+                                    <a href="javascript:void(0);" class="btn-view-issues" data-material-code="MAT-002" style="color:#1890ff;text-decoration:none;cursor:pointer;">30</a>
+                                </td>
+                                <td>6%</td>
+                                <td>
+                                    <span class="status-badge" style="background:#fff7e6;color:#d46b08;">性能不达标</span>
+                                </td>
+                            </tr>
+                            <tr data-material-code="MAT-003">
+                                <td>3</td>
+                                <td>MAT-003</td>
+                                <td>电路板</td>
+                                <td>PCB-001</td>
+                                <td>块</td>
+                                <td>200</td>
+                                <td>
+                                    <a href="javascript:void(0);" class="btn-view-issues" data-material-code="MAT-003" style="color:#1890ff;text-decoration:none;cursor:pointer;">10</a>
+                                </td>
+                                <td>5%</td>
+                                <td>
+                                    <span class="status-badge" style="background:#fff1f0;color:#cf1322;">焊接不良</span>
+                                    <span class="status-badge" style="background:#fff7e6;color:#d46b08;">功能异常</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 会审意见与最终处理 -->
+        <div class="card" id="review-section" style="display:none;">
+            <div class="card-header">
+                <h3 class="card-title">会审意见与最终处理</h3>
+                <p style="font-size:12px;color:#8c8c8c;margin:0;font-weight:normal;">查看发起会审时定义的初步处理方式分配及各参与人的反馈意见，参考所有意见后确定每个分配项的最终处理方式。</p>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table class="list-table-nowrap">
+                        <thead>
+                            <tr>
+                                <th width="60">序号</th>
+                                <th width="120">物料编码</th>
+                                <th width="180">物料名称</th>
+                                <th width="100">规格型号</th>
+                                <th width="100">不合格数量</th>
+                                <th width="80">单位</th>
+                                <th width="180">初步处理方式</th>
+                                <th width="120">会审反馈</th>
+                                <th width="150">最终处理方式 <span style="color:#ff4d4f;">*</span></th>
+                                <th width="100">处理方案</th>
+                                <th width="90">原等级</th>
+                                <th width="90">降级后等级</th>
+                                <th width="90">原等级单价</th>
+                                <th width="90">降级后单价</th>
+                                <th width="150">处理说明</th>
+                                <th width="80">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="review-material-tbody">
+                            <!-- 动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+                <p style="margin-top:12px;font-size:12px;color:#8c8c8c;line-height:1.6;">
+                    <strong>操作说明：</strong><br>
+                    1. 点击"查看意见"查看各参与人对该分配项的详细反馈意见；<br>
+                    2. 参考所有参与人的意见后，为每个分配项确定最终处理方式；<br>
+                    3. <strong>让步接收</strong>需填写处理方案（降级接收/让步使用折价等）、原物料等级与降级后等级、原等级单价与降级后单价，用于生成让步接收单及结算；<br>
+                    4. 相同处理方式的分配项将合并生成一张单据（例如：所有退货项合并为一张退货单）；<br>
+                    5. 确定最终处理方式后，系统将自动创建对应的处理单据并同步至供应链协同应用。
+                </p>
+            </div>
+        </div>
+
+        <!-- 不合格项详情弹窗 -->
+        <div id="issues-detail-modal" class="modal-overlay" style="display:none;">
+            <div class="modal" style="max-width:900px;width:90%;">
+                <div class="modal-header">
+                    <div class="modal-title">不合格项详情</div>
+                    <div class="modal-close" id="issues-modal-close" style="cursor:pointer;font-size:20px;color:#8c8c8c;">×</div>
+                </div>
+                <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
+                    <div id="issues-detail-content">
+                        <!-- 动态生成 -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" id="issues-modal-close-btn">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 会审意见详情弹窗 -->
+        <div id="opinion-detail-modal" class="modal-overlay" style="display:none;">
+            <div class="modal" style="max-width:800px;width:90%;">
+                <div class="modal-header">
+                    <div class="modal-title">会审意见详情</div>
+                    <div class="modal-close" id="opinion-modal-close" style="cursor:pointer;font-size:20px;color:#8c8c8c;">×</div>
+                </div>
+                <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
+                    <div id="opinion-detail-content">
+                        <!-- 动态生成 -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" id="opinion-modal-close-btn">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="action-bar" style="margin-top:20px;">
+            <div class="action-left">
+                <button class="btn btn-primary" id="btn-start-review" data-id="1" data-no="UH-2025-001">发起会审</button>
+                <button class="btn btn-primary" id="btn-submit-final-handle" style="display:none;">确定最终处理方式</button>
+                <button class="btn btn-default" onclick="history.back();">返回</button>
+            </div>
+        </div>
+
+        <script>
+        console.log('不合格处理单详情 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+        
+        // 不合格项详情数据（实际应从后端获取）
+        var ISSUES_DETAIL = {
+            'MAT-001': [
+                { issue: '尺寸偏差', qty: 30, unit: '个', description: '长度超出标准范围±0.1mm', standard: 'GB/T 2828.1-2012', result: '不合格' },
+                { issue: '外观缺陷', qty: 20, unit: '个', description: '表面有划痕、污渍', standard: '外观检验标准', result: '不合格' }
+            ],
+            'MAT-002': [
+                { issue: '性能不达标', qty: 30, unit: '个', description: '电阻值超出允许范围', standard: '技术规格书', result: '不合格' }
+            ],
+            'MAT-003': [
+                { issue: '焊接不良', qty: 5, unit: '块', description: '焊点存在虚焊、冷焊现象', standard: 'IPC-A-610', result: '不合格' },
+                { issue: '功能异常', qty: 5, unit: '块', description: '通电测试功能不满足要求', standard: '功能测试标准', result: '不合格' }
+            ]
+        };
+        
+        // 点击不合格数量查看详情
+        document.querySelectorAll('.btn-view-issues').forEach(function(link) {
+            link.addEventListener('click', function() {
+                var materialCode = this.getAttribute('data-material-code');
+                var row = this.closest('tr');
+                var materialName = row.querySelector('td:nth-child(3)').textContent;
+                var materialSpec = row.querySelector('td:nth-child(4)').textContent;
+                var issues = ISSUES_DETAIL[materialCode] || [];
+                
+                showIssuesDetailModal(materialCode, materialName, materialSpec, issues);
+            });
+        });
+        
+        // 显示不合格项详情弹窗
+        function showIssuesDetailModal(materialCode, materialName, materialSpec, issues) {
+            var modal = document.getElementById('issues-detail-modal');
+            var content = document.getElementById('issues-detail-content');
+            
+            var html = '<div style="margin-bottom:16px;padding:12px;background:#f5f8fc;border-radius:6px;">' +
+                '<div style="font-weight:600;font-size:14px;color:#262626;margin-bottom:8px;">物料信息</div>' +
+                '<div style="font-size:13px;color:#595959;line-height:1.8;">' +
+                    '物料编码：' + materialCode + '<br>' +
+                    '物料名称：' + materialName + '<br>' +
+                    '规格型号：' + materialSpec +
+                '</div>' +
+                '</div>';
+            
+            if (issues.length === 0) {
+                html += '<div style="padding:40px;text-align:center;color:#8c8c8c;font-size:13px;">暂无不合格项</div>';
+            } else {
+                html += '<div class="table-wrapper">' +
+                    '<table class="list-table-nowrap">' +
+                        '<thead>' +
+                            '<tr>' +
+                                '<th width="80">序号</th>' +
+                                '<th width="150">不合格项</th>' +
+                                '<th width="100">不合格数量</th>' +
+                                '<th width="250">不合格描述</th>' +
+                                '<th width="150">检验标准</th>' +
+                                '<th>检验结果</th>' +
+                            '</tr>' +
+                        '</thead>' +
+                        '<tbody>';
+                
+                issues.forEach(function(issue, idx) {
+                    html += '<tr>' +
+                        '<td style="text-align:center;">' + (idx + 1) + '</td>' +
+                        '<td>' + issue.issue + '</td>' +
+                        '<td style="text-align:right;">' + issue.qty + issue.unit + '</td>' +
+                        '<td>' + issue.description + '</td>' +
+                        '<td>' + issue.standard + '</td>' +
+                        '<td><span class="status-badge status-error">' + issue.result + '</span></td>' +
+                        '</tr>';
+                });
+                
+                html += '</tbody></table></div>';
+            }
+            
+            content.innerHTML = html;
+            modal.style.display = 'flex';
+        }
+        
+        // 关闭不合格项详情弹窗
+        document.getElementById('issues-modal-close').addEventListener('click', function() {
+            document.getElementById('issues-detail-modal').style.display = 'none';
+        });
+        
+        document.getElementById('issues-modal-close-btn').addEventListener('click', function() {
+            document.getElementById('issues-detail-modal').style.display = 'none';
+        });
+        
+        document.getElementById('issues-detail-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+        
+        // 模拟初步处理方式分配数据（实际应从后端获取）
+        var INITIAL_ALLOCATIONS = {
+            'MAT-001': [
+                { type: 'return', typeText: '退货', qty: 30, unit: '个' },
+                { type: 'exchange', typeText: '换货', qty: 15, unit: '个' },
+                { type: 'concession', typeText: '让步接收', qty: 5, unit: '个' }
+            ],
+            'MAT-002': [
+                { type: 'exchange', typeText: '换货', qty: 30, unit: '个' }
+            ],
+            'MAT-003': [
+                { type: 'return', typeText: '退货', qty: 10, unit: '块' }
+            ]
+        };
+        
+        // 模拟会审意见数据（实际应从后端获取，按分配项存储）
+        var REVIEW_OPINIONS = {
+            'MAT-001-RETURN-30': [
+                { personName: '质量-李质检', personRole: '质量', time: '2025-01-22 15:30', isAgree: true, content: '', suggestion: '', suggestionText: '同意初步处理方式（退货30个）' },
+                { personName: '技术-王工', personRole: '技术', time: '2025-01-22 16:00', isAgree: false, content: '部分可以降级使用，建议将其中10个改为让步接收。', suggestion: 'concession', suggestionText: '建议部分让步接收' },
+                { personName: '采购-张采购', personRole: '采购', time: '2025-01-22 16:30', isAgree: true, content: '', suggestion: '', suggestionText: '同意初步处理方式（退货30个）' }
+            ],
+            'MAT-001-EXCHANGE-15': [
+                { personName: '质量-李质检', personRole: '质量', time: '2025-01-22 15:32', isAgree: true, content: '', suggestion: '', suggestionText: '同意初步处理方式（换货15个）' },
+                { personName: '技术-王工', personRole: '技术', time: '2025-01-22 16:02', isAgree: true, content: '', suggestion: '', suggestionText: '同意初步处理方式（换货15个）' }
+            ],
+            'MAT-001-CONCESSION-5': [
+                { personName: '质量-李质检', personRole: '质量', time: '2025-01-22 15:34', isAgree: true, content: '', suggestion: '', suggestionText: '同意初步处理方式（让步接收5个）' },
+                { personName: '技术-王工', personRole: '技术', time: '2025-01-22 16:04', isAgree: true, content: '', suggestion: '', suggestionText: '同意初步处理方式（让步接收5个）' }
+            ],
+            'MAT-002-EXCHANGE-30': [
+                { personName: '质量-李质检', personRole: '质量', time: '2025-01-22 15:35', isAgree: false, content: '性能不达标，影响产品质量，建议退货。', suggestion: 'return', suggestionText: '建议退货' },
+                { personName: '技术-王工', personRole: '技术', time: '2025-01-22 16:05', isAgree: true, content: '', suggestion: '', suggestionText: '同意初步处理方式（换货30个）' }
+            ],
+            'MAT-003-RETURN-10': [
+                { personName: '质量-李质检', personRole: '质量', time: '2025-01-22 15:40', isAgree: true, content: '', suggestion: '', suggestionText: '同意初步处理方式（退货10块）' },
+                { personName: '技术-王工', personRole: '技术', time: '2025-01-22 16:10', isAgree: true, content: '', suggestion: '', suggestionText: '同意初步处理方式（退货10块）' },
+                { personName: '生产-赵主管', personRole: '生产', time: '2025-01-22 16:40', isAgree: true, content: '', suggestion: '', suggestionText: '同意初步处理方式（退货10块）' }
+            ]
+        };
+        
+        var MATERIALS = [
+            { code: 'MAT-001', name: '电子元件A', spec: '规格A', qty: 50, unit: '个' },
+            { code: 'MAT-002', name: '电子元件B', spec: '规格B', qty: 30, unit: '个' },
+            { code: 'MAT-003', name: '电路板', spec: 'PCB-001', qty: 10, unit: '块' }
+        ];
+        
+        // 检查是否已发起会审（实际应从后端获取状态）
+        var isReviewStarted = true; // 模拟已发起会审
+        var isReviewCompleted = false; // 模拟会审是否已完成（最终处理方式已确定）
+        
+        if (isReviewStarted) {
+            // 显示会审意见区域
+            document.getElementById('review-section').style.display = 'block';
+            document.getElementById('btn-start-review').style.display = 'none';
+            
+            // 如果会审未完成，显示确定最终处理方式按钮
+            if (!isReviewCompleted) {
+                document.getElementById('btn-submit-final-handle').style.display = 'inline-block';
+            }
+            
+            // 渲染会审意见表格
+            renderReviewMaterials();
+        }
+        
+        function renderReviewMaterials() {
+            var tbody = document.getElementById('review-material-tbody');
+            if (!tbody) return;
+            
+            var html = '';
+            var rowIdx = 1;
+            
+            MATERIALS.forEach(function(material) {
+                var allocations = INITIAL_ALLOCATIONS[material.code] || [];
+                
+                if (allocations.length === 0) {
+                    html += '<tr data-material-code="' + material.code + '">' +
+                        '<td style="text-align:center;">' + rowIdx + '</td>' +
+                        '<td>' + material.code + '</td>' +
+                        '<td>' + material.name + '</td>' +
+                        '<td>' + material.spec + '</td>' +
+                        '<td style="text-align:right;">' + material.qty + '</td>' +
+                        '<td>' + material.unit + '</td>' +
+                        '<td><span style="color:#8c8c8c;">未分配</span></td>' +
+                        '<td><span style="color:#8c8c8c;">-</span></td>' +
+                        '<td>-</td>' +
+                        '<td>-</td>' +
+                        '<td>-</td>' +
+                        '<td>-</td>' +
+                        '<td>-</td>' +
+                        '<td>-</td>' +
+                        '<td>-</td>' +
+                        '</tr>';
+                    rowIdx++;
+                    return;
+                }
+                
+                allocations.forEach(function(alloc, allocIdx) {
+                    var allocationKey = material.code + '-' + alloc.type.toUpperCase() + '-' + alloc.qty;
+                    var opinions = REVIEW_OPINIONS[allocationKey] || [];
+                    
+                    var initialHandleBadge = '';
+                    var badgeColor = '';
+                    if (alloc.type === 'return') {
+                        initialHandleBadge = '退货 ' + alloc.qty + alloc.unit;
+                        badgeColor = 'background:#fff1f0;color:#cf1322;';
+                    } else if (alloc.type === 'exchange') {
+                        initialHandleBadge = '换货 ' + alloc.qty + alloc.unit;
+                        badgeColor = 'background:#fff7e6;color:#d46b08;';
+                    } else if (alloc.type === 'concession') {
+                        initialHandleBadge = '让步接收 ' + alloc.qty + alloc.unit;
+                        badgeColor = 'background:#f6ffed;color:#52c41a;';
+                    }
+                    
+                    var agreeCount = opinions.filter(function(op) { return op.isAgree; }).length;
+                    var disagreeCount = opinions.filter(function(op) { return !op.isAgree; }).length;
+                    var totalCount = opinions.length;
+                    
+                    var feedbackHtml = '';
+                    if (totalCount === 0) {
+                        feedbackHtml = '<span style="color:#8c8c8c;font-size:12px;">待反馈</span>';
+                    } else {
+                        feedbackHtml = '<div style="font-size:12px;">' +
+                            '<span style="color:#52c41a;font-weight:600;">' + agreeCount + '</span>' +
+                            '<span style="color:#8c8c8c;margin:0 4px;">/</span>' +
+                            '<span style="color:#cf1322;font-weight:600;">' + disagreeCount + '</span>' +
+                            '<span style="color:#8c8c8c;margin:0 4px;">/</span>' +
+                            '<span style="color:#595959;">' + totalCount + '</span>' +
+                            '</div>';
+                    }
+                    
+                    var isFirstRow = allocIdx === 0;
+                    var rowspan = allocations.length;
+                    
+                    html += '<tr data-material-code="' + material.code + '" data-allocation-key="' + allocationKey + '" data-allocation-type="' + alloc.type + '" data-allocation-qty="' + alloc.qty + '">' +
+                        (isFirstRow ? '<td rowspan="' + rowspan + '" style="text-align:center;vertical-align:middle;">' + rowIdx + '</td>' : '') +
+                        (isFirstRow ? '<td rowspan="' + rowspan + '" style="vertical-align:middle;">' + material.code + '</td>' : '') +
+                        (isFirstRow ? '<td rowspan="' + rowspan + '" style="vertical-align:middle;">' + material.name + '</td>' : '') +
+                        (isFirstRow ? '<td rowspan="' + rowspan + '" style="vertical-align:middle;">' + material.spec + '</td>' : '') +
+                        (isFirstRow ? '<td rowspan="' + rowspan + '" style="text-align:right;vertical-align:middle;">' + material.qty + '</td>' : '') +
+                        (isFirstRow ? '<td rowspan="' + rowspan + '" style="vertical-align:middle;">' + material.unit + '</td>' : '') +
+                        '<td style="vertical-align:middle;">' +
+                            '<span class="status-badge" style="' + badgeColor + 'padding:4px 8px;border-radius:4px;font-size:12px;display:inline-block;">' + initialHandleBadge + '</span>' +
+                        '</td>' +
+                        '<td style="vertical-align:middle;">' + feedbackHtml + '</td>' +
+                        '<td style="vertical-align:middle;">' +
+                            '<select class="form-select final-handle-type" data-material-code="' + material.code + '" data-allocation-key="' + allocationKey + '" data-allocation-type="' + alloc.type + '" data-allocation-qty="' + alloc.qty + '" style="width:100%;padding:6px 10px;border:1px solid #d9d9d9;border-radius:4px;font-size:13px;">' +
+                                '<option value="">请选择</option>' +
+                                '<option value="return"' + (alloc.type === 'return' ? ' selected' : '') + '>退货</option>' +
+                                '<option value="exchange"' + (alloc.type === 'exchange' ? ' selected' : '') + '>换货</option>' +
+                                '<option value="concession"' + (alloc.type === 'concession' ? ' selected' : '') + '>让步接收</option>' +
+                            '</select>' +
+                        '</td>' +
+                        (alloc.type === 'concession' ?
+                        '<td style="vertical-align:middle;"><select class="form-select concession-plan-type" data-allocation-key="' + allocationKey + '" style="width:100%;padding:4px 8px;font-size:12px;"><option value="downgrade">降级接收</option><option value="discount">让步使用(折价)</option><option value="as-is">让步使用(原价)</option></select></td>' +
+                        '<td style="vertical-align:middle;"><input type="text" class="form-input concession-orig-grade" data-allocation-key="' + allocationKey + '" placeholder="如一级品" style="width:100%;padding:4px 8px;font-size:12px;"></td>' +
+                        '<td style="vertical-align:middle;"><input type="text" class="form-input concession-downgrade-grade" data-allocation-key="' + allocationKey + '" placeholder="如二级品" style="width:100%;padding:4px 8px;font-size:12px;"></td>' +
+                        '<td style="vertical-align:middle;"><input type="text" class="form-input concession-orig-price" data-allocation-key="' + allocationKey + '" placeholder="原单价" style="width:100%;padding:4px 8px;font-size:12px;"></td>' +
+                        '<td style="vertical-align:middle;"><input type="text" class="form-input concession-downgrade-price" data-allocation-key="' + allocationKey + '" placeholder="降级后单价" style="width:100%;padding:4px 8px;font-size:12px;"></td>' :
+                        '<td style="vertical-align:middle;color:#8c8c8c;">-</td><td>-</td><td>-</td><td>-</td><td>-</td>') +
+                        '<td style="vertical-align:middle;">' +
+                            '<input type="text" class="form-input final-handle-remark" data-material-code="' + material.code + '" data-allocation-key="' + allocationKey + '" placeholder="可选" style="width:100%;padding:6px 10px;border:1px solid #d9d9d9;border-radius:4px;font-size:13px;">' +
+                        '</td>' +
+                        '<td style="vertical-align:middle;">' +
+                            '<button type="button" class="btn btn-sm btn-default btn-view-opinion" data-allocation-key="' + allocationKey + '" style="padding:4px 12px;font-size:12px;">查看意见</button>' +
+                        '</td>' +
+                        '</tr>';
+                });
+                
+                rowIdx++;
+            });
+            
+            tbody.innerHTML = html;
+            
+            // 绑定查看意见按钮事件
+            bindOpinionViewEvents();
+        }
+        
+        // 绑定查看意见按钮事件
+        function bindOpinionViewEvents() {
+            document.querySelectorAll('.btn-view-opinion').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var allocationKey = this.getAttribute('data-allocation-key');
+                    var row = this.closest('tr');
+                    var materialCode = row.getAttribute('data-material-code');
+                    var material = MATERIALS.find(function(m) { return m.code === materialCode; });
+                    var allocations = INITIAL_ALLOCATIONS[materialCode] || [];
+                    var alloc = allocations.find(function(a) {
+                        return materialCode + '-' + a.type.toUpperCase() + '-' + a.qty === allocationKey;
+                    });
+                    
+                    if (!alloc) return;
+                    
+                    var opinions = REVIEW_OPINIONS[allocationKey] || [];
+                    showOpinionDetailModal(material, alloc, opinions);
+                });
+            });
+        }
+        
+        // 显示会审意见详情弹窗
+        function showOpinionDetailModal(material, alloc, opinions) {
+            var modal = document.getElementById('opinion-detail-modal');
+            var content = document.getElementById('opinion-detail-content');
+            
+            var initialHandleText = '';
+            var badgeColor = '';
+            if (alloc.type === 'return') {
+                initialHandleText = '退货';
+                badgeColor = '#fff1f0';
+            } else if (alloc.type === 'exchange') {
+                initialHandleText = '换货';
+                badgeColor = '#fff7e6';
+            } else if (alloc.type === 'concession') {
+                initialHandleText = '让步接收';
+                badgeColor = '#f6ffed';
+            }
+            
+            var html = '<div style="margin-bottom:16px;padding:12px;background:#f5f8fc;border-radius:6px;">' +
+                '<div style="font-weight:600;font-size:14px;color:#262626;margin-bottom:8px;">物料信息</div>' +
+                '<div style="font-size:13px;color:#595959;line-height:1.8;">' +
+                    '物料名称：' + material.name + '（' + material.code + '）<br>' +
+                    '规格型号：' + material.spec + '<br>' +
+                    '初步处理方式：<span class="status-badge" style="' + (alloc.type === 'return' ? 'background:#fff1f0;color:#cf1322;' : (alloc.type === 'exchange' ? 'background:#fff7e6;color:#d46b08;' : 'background:#f6ffed;color:#52c41a;')) + 'padding:2px 8px;border-radius:4px;font-size:12px;margin-left:4px;">' + initialHandleText + ' ' + alloc.qty + alloc.unit + '</span>' +
+                '</div>' +
+                '</div>';
+            
+            if (opinions.length === 0) {
+                html += '<div style="padding:40px;text-align:center;color:#8c8c8c;font-size:13px;">暂无反馈意见</div>';
+            } else {
+                var agreeCount = opinions.filter(function(op) { return op.isAgree; }).length;
+                var disagreeCount = opinions.filter(function(op) { return !op.isAgree; }).length;
+                
+                html += '<div style="margin-bottom:12px;padding:8px 12px;background:#fafafa;border-radius:4px;">' +
+                    '<span style="font-size:12px;color:#595959;">反馈统计：</span>' +
+                    '<span style="color:#52c41a;font-weight:600;margin-left:8px;">同意 ' + agreeCount + ' 人</span>' +
+                    '<span style="color:#8c8c8c;margin:0 8px;">|</span>' +
+                    '<span style="color:#cf1322;font-weight:600;">不同意 ' + disagreeCount + ' 人</span>' +
+                    '<span style="color:#8c8c8c;margin:0 8px;">|</span>' +
+                    '<span style="color:#595959;">共 ' + opinions.length + ' 人</span>' +
+                    '</div>';
+                
+                opinions.forEach(function(opinion) {
+                    var roleColor = {
+                        '采购': '#1890ff',
+                        '质量': '#52c41a',
+                        '技术': '#722ed1',
+                        '生产': '#fa8c16',
+                        '财务': '#eb2f96'
+                    }[opinion.personRole] || '#595959';
+                    
+                    var agreeBadge = opinion.isAgree 
+                        ? '<span style="display:inline-block;padding:2px 6px;background:#f6ffed;color:#52c41a;border-radius:2px;font-size:11px;margin-right:6px;">✓ 同意</span>'
+                        : '<span style="display:inline-block;padding:2px 6px;background:#fff1f0;color:#cf1322;border-radius:2px;font-size:11px;margin-right:6px;">✗ 不同意</span>';
+                    
+                    html += '<div style="margin-bottom:12px;padding:12px;background:#fff;border-radius:6px;border-left:3px solid ' + roleColor + ';border:1px solid #e8e8e8;">' +
+                        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
+                            '<span style="font-weight:600;font-size:13px;color:#262626;">' + agreeBadge + opinion.personName + '（' + opinion.personRole + '）</span>' +
+                            '<span style="font-size:11px;color:#8c8c8c;">' + opinion.time + '</span>' +
+                        '</div>';
+                    
+                    if (!opinion.isAgree && opinion.content) {
+                        html += '<div style="font-size:12px;color:#595959;margin-bottom:6px;line-height:1.6;padding-left:20px;">' + opinion.content + '</div>';
+                    }
+                    
+                    if (opinion.suggestionText) {
+                        html += '<div style="font-size:11px;color:#1890ff;padding-left:20px;">💡 ' + opinion.suggestionText + '</div>';
+                    }
+                    
+                    html += '</div>';
+                });
+            }
+            
+            content.innerHTML = html;
+            modal.style.display = 'flex';
+        }
+        
+        // 关闭会审意见详情弹窗
+        document.getElementById('opinion-modal-close').addEventListener('click', function() {
+            document.getElementById('opinion-detail-modal').style.display = 'none';
+        });
+        
+        document.getElementById('opinion-modal-close-btn').addEventListener('click', function() {
+            document.getElementById('opinion-detail-modal').style.display = 'none';
+        });
+        
+        document.getElementById('opinion-detail-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+        
+        // 发起会审（跳转到列表页发起会审）
+        document.getElementById('btn-start-review').addEventListener('click', function() {
+            var id = this.getAttribute('data-id');
+            var no = this.getAttribute('data-no');
+            // 跳转到列表页，并自动选中当前处理单并打开发起会审弹窗
+            window.location.href = 'pages/procurement-unqualified-handle-list.html?action=start-review&id=' + id + '&no=' + no;
+        });
+        
+        // 确定最终处理方式
+        document.getElementById('btn-submit-final-handle').addEventListener('click', function() {
+            var selects = document.querySelectorAll('.final-handle-type');
+            var hasUnselected = false;
+            var handleDetails = [];
+            var concessionIncomplete = false;
+            
+            selects.forEach(function(select) {
+                if (!select.value) {
+                    hasUnselected = true;
+                } else {
+                    var materialCode = select.getAttribute('data-material-code');
+                    var allocationKey = select.getAttribute('data-allocation-key');
+                    var allocationType = select.getAttribute('data-allocation-type');
+                    var allocationQty = parseInt(select.getAttribute('data-allocation-qty')) || 0;
+                    var material = MATERIALS.find(function(m) { return m.code === materialCode; });
+                    var remarkInput = document.querySelector('.final-handle-remark[data-allocation-key="' + allocationKey + '"]');
+                    var detail = {
+                        materialCode: materialCode,
+                        materialName: material ? material.name : '',
+                        materialSpec: material ? material.spec : '',
+                        qty: allocationQty,
+                        unit: material ? material.unit : '',
+                        handleType: select.value,
+                        remark: remarkInput ? remarkInput.value.trim() : '',
+                        allocationKey: allocationKey
+                    };
+                    if (select.value === 'concession') {
+                        var planSelect = document.querySelector('.concession-plan-type[data-allocation-key="' + allocationKey + '"]');
+                        var origGrade = document.querySelector('.concession-orig-grade[data-allocation-key="' + allocationKey + '"]');
+                        var downgradeGrade = document.querySelector('.concession-downgrade-grade[data-allocation-key="' + allocationKey + '"]');
+                        var origPrice = document.querySelector('.concession-orig-price[data-allocation-key="' + allocationKey + '"]');
+                        var downgradePrice = document.querySelector('.concession-downgrade-price[data-allocation-key="' + allocationKey + '"]');
+                        detail.concessionPlan = planSelect ? planSelect.value : '';
+                        detail.origGrade = origGrade ? origGrade.value.trim() : '';
+                        detail.downgradeGrade = downgradeGrade ? downgradeGrade.value.trim() : '';
+                        detail.origPrice = origPrice ? origPrice.value.trim() : '';
+                        detail.downgradePrice = downgradePrice ? downgradePrice.value.trim() : '';
+                        if (!detail.concessionPlan || !detail.downgradeGrade || !detail.downgradePrice) concessionIncomplete = true;
+                    }
+                    handleDetails.push(detail);
+                }
+            });
+            concessionIncomplete = concessionIncomplete && handleDetails.some(function(d) { return d.handleType === 'concession'; });
+            
+            if (hasUnselected) {
+                alert('请为所有分配项确定最终处理方式');
+                return;
+            }
+            if (concessionIncomplete) {
+                alert('让步接收项需填写处理方案、降级后等级及降级后单价，用于生成让步接收单及结算。');
+                return;
+            }
+            
+                // 按处理方式分组（相同处理方式的物料合并到一张单据）
+                var returnMaterials = handleDetails.filter(function(d) { return d.handleType === 'return'; });
+                var exchangeMaterials = handleDetails.filter(function(d) { return d.handleType === 'exchange'; });
+                var concessionMaterials = handleDetails.filter(function(d) { return d.handleType === 'concession'; });
+                
+                // 统计各处理方式的总数量和物料种类
+                var returnTotalQty = returnMaterials.reduce(function(sum, m) { return sum + m.qty; }, 0);
+                var exchangeTotalQty = exchangeMaterials.reduce(function(sum, m) { return sum + m.qty; }, 0);
+                var concessionTotalQty = concessionMaterials.reduce(function(sum, m) { return sum + m.qty; }, 0);
+                
+                var returnMaterialsSet = new Set(returnMaterials.map(function(m) { return m.materialCode; }));
+                var exchangeMaterialsSet = new Set(exchangeMaterials.map(function(m) { return m.materialCode; }));
+                var concessionMaterialsSet = new Set(concessionMaterials.map(function(m) { return m.materialCode; }));
+                
+                var confirmMsg = '确定提交最终处理方式？\n\n';
+                confirmMsg += '处理明细：\n';
+                if (returnMaterials.length > 0) {
+                    confirmMsg += '- 退货：' + returnMaterials.length + ' 个分配项（' + returnMaterialsSet.size + ' 种物料，共 ' + returnTotalQty + ' 个）→ 合并生成1张退货单\n';
+                }
+                if (exchangeMaterials.length > 0) {
+                    confirmMsg += '- 换货：' + exchangeMaterials.length + ' 个分配项（' + exchangeMaterialsSet.size + ' 种物料，共 ' + exchangeTotalQty + ' 个）→ 合并生成1张换货单\n';
+                }
+                if (concessionMaterials.length > 0) {
+                    confirmMsg += '- 让步接收：' + concessionMaterials.length + ' 个分配项（' + concessionMaterialsSet.size + ' 种物料，共 ' + concessionTotalQty + ' 个），含处理方案与等级、价格 → 合并生成1张让步接收单\n';
+                }
+                confirmMsg += '\n系统将创建对应的处理单据（让步接收单含处理方案与等级、价格，用于结算），并同步至供应链协同应用。';
+                
+                if (confirm(confirmMsg)) {
+                    // 模拟创建单据（相同处理方式的物料合并到一张单据）
+                    var createdDocs = [];
+                    
+                    if (returnMaterials.length > 0) {
+                        var returnDocNo = 'RET-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+                        createdDocs.push({ 
+                            type: '退货单', 
+                            docNo: returnDocNo, 
+                            materials: returnMaterials,
+                            handleNo: 'UH-2025-001',
+                            orderNo: 'PO-2025-001',
+                            supplier: '深圳市电子科技有限公司'
+                        });
+                    }
+                    
+                    if (exchangeMaterials.length > 0) {
+                        var exchangeDocNo = 'EXC-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+                        createdDocs.push({ 
+                            type: '换货单', 
+                            docNo: exchangeDocNo, 
+                            materials: exchangeMaterials,
+                            handleNo: 'UH-2025-001',
+                            orderNo: 'PO-2025-001',
+                            supplier: '深圳市电子科技有限公司'
+                        });
+                    }
+                    
+                    if (concessionMaterials.length > 0) {
+                        var concessionDocNo = 'CON-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+                        createdDocs.push({ 
+                            type: '让步接收单', 
+                            docNo: concessionDocNo, 
+                            materials: concessionMaterials,
+                            handleNo: 'UH-2025-001',
+                            orderNo: 'PO-2025-001',
+                            supplier: '深圳市电子科技有限公司'
+                        });
+                    }
+                    
+                    var successMsg = '✅ 最终处理方式已确定\n\n已创建以下单据（相同处理方式的物料已合并）：\n\n';
+                    createdDocs.forEach(function(doc) {
+                        successMsg += doc.type + '：' + doc.docNo + '\n';
+                        successMsg += '  关联处理单：' + doc.handleNo + '\n';
+                        successMsg += '  关联订单：' + doc.orderNo + '\n';
+                        successMsg += '  供应商：' + doc.supplier + '\n';
+                        successMsg += '  包含物料：' + doc.materials.length + ' 种\n';
+                        doc.materials.forEach(function(m) {
+                            successMsg += '    - ' + m.materialName + '（' + m.materialCode + '）' + m.qty + m.unit;
+                            if (m.remark) successMsg += '，说明：' + m.remark;
+                            if (doc.type === '让步接收单' && m.concessionPlan) {
+                                successMsg += '；处理方案：' + (m.concessionPlan === 'downgrade' ? '降级接收' : (m.concessionPlan === 'discount' ? '让步使用(折价)' : '让步使用(原价)'));
+                                if (m.origGrade) successMsg += '，原等级：' + m.origGrade;
+                                if (m.downgradeGrade) successMsg += '，降级后等级：' + m.downgradeGrade;
+                                if (m.downgradePrice) successMsg += '，降级后单价：' + m.downgradePrice;
+                            }
+                            successMsg += '\n';
+                        });
+                        successMsg += '\n';
+                    });
+                    successMsg += '所有单据已同步至供应链协同应用中的对应模块（退货单/换货单/让步接收单）。让步接收单含处理方案与等级、价格信息，用于结算。';
+                    
+                    alert(successMsg);
+                    
+                    // 更新状态
+                    document.getElementById('handle-status').textContent = '已完成';
+                    document.getElementById('handle-status').className = 'status-badge status-success';
+                    document.getElementById('btn-submit-final-handle').style.display = 'none';
+                    
+                    // 实际应用中这里应该：
+                    // 1. 提交最终处理方式到后端
+                    // 2. 后端创建对应的单据（相同处理方式合并）
+                    // 3. 同步单据到供应链协同应用
+                    // 4. 更新处理单状态为"已完成"
+                    // 5. 刷新页面
+                    // location.reload();
+                }
+        });
+        </script>
+    </div>
+</body>
+</html>

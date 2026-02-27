@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户档案 - 供应链协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/supply-chain-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">基础数据</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">客户档案</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理客户（上游客户）准入申请。本页「新建申请」= <strong>本企业向对方企业（本企业的上游）发起申请</strong>，申请成为<strong>对方的供应商</strong>（即本企业想向对方供货）；申请提交后会<strong>同步到对方的供应商档案</strong>（对方在采购协同或供应链协同中评审），对方评审通过后，本企业成为对方的供应商。例如：B 在客户档案向 A 发起申请，评审通过后 B 成为 A 的供应商。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" id="filter-keyword" placeholder="申请单号、企业名称">
+                </div>
+                <div class="filter-item">
+                    <label>申请状态</label>
+                    <select class="form-select" id="filter-status">
+                        <option value="">全部</option>
+                        <option value="draft">草稿</option>
+                        <option value="submitted">已提交待评审</option>
+                        <option value="approved">已通过</option>
+                        <option value="rejected">已驳回</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary" data-open-modal="customer-apply-modal">+ 新建申请</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="130">申请单号</th>
+                            <th width="200">企业名称</th>
+                            <th width="140">统一社会信用代码</th>
+                            <th width="100">类型</th>
+                            <th width="110">申请状态</th>
+                            <th width="80">对方评审等级</th>
+                            <th width="90">对方评审状态</th>
+                            <th width="90">申请人</th>
+                            <th width="110">提交时间</th>
+                            <th width="110">对方评审时间</th>
+                            <th width="120">申请对象（对方企业）</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-apply-id="1" data-status="approved" data-level="A" data-proc-status="已通过" data-contact="李经理" data-phone="139****9999" data-email="li@example.com" data-reg-address="上海市浦东新区" data-legal-rep="李某某" data-establish-date="2015-03-01" data-biz-start="2015-03-01" data-biz-end="2045-02-28" data-quality-cert="ISO9001" data-env-cert="ISO14001">
+                            <td><input type="checkbox" name="apply-id" value="1"></td>
+                            <td>SA-2025-001</td>
+                            <td>上海精密机械制造有限公司</td>
+                            <td>91310000MA6XXXXXXX</td>
+                            <td>生产制造商</td>
+                            <td><span class="status-badge status-published">已通过</span></td>
+                            <td>A级</td>
+                            <td><span class="status-badge status-published">已通过</span></td>
+                            <td>李四</td>
+                            <td>2024-11-18</td>
+                            <td>2024-12-08</td>
+                            <td>A企业</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="customer-view-modal" data-apply-id="1">查看</button>
+                            </td>
+                        </tr>
+                        <tr data-apply-id="2" data-status="approved" data-level="C" data-proc-status="已淘汰" data-contact="王经理" data-phone="137****7777" data-email="wang@example.com" data-reg-address="北京市朝阳区" data-legal-rep="王某某" data-establish-date="2018-01-15" data-biz-start="2018-01-15" data-biz-end="2038-01-14">
+                            <td><input type="checkbox" name="apply-id" value="2"></td>
+                            <td>SA-2025-002</td>
+                            <td>北京贸易有限公司</td>
+                            <td>91110000MA7XXXXXXX</td>
+                            <td>贸易商</td>
+                            <td><span class="status-badge status-warning">已驳回</span></td>
+                            <td>C级</td>
+                            <td><span class="status-badge status-warning">已淘汰</span></td>
+                            <td>王五</td>
+                            <td>2024-06-10</td>
+                            <td>2024-07-01</td>
+                            <td>B企业</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="customer-view-modal" data-apply-id="2">查看</button>
+                            </td>
+                        </tr>
+                        <tr data-apply-id="3" data-status="submitted" data-level="" data-proc-status="" data-contact="赵经理" data-phone="136****6666" data-email="zhao@example.com" data-reg-address="广州市天河区" data-legal-rep="赵某某" data-establish-date="2020-08-01" data-biz-start="2020-08-01" data-biz-end="2040-07-31">
+                            <td><input type="checkbox" name="apply-id" value="3"></td>
+                            <td>SA-2025-003</td>
+                            <td>广州新材料有限公司</td>
+                            <td>91440100MA8XXXXXXX</td>
+                            <td>生产制造商</td>
+                            <td><span class="status-badge status-submitted">已提交待评审</span></td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>赵六</td>
+                            <td>2025-02-05</td>
+                            <td>-</td>
+                            <td>C企业</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="customer-view-modal" data-apply-id="3">查看</button>
+                                <button type="button" class="btn btn-sm btn-default btn-withdraw" data-apply-id="3">撤回</button>
+                            </td>
+                        </tr>
+                        <tr data-apply-id="4" data-status="draft" data-level="" data-proc-status="" data-contact="钱经理" data-phone="135****5555" data-email="qian@example.com" data-reg-address="杭州市余杭区" data-biz-address="杭州市余杭区科技园" data-legal-rep="钱某某" data-establish-date="2020-06-01" data-biz-start="2020-06-01" data-biz-end="2040-05-31" data-quality-cert="ISO9001" data-main-materials="电子元器件" data-remark="意向合作">
+                            <td><input type="checkbox" name="apply-id" value="4"></td>
+                            <td>SA-2025-004</td>
+                            <td>杭州智造科技有限公司</td>
+                            <td>91330100MA9XXXXXXX</td>
+                            <td>生产制造商</td>
+                            <td><span class="status-badge status-draft">草稿</span></td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>钱七</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>D企业</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="customer-view-modal" data-apply-id="4">查看</button>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="customer-edit-modal" data-apply-id="4">编辑</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-submit-apply" data-apply-id="4">提交</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 4 条记录</span>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 新建申请弹窗 -->
+        <div id="customer-apply-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:720px;max-height:90vh;overflow-y:auto;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">新建申请</span><button type="button" class="modal-close" data-close-modal="customer-apply-modal">×</button></div>
+                <div class="modal-body" style="max-height:75vh;overflow-y:auto;">
+                    <p style="font-size:13px;color:#666;margin-bottom:16px;">本申请将同步到<strong>申请对象（对方企业）</strong>的供应商档案，由对方评审；对方评审通过后，本企业成为对方的供应商。请先选择申请对象，再填写本企业信息。</p>
+                    <div class="section-title" style="margin-bottom:12px;">申请对象</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item" style="grid-column:1/-1;"><label class="form-label required">申请对象（对方企业）</label><input type="text" id="apply-target-company" class="form-input" placeholder="选择或输入向谁申请（同步到该企业的供应商档案），如：A企业、B企业"></div>
+                    </div>
+                    <div class="section-title" style="margin-bottom:12px;">本企业信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item" style="grid-column:1/-1;"><label class="form-label required">企业名称</label><input type="text" id="apply-company-name" class="form-input" placeholder="本企业全称"></div>
+                        <div class="form-item"><label class="form-label required">统一社会信用代码</label><input type="text" id="apply-credit" class="form-input" placeholder="18位"></div>
+                        <div class="form-item"><label class="form-label required">类型</label><select id="apply-type" class="form-select"><option value="">请选择</option><option value="manufacturer">生产制造商</option><option value="trader">贸易商</option><option value="service">服务商</option></select></div>
+                        <div class="form-item"><label class="form-label required">注册地址</label><input type="text" id="apply-reg-address" class="form-input" placeholder="营业执照注册地址"></div>
+                        <div class="form-item"><label class="form-label">经营地址</label><input type="text" id="apply-biz-address" class="form-input" placeholder="实际经营地址"></div>
+                        <div class="form-item"><label class="form-label required">法定代表人</label><input type="text" id="apply-legal-rep" class="form-input" placeholder="法定代表人姓名"></div>
+                        <div class="form-item"><label class="form-label">注册资本(万元)</label><input type="number" id="apply-reg-capital" class="form-input" placeholder="注册资本" min="0" step="0.01"></div>
+                        <div class="form-item"><label class="form-label required">成立时间</label><input type="date" id="apply-establish-date" class="form-input"></div>
+                        <div class="form-item"><label class="form-label required">营业期限起</label><input type="date" id="apply-biz-start" class="form-input"></div>
+                        <div class="form-item"><label class="form-label required">营业期限止</label><input type="date" id="apply-biz-end" class="form-input" placeholder="长期有效填2099-12-31"></div>
+                    </div>
+                    <div class="section-title" style="margin:16px 0 12px;">联系信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label required">联系人</label><input type="text" id="apply-contact" class="form-input" placeholder="主要业务联系人"></div>
+                        <div class="form-item"><label class="form-label required">联系电话</label><input type="tel" id="apply-phone" class="form-input" placeholder="手机或座机"></div>
+                        <div class="form-item"><label class="form-label required">联系邮箱</label><input type="email" id="apply-email" class="form-input" placeholder="主要联系邮箱"></div>
+                        <div class="form-item"><label class="form-label">紧急联系人</label><input type="text" id="apply-emergency-contact" class="form-input" placeholder="紧急情况联系人"></div>
+                        <div class="form-item"><label class="form-label">紧急联系电话</label><input type="tel" id="apply-emergency-phone" class="form-input" placeholder="紧急联系电话"></div>
+                    </div>
+                    <div class="section-title" style="margin:16px 0 12px;">资质信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label">质量体系认证</label><input type="text" id="apply-quality-cert" class="form-input" placeholder="如：ISO9001"></div>
+                        <div class="form-item"><label class="form-label">环保认证</label><input type="text" id="apply-env-cert" class="form-input" placeholder="如：ISO14001"></div>
+                        <div class="form-item"><label class="form-label">资质到期日期</label><input type="date" id="apply-cert-expiry" class="form-input"></div>
+                        <div class="form-item"><label class="form-label">主要物料/产品类别</label><input type="text" id="apply-main-materials" class="form-input" placeholder="如：电子元器件,机械零部件"></div>
+                        <div class="form-item" style="grid-column:1/-1;"><label class="form-label">产能信息</label><textarea id="apply-capacity-info" class="form-textarea" rows="2" placeholder="月产能、年产能等简要描述"></textarea></div>
+                        <div class="form-item" style="grid-column:1/-1;"><label class="form-label">资质证书附件</label><input type="file" id="apply-cert-files" class="form-input" accept=".pdf,.jpg,.png" multiple> <span style="font-size:12px;color:#999;">营业执照、资质证书等</span></div>
+                    </div>
+                    <div class="section-title" style="margin:16px 0 12px;">财务信息（可选，便于评审后合作）</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label">开户银行</label><input type="text" id="apply-bank-name" class="form-input" placeholder="银行开户行名称"></div>
+                        <div class="form-item"><label class="form-label">银行账号</label><input type="text" id="apply-bank-account" class="form-input" placeholder="银行账号"></div>
+                        <div class="form-item"><label class="form-label">税号</label><input type="text" id="apply-tax-number" class="form-input" placeholder="纳税人识别号"></div>
+                        <div class="form-item"><label class="form-label">发票类型</label><select id="apply-invoice-type" class="form-select"><option value="">请选择</option><option value="normal">增值税普通发票</option><option value="special">增值税专用发票</option></select></div>
+                    </div>
+                    <div class="section-title" style="margin:16px 0 12px;">申请说明与附件</div>
+                    <div style="display:grid;grid-template-columns:1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label">申请说明</label><textarea id="apply-remark" class="form-textarea" rows="2" placeholder="合作意向、补充说明等"></textarea></div>
+                        <div class="form-item"><label class="form-label">其他附件</label><input type="file" id="apply-attach" class="form-input" accept=".pdf,.doc,.docx,.jpg,.png" multiple> <span style="font-size:12px;color:#999;">可补充其他证明材料</span></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="customer-apply-modal">取消</button>
+                    <button type="button" class="btn btn-default" id="apply-save-draft-btn">保存草稿</button>
+                    <button type="button" class="btn btn-primary" id="apply-submit-btn">提交</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 查看申请详情弹窗 -->
+        <div id="customer-view-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:640px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">申请详情</span><button type="button" class="modal-close" data-close-modal="customer-view-modal">×</button></div>
+                <div class="modal-body" style="max-height:80vh;overflow-y:auto;">
+                    <div class="section-title" style="margin-bottom:12px;">申请单与状态</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:13px;">
+                        <div><span style="color:#666;">申请单号：</span><span id="view-apply-no">-</span></div>
+                        <div><span style="color:#666;">申请对象（对方企业）：</span><span id="view-target-company">-</span></div>
+                        <div><span style="color:#666;">申请状态：</span><span id="view-apply-status">-</span></div>
+                        <div><span style="color:#666;">申请人：</span><span id="view-applicant">-</span></div>
+                        <div><span style="color:#666;">提交时间：</span><span id="view-submit-time">-</span></div>
+                        <div><span style="color:#666;">对方评审时间：</span><span id="view-sync-time">-</span></div>
+                    </div>
+                    <div class="section-title" style="margin:16px 0 8px;">企业信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:13px;">
+                        <div style="grid-column:1/-1;"><span style="color:#666;">企业名称：</span><span id="view-company-name">-</span></div>
+                        <div><span style="color:#666;">统一社会信用代码：</span><span id="view-credit">-</span></div>
+                        <div><span style="color:#666;">类型：</span><span id="view-type">-</span></div>
+                        <div><span style="color:#666;">注册地址：</span><span id="view-reg-address">-</span></div>
+                        <div><span style="color:#666;">经营地址：</span><span id="view-biz-address">-</span></div>
+                        <div><span style="color:#666;">法定代表人：</span><span id="view-legal-rep">-</span></div>
+                        <div><span style="color:#666;">注册资本(万元)：</span><span id="view-reg-capital">-</span></div>
+                        <div><span style="color:#666;">成立时间：</span><span id="view-establish-date">-</span></div>
+                        <div><span style="color:#666;">营业期限：</span><span id="view-biz-period">-</span></div>
+                    </div>
+                    <div class="section-title" style="margin:16px 0 8px;">联系信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:13px;">
+                        <div><span style="color:#666;">联系人：</span><span id="view-contact">-</span></div>
+                        <div><span style="color:#666;">联系电话：</span><span id="view-phone">-</span></div>
+                        <div><span style="color:#666;">联系邮箱：</span><span id="view-email">-</span></div>
+                        <div><span style="color:#666;">紧急联系人/电话：</span><span id="view-emergency">-</span></div>
+                    </div>
+                    <div class="section-title" style="margin:16px 0 8px;">资质信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:13px;">
+                        <div><span style="color:#666;">质量体系认证：</span><span id="view-quality-cert">-</span></div>
+                        <div><span style="color:#666;">环保认证：</span><span id="view-env-cert">-</span></div>
+                        <div><span style="color:#666;">资质到期日期：</span><span id="view-cert-expiry">-</span></div>
+                        <div><span style="color:#666;">主要物料/产品类别：</span><span id="view-main-materials">-</span></div>
+                        <div style="grid-column:1/-1;"><span style="color:#666;">产能信息：</span><span id="view-capacity-info">-</span></div>
+                    </div>
+                    <div class="section-title" style="margin:16px 0 8px;">财务信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:13px;">
+                        <div><span style="color:#666;">开户银行：</span><span id="view-bank-name">-</span></div>
+                        <div><span style="color:#666;">银行账号：</span><span id="view-bank-account">-</span></div>
+                        <div><span style="color:#666;">税号：</span><span id="view-tax-number">-</span></div>
+                        <div><span style="color:#666;">发票类型：</span><span id="view-invoice-type">-</span></div>
+                    </div>
+                    <div class="section-title" style="margin:16px 0 8px;">申请说明</div>
+                    <div style="font-size:13px;"><span style="color:#666;">说明：</span><span id="view-remark">-</span></div>
+                    <div class="section-title" style="margin:16px 0 8px;">对方评审结果（同步）</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:13px;">
+                        <div><span style="color:#666;">对方评审等级：</span><span id="view-proc-level">-</span></div>
+                        <div><span style="color:#666;">对方评审状态：</span><span id="view-proc-status">-</span></div>
+                    </div>
+                    <p id="view-sync-tip" style="display:none;margin-top:12px;padding:10px;background:#e6f7ff;border:1px solid #91d5ff;border-radius:6px;font-size:13px;color:#0050b3;">已提交待评审时，对方企业评审完成后结果将自动同步至本页。</p>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="customer-view-modal">关闭</button></div>
+            </div>
+        </div>
+
+        <!-- 编辑申请弹窗（仅草稿） -->
+        <div id="customer-edit-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:720px;max-height:90vh;overflow-y:auto;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">编辑申请</span><button type="button" class="modal-close" data-close-modal="customer-edit-modal">×</button></div>
+                <div class="modal-body" style="max-height:75vh;overflow-y:auto;">
+                    <div class="section-title" style="margin-bottom:12px;">申请对象与企业信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label">申请单号</label><input type="text" id="edit-apply-no" class="form-input" readonly></div>
+                        <div class="form-item"><label class="form-label required">申请对象（对方企业）</label><input type="text" id="edit-target-company" class="form-input" placeholder="向谁申请"></div>
+                        <div class="form-item" style="grid-column:1/-1;"><label class="form-label required">企业名称</label><input type="text" id="edit-company-name" class="form-input" placeholder="本企业全称"></div>
+                        <div class="form-item"><label class="form-label required">统一社会信用代码</label><input type="text" id="edit-credit" class="form-input"></div>
+                        <div class="form-item"><label class="form-label required">类型</label><select id="edit-type" class="form-select"><option value="">请选择</option><option value="manufacturer">生产制造商</option><option value="trader">贸易商</option><option value="service">服务商</option></select></div>
+                        <div class="form-item"><label class="form-label required">注册地址</label><input type="text" id="edit-reg-address" class="form-input"></div>
+                        <div class="form-item"><label class="form-label">经营地址</label><input type="text" id="edit-biz-address" class="form-input"></div>
+                        <div class="form-item"><label class="form-label required">法定代表人</label><input type="text" id="edit-legal-rep" class="form-input"></div>
+                        <div class="form-item"><label class="form-label">注册资本(万元)</label><input type="number" id="edit-reg-capital" class="form-input" min="0" step="0.01"></div>
+                        <div class="form-item"><label class="form-label required">成立时间</label><input type="date" id="edit-establish-date" class="form-input"></div>
+                        <div class="form-item"><label class="form-label required">营业期限起</label><input type="date" id="edit-biz-start" class="form-input"></div>
+                        <div class="form-item"><label class="form-label required">营业期限止</label><input type="date" id="edit-biz-end" class="form-input"></div>
+                    </div>
+                    <div class="section-title" style="margin:16px 0 12px;">联系信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label required">联系人</label><input type="text" id="edit-contact" class="form-input"></div>
+                        <div class="form-item"><label class="form-label required">联系电话</label><input type="tel" id="edit-phone" class="form-input"></div>
+                        <div class="form-item"><label class="form-label required">联系邮箱</label><input type="email" id="edit-email" class="form-input"></div>
+                        <div class="form-item"><label class="form-label">紧急联系人</label><input type="text" id="edit-emergency-contact" class="form-input"></div>
+                        <div class="form-item"><label class="form-label">紧急联系电话</label><input type="tel" id="edit-emergency-phone" class="form-input"></div>
+                    </div>
+                    <div class="section-title" style="margin:16px 0 12px;">资质信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label">质量体系认证</label><input type="text" id="edit-quality-cert" class="form-input"></div>
+                        <div class="form-item"><label class="form-label">环保认证</label><input type="text" id="edit-env-cert" class="form-input"></div>
+                        <div class="form-item"><label class="form-label">资质到期日期</label><input type="date" id="edit-cert-expiry" class="form-input"></div>
+                        <div class="form-item"><label class="form-label">主要物料/产品类别</label><input type="text" id="edit-main-materials" class="form-input"></div>
+                        <div class="form-item" style="grid-column:1/-1;"><label class="form-label">产能信息</label><textarea id="edit-capacity-info" class="form-textarea" rows="2"></textarea></div>
+                    </div>
+                    <div class="section-title" style="margin:16px 0 12px;">财务信息（可选）</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label">开户银行</label><input type="text" id="edit-bank-name" class="form-input"></div>
+                        <div class="form-item"><label class="form-label">银行账号</label><input type="text" id="edit-bank-account" class="form-input"></div>
+                        <div class="form-item"><label class="form-label">税号</label><input type="text" id="edit-tax-number" class="form-input"></div>
+                        <div class="form-item"><label class="form-label">发票类型</label><select id="edit-invoice-type" class="form-select"><option value="">请选择</option><option value="normal">增值税普通发票</option><option value="special">增值税专用发票</option></select></div>
+                    </div>
+                    <div class="section-title" style="margin:16px 0 12px;">申请说明</div>
+                    <div class="form-item"><label class="form-label">申请说明</label><textarea id="edit-remark" class="form-textarea" rows="2"></textarea></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="customer-edit-modal">取消</button><button type="button" class="btn btn-primary" id="edit-save-btn">保存</button></div>
+            </div>
+        </div>
+        <script>
+        console.log('客户档案 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+            PageInteractions.toggleSelectAll('input[name="apply-id"]');
+        }
+        (function() {
+            function getTypeText(v) {
+                return v === 'manufacturer' ? '生产制造商' : (v === 'trader' ? '贸易商' : (v === 'service' ? '服务商' : v || '-'));
+            }
+            function getStatusText(v) {
+                return v === 'draft' ? '草稿' : (v === 'submitted' ? '已提交待评审' : (v === 'approved' ? '已通过' : (v === 'rejected' ? '已驳回' : v || '-')));
+            }
+            document.addEventListener('click', function(e) {
+                var viewBtn = e.target && e.target.closest ? e.target.closest('[data-open-modal="customer-view-modal"]') : null;
+                if (viewBtn) {
+                    var row = viewBtn.closest('tr');
+                    var cells = row ? row.querySelectorAll('td') : [];
+                    if (cells.length >= 13) {
+                        var get = function(attr) { return (row.getAttribute(attr) || '').trim() || '-'; };
+                        document.getElementById('view-apply-no').textContent = (cells[1] && cells[1].textContent.trim()) || '-';
+                        document.getElementById('view-target-company').textContent = (cells[11] && cells[11].textContent.trim()) || '-';
+                        document.getElementById('view-apply-status').textContent = (cells[5] && cells[5].textContent.trim()) || '-';
+                        document.getElementById('view-applicant').textContent = (cells[8] && cells[8].textContent.trim()) || '-';
+                        document.getElementById('view-submit-time').textContent = (cells[9] && cells[9].textContent.trim()) || '-';
+                        document.getElementById('view-sync-time').textContent = (cells[10] && cells[10].textContent.trim()) || '-';
+                        document.getElementById('view-company-name').textContent = (cells[2] && cells[2].textContent.trim()) || '-';
+                        document.getElementById('view-credit').textContent = (cells[3] && cells[3].textContent.trim()) || '-';
+                        document.getElementById('view-type').textContent = (cells[4] && cells[4].textContent.trim()) || '-';
+                        document.getElementById('view-reg-address').textContent = get('data-reg-address');
+                        document.getElementById('view-biz-address').textContent = get('data-biz-address');
+                        document.getElementById('view-legal-rep').textContent = get('data-legal-rep');
+                        document.getElementById('view-reg-capital').textContent = get('data-reg-capital');
+                        document.getElementById('view-establish-date').textContent = get('data-establish-date');
+                        var start = get('data-biz-start'), end = get('data-biz-end');
+                        document.getElementById('view-biz-period').textContent = (start !== '-' || end !== '-') ? (start + ' 至 ' + end) : '-';
+                        document.getElementById('view-contact').textContent = get('data-contact');
+                        document.getElementById('view-phone').textContent = get('data-phone');
+                        document.getElementById('view-email').textContent = get('data-email');
+                        var em = get('data-emergency-contact'), emPhone = get('data-emergency-phone');
+                        document.getElementById('view-emergency').textContent = (em !== '-' || emPhone !== '-') ? (em + ' / ' + emPhone) : '-';
+                        document.getElementById('view-quality-cert').textContent = get('data-quality-cert');
+                        document.getElementById('view-env-cert').textContent = get('data-env-cert');
+                        document.getElementById('view-cert-expiry').textContent = get('data-cert-expiry');
+                        document.getElementById('view-main-materials').textContent = get('data-main-materials');
+                        document.getElementById('view-capacity-info').textContent = get('data-capacity-info');
+                        document.getElementById('view-bank-name').textContent = get('data-bank-name');
+                        document.getElementById('view-bank-account').textContent = get('data-bank-account');
+                        document.getElementById('view-tax-number').textContent = get('data-tax-number');
+                        var inv = get('data-invoice-type');
+                        document.getElementById('view-invoice-type').textContent = inv === 'normal' ? '增值税普通发票' : (inv === 'special' ? '增值税专用发票' : inv);
+                        document.getElementById('view-remark').textContent = get('data-remark');
+                        document.getElementById('view-proc-level').textContent = (cells[6] && cells[6].textContent.trim()) || '-';
+                        document.getElementById('view-proc-status').textContent = (cells[7] && cells[7].textContent.trim()) || '-';
+                        document.getElementById('view-sync-tip').style.display = row.getAttribute('data-status') === 'submitted' ? 'block' : 'none';
+                    }
+                    return;
+                }
+                var editBtn = e.target && e.target.closest ? e.target.closest('[data-open-modal="customer-edit-modal"]') : null;
+                if (editBtn) {
+                    var row = editBtn.closest('tr');
+                    var cells = row ? row.querySelectorAll('td') : [];
+                    if (cells.length >= 13) {
+                        var get = function(attr) { return (row.getAttribute(attr) || '').trim(); };
+                        var applyNo = (cells[1] && cells[1].textContent.trim()) || '';
+                        document.getElementById('edit-apply-no').value = applyNo;
+                        document.getElementById('customer-edit-modal').setAttribute('data-edit-apply-no', applyNo);
+                        document.getElementById('edit-target-company').value = (cells[11] && cells[11].textContent.trim()) || '';
+                        document.getElementById('edit-company-name').value = (cells[2] && cells[2].textContent.trim()) || '';
+                        document.getElementById('edit-credit').value = (cells[3] && cells[3].textContent.trim()) || '';
+                        var typeText = (cells[4] && cells[4].textContent.trim()) || '';
+                        var typeEl = document.getElementById('edit-type');
+                        if (typeEl) typeEl.value = typeText === '生产制造商' ? 'manufacturer' : (typeText === '贸易商' ? 'trader' : (typeText === '服务商' ? 'service' : ''));
+                        document.getElementById('edit-reg-address').value = get('data-reg-address');
+                        document.getElementById('edit-biz-address').value = get('data-biz-address');
+                        document.getElementById('edit-legal-rep').value = get('data-legal-rep');
+                        document.getElementById('edit-reg-capital').value = get('data-reg-capital');
+                        document.getElementById('edit-establish-date').value = get('data-establish-date');
+                        document.getElementById('edit-biz-start').value = get('data-biz-start');
+                        document.getElementById('edit-biz-end').value = get('data-biz-end');
+                        document.getElementById('edit-contact').value = get('data-contact');
+                        document.getElementById('edit-phone').value = get('data-phone');
+                        document.getElementById('edit-email').value = get('data-email');
+                        document.getElementById('edit-emergency-contact').value = get('data-emergency-contact');
+                        document.getElementById('edit-emergency-phone').value = get('data-emergency-phone');
+                        document.getElementById('edit-quality-cert').value = get('data-quality-cert');
+                        document.getElementById('edit-env-cert').value = get('data-env-cert');
+                        document.getElementById('edit-cert-expiry').value = get('data-cert-expiry');
+                        document.getElementById('edit-main-materials').value = get('data-main-materials');
+                        document.getElementById('edit-capacity-info').value = get('data-capacity-info');
+                        document.getElementById('edit-bank-name').value = get('data-bank-name');
+                        document.getElementById('edit-bank-account').value = get('data-bank-account');
+                        document.getElementById('edit-tax-number').value = get('data-tax-number');
+                        var inv = get('data-invoice-type');
+                        var invEl = document.getElementById('edit-invoice-type');
+                        if (invEl) invEl.value = inv || '';
+                        document.getElementById('edit-remark').value = get('data-remark');
+                    }
+                    return;
+                }
+            }, true);
+
+            function getApplyData() {
+                var g = function(id) { var el = document.getElementById(id); return el ? (el.value || '').trim() : ''; };
+                return {
+                    targetCompany: g('apply-target-company'), companyName: g('apply-company-name'), credit: g('apply-credit'), type: g('apply-type'),
+                    regAddress: g('apply-reg-address'), bizAddress: g('apply-biz-address'), legalRep: g('apply-legal-rep'),
+                    regCapital: g('apply-reg-capital'), establishDate: g('apply-establish-date'), bizStart: g('apply-biz-start'), bizEnd: g('apply-biz-end'),
+                    contact: g('apply-contact'), phone: g('apply-phone'), email: g('apply-email'),
+                    emergencyContact: g('apply-emergency-contact'), emergencyPhone: g('apply-emergency-phone'),
+                    qualityCert: g('apply-quality-cert'), envCert: g('apply-env-cert'), certExpiry: g('apply-cert-expiry'),
+                    mainMaterials: g('apply-main-materials'), capacityInfo: g('apply-capacity-info'),
+                    bankName: g('apply-bank-name'), bankAccount: g('apply-bank-account'), taxNumber: g('apply-tax-number'), invoiceType: g('apply-invoice-type'),
+                    remark: g('apply-remark')
+                };
+            }
+            function setRowData(tr, d) {
+                if (!tr || !d) return;
+                if (d.targetCompany !== undefined) tr.setAttribute('data-target-company', d.targetCompany || '');
+                tr.setAttribute('data-reg-address', d.regAddress || '');
+                tr.setAttribute('data-biz-address', d.bizAddress || '');
+                tr.setAttribute('data-legal-rep', d.legalRep || '');
+                tr.setAttribute('data-reg-capital', d.regCapital || '');
+                tr.setAttribute('data-establish-date', d.establishDate || '');
+                tr.setAttribute('data-biz-start', d.bizStart || '');
+                tr.setAttribute('data-biz-end', d.bizEnd || '');
+                tr.setAttribute('data-contact', d.contact || '');
+                tr.setAttribute('data-phone', d.phone || '');
+                tr.setAttribute('data-email', d.email || '');
+                tr.setAttribute('data-emergency-contact', d.emergencyContact || '');
+                tr.setAttribute('data-emergency-phone', d.emergencyPhone || '');
+                tr.setAttribute('data-quality-cert', d.qualityCert || '');
+                tr.setAttribute('data-env-cert', d.envCert || '');
+                tr.setAttribute('data-cert-expiry', d.certExpiry || '');
+                tr.setAttribute('data-main-materials', d.mainMaterials || '');
+                tr.setAttribute('data-capacity-info', d.capacityInfo || '');
+                tr.setAttribute('data-bank-name', d.bankName || '');
+                tr.setAttribute('data-bank-account', d.bankAccount || '');
+                tr.setAttribute('data-tax-number', d.taxNumber || '');
+                tr.setAttribute('data-invoice-type', d.invoiceType || '');
+                tr.setAttribute('data-remark', d.remark || '');
+            }
+            function clearApplyForm() {
+                ['apply-target-company','apply-company-name','apply-credit','apply-type','apply-reg-address','apply-biz-address','apply-legal-rep','apply-reg-capital','apply-establish-date','apply-biz-start','apply-biz-end','apply-contact','apply-phone','apply-email','apply-emergency-contact','apply-emergency-phone','apply-quality-cert','apply-env-cert','apply-cert-expiry','apply-main-materials','apply-capacity-info','apply-bank-name','apply-bank-account','apply-tax-number','apply-invoice-type','apply-remark'].forEach(function(id) { var el = document.getElementById(id); if (el) el.value = ''; });
+                var certFiles = document.getElementById('apply-cert-files'); if (certFiles) certFiles.value = '';
+                var attach = document.getElementById('apply-attach'); if (attach) attach.value = '';
+            }
+            document.getElementById('apply-save-draft-btn').addEventListener('click', function() {
+                var d = getApplyData();
+                if (!d.targetCompany || !d.companyName || !d.credit || !d.type || !d.regAddress || !d.legalRep || !d.establishDate || !d.bizStart || !d.bizEnd || !d.contact || !d.phone || !d.email) {
+                    alert('请填写必填项：申请对象（对方企业）、企业名称、统一社会信用代码、类型、注册地址、法定代表人、成立时间、营业期限起/止、联系人、联系电话、联系邮箱');
+                    return;
+                }
+                var applyNo = 'SA-2025-00' + (document.querySelectorAll('.card tbody tr').length + 1);
+                var tbody = document.querySelector('.card table tbody');
+                var typeText = getTypeText(d.type);
+                var tr = document.createElement('tr');
+                tr.setAttribute('data-apply-id', 'new');
+                tr.setAttribute('data-status', 'draft');
+                setRowData(tr, d);
+                tr.innerHTML = '<td><input type="checkbox" name="apply-id" value="new"></td><td>' + applyNo + '</td><td>' + d.companyName + '</td><td>' + d.credit + '</td><td>' + typeText + '</td><td><span class="status-badge status-draft">草稿</span></td><td>-</td><td>-</td><td>当前用户</td><td>-</td><td>-</td><td>' + (d.targetCompany || '') + '</td><td><button type="button" class="btn btn-sm btn-default" data-open-modal="customer-view-modal">查看</button><button type="button" class="btn btn-sm btn-default" data-open-modal="customer-edit-modal">编辑</button><button type="button" class="btn btn-sm btn-primary btn-submit-apply">提交</button></td>';
+                tbody.appendChild(tr);
+                if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+                document.querySelector('[data-close-modal="customer-apply-modal"]').click();
+                clearApplyForm();
+                alert('已保存为草稿，可稍后在列表中编辑或提交。');
+            });
+
+            document.getElementById('apply-submit-btn').addEventListener('click', function() {
+                var d = getApplyData();
+                if (!d.targetCompany || !d.companyName || !d.credit || !d.type || !d.regAddress || !d.legalRep || !d.establishDate || !d.bizStart || !d.bizEnd || !d.contact || !d.phone || !d.email) {
+                    alert('请填写必填项：申请对象（对方企业）、企业名称、统一社会信用代码、类型、注册地址、法定代表人、成立时间、营业期限起/止、联系人、联系电话、联系邮箱');
+                    return;
+                }
+                var applyNo = 'SA-2025-00' + (document.querySelectorAll('.card tbody tr').length + 1);
+                var tbody = document.querySelector('.card table tbody');
+                var typeText = getTypeText(d.type);
+                var today = new Date();
+                var submitTime = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+                var tr = document.createElement('tr');
+                tr.setAttribute('data-apply-id', 'new');
+                tr.setAttribute('data-status', 'submitted');
+                setRowData(tr, d);
+                tr.innerHTML = '<td><input type="checkbox" name="apply-id" value="new"></td><td>' + applyNo + '</td><td>' + d.companyName + '</td><td>' + d.credit + '</td><td>' + typeText + '</td><td><span class="status-badge status-submitted">已提交待评审</span></td><td>-</td><td>-</td><td>当前用户</td><td>' + submitTime + '</td><td>-</td><td>' + (d.targetCompany || '') + '</td><td><button type="button" class="btn btn-sm btn-default" data-open-modal="customer-view-modal">查看</button><button type="button" class="btn btn-sm btn-default btn-withdraw">撤回</button></td>';
+                tbody.appendChild(tr);
+                if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+                document.querySelector('[data-close-modal="customer-apply-modal"]').click();
+                clearApplyForm();
+                alert('申请已提交，已同步到对方供应商档案，待对方评审通过后本企业成为其供应商。');
+            });
+
+            document.getElementById('edit-save-btn').addEventListener('click', function() {
+                var modal = document.getElementById('customer-edit-modal');
+                var applyNo = modal ? modal.getAttribute('data-edit-apply-no') : '';
+                var nameEl = document.getElementById('edit-company-name');
+                var name = nameEl && nameEl.value ? nameEl.value.trim() : '';
+                var g = function(id) { var el = document.getElementById(id); return el ? (el.value || '').trim() : ''; };
+                if (!g('edit-target-company') || !name || !g('edit-credit') || !g('edit-type') || !g('edit-reg-address') || !g('edit-legal-rep') || !g('edit-establish-date') || !g('edit-biz-start') || !g('edit-biz-end') || !g('edit-contact') || !g('edit-phone') || !g('edit-email')) {
+                    alert('请填写必填项：申请对象（对方企业）、企业名称、统一社会信用代码、类型、注册地址、法定代表人、成立时间、营业期限起/止、联系人、联系电话、联系邮箱');
+                    return;
+                }
+                var creditEl = document.getElementById('edit-credit');
+                var typeEl = document.getElementById('edit-type');
+                var contactEl = document.getElementById('edit-contact');
+                var phoneEl = document.getElementById('edit-phone');
+                var remarkEl = document.getElementById('edit-remark');
+                var regEl = document.getElementById('edit-reg-address');
+                var row = null;
+                document.querySelectorAll('.card tbody tr').forEach(function(r) {
+                    var c = r.querySelectorAll('td');
+                    if (c[1] && c[1].textContent.trim() === applyNo) row = r;
+                });
+                if (row && row.getAttribute('data-status') === 'draft') {
+                    var cells = row.querySelectorAll('td');
+                    if (cells[2]) cells[2].textContent = name;
+                    if (cells[3]) cells[3].textContent = creditEl ? creditEl.value.trim() : '';
+                    if (cells[4]) cells[4].textContent = typeEl ? getTypeText(typeEl.value) : '';
+                    var targetCompanyEl = document.getElementById('edit-target-company');
+                    if (cells[11]) cells[11].textContent = targetCompanyEl ? targetCompanyEl.value.trim() : '';
+                    var g = function(id) { var el = document.getElementById(id); return el ? (el.value || '').trim() : ''; };
+                    setRowData(row, {
+                        targetCompany: g('edit-target-company'),
+                        regAddress: g('edit-reg-address'), bizAddress: g('edit-biz-address'), legalRep: g('edit-legal-rep'), regCapital: g('edit-reg-capital'),
+                        establishDate: g('edit-establish-date'), bizStart: g('edit-biz-start'), bizEnd: g('edit-biz-end'),
+                        contact: g('edit-contact'), phone: g('edit-phone'), email: g('edit-email'),
+                        emergencyContact: g('edit-emergency-contact'), emergencyPhone: g('edit-emergency-phone'),
+                        qualityCert: g('edit-quality-cert'), envCert: g('edit-env-cert'), certExpiry: g('edit-cert-expiry'),
+                        mainMaterials: g('edit-main-materials'), capacityInfo: g('edit-capacity-info'),
+                        bankName: g('edit-bank-name'), bankAccount: g('edit-bank-account'), taxNumber: g('edit-tax-number'),
+                        invoiceType: (document.getElementById('edit-invoice-type') || {}).value || '', remark: g('edit-remark')
+                    });
+                }
+                var closeBtn = document.querySelector('[data-close-modal="customer-edit-modal"]');
+                if (closeBtn) closeBtn.click();
+                alert('保存成功。');
+            });
+
+            document.addEventListener('click', function(ev) {
+                if (ev.target && ev.target.classList && ev.target.classList.contains('btn-submit-apply')) {
+                    var btn = ev.target.closest ? ev.target.closest('.btn-submit-apply') : ev.target;
+                    var row = btn ? btn.closest('tr') : null;
+                    if (row && row.getAttribute('data-status') === 'draft') {
+                        if (!confirm('确认提交？提交后将同步到对方供应商档案，待对方评审。')) return;
+                        var cells = row.querySelectorAll('td');
+                        var today = new Date();
+                        var submitTime = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+                        row.setAttribute('data-status', 'submitted');
+                        if (cells[5]) cells[5].innerHTML = '<span class="status-badge status-submitted">已提交待评审</span>';
+                        if (cells[9]) cells[9].textContent = submitTime;
+                        var opCell = cells[12];
+                        if (opCell) {
+                            opCell.innerHTML = '<button type="button" class="btn btn-sm btn-default" data-open-modal="customer-view-modal">查看</button><button type="button" class="btn btn-sm btn-default btn-withdraw">撤回</button>';
+                        }
+                        if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+                        alert('已提交，已同步到对方供应商档案，待对方评审通过后本企业成为其供应商。');
+                    }
+                }
+                if (ev.target && (ev.target.classList.contains('btn-withdraw') || (ev.target.closest && ev.target.closest('.btn-withdraw')))) {
+                    var wbtn = ev.target.classList && ev.target.classList.contains('btn-withdraw') ? ev.target : (ev.target.closest ? ev.target.closest('.btn-withdraw') : null);
+                    var row = wbtn ? wbtn.closest('tr') : null;
+                    if (row && row.getAttribute('data-status') === 'submitted') {
+                        if (!confirm('确认撤回？撤回后可在本侧编辑后重新提交。')) return;
+                        var cells = row.querySelectorAll('td');
+                        row.setAttribute('data-status', 'draft');
+                        if (cells[5]) cells[5].innerHTML = '<span class="status-badge status-draft">草稿</span>';
+                        if (cells[9]) cells[9].textContent = '-';
+                        if (cells[10]) cells[10].textContent = '-';
+                        var opCell = cells[12];
+                        if (opCell) opCell.innerHTML = '<button type="button" class="btn btn-sm btn-default" data-open-modal="customer-view-modal">查看</button><button type="button" class="btn btn-sm btn-default" data-open-modal="customer-edit-modal">编辑</button><button type="button" class="btn btn-sm btn-primary btn-submit-apply">提交</button>';
+                        if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+                        alert('已撤回，可编辑后重新提交。');
+                    }
+                }
+            }, true);
+        })();
+        document.querySelectorAll('.action-left .btn-default').forEach(function(btn) {
+            if (btn.textContent.indexOf('导出') !== -1) btn.addEventListener('click', function() { if (confirm('确定导出当前列表？')) alert('导出成功，文件已下载。'); });
+        });
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订单管理 - 供应链协同系统</title>
+    <style>
+        .plan-source-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+        .plan-source-badge.demand { background: #e6f7ff; color: #1890ff; }
+        .plan-source-badge.manual { background: #f6ffed; color: #52c41a; }
+        .order-list-table tbody tr.order-list-row { cursor: pointer; }
+        .order-list-table tbody tr.order-list-row:hover { background: #f5f5f5; }
+        .order-list-table tbody tr.order-list-row.selected {
+            background: #e6f7ff !important;
+            border-left: 3px solid #1890ff;
+            box-shadow: inset 0 0 0 1px rgba(24, 144, 255, 0.15);
+        }
+        .ship-list-placeholder { text-align: center; color: #999; padding: 24px; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/supply-chain-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">订单协同</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">订单管理</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">订单数据有两个来源：① 采购协同中的采购订单审批通过后自动推送至本列表；② 本应用内人工新建。采购下推订单不允许编辑，仅支持查看、发货；人工创建订单支持查看、编辑、确认等。点击「发货」可填写发货明细（可减少物料或数量），生成发货单；未调整明细则订单状态为「发货中」，若有减少则订单状态为「部分发货」且可再次发货（订单与发货单一对多）。支持按订单来源、状态筛选。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item filter-item--wide">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="订单编号、来源单号、需求方名称、物料编码">
+                </div>
+                <div class="filter-item">
+                    <label>订单来源</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="push">采购下推</option>
+                        <option value="manual">人工创建</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>订单状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="draft">草稿</option>
+                        <option value="pending">待确认</option>
+                        <option value="confirmed">已确认</option>
+                        <option value="executing">执行中</option>
+                        <option value="partial">部分发货</option>
+                        <option value="completed">已完成</option>
+                        <option value="cancelled">已取消</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>需求方</label>
+                    <input type="text" class="form-input" placeholder="需求方名称">
+                </div>
+                <div class="filter-item">
+                    <label>下单日期</label>
+                    <input type="date" class="form-input">
+                </div>
+                <div class="filter-actions">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary btn-create-modal"
+                        data-modal="order-create-modal"
+                        data-title="新建协同订单"
+                        data-url="pages/supply-chain-order-create.html">
+                    + 新建订单
+                </button>
+                <button class="btn btn-default">批量导入</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="order-list-table list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">订单编号</th>
+                            <th width="90">订单来源</th>
+                            <th width="120">来源单号</th>
+                            <th width="150">需求方</th>
+                            <th width="100">订单金额</th>
+                            <th width="90">订单状态</th>
+                            <th width="100">下单日期</th>
+                            <th width="100">要求交期</th>
+                            <th width="100">确认时间</th>
+                            <th width="90">交付进度</th>
+                            <th width="90">创建人</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="order-list-tbody">
+                        <tr class="order-list-row" data-order-no="SO-2025-001">
+                            <td><input type="checkbox" name="order-id" value="1"></td>
+                            <td>SO-2025-001</td>
+                            <td><span class="plan-source-badge demand">采购下推</span></td>
+                            <td>PO-2025-001</td>
+                            <td>深圳市电子科技有限公司</td>
+                            <td>¥156,800.00</td>
+                            <td><span class="status-badge status-processing">执行中</span></td>
+                            <td>2025-01-15</td>
+                            <td>2025-02-20</td>
+                            <td>2025-01-16 09:30</td>
+                            <td>45%</td>
+                            <td>张协同</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/supply-chain-order-detail.html" data-id="1">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary" data-open-modal="ship-order-modal">发货</button>
+                            </td>
+                        </tr>
+                        <tr class="order-list-row" data-order-no="SO-2025-005" data-procurement-order-no="PO-2025-005" data-procurement-order-id="5">
+                            <td><input type="checkbox" name="order-id" value="5"></td>
+                            <td>SO-2025-005</td>
+                            <td><span class="plan-source-badge demand">采购下推</span></td>
+                            <td>PO-2025-005</td>
+                            <td>深圳精密制造有限公司</td>
+                            <td>¥156,800.00</td>
+                            <td><span class="status-badge status-warning">待确认</span></td>
+                            <td>2025-01-18</td>
+                            <td>2025-02-20</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>系统</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/supply-chain-order-detail.html" data-id="5">查看</button>
+                                <button class="btn btn-sm btn-primary btn-confirm-order" data-procurement-order-id="5" data-procurement-order-no="PO-2025-005">确认</button>
+                            </td>
+                        </tr>
+                        <tr class="order-list-row" data-order-no="SO-2025-002">
+                            <td><input type="checkbox" name="order-id" value="2"></td>
+                            <td>SO-2025-002</td>
+                            <td><span class="plan-source-badge manual">人工创建</span></td>
+                            <td>-</td>
+                            <td>上海精密机械制造有限公司</td>
+                            <td>¥98,500.00</td>
+                            <td><span class="status-badge status-warning">待确认</span></td>
+                            <td>2025-01-20</td>
+                            <td>2025-03-05</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>李协同</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/supply-chain-order-detail.html" data-id="2">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/supply-chain-order-edit.html" data-id="2">编辑</button>
+                                <button class="btn btn-sm btn-primary">确认</button>
+                            </td>
+                        </tr>
+                        <tr class="order-list-row" data-order-no="SO-2025-003">
+                            <td><input type="checkbox" name="order-id" value="3"></td>
+                            <td>SO-2025-003</td>
+                            <td><span class="plan-source-badge demand">采购下推</span></td>
+                            <td>PO-2025-003</td>
+                            <td>北京贸易有限公司</td>
+                            <td>¥52,300.00</td>
+                            <td><span class="status-badge status-success">已完成</span></td>
+                            <td>2025-01-10</td>
+                            <td>2025-01-30</td>
+                            <td>2025-01-11 14:20</td>
+                            <td>100%</td>
+                            <td>王协同</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/supply-chain-order-detail.html" data-id="3">查看</button>
+                            </td>
+                        </tr>
+                        <tr class="order-list-row" data-order-no="SO-2025-004" data-order-id="ship-partial">
+                            <td><input type="checkbox" name="order-id" value="4"></td>
+                            <td>SO-2025-004</td>
+                            <td><span class="plan-source-badge demand">采购下推</span></td>
+                            <td>PO-2025-005</td>
+                            <td>东莞电路板制造厂</td>
+                            <td>¥78,600.00</td>
+                            <td><span class="status-badge status-warning">部分发货</span></td>
+                            <td>2025-01-25</td>
+                            <td>2025-02-28</td>
+                            <td>2025-01-26 10:00</td>
+                            <td>60%</td>
+                            <td>张协同</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/supply-chain-order-detail.html" data-id="4">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary" data-open-modal="ship-order-modal">发货</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 4 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 发货单模块：点击主表行后下方列表显示该订单的发货单 -->
+        <div class="card" style="margin-top: 20px;">
+            <div class="card-header">
+                <h3 class="card-title">发货单</h3>
+            </div>
+            <div class="card-body">
+                <p class="page-description" style="margin-bottom: 12px; font-size: 13px; color: #666;">点击上方订单列表中的一行，下方将显示该订单对应的发货单；点击「详情」可查看发货单明细。</p>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="130">发货单号</th>
+                                <th width="120">关联订单</th>
+                                <th width="160">需求方</th>
+                                <th width="90">发货状态</th>
+                                <th width="110">发货日期</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ship-list-tbody">
+                            <tr class="ship-list-placeholder-row" data-order-no="">
+                                <td colspan="6" class="ship-list-placeholder">请在上方订单列表中点击一行，查看该订单的发货单</td>
+                            </tr>
+                            <tr class="ship-list-row" data-order-no="SO-2025-001" data-ship-no="SH-2025-001" style="display:none;">
+                                <td>SH-2025-001</td>
+                                <td>SO-2025-001</td>
+                                <td>深圳市电子科技有限公司</td>
+                                <td><span class="status-badge status-success">已发货</span></td>
+                                <td>2025-01-25</td>
+                                <td><button type="button" class="btn btn-sm btn-default" data-open-modal="ship-detail-modal" data-ship-no="SH-2025-001">详情</button></td>
+                            </tr>
+                            <tr class="ship-list-row" data-order-no="SO-2025-001" data-ship-no="SH-2025-002" style="display:none;">
+                                <td>SH-2025-002</td>
+                                <td>SO-2025-001</td>
+                                <td>深圳市电子科技有限公司</td>
+                                <td><span class="status-badge status-processing">发货中</span></td>
+                                <td>2025-02-01</td>
+                                <td><button type="button" class="btn btn-sm btn-default" data-open-modal="ship-detail-modal" data-ship-no="SH-2025-002">详情</button></td>
+                            </tr>
+                            <tr class="ship-list-row" data-order-no="SO-2025-004" data-ship-no="SH-2025-003" style="display:none;">
+                                <td>SH-2025-003</td>
+                                <td>SO-2025-004</td>
+                                <td>东莞电路板制造厂</td>
+                                <td><span class="status-badge status-success">已发货</span></td>
+                                <td>2025-01-28</td>
+                                <td><button type="button" class="btn btn-sm btn-default" data-open-modal="ship-detail-modal" data-ship-no="SH-2025-003">详情</button></td>
+                            </tr>
+                            <tr class="ship-list-row" data-order-no="SO-2025-003" data-ship-no="SH-2025-004" style="display:none;">
+                                <td>SH-2025-004</td>
+                                <td>SO-2025-003</td>
+                                <td>北京贸易有限公司</td>
+                                <td><span class="status-badge status-success">已发货</span></td>
+                                <td>2025-01-20</td>
+                                <td><button type="button" class="btn btn-sm btn-default" data-open-modal="ship-detail-modal" data-ship-no="SH-2025-004">详情</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 订单确认Modal（放在 content-wrapper 内以便 SPA 加载时一并注入） -->
+    <div class="modal-overlay" id="confirm-order-modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 class="modal-title">确认订单</h3>
+                <button class="modal-close" data-close-modal="confirm-order-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="confirm-order-form">
+                    <div class="form-item">
+                        <label class="form-label">订单编号</label>
+                        <input type="text" class="form-input" id="confirm-order-no" readonly>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">需求方</label>
+                        <input type="text" class="form-input" id="confirm-supplier" readonly>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">订单金额</label>
+                        <input type="text" class="form-input" id="confirm-amount" readonly>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">需求方确认状态 <span style="color: #ff4d4f;">*</span></label>
+                        <select class="form-select" name="supplierConfirmed" required>
+                            <option value="">请选择</option>
+                            <option value="true">已确认</option>
+                            <option value="false">未确认</option>
+                        </select>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">确认备注</label>
+                        <textarea class="form-input" name="confirmComment" rows="3" placeholder="请输入确认备注"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-close-modal="confirm-order-modal">取消</button>
+                <button class="btn btn-primary" id="btn-confirm-order">确认</button>
+            </div>
+        </div>
+    </div>
+
+        <!-- 发货弹窗：订单信息 + 明细（可减少物料/数量），生成发货单后订单状态为发货中或部分发货，订单与发货单一对多 -->
+        <div class="modal-overlay" id="ship-order-modal">
+        <div class="modal-content" style="max-width: 860px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h3 class="modal-title">发货</h3>
+                <button type="button" class="modal-close" data-close-modal="ship-order-modal">&times;</button>
+            </div>
+            <div class="modal-body" style="overflow-y: auto; flex: 1;">
+                <p style="font-size: 13px; color: #666; margin-bottom: 12px;">可减少明细行或减少本次发货数量；未调整则生成整单发货，订单状态为「发货中」；若有减少则订单状态为「部分发货」，可再次发货（订单与发货单一对多）。</p>
+                <div class="section-title" style="margin-bottom: 8px;">订单信息</div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 20px; font-size: 13px; margin-bottom: 16px;">
+                    <div><span style="color: #666;">订单编号：</span><span id="ship-order-no">-</span></div>
+                    <div><span style="color: #666;">需求方：</span><span id="ship-demand-party">-</span></div>
+                    <div><span style="color: #666;">订单金额：</span><span id="ship-order-amount">-</span></div>
+                    <div><span style="color: #666;">下单日期：</span><span id="ship-order-date">-</span></div>
+                    <div><span style="color: #666;">要求交期：</span><span id="ship-delivery-date">-</span></div>
+                    <div><span style="color: #666;">订单状态：</span><span id="ship-order-status">-</span></div>
+                </div>
+                <div class="section-title" style="margin-bottom: 8px;">发货明细（可减少物料或数量）</div>
+                <div class="table-wrapper" style="max-height: 280px; overflow: auto; border: 1px solid var(--border-color, #e8e8e8); border-radius: 6px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="40">序号</th>
+                                <th width="120">物料编码</th>
+                                <th width="160">物料名称</th>
+                                <th width="100">规格型号</th>
+                                <th width="90">订单数量</th>
+                                <th width="100">本次发货数量</th>
+                                <th width="50">单位</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ship-detail-tbody">
+                            <!-- 由脚本填充，每行：序号、物料编码、物料名称、规格、订单数量、本次发货数量(input)、单位、删除 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-close-modal="ship-order-modal">取消</button>
+                <button type="button" class="btn btn-primary" id="btn-generate-ship">生成发货单</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 发货单详情Modal：与主表「发货」弹窗样式一致，单头 + 发货明细表（只读） -->
+    <div class="modal-overlay" id="ship-detail-modal">
+        <div class="modal-content" style="max-width: 860px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h3 class="modal-title">发货单详情</h3>
+                <button type="button" class="modal-close" data-close-modal="ship-detail-modal">&times;</button>
+            </div>
+            <div class="modal-body" style="overflow-y: auto; flex: 1;">
+                <div class="section-title" style="margin-bottom: 8px;">单头信息</div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 20px; font-size: 13px; margin-bottom: 16px;">
+                    <div><span style="color: #666;">发货单号：</span><span id="ship-detail-ship-no">-</span></div>
+                    <div><span style="color: #666;">关联订单：</span><span id="ship-detail-order-no">-</span></div>
+                    <div><span style="color: #666;">需求方：</span><span id="ship-detail-demand-party">-</span></div>
+                    <div><span style="color: #666;">发货状态：</span><span id="ship-detail-status">-</span></div>
+                    <div><span style="color: #666;">发货日期：</span><span id="ship-detail-date">-</span></div>
+                </div>
+                <div class="section-title" style="margin-bottom: 8px;">发货明细</div>
+                <div class="table-wrapper" style="max-height: 280px; overflow: auto; border: 1px solid var(--border-color, #e8e8e8); border-radius: 6px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="60">序号</th>
+                                <th width="120">物料编码</th>
+                                <th width="160">物料名称</th>
+                                <th width="120">规格</th>
+                                <th width="80">数量</th>
+                                <th width="60">单位</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ship-detail-lines-tbody">
+                            <tr><td colspan="6" class="ship-list-placeholder">暂无明细</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-close-modal="ship-detail-modal">关闭</button>
+            </div>
+        </div>
+    </div>
+
+        <script src="../assets/business-logic.js"></script>
+        <script>
+            console.log('订单管理列表 页面已加载');
+        
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+            PageInteractions.toggleSelectAll('input[name="order-id"]');
+        }
+
+        // 订单确认按钮
+        document.querySelectorAll('.btn-primary').forEach(function(btn) {
+            if (btn.textContent.trim() === '确认' || btn.classList.contains('btn-confirm-order')) {
+                btn.addEventListener('click', function() {
+                    var row = this.closest('tr');
+                    var procurementOrderId = row.getAttribute('data-procurement-order-id');
+                    var procurementOrderNo = row.getAttribute('data-procurement-order-no');
+                    
+                    document.getElementById('confirm-order-no').value = row.querySelector('td:nth-child(2)').textContent.trim();
+                    document.getElementById('confirm-supplier').value = row.querySelector('td:nth-child(5)').textContent.trim();
+                    document.getElementById('confirm-amount').value = row.querySelector('td:nth-child(6)').textContent.trim();
+                    document.getElementById('confirm-order-modal').classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                    document.getElementById('confirm-order-modal').dataset.orderId = row.querySelector('input[name="order-id"]').value;
+                    document.getElementById('confirm-order-modal').dataset.procurementOrderId = procurementOrderId || '';
+                    document.getElementById('confirm-order-modal').dataset.procurementOrderNo = procurementOrderNo || '';
+                });
+            }
+        });
+
+        // 确认订单提交
+        document.getElementById('btn-confirm-order').addEventListener('click', function() {
+            var form = document.getElementById('confirm-order-form');
+            var formData = new FormData(form);
+            var supplierConfirmed = formData.get('supplierConfirmed') === 'true';
+            if (!supplierConfirmed) {
+                alert('需求方尚未确认订单，无法完成确认操作');
+                return;
+            }
+            
+            var modal = document.getElementById('confirm-order-modal');
+            var procurementOrderId = modal.dataset.procurementOrderId;
+            var procurementOrderNo = modal.dataset.procurementOrderNo;
+            var orderId = modal.dataset.orderId;
+            
+            // 如果是采购端推送的订单，需要同步更新采购端的订单状态
+            if (procurementOrderId && procurementOrderNo) {
+                try {
+                    // 更新采购端的订单状态为"执行中"
+                    // 实际应用中这里应该调用API同步更新采购端订单状态
+                    var procurementOrderUpdates = JSON.parse(sessionStorage.getItem('procurementOrderUpdates') || '[]');
+                    procurementOrderUpdates.push({
+                        orderId: procurementOrderId,
+                        orderNo: procurementOrderNo,
+                        oldStatus: '已推送',
+                        newStatus: '执行中',
+                        updateTime: new Date().toISOString(),
+                        confirmedBy: '供应商端确认'
+                    });
+                    sessionStorage.setItem('procurementOrderUpdates', JSON.stringify(procurementOrderUpdates));
+                } catch (err) {
+                    console.error('更新采购端订单状态失败:', err);
+                }
+            }
+            
+            var result = BusinessLogic.changeStatus('order', 'pending', 'confirmed', {
+                supplierConfirmed: supplierConfirmed,
+                confirmComment: formData.get('confirmComment')
+            });
+            if (result.success) {
+                // 更新供应商端订单状态为"执行中"
+                var orderInput = document.querySelector('tr input[name="order-id"][value="' + orderId + '"]');
+                var row = orderInput ? orderInput.closest('tr') : null;
+                if (row) {
+                    var statusCell = row.querySelector('td:nth-child(7)');
+                    if (statusCell) {
+                        statusCell.innerHTML = '<span class="status-badge status-processing">执行中</span>';
+                    }
+                    // 更新确认时间
+                    var confirmTimeCell = row.querySelector('td:nth-child(10)');
+                    if (confirmTimeCell) {
+                        var now = new Date();
+                        confirmTimeCell.textContent = now.getFullYear() + '-' + 
+                            String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                            String(now.getDate()).padStart(2, '0') + ' ' +
+                            String(now.getHours()).padStart(2, '0') + ':' + 
+                            String(now.getMinutes()).padStart(2, '0');
+                    }
+                    // 更新操作列：移除确认按钮，添加发货按钮（仅采购下推订单）
+                    var actionCell = row.querySelector('td:nth-child(13)');
+                    if (actionCell && procurementOrderId) {
+                        actionCell.innerHTML = '<button class="btn btn-sm btn-default btn-view" data-url="pages/supply-chain-order-detail.html" data-id="' + orderId + '">查看</button> <button type="button" class="btn btn-sm btn-primary" data-open-modal="ship-order-modal">发货</button>';
+                    }
+                }
+                
+                alert('订单已确认。' + (procurementOrderNo ? '\n采购端订单 ' + procurementOrderNo + ' 状态已更新为"执行中"。' : ''));
+                document.getElementById('confirm-order-modal').classList.remove('active');
+                document.body.style.overflow = '';
+                form.reset();
+            } else {
+                alert(result.message);
+            }
+        });
+
+        // 交付进度计算和显示
+        document.querySelectorAll('tbody tr').forEach(function(row) {
+            var progressCell = row.querySelector('td:nth-child(11)');
+            if (progressCell && progressCell.textContent.indexOf('%') !== -1) {
+                var progress = parseFloat(progressCell.textContent);
+                if (progress < 50) progressCell.style.color = '#ff4d4f';
+                else if (progress < 100) progressCell.style.color = '#faad14';
+                else progressCell.style.color = '#52c41a';
+            }
+        });
+
+        // 发货：打开弹窗，填充订单信息与明细（可减物料/数量），生成发货单后更新订单状态
+        var shipDetailRows = [
+            { code: 'MAT-001', name: '电子元器件A', spec: '10KΩ ±5%', qty: 500, unit: '个' },
+            { code: 'MAT-002', name: 'PCB板', spec: '100x80mm 4层', qty: 200, unit: '片' },
+            { code: 'MAT-003', name: '电阻B', spec: '20KΩ', qty: 100, unit: '个' }
+        ];
+        function openShipModal(tr) {
+            if (!tr) return;
+            var tds = tr.querySelectorAll('td');
+            if (tds.length < 10) return;
+            document.getElementById('ship-order-no').textContent = tds[1].textContent.trim();
+            document.getElementById('ship-demand-party').textContent = tds[4].textContent.trim();
+            document.getElementById('ship-order-amount').textContent = tds[5].textContent.trim();
+            document.getElementById('ship-order-date').textContent = tds[7].textContent.trim();
+            document.getElementById('ship-delivery-date').textContent = tds[8].textContent.trim();
+            document.getElementById('ship-order-status').innerHTML = (tds[6].querySelector('.status-badge') ? tds[6].innerHTML : tds[6].textContent.trim());
+            var tbody = document.getElementById('ship-detail-tbody');
+            tbody.innerHTML = '';
+            shipDetailRows.forEach(function(r, i) {
+                var tr2 = document.createElement('tr');
+                tr2.setAttribute('data-order-qty', r.qty);
+                tr2.innerHTML = '<td class="ship-seq">' + (i + 1) + '</td><td>' + r.code + '</td><td>' + r.name + '</td><td>' + r.spec + '</td><td class="ship-order-qty">' + r.qty + '</td><td><input type="number" class="form-input form-input-sm ship-qty-input" min="0" max="' + r.qty + '" value="' + r.qty + '" data-max-qty="' + r.qty + '" style="width:80px;"></td><td>' + r.unit + '</td><td><button type="button" class="btn btn-sm btn-link btn-remove-ship-row">删除</button></td>';
+                tbody.appendChild(tr2);
+            });
+            document.getElementById('ship-order-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('ship-order-modal').dataset.shipTrIndex = Array.prototype.indexOf.call(tr.parentNode.children, tr);
+        }
+        function refreshShipSeq() {
+            document.querySelectorAll('#ship-detail-tbody tr').forEach(function(r, i) {
+                var seq = r.querySelector('.ship-seq');
+                if (seq) seq.textContent = i + 1;
+            });
+        }
+        document.addEventListener('click', function(e) {
+            var btn = e.target && e.target.closest ? e.target.closest('.btn-ship-order') : null;
+            if (btn) {
+                e.preventDefault();
+                e.stopPropagation();
+                var tr = btn.closest('tr');
+                if (tr) openShipModal(tr);
+            }
+        }, true);
+        document.getElementById('ship-order-modal').addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('btn-remove-ship-row')) {
+                var row = e.target.closest('tr');
+                if (row && row.parentNode && row.parentNode.id === 'ship-detail-tbody') {
+                    if (row.parentNode.querySelectorAll('tr').length <= 1) { alert('至少保留一行明细'); return; }
+                    row.remove();
+                    refreshShipSeq();
+                }
+            }
+        });
+        document.getElementById('btn-generate-ship').addEventListener('click', function() {
+            var tbody = document.getElementById('ship-detail-tbody');
+            var rows = tbody.querySelectorAll('tr');
+            var allFull = true;
+            var hasZero = false;
+            var overQty = false;
+            rows.forEach(function(r) {
+                var orderQty = parseInt(r.getAttribute('data-order-qty'), 10) || 0;
+                var input = r.querySelector('.ship-qty-input');
+                var qty = input ? (parseInt(input.value, 10) || 0) : 0;
+                var maxQty = input ? (parseInt(input.getAttribute('data-max-qty') || input.getAttribute('max'), 10) || orderQty : 0;
+                if (qty > maxQty) overQty = true;
+                if (qty < orderQty) allFull = false;
+                if (qty <= 0) hasZero = true;
+            });
+            if (overQty) { alert('本次发货数量不能大于订单数量'); return; }
+            if (rows.length === 0) { alert('请保留至少一行发货明细'); return; }
+            var newStatus = (allFull && !hasZero && rows.length === shipDetailRows.length) ? '发货中' : '部分发货';
+            var trIndex = document.getElementById('ship-order-modal').dataset.shipTrIndex;
+            if (trIndex !== undefined && trIndex !== '') {
+                var listTr = document.querySelector('.card tbody tr:nth-child(' + (parseInt(trIndex, 10) + 1) + ')');
+                if (listTr) {
+                    var statusTd = listTr.querySelector('td:nth-child(7)');
+                    if (statusTd) {
+                        statusTd.innerHTML = newStatus === '发货中' ? '<span class="status-badge status-processing">发货中</span>' : '<span class="status-badge status-warning">部分发货</span>';
+                    }
+                }
+            }
+            document.getElementById('ship-order-modal').classList.remove('active');
+            document.body.style.overflow = '';
+            alert('已生成发货单。' + (newStatus === '部分发货' ? '订单状态为「部分发货」，可再次发货（订单与发货单一对多）。' : '订单状态为「发货中」。'));
+        });
+
+            document.querySelectorAll('.action-left .btn-default').forEach(function(btn) {
+                var t = btn.textContent;
+                if (t.indexOf('批量导入') !== -1) btn.addEventListener('click', function() { if (confirm('确定打开批量导入？')) alert('请选择文件上传。'); });
+                else if (t.indexOf('导出') !== -1) btn.addEventListener('click', function() { if (confirm('确定导出当前列表？')) alert('导出成功，文件已下载。'); });
+            });
+        </script>
+    </div>
+</body>
+</html>

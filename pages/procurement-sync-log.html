@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>同步日志 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">系统协同</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">同步日志</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">查看系统协同的同步日志，包括ERP、WMS等系统的数据同步记录和错误日志。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="任务编号、系统名称">
+                </div>
+                <div class="filter-item">
+                    <label>目标系统</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="erp">ERP系统</option>
+                        <option value="wms">WMS系统</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>同步状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="success">成功</option>
+                        <option value="failed">失败</option>
+                        <option value="syncing">同步中</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>同步时间</label>
+                    <input type="date" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">导出</button>
+                <button class="btn btn-default">清空日志</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">任务编号</th>
+                            <th width="100">目标系统</th>
+                            <th width="100">同步类型</th>
+                            <th width="150">同步对象</th>
+                            <th width="100">同步状态</th>
+                            <th width="200">错误信息</th>
+                            <th width="120">同步时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="log-id" value="1"></td>
+                            <td>SYNC-2025-001</td>
+                            <td>ERP系统</td>
+                            <td>订单同步</td>
+                            <td>PO-2025-001</td>
+                            <td><span class="status-badge status-success">成功</span></td>
+                            <td>-</td>
+                            <td>2025-01-20 10:30</td>
+                            <td>
+                                <button class="btn btn-sm btn-default">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="log-id" value="2"></td>
+                            <td>SYNC-2025-002</td>
+                            <td>WMS系统</td>
+                            <td>收货同步</td>
+                            <td>REC-2025-001</td>
+                            <td><span class="status-badge status-error">失败</span></td>
+                            <td>网络连接超时</td>
+                            <td>2025-01-20 14:20</td>
+                            <td>
+                                <button class="btn btn-sm btn-default">查看</button>
+                                <button class="btn btn-sm btn-primary">重试</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 2 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('同步日志 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

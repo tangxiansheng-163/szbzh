@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>待办事项 - 供应链协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/supply-chain-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">待办事项</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">查看和处理供应链协同相关的待办事项，包括订单确认、异常处理、结算管理等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="单据编号、标题">
+                </div>
+                <div class="filter-item">
+                    <label>事项类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="order-confirm">订单确认</option>
+                        <option value="exception-handle">异常处理</option>
+                        <option value="settlement">结算管理</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待处理</option>
+                        <option value="processing">处理中</option>
+                        <option value="completed">已完成</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">批量处理</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">事项类型</th>
+                            <th width="200">标题</th>
+                            <th width="150">关联单据</th>
+                            <th width="100">状态</th>
+                            <th width="120">创建时间</th>
+                            <th width="120">截止时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="todo-id" value="1"></td>
+                            <td>订单确认</td>
+                            <td>SO-2025-001 原材料采购订单</td>
+                            <td>SO-2025-001</td>
+                            <td><span class="status-badge status-warning">待处理</span></td>
+                            <td>2025-01-18</td>
+                            <td>2025-01-20</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-primary btn-handle-todo-sc" data-id="1">处理</button>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/supply-chain-todo-detail.html" data-id="1">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="todo-id" value="2"></td>
+                            <td>异常处理</td>
+                            <td>交付延期异常处理</td>
+                            <td>EXC-2025-003</td>
+                            <td><span class="status-badge status-processing">处理中</span></td>
+                            <td>2025-01-19</td>
+                            <td>2025-01-22</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-primary btn-handle-todo-sc" data-id="2">处理</button>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/supply-chain-todo-detail.html" data-id="2">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 2 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            console.log('待办事项 页面已加载');
+            if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+            document.querySelectorAll('.btn-handle-todo-sc').forEach(function(btn) {
+                btn.addEventListener('click', function() { if (confirm('确定处理该待办？')) alert('已进入处理流程。'); });
+            });
+            document.querySelectorAll('.action-left .btn-default').forEach(function(btn) {
+                var t = btn.textContent;
+                if (t.indexOf('批量处理') !== -1) btn.addEventListener('click', function() {
+                    var sel = document.querySelectorAll('input[name="todo-id"]:checked');
+                    if (sel.length === 0) { alert('请先勾选要处理的待办。'); return; }
+                    if (confirm('确定批量处理选中的 ' + sel.length + ' 项待办？')) alert('批量处理已提交。');
+                });
+                else if (t.indexOf('导出') !== -1) btn.addEventListener('click', function() { if (confirm('确定导出当前列表？')) alert('导出成功，文件已下载。'); });
+            });
+        </script>
+    </div>
+</body>
+</html>

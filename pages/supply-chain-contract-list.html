@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合同管理 - 供应链协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/supply-chain-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">合同协同</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">合同管理</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">合同由采购协同审批通过后推送至本系统，本侧负责接收、验证、电子签章、分发、归档与变更。<strong>上传合同附件并点击「确认」后，采购协同应用中该合同状态将同步为「已签署」</strong>，届时可在采购协同-采购合同中点击「生成采购订单」下推订单并同步至本系统订单管理。合同执行跟踪、合同评审由采购协同负责；本页侧重合同列表、详情、检索与到期提醒。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="合同编号、供应商名称">
+                </div>
+                <div class="filter-item">
+                    <label>合同状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="draft">草稿</option>
+                        <option value="reviewing">评审中</option>
+                        <option value="signed">已签订</option>
+                        <option value="executing">执行中</option>
+                        <option value="completed">已完成</option>
+                        <option value="terminated">已终止</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>供应商</label>
+                    <input type="text" class="form-input" placeholder="供应商名称">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button type="button" class="btn btn-default" onclick="alert('从采购协同拉取已审批合同，同步至本系统。')">从采购协同同步</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">合同编号</th>
+                            <th width="150">供应商</th>
+                            <th width="120">合同金额</th>
+                            <th width="120">合同期限</th>
+                            <th width="100">合同状态</th>
+                            <th width="120">签订日期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="contract-id" value="1"></td>
+                            <td>CT-2025-020</td>
+                            <td>深圳市电子科技</td>
+                            <td>¥1,500,000.00</td>
+                            <td>2025-01-01 ~ 2025-12-31</td>
+                            <td><span class="status-badge status-processing">执行中</span></td>
+                            <td>2025-01-05</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/supply-chain-contract-detail.html" data-id="1">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-track-contract" data-id="1">跟踪</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="contract-id" value="2"></td>
+                            <td>CT-2025-021</td>
+                            <td>上海精密机械</td>
+                            <td>¥980,000.00</td>
+                            <td>2025-01-01 ~ 2025-06-30</td>
+                            <td><span class="status-badge status-success">已完成</span></td>
+                            <td>2025-01-03</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/supply-chain-contract-detail.html" data-id="2">查看</button>
+                            </td>
+                        </tr>
+                        <tr id="sc-contract-pending-row">
+                            <td><input type="checkbox" name="contract-id" value="3"></td>
+                            <td>CT-2025-007</td>
+                            <td>广州化工有限公司</td>
+                            <td>¥280,000.00</td>
+                            <td>— ~ 2025-12-31</td>
+                            <td><span class="status-badge status-pending-confirm">待确认</span></td>
+                            <td>—</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/supply-chain-contract-detail.html" data-id="3">查看</button>
+                                <button type="button" class="btn btn-sm btn-default btn-sc-upload-attach" data-id="3">上传附件</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-sc-confirm-contract" data-id="3">确认</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 3 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 上传合同附件弹窗（待确认时须先上传附件再确认） -->
+        <div id="sc-upload-attach-modal" class="modal-overlay" style="display:none;">
+            <div class="modal" style="max-width:520px;">
+                <div class="modal-header">
+                    <div class="modal-title">上传合同附件</div>
+                    <div class="modal-close" data-close-modal="sc-upload-attach-modal">×</div>
+                </div>
+                <div class="modal-body">
+                    <p class="page-description" style="margin-bottom:12px;">待确认合同须先上传附件（如已签章扫描件），确认后将同步至采购协同-采购合同页面。</p>
+                    <div style="margin-bottom:12px;">
+                        <label class="form-label">选择文件</label>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <input type="file" id="sc-attach-file-input" multiple style="flex:1;font-size:13px;">
+                            <button type="button" class="btn btn-default btn-sm" id="sc-attach-add-btn">添加</button>
+                        </div>
+                    </div>
+                    <div class="form-label" style="margin-bottom:6px;">已选文件</div>
+                    <div id="sc-attach-list" style="min-height:60px;max-height:200px;overflow:auto;border:1px solid #d9d9d9;border-radius:4px;padding:8px;background:#fafafa;">
+                        <div id="sc-attach-empty-hint" style="color:#999;font-size:13px;">暂未选择文件，请点击「添加」或选择文件后添加</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="sc-upload-attach-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="sc-attach-confirm-btn">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <style>
+        .status-badge.status-pending-confirm{background:#fff7e6;color:#d46b08;}
+        .sc-attach-item{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:#fff;border:1px solid #f0f0f0;border-radius:4px;margin-bottom:6px;font-size:13px;}
+        .sc-attach-item:last-child{margin-bottom:0;}
+        .sc-attach-item .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+        .sc-attach-item .size{color:#8c8c8c;margin-left:8px;}
+        .sc-attach-item .del{color:#ff4d4f;cursor:pointer;margin-left:8px;}
+#sc-upload-attach-modal{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;display:flex;align-items:center;justify-content:center;}
+#sc-upload-attach-modal .modal{background:#fff;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);min-width:400px;}
+#sc-upload-attach-modal .modal-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #f0f0f0;}
+#sc-upload-attach-modal .modal-body{padding:16px;}
+#sc-upload-attach-modal .modal-footer{padding:12px 16px;border-top:1px solid #f0f0f0;text-align:right;}
+        </style>
+        <script>
+            (function() {
+                var STORAGE_SC_ATTACH = 'sc_contract_3_attachments';
+                var STORAGE_PC_FROM_SC = 'pc_contract_7_attachments_from_sc';
+                var modal = document.getElementById('sc-upload-attach-modal');
+                var fileInput = document.getElementById('sc-attach-file-input');
+                var listEl = document.getElementById('sc-attach-list');
+                var emptyHint = document.getElementById('sc-attach-empty-hint');
+                var addBtn = document.getElementById('sc-attach-add-btn');
+                var confirmBtn = document.getElementById('sc-attach-confirm-btn');
+                var pendingFiles = [];
+
+                function formatSize(bytes) {
+                    if (bytes < 1024) return bytes + ' B';
+                    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+                    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+                }
+                function renderList() {
+                    if (pendingFiles.length === 0) {
+                        emptyHint.style.display = 'block';
+                        listEl.querySelectorAll('.sc-attach-item').forEach(function(n){ n.remove(); });
+                        return;
+                    }
+                    emptyHint.style.display = 'none';
+                    listEl.querySelectorAll('.sc-attach-item').forEach(function(n){ n.remove(); });
+                    pendingFiles.forEach(function(f, i) {
+                        var div = document.createElement('div');
+                        div.className = 'sc-attach-item';
+                        div.innerHTML = '<span class="name" title="' + (f.name || '') + '">' + (f.name || '未命名') + '</span><span class="size">' + formatSize(f.size || 0) + '</span><span class="del" data-i="' + i + '">删除</span>';
+                        listEl.appendChild(div);
+                        div.querySelector('.del').addEventListener('click', function() {
+                            pendingFiles.splice(parseInt(this.getAttribute('data-i'), 10), 1);
+                            renderList();
+                        });
+                    });
+                }
+                function openModal() {
+                    try {
+                        var saved = localStorage.getItem(STORAGE_SC_ATTACH);
+                        pendingFiles = saved ? JSON.parse(saved) : [];
+                    } catch (e) { pendingFiles = []; }
+                    renderList();
+                    if (modal) modal.style.display = 'flex';
+                }
+                function closeModal() {
+                    if (modal) modal.style.display = 'none';
+                    fileInput.value = '';
+                }
+                addBtn.addEventListener('click', function() {
+                    if (!fileInput.files || fileInput.files.length === 0) { alert('请先选择文件'); return; }
+                    for (var i = 0; i < fileInput.files.length; i++) {
+                        var f = fileInput.files[i];
+                        pendingFiles.push({ name: f.name, size: f.size });
+                    }
+                    fileInput.value = '';
+                    renderList();
+                });
+                confirmBtn.addEventListener('click', function() {
+                    if (pendingFiles.length === 0) { alert('请至少添加一个附件'); return; }
+                    try {
+                        localStorage.setItem(STORAGE_SC_ATTACH, JSON.stringify(pendingFiles));
+                    } catch (e) {}
+                    closeModal();
+                    alert('已保存 ' + pendingFiles.length + ' 个附件。请点击列表中的「确认」按钮，将附件同步至采购协同-采购合同页面。');
+                });
+                modal.querySelector('.modal-close').addEventListener('click', closeModal);
+                modal.querySelector('[data-close-modal="sc-upload-attach-modal"]').addEventListener('click', closeModal);
+                document.querySelectorAll('[data-close-modal="sc-upload-attach-modal"]').forEach(function(btn) {
+                    if (btn.classList && btn.classList.contains('modal-close')) return;
+                    btn.addEventListener('click', closeModal);
+                });
+
+                console.log('合同管理 页面已加载');
+                if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+                document.querySelectorAll('.btn-track-contract').forEach(function(btn) {
+                    btn.addEventListener('click', function() { if (confirm('确定查看该合同执行跟踪？')) alert('可在详情页查看执行跟踪。'); });
+                });
+                document.querySelectorAll('.action-left .btn-default').forEach(function(btn) {
+                    if (btn.textContent.indexOf('导出') !== -1) btn.addEventListener('click', function() { if (confirm('确定导出当前列表？')) alert('导出成功，文件已下载。'); });
+                });
+                document.querySelectorAll('.btn-sc-upload-attach').forEach(function(btn) {
+                    btn.addEventListener('click', function() { openModal(); });
+                });
+                document.querySelectorAll('.btn-sc-confirm-contract').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        try {
+                            var list = localStorage.getItem(STORAGE_SC_ATTACH);
+                            var arr = list ? JSON.parse(list) : [];
+                            if (arr.length === 0) {
+                                alert('请先上传附件后再确认。');
+                                return;
+                            }
+                            localStorage.setItem(STORAGE_PC_FROM_SC, JSON.stringify(arr));
+                        } catch (e) {}
+                        if (!confirm('确认已上传合同附件并完成签章？确认后附件将同步至采购协同-采购合同页面，采购合同状态将变更为「待确认」，采购侧可在列表中点击「查看附件并确认」进行操作。')) return;
+                        try { localStorage.setItem('pc_contract_7_status', 'pending_confirm'); } catch (e) {}
+                        var tr = document.getElementById('sc-contract-pending-row');
+                        if (tr) {
+                            var statusTd = tr.querySelector('td:nth-child(6)');
+                            if (statusTd) statusTd.innerHTML = '<span class="status-badge status-success">已签订</span>';
+                            var signTd = tr.querySelector('td:nth-child(7)');
+                            if (signTd) signTd.textContent = new Date().toISOString().slice(0, 10);
+                            var opTd = tr.querySelector('td:last-child');
+                            if (opTd) opTd.innerHTML = '<button class="btn btn-sm btn-default btn-view" data-url="pages/supply-chain-contract-detail.html" data-id="3">查看</button>';
+                        }
+                        alert('确认成功。附件已同步至采购协同，采购合同（CT-2025-007）状态已变更为「待确认」。请在采购协同-采购合同列表中点击「查看附件并确认」查看附件、可下载、可补充资料后点击确认，合同状态将变更为已签署。');
+                    });
+                });
+            })();
+        </script>
+    </div>
+</body>
+</html>

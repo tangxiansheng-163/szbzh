@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>权限配置 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">系统配置</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">权限配置</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">配置采购系统的用户权限，包括角色管理、权限分配、菜单权限等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="角色名称、用户名称">
+                </div>
+                <div class="filter-item">
+                    <label>角色类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="admin">管理员</option>
+                        <option value="purchaser">采购员</option>
+                        <option value="manager">经理</option>
+                        <option value="approver">审批人</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button type="button" class="btn btn-primary" data-open-modal="role-add-modal">+ 新建角色</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">角色编码</th>
+                            <th width="150">角色名称</th>
+                            <th width="100">角色类型</th>
+                            <th width="100">用户数量</th>
+                            <th width="100">状态</th>
+                            <th width="120">创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="role-id" value="1"></td>
+                            <td>ROLE-001</td>
+                            <td>采购管理员</td>
+                            <td>管理员</td>
+                            <td>5</td>
+                            <td><span class="status-badge status-success">已启用</span></td>
+                            <td>2025-01-10</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="role-view-modal" data-row-index="0">查看</button>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="role-edit-modal" data-row-index="0">编辑</button>
+                                <button type="button" class="btn btn-sm btn-primary" data-open-modal="role-permission-modal" data-row-index="0">权限</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="role-id" value="2"></td>
+                            <td>ROLE-002</td>
+                            <td>采购员</td>
+                            <td>采购员</td>
+                            <td>15</td>
+                            <td><span class="status-badge status-success">已启用</span></td>
+                            <td>2025-01-10</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="role-view-modal" data-row-index="1">查看</button>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="role-edit-modal" data-row-index="1">编辑</button>
+                                <button type="button" class="btn btn-sm btn-primary" data-open-modal="role-permission-modal" data-row-index="1">权限</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 2 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 角色查看弹窗 -->
+        <div id="role-view-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:560px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">角色详情</span><button type="button" class="modal-close" data-close-modal="role-view-modal">×</button></div>
+                <div class="modal-body">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:13px;">
+                        <div><span style="color:#666;">角色编码：</span><span id="view-role-code">-</span></div>
+                        <div><span style="color:#666;">角色名称：</span><span id="view-role-name">-</span></div>
+                        <div><span style="color:#666;">角色类型：</span><span id="view-role-type">-</span></div>
+                        <div><span style="color:#666;">用户数量：</span><span id="view-role-users">-</span></div>
+                        <div><span style="color:#666;">状态：</span><span id="view-role-status">-</span></div>
+                        <div><span style="color:#666;">创建时间：</span><span id="view-role-time">-</span></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="role-view-modal">关闭</button></div>
+            </div>
+        </div>
+
+        <!-- 角色编辑弹窗 -->
+        <div id="role-edit-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:640px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">编辑角色</span><button type="button" class="modal-close" data-close-modal="role-edit-modal">×</button></div>
+                <div class="modal-body">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label">角色编码</label><input type="text" id="edit-role-code" class="form-input" readonly></div>
+                        <div class="form-item"><label class="form-label required">角色名称</label><input type="text" id="edit-role-name" class="form-input" placeholder="如：采购审批人"></div>
+                        <div class="form-item"><label class="form-label required">角色类型</label><select id="edit-role-type" class="form-select"><option value="">请选择</option><option value="admin">管理员</option><option value="purchaser">采购员</option><option value="manager">经理</option><option value="approver">审批人</option></select></div>
+                        <div class="form-item" style="grid-column:1/-1;"><label class="form-label">备注</label><input type="text" id="edit-role-remark" class="form-input" placeholder="选填"></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="role-edit-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="role-edit-modal" onclick="alert('✅ 角色已保存')">保存</button></div>
+            </div>
+        </div>
+
+        <!-- 权限配置弹窗 -->
+        <div id="role-permission-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:560px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title" id="role-permission-modal-title">权限配置</span><button type="button" class="modal-close" data-close-modal="role-permission-modal">×</button></div>
+                <div class="modal-body" style="overflow-y:auto;flex:1;">
+                    <p style="font-size:13px;color:#666;margin-bottom:12px;">为角色 <strong id="role-permission-role-name">-</strong> 分配菜单与功能权限，勾选即授权。</p>
+                    <div class="section-title" style="margin-bottom:8px;">菜单权限</div>
+                    <div style="font-size:13px;">
+                        <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><input type="checkbox"> 工作台</label>
+                        <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><input type="checkbox"> 采购计划</label>
+                        <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><input type="checkbox"> 采购订单</label>
+                        <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><input type="checkbox"> 供应商管理</label>
+                        <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><input type="checkbox"> 系统配置</label>
+                    </div>
+                    <div class="section-title" style="margin:16px 0 8px;">功能权限</div>
+                    <div style="font-size:13px;">
+                        <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><input type="checkbox"> 新增</label>
+                        <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><input type="checkbox"> 编辑</label>
+                        <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><input type="checkbox"> 删除</label>
+                        <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><input type="checkbox"> 审批</label>
+                        <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><input type="checkbox"> 导出</label>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="role-permission-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="role-permission-modal" onclick="alert('✅ 权限已保存')">保存</button></div>
+            </div>
+        </div>
+
+        <div id="role-add-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:640px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">新建角色</span><button type="button" class="modal-close" data-close-modal="role-add-modal">×</button></div>
+                <div class="modal-body">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label required">角色编码</label><input type="text" class="form-input" placeholder="如：ROLE-003"></div>
+                        <div class="form-item"><label class="form-label required">角色名称</label><input type="text" class="form-input" placeholder="如：采购审批人"></div>
+                        <div class="form-item"><label class="form-label required">角色类型</label><select class="form-select"><option value="">请选择</option><option value="admin">管理员</option><option value="purchaser">采购员</option><option value="manager">经理</option><option value="approver">审批人</option></select></div>
+                        <div class="form-item" style="grid-column:1/-1;"><label class="form-label">备注</label><input type="text" class="form-input" placeholder="选填"></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="role-add-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="role-add-modal" onclick="alert('✅ 角色已保存')">保存</button></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('权限配置 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+        (function() {
+            document.addEventListener('click', function(e) {
+                var viewBtn = e.target && e.target.closest ? e.target.closest('[data-open-modal="role-view-modal"]') : null;
+                if (viewBtn) {
+                    var row = viewBtn.closest('tr');
+                    var cells = row ? row.querySelectorAll('td') : [];
+                    if (cells.length >= 8) {
+                        document.getElementById('view-role-code').textContent = (cells[1] && cells[1].textContent) || '-';
+                        document.getElementById('view-role-name').textContent = (cells[2] && cells[2].textContent) || '-';
+                        document.getElementById('view-role-type').textContent = (cells[3] && cells[3].textContent) || '-';
+                        document.getElementById('view-role-users').textContent = (cells[4] && cells[4].textContent) || '-';
+                        document.getElementById('view-role-status').textContent = (cells[5] && cells[5].textContent) || '-';
+                        document.getElementById('view-role-time').textContent = (cells[6] && cells[6].textContent) || '-';
+                    }
+                    return;
+                }
+                var editBtn = e.target && e.target.closest ? e.target.closest('[data-open-modal="role-edit-modal"]') : null;
+                if (editBtn) {
+                    var row = editBtn.closest('tr');
+                    var cells = row ? row.querySelectorAll('td') : [];
+                    if (cells.length >= 8) {
+                        var codeEl = document.getElementById('edit-role-code'); if (codeEl) codeEl.value = (cells[1] && cells[1].textContent) || '';
+                        var nameEl = document.getElementById('edit-role-name'); if (nameEl) nameEl.value = (cells[2] && cells[2].textContent) || '';
+                        var typeText = (cells[3] && cells[3].textContent.trim()) || '';
+                        var typeEl = document.getElementById('edit-role-type'); if (typeEl) typeEl.value = typeText === '管理员' ? 'admin' : (typeText === '采购员' ? 'purchaser' : (typeText === '经理' ? 'manager' : 'approver'));
+                    }
+                    return;
+                }
+                var permBtn = e.target && e.target.closest ? e.target.closest('[data-open-modal="role-permission-modal"]') : null;
+                if (permBtn) {
+                    var row = permBtn.closest('tr');
+                    var cells = row ? row.querySelectorAll('td') : [];
+                    if (cells.length >= 3) {
+                        var roleNameEl = document.getElementById('role-permission-role-name');
+                        if (roleNameEl) roleNameEl.textContent = (cells[2] && cells[2].textContent) || '-';
+                    }
+                    return;
+                }
+            }, true);
+        })();
+    </script>
+</body>
+</html>

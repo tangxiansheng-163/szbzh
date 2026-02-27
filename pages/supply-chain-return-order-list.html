@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>退货单 - 供应链协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/supply-chain-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">异常处理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">退货单</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">退货单由采购协同应用下推至本系统，本侧负责接收、查看与执行跟踪。不支持新建或编辑，仅可查看详情与跟踪状态。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="退货单号、订单编号、供应商名称">
+                </div>
+                <div class="filter-item">
+                    <label>退货状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="draft">草稿</option>
+                        <option value="submitted">已提交</option>
+                        <option value="approved">已审批</option>
+                        <option value="returning">退货中</option>
+                        <option value="completed">已完成</option>
+                        <option value="cancelled">已取消</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="130">退货单号</th>
+                            <th width="120">关联订单</th>
+                            <th width="150">供应商</th>
+                            <th width="100">退货类型</th>
+                            <th width="90">退货状态</th>
+                            <th width="100">退货金额</th>
+                            <th width="110">申请日期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="return-id" value="1"></td>
+                            <td>RT-2025-001</td>
+                            <td>PO-2025-008</td>
+                            <td>深圳市电子科技</td>
+                            <td>质量不合格</td>
+                            <td><span class="status-badge status-processing">退货中</span></td>
+                            <td>¥12,500.00</td>
+                            <td>2025-02-01</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="return-detail-modal">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="return-id" value="2"></td>
+                            <td>RT-2025-002</td>
+                            <td>PO-2025-006</td>
+                            <td>上海精密机械</td>
+                            <td>规格不符</td>
+                            <td><span class="status-badge status-success">已完成</span></td>
+                            <td>¥8,200.00</td>
+                            <td>2025-01-28</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="return-detail-modal">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 2 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 退货单详情弹窗（只读，含明细） -->
+        <div id="return-detail-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:800px;max-height:90vh;overflow:auto;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">退货单详情</span>
+                    <button type="button" class="modal-close" data-close-modal="return-detail-modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="section-title" style="margin-bottom:12px;">单头信息</div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px 24px;font-size:13px;margin-bottom:20px;">
+                        <div><span style="color:#666;">退货单号：</span><span id="view-return-no">RT-2025-001</span></div>
+                        <div><span style="color:#666;">关联订单：</span><span id="view-return-order">PO-2025-008</span></div>
+                        <div><span style="color:#666;">供应商：</span><span id="view-return-supplier">深圳市电子科技</span></div>
+                        <div><span style="color:#666;">退货类型：</span><span id="view-return-type">质量不合格</span></div>
+                        <div><span style="color:#666;">退货状态：</span><span id="view-return-status"><span class="status-badge status-processing">退货中</span></span></div>
+                        <div><span style="color:#666;">退货金额：</span><span id="view-return-amount">¥12,500.00</span></div>
+                        <div><span style="color:#666;">申请日期：</span><span id="view-return-date">2025-02-01</span></div>
+                        <div><span style="color:#666;">申请人：</span><span id="view-return-applicant">-</span></div>
+                    </div>
+                    <div class="section-title" style="margin-bottom:8px;">退货明细</div>
+                    <div class="table-wrapper" style="max-height:260px;overflow:auto;border:1px solid var(--border-color,#e8e8e8);border-radius:6px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="50">序号</th>
+                                    <th width="120">物料编码</th>
+                                    <th width="160">物料名称</th>
+                                    <th width="120">规格型号</th>
+                                    <th width="80">退货数量</th>
+                                    <th width="50">单位</th>
+                                    <th width="120">退货原因</th>
+                                    <th width="100">备注</th>
+                                </tr>
+                            </thead>
+                            <tbody id="return-detail-tbody">
+                                <tr><td>1</td><td>MAT-001</td><td>电子元器件A</td><td>10KΩ ±5%</td><td>500</td><td>个</td><td>质量不合格</td><td>-</td></tr>
+                                <tr><td>2</td><td>MAT-003</td><td>电阻B</td><td>20KΩ</td><td>200</td><td>个</td><td>规格不符</td><td>-</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="return-detail-modal">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            console.log('退货单 页面已加载');
+            if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+            document.querySelectorAll('[data-open-modal="return-detail-modal"]').forEach(function(btn) { if (!btn.hasAttribute('data-bound')) { btn.setAttribute('data-bound','1'); btn.addEventListener('click', function() { var row = this.closest('tr'); if (row) { var c = row.querySelectorAll('td'); if (c.length >= 8) { var set = function(id, v) { var el = document.getElementById(id); if (el) el.innerHTML = v; }; set('view-return-no', c[1].textContent.trim()); set('view-return-order', c[2].textContent.trim()); set('view-return-supplier', c[3].textContent.trim()); set('view-return-type', c[4].textContent.trim()); set('view-return-status', c[5].innerHTML); set('view-return-amount', c[6].textContent.trim()); set('view-return-date', c[7].textContent.trim()); } } }); } });
+            document.querySelectorAll('.action-left .btn-default').forEach(function(btn) {
+                if (btn.textContent.indexOf('导出') !== -1) btn.addEventListener('click', function() { if (confirm('确定导出当前列表？')) alert('导出成功，文件已下载。'); });
+            });
+        </script>
+    </div>
+</body>
+</html>

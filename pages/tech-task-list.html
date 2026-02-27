@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>技术任务列表</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <!-- 面包屑 -->
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">技术任务管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">技术任务列表</span>
+        </div>
+
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <p class="page-description">技术任务创建、拆解、分配与审核。<strong>性质</strong>（样品/正式）在拆解时设定，随设计任务流转至 EBOM、MBOM。可按状态、性质、负责人、产品筛选。</p>
+        </div>
+
+        <!-- 筛选栏 -->
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="任务编号、任务名称、产品编码">
+                </div>
+                <div class="filter-item">
+                    <label>状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待分配</option>
+                        <option value="assigned">已分配</option>
+                        <option value="processing">执行中</option>
+                        <option value="completed">已完成</option>
+                        <option value="terminated">已终止</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>性质</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="formal">正式</option>
+                        <option value="sample">样品</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>负责人</label>
+                    <input type="text" class="form-input" placeholder="负责人">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 操作栏 -->
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary btn-create-modal"
+                        data-modal="create-modal"
+                        data-title="新建技术任务"
+                        data-url="pages/tech-task-create.html">
+                    + 新建
+                </button>
+                <button class="btn btn-default">批量导入</button>
+                <button class="btn btn-default">批量导出</button>
+            </div>
+        </div>
+
+        <!-- 数据表格 -->
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="100">任务编号</th>
+                            <th width="140">任务名称</th>
+                            <th width="90">产品编码</th>
+                            <th width="120">产品名称</th>
+                            <th width="70">负责人</th>
+                            <th width="75">任务状态</th>
+                            <th width="70">性质</th>
+                            <th width="90">数据来源</th>
+                            <th width="105">计划开始</th>
+                            <th width="105">计划完成</th>
+                            <th width="90">实际开始</th>
+                            <th width="90">实际完成</th>
+                            <th width="60">进度</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="task-id" value="1"></td>
+                            <td>TT-2025-001</td>
+                            <td>新产品研发</td>
+                            <td>PROD-001</td>
+                            <td>智能控制器</td>
+                            <td>张工</td>
+                            <td><span class="status-badge status-processing">执行中</span></td>
+                            <td>正式</td>
+                            <td><span class="source-badge source-upstream">产销协同</span></td>
+                            <td>2025-01-15</td>
+                            <td>2025-03-15</td>
+                            <td>2025-01-18</td>
+                            <td>-</td>
+                            <td>60%</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/tech-task-detail.html" data-id="1">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="task-id" value="2"></td>
+                            <td>TT-2025-002</td>
+                            <td>技术改进</td>
+                            <td>PROD-002</td>
+                            <td>传感器模块</td>
+                            <td>李工</td>
+                            <td><span class="status-badge status-pending">待分配</span></td>
+                            <td>正式</td>
+                            <td><span class="source-badge source-manual">手动新建</span></td>
+                            <td>2025-01-20</td>
+                            <td>2025-03-20</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>0%</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/tech-task-detail.html" data-id="2">查看</button>
+                                <button class="btn btn-sm btn-primary btn-edit" data-url="pages/tech-task-create.html" data-id="2">编辑</button>
+                                <button class="btn btn-sm btn-primary btn-disassemble"
+                                    onclick="window.openDisassembleModal('TT-2025-002', '技术改进', 'PROD-002', '传感器模块')">拆解</button>
+                                <button class="btn btn-sm btn-danger btn-delete" data-source="manual" data-id="2">删除</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="task-id" value="3"></td>
+                            <td>TT-2025-003</td>
+                            <td>工艺优化</td>
+                            <td>PROD-003</td>
+                            <td>执行器</td>
+                            <td>王工</td>
+                            <td><span class="status-badge status-success">已完成</span></td>
+                            <td>样品</td>
+                            <td><span class="source-badge source-manual">手动新建</span></td>
+                            <td>2025-01-10</td>
+                            <td>2025-03-10</td>
+                            <td>2025-01-12</td>
+                            <td>2025-03-08</td>
+                            <td>100%</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/tech-task-detail.html" data-id="3">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="task-id" value="4"></td>
+                            <td>TT-2025-004</td>
+                            <td>产品升级</td>
+                            <td>PROD-004</td>
+                            <td>控制面板</td>
+                            <td>赵工</td>
+                            <td><span class="status-badge status-success">已完成</span></td>
+                            <td>正式</td>
+                            <td><span class="source-badge source-upstream">产销协同</span></td>
+                            <td>2025-01-05</td>
+                            <td>2025-02-05</td>
+                            <td>2025-01-08</td>
+                            <td>2025-02-03</td>
+                            <td>100%</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/tech-task-detail.html" data-id="4">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="task-id" value="5"></td>
+                            <td>TT-2025-005</td>
+                            <td>旧版改造</td>
+                            <td>PROD-005</td>
+                            <td>电源模块</td>
+                            <td>孙工</td>
+                            <td><span class="status-badge status-terminated">已终止</span></td>
+                            <td>样品</td>
+                            <td><span class="source-badge source-manual">手动新建</span></td>
+                            <td>2025-01-08</td>
+                            <td>2025-02-08</td>
+                            <td>2025-01-10</td>
+                            <td>-</td>
+                            <td>30%</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/tech-task-detail.html" data-id="5">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 分页 -->
+            <div class="pagination">
+                <div class="pagination-info">共 5 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 拆解Modal -->
+        <div id="disassemble-modal" class="modal-overlay">
+            <div class="modal" style="max-width: 800px;">
+                <div class="modal-header">
+                    <div class="modal-title">拆解技术任务</div>
+                    <div class="modal-close" data-modal="disassemble-modal">×</div>
+                </div>
+                <div class="modal-body" id="disassemble-modal-body">
+                    <!-- 动态内容 -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-modal-cancel" data-modal="disassemble-modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveDisassemble()">保存拆解</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* 数据来源标签样式 */
+        .source-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .source-upstream {
+            background: #e6f7ff;
+            color: #1890ff;
+            border: 1px solid #91d5ff;
+        }
+        .source-manual {
+            background: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+        .status-pending {
+            background: #fff7e6;
+            color: #fa8c16;
+            border: 1px solid #ffd591;
+        }
+        .status-terminated {
+            background: #f5f5f5;
+            color: #8c8c8c;
+            border: 1px solid #d9d9d9;
+        }
+    </style>
+
+    <script>
+        console.log('技术任务列表页已加载');
+
+        // 初始化Modal关闭事件
+        function initModalEvents() {
+            console.log('初始化Modal事件...');
+
+            // Modal关闭按钮
+            const closeButtons = document.querySelectorAll('[data-modal="disassemble-modal"]');
+            closeButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modal = document.getElementById('disassemble-modal');
+                    if (modal) {
+                        modal.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
+
+            // 点击遮罩关闭
+            const modal = document.getElementById('disassemble-modal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                });
+            }
+
+            // 初始化PageInteractions
+            if (typeof PageInteractions !== 'undefined') {
+                PageInteractions.initButtons();
+                PageInteractions.toggleSelectAll('input[name="task-id"]');
+            }
+
+            // 删除按钮事件处理
+            document.body.addEventListener('click', function(e) {
+                const deleteBtn = e.target.closest('.btn-delete');
+                if (deleteBtn && !deleteBtn.disabled) {
+                    const source = deleteBtn.dataset.source;
+                    const taskId = deleteBtn.dataset.id;
+
+                    if (source === 'upstream') {
+                        // 上游数据，需要通知上游
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        if (confirm('此任务来自产销协同系统，删除将通知上游系统。\n\n确认要删除任务 TT-2025-00' + taskId + ' 吗？')) {
+                            // TODO: 调用删除API并通知上游系统
+                            console.log('删除上游任务并通知:', taskId);
+                            alert('✅ 任务已删除，已向产销协同系统发送通知');
+                            // 实际项目中这里应该刷新列表
+                        }
+                    } else if (source === 'manual') {
+                        // 手动新建，直接删除
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        if (confirm('确认要删除手动新建的任务吗？\n\n任务编号：TT-2025-00' + taskId)) {
+                            // TODO: 调用删除API
+                            console.log('删除手动任务:', taskId);
+                            alert('✅ 任务已删除');
+                            // 实际项目中这里应该刷新列表
+                        }
+                    }
+                }
+            }, true);
+
+            console.log('Modal事件已初始化');
+        }
+
+        // 立即初始化
+        initModalEvents();
+
+        // DOMContentLoaded时再次初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initModalEvents);
+        }
+        document.querySelectorAll('.action-left .btn-default').forEach(function(btn) {
+            var t = btn.textContent;
+            if (t.indexOf('批量导入') !== -1) btn.addEventListener('click', function() { if (confirm('确定打开批量导入？')) alert('请选择文件上传。'); });
+            else if (t.indexOf('批量导出') !== -1) btn.addEventListener('click', function() { if (confirm('确定导出当前列表？')) alert('导出成功，文件已下载。'); });
+        });
+    </script>
+    </div>
+</body>
+</html>

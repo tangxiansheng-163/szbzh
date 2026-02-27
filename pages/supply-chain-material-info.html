@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物料档案 - 供应链协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/supply-chain-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">基础数据</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">物料档案</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">物料主数据为企业基础数据，与采购协同等应用互通；本侧负责维护、接收、应用及使用反馈；包括物料基本信息、供应商信息、库存信息等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="物料编码、物料名称">
+                </div>
+                <div class="filter-item">
+                    <label>物料类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="raw">原材料</option>
+                        <option value="semi">半成品</option>
+                        <option value="finished">成品</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary">+ 新建物料</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">物料编码</th>
+                            <th width="200">物料名称</th>
+                            <th width="150">规格型号</th>
+                            <th width="100">物料类型</th>
+                            <th width="100">计量单位</th>
+                            <th width="150">主要供应商</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="material-id" value="1"></td>
+                            <td>MAT-001</td>
+                            <td>电子元器件A</td>
+                            <td>10KΩ ±5%</td>
+                            <td>原材料</td>
+                            <td>个</td>
+                            <td>深圳市电子科技</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/supply-chain-material-detail.html" data-id="1">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/supply-chain-material-edit.html" data-id="1">编辑</button>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="material-code-match-modal" data-material-code="MAT-001" data-material-name="电子元器件A">编码匹配</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="material-id" value="2"></td>
+                            <td>MAT-002</td>
+                            <td>PCB板</td>
+                            <td>100x80mm 4层</td>
+                            <td>半成品</td>
+                            <td>片</td>
+                            <td>东莞电路板制造厂</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/supply-chain-material-detail.html" data-id="2">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/supply-chain-material-edit.html" data-id="2">编辑</button>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="material-code-match-modal" data-material-code="MAT-002" data-material-name="PCB板">编码匹配</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 2 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 编码匹配弹窗 -->
+        <div id="material-code-match-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:640px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">编码匹配</span>
+                    <button type="button" class="modal-close" data-close-modal="material-code-match-modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <p style="font-size:13px;color:#666;margin-bottom:12px;"><strong>当前物料：</strong><span id="code-match-material-info">-</span></p>
+                    <p style="font-size:12px;color:#999;margin-bottom:16px;">采购协同下推的询价单明细将按此映射在需求报价中转为本系统物料编码；报价单提交回采购协同时再按此映射转回上游编码。</p>
+                    <div class="section-title" style="margin-bottom:8px;">已匹配的上游编码</div>
+                    <div class="table-wrapper" style="max-height:200px;overflow-y:auto;border:1px solid var(--border-color,#e8e8e8);border-radius:6px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="160">上游编码</th>
+                                    <th width="160">上游客户</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="code-match-tbody">
+                                <tr><td colspan="3" style="text-align:center;color:#999;font-size:13px;">暂无，请点击下方「添加上游编码」</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="section-title" style="margin:16px 0 8px;">添加上游编码</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+                        <div class="form-item" style="margin:0;">
+                            <label class="form-label">上游编码</label>
+                            <input type="text" id="upstream-code-input" class="form-input" placeholder="如采购协同中的物料编码" style="width:200px;">
+                        </div>
+                        <div class="form-item" style="margin:0;">
+                            <label class="form-label">上游客户</label>
+                            <select id="upstream-customer" class="form-select" style="width:180px;">
+                                <option value="">请选择上游客户</option>
+                                <option value="A">A企业</option>
+                                <option value="B">B企业</option>
+                                <option value="C">深圳制造有限公司</option>
+                                <option value="D">北京贸易有限公司</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-primary" id="btn-add-upstream-code">添加上游编码</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="material-code-match-modal">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            console.log('物料档案 页面已加载');
+            if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+            document.querySelectorAll('.action-left .btn-default').forEach(function(btn) {
+                if (btn.textContent.indexOf('导出') !== -1) btn.addEventListener('click', function() { if (confirm('确定导出当前列表？')) alert('导出成功，文件已下载。'); });
+            });
+
+            (function() {
+                document.addEventListener('click', function(e) {
+                    var btn = e.target && e.target.closest ? e.target.closest('[data-open-modal="material-code-match-modal"]') : null;
+                    if (btn) {
+                        var code = btn.getAttribute('data-material-code') || '';
+                        var name = btn.getAttribute('data-material-name') || '';
+                        var infoEl = document.getElementById('code-match-material-info');
+                        if (infoEl) infoEl.textContent = (code && name) ? (code + ' ' + name) : '-';
+                        var overlay = document.getElementById('material-code-match-modal');
+                        if (overlay) overlay.setAttribute('data-current-code', code);
+                        var tbody = document.getElementById('code-match-tbody');
+                        if (tbody) {
+                            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#999;font-size:13px;">暂无，请点击下方「添加上游编码」</td></tr>';
+                        }
+                    }
+                }, true);
+
+                document.getElementById('btn-add-upstream-code').addEventListener('click', function() {
+                    var input = document.getElementById('upstream-code-input');
+                    var select = document.getElementById('upstream-customer');
+                    var code = input && input.value ? input.value.trim() : '';
+                    var customerText = select && select.options[select.selectedIndex] && select.options[select.selectedIndex].value ? select.options[select.selectedIndex].text : '';
+                    if (!code) {
+                        alert('请填写上游编码');
+                        return;
+                    }
+                    if (!customerText) {
+                        alert('请选择上游客户');
+                        return;
+                    }
+                    var tbody = document.getElementById('code-match-tbody');
+                    if (!tbody) return;
+                    if (tbody.querySelector('tr td[colspan="3"]')) {
+                        tbody.innerHTML = '';
+                    }
+                    var tr = document.createElement('tr');
+                    tr.innerHTML = '<td>' + code + '</td><td>' + customerText + '</td><td><button type="button" class="btn btn-sm btn-link btn-remove-upstream">删除</button></td>';
+                    tbody.appendChild(tr);
+                    if (input) input.value = '';
+                    if (select) select.value = '';
+                    tr.querySelector('.btn-remove-upstream').addEventListener('click', function() {
+                        tr.remove();
+                        if (tbody.rows.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#999;font-size:13px;">暂无，请点击下方「添加上游编码」</td></tr>';
+                        }
+                    });
+                });
+            })();
+        </script>
+    </div>
+</body>
+</html>

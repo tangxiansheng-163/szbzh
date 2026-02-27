@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创建变更申请</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <!-- 面包屑 -->
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">变更管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/change-request-list.html" class="breadcrumb-item">变更申请单</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">新建变更申请</span>
+        </div>
+
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <p class="page-description">可关联已通过的会审单（从会审单下推）或独立发起变更申请；明确变更类型、涉及对象、原因及影响范围。</p>
+        </div>
+
+        <!-- 表单卡片 -->
+        <div class="card">
+            <div class="card-body">
+                <form id="change-request-form">
+                    <div class="section-title">来源</div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label">来源方式</label>
+                                <select class="form-select" id="req-source-type">
+                                    <option value="independent">独立创建</option>
+                                    <option value="review">关联会审单</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-col" id="req-review-col" style="display:none;">
+                            <div class="form-item">
+                                <label class="form-label required">选择会审单</label>
+                                <select class="form-select" id="req-review-id">
+                                    <option value="">请选择已通过的会审单</option>
+                                    <option value="1">BG-HS-2025-001（技术变更/BOM变更）</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-title" style="margin-top:24px;">基本信息</div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label required">变更单类型</label>
+                                <select class="form-select" id="req-change-type" required>
+                                    <option value="">请选择</option>
+                                    <option value="EBOM">EBOM 变更</option>
+                                    <option value="MBOM">MBOM 变更</option>
+                                    <option value="SBOM">SBOM 变更</option>
+                                    <option value="requisition">领料单</option>
+                                    <option value="purchase">采购订单</option>
+                                    <option value="feeding">投料单</option>
+                                    <option value="inout">出入库单</option>
+                                    <option value="sales">销售订单</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-col" id="req-product-col">
+                            <div class="form-item">
+                                <label class="form-label required">涉及产品</label>
+                                <select class="form-select" id="req-product-code">
+                                    <option value="">请选择</option>
+                                    <option value="PROD-001">PROD-001 智能控制器</option>
+                                    <option value="PROD-002">PROD-002 传感器模块</option>
+                                    <option value="PROD-003">PROD-003 执行器</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-col" id="req-order-col" style="display:none;">
+                            <div class="form-item">
+                                <label class="form-label required">销售订单</label>
+                                <select class="form-select" id="req-order-code">
+                                    <option value="">请选择</option>
+                                    <option value="SO-2025-001">SO-2025-001</option>
+                                    <option value="SO-2025-002">SO-2025-002</option>
+                                    <option value="SO-2025-003">SO-2025-003</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label required">计划执行日期</label>
+                                <input type="date" class="form-input" id="req-eff-date" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row" id="req-bom-row">
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label required">BOM 类型及版本</label>
+                                <select class="form-select" id="req-bom-version">
+                                    <option value="">请选择</option>
+                                    <option value="EBOM-V1.0">EBOM V1.0</option>
+                                    <option value="EBOM-V1.1">EBOM V1.1</option>
+                                    <option value="MBOM-V2.0">MBOM V2.0</option>
+                                    <option value="SBOM-V1.1">SBOM V1.1</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-item" style="margin-top:16px;">
+                        <label class="form-label">变更前内容</label>
+                        <textarea class="form-textarea" id="req-content-before" placeholder="请输入变更前内容" maxlength="255"></textarea>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">变更后内容</label>
+                        <textarea class="form-textarea" id="req-content-after" placeholder="请输入变更后内容" maxlength="255"></textarea>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label required">变更原因</label>
+                        <textarea class="form-textarea" id="req-reason" placeholder="请输入变更原因" required maxlength="255"></textarea>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">附件</label>
+                        <input type="file" class="form-input" id="req-attachment" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.dwg,.step">
+                        <span style="font-size:12px;color:#999;margin-top:4px;display:block;">支持 PDF、Word、Excel、图纸等，用于变更依据说明</span>
+                    </div>
+
+                    <div class="section-title" style="margin-top:24px;">影响分析</div>
+                    <div class="table-wrapper">
+                        <table class="output-table">
+                            <thead>
+                                <tr>
+                                    <th width="50">序号</th>
+                                    <th width="140">*影响部门</th>
+                                    <th width="140">*审核人</th>
+                                    <th width="100">影响费用</th>
+                                    <th>影响内容</th>
+                                    <th width="80"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="req-impact-tbody">
+                                <tr class="req-impact-row">
+                                    <td class="req-impact-seq">1</td>
+                                    <td><select class="form-select form-select-sm" name="impactDept"><option value="">请选择</option><option value="研发">研发</option><option value="工艺">工艺</option><option value="生产">生产</option><option value="采购">采购</option><option value="质量">质量</option><option value="销售">销售</option></select></td>
+                                    <td><select class="form-select form-select-sm" name="reviewer"><option value="">请选择</option><option value="张三">张三</option><option value="李四">李四</option><option value="王工">王工</option><option value="赵工">赵工</option></select></td>
+                                    <td><input type="number" class="form-input form-input-sm" name="impactCost" value="0" style="width:70px;"></td>
+                                    <td><input type="text" class="form-input form-input-sm" name="impactContent" placeholder="影响内容"></td>
+                                    <td><button type="button" class="btn btn-sm btn-link btn-remove-req-impact">删除</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button type="button" class="btn btn-link" id="btn-add-req-impact">+ 添加</button>
+
+                    <div class="form-actions" style="margin-top:24px;">
+                        <button type="button" class="btn btn-primary" id="req-submit">提交</button>
+                        <button type="button" class="btn btn-default btn-cancel" data-url="pages/change-request-list.html">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .form-select-sm, .form-input-sm { padding: 4px 8px; font-size: 13px; height: 28px; }
+        .section-title { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+    </style>
+
+    <script>
+        (function () {
+            var sourceType = document.getElementById('req-source-type');
+            var reviewCol = document.getElementById('req-review-col');
+            var changeType = document.getElementById('req-change-type');
+            var bomRow = document.getElementById('req-bom-row');
+            var tbody = document.getElementById('req-impact-tbody');
+            var addBtn = document.getElementById('btn-add-req-impact');
+            var rowTpl = '<tr class="req-impact-row"><td class="req-impact-seq"></td><td><select class="form-select form-select-sm" name="impactDept"><option value="">请选择</option><option value="研发">研发</option><option value="工艺">工艺</option><option value="生产">生产</option><option value="采购">采购</option><option value="质量">质量</option><option value="销售">销售</option></select></td><td><select class="form-select form-select-sm" name="reviewer"><option value="">请选择</option><option value="张三">张三</option><option value="李四">李四</option><option value="王工">王工</option><option value="赵工">赵工</option></select></td><td><input type="number" class="form-input form-input-sm" name="impactCost" value="0" style="width:70px;"></td><td><input type="text" class="form-input form-input-sm" name="impactContent" placeholder="影响内容"></td><td><button type="button" class="btn btn-sm btn-link btn-remove-req-impact">删除</button></td></tr>';
+
+            if (sourceType) {
+                sourceType.addEventListener('change', function () {
+                    if (reviewCol) reviewCol.style.display = this.value === 'review' ? '' : 'none';
+                });
+            }
+
+            var bomTypes = ['EBOM', 'MBOM', 'SBOM'];
+            var productCol = document.getElementById('req-product-col');
+            var orderCol = document.getElementById('req-order-col');
+            var orderCode = document.getElementById('req-order-code');
+            if (changeType) {
+                changeType.addEventListener('change', function () {
+                    var v = this.value;
+                    var isBom = bomTypes.indexOf(v) >= 0;
+                    var isSales = v === 'sales';
+                    if (bomRow) bomRow.style.display = isBom ? '' : 'none';
+                    if (productCol) productCol.style.display = isSales ? 'none' : '';
+                    if (orderCol) orderCol.style.display = isSales ? '' : 'none';
+                    if (orderCode) orderCode.required = isSales;
+                });
+                var v0 = changeType.value;
+                if (bomRow) bomRow.style.display = bomTypes.indexOf(v0) >= 0 ? '' : 'none';
+                if (productCol) productCol.style.display = v0 === 'sales' ? 'none' : '';
+                if (orderCol) orderCol.style.display = v0 === 'sales' ? '' : 'none';
+                if (orderCode) orderCode.required = v0 === 'sales';
+            }
+
+            function refreshSeq() {
+                if (!tbody) return;
+                tbody.querySelectorAll('.req-impact-row').forEach(function (tr, i) {
+                    var td = tr.querySelector('.req-impact-seq');
+                    if (td) td.textContent = i + 1;
+                });
+            }
+
+            function bindRow(row) {
+                var rm = row.querySelector('.btn-remove-req-impact');
+                if (rm) rm.onclick = function () {
+                    if (tbody.querySelectorAll('.req-impact-row').length <= 1) { alert('至少保留一行'); return; }
+                    row.remove();
+                    refreshSeq();
+                };
+            }
+
+            if (addBtn && tbody) {
+                addBtn.onclick = function () {
+                    tbody.insertAdjacentHTML('beforeend', rowTpl);
+                    bindRow(tbody.lastElementChild);
+                    refreshSeq();
+                };
+            }
+
+            tbody && tbody.querySelectorAll('.req-impact-row').forEach(bindRow);
+
+            var submitBtn = document.getElementById('req-submit');
+            if (submitBtn) {
+                submitBtn.onclick = function () {
+                    var reason = document.getElementById('req-reason');
+                    if (!reason || !reason.value.trim()) { alert('请填写变更原因'); return; }
+                    var effDate = document.getElementById('req-eff-date');
+                    if (!effDate || !effDate.value) { alert('请选择计划执行日期'); return; }
+                    var ct = document.getElementById('req-change-type');
+                    if (!ct || !ct.value) { alert('请选择变更单类型'); return; }
+                    if (ct.value === 'sales') {
+                        var orderCode = document.getElementById('req-order-code');
+                        if (!orderCode || !orderCode.value) { alert('请选择销售订单'); return; }
+                    } else {
+                        var productCode = document.getElementById('req-product-code');
+                        if (!productCode || !productCode.value) { alert('请选择涉及产品'); return; }
+                    }
+                    if (bomTypes.indexOf(ct.value) >= 0) {
+                        var bomVer = document.getElementById('req-bom-version');
+                        if (!bomVer || !bomVer.value) { alert('请选择 BOM 类型及版本'); return; }
+                    }
+                    var rows = tbody.querySelectorAll('.req-impact-row');
+                    var ok = true;
+                    rows.forEach(function (r) {
+                        var d = r.querySelector('select[name="impactDept"]');
+                        var rev = r.querySelector('select[name="reviewer"]');
+                        if (!d || !d.value || !rev || !rev.value) ok = false;
+                    });
+                    if (!ok) { alert('影响分析中请为每行选择影响部门和审核人'); return; }
+                    alert('变更申请已提交（原型演示）');
+                    if (typeof PageLoader !== 'undefined') PageLoader.loadPage('pages/change-request-list.html');
+                };
+            }
+
+            var cancelBtn = document.querySelector('.btn-cancel[data-url]');
+            if (cancelBtn && typeof PageLoader !== 'undefined') {
+                cancelBtn.onclick = function () { PageLoader.loadPage(cancelBtn.dataset.url); };
+            }
+        })();
+    </script>
+</body>
+</html>

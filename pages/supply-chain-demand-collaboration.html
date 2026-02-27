@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>需求报价 - 供应链协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <style>
+        /* 需求报价列表页 - 与采购计划列表页风格一致（样式放在 content-wrapper 内以便 SPA 加载时一并注入） */
+        .demand-quote-list-filter .filter-actions { display: flex; align-items: center; gap: 8px; }
+        .demand-quote-list-card .table-wrapper { border-radius: 0 0 var(--radius-md) var(--radius-md); overflow-x: auto; overflow-y: hidden; }
+        .demand-quote-list-card .table-wrapper table { min-width: 1200px; }
+        .demand-quote-list-card .table-wrapper thead th { font-size: 13px; color: rgba(0,0,0,0.65); font-weight: 600; vertical-align: top; }
+        .demand-quote-list-card .table-wrapper tbody td { font-size: 13px; color: rgba(0,0,0,0.85); vertical-align: top; }
+        .demand-quote-list-card .table-wrapper td:last-child { display: table-cell; padding: 13px 16px; vertical-align: top; }
+        .demand-quote-list-card .table-wrapper td:last-child .plan-list-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-start; }
+        .demand-quote-list-card .table-wrapper tbody tr.master-row { cursor: pointer; }
+        .demand-quote-list-card .table-wrapper tbody tr.master-row:hover { background: #f5f5f5 !important; }
+        .demand-quote-list-card .table-wrapper tbody tr.master-row.demand-quote-row--active { background: #e6f7ff !important; }
+        .demand-quote-list-card .table-wrapper tbody tr.master-row.demand-quote-row--active:hover { background: #bae7ff !important; }
+        .demand-quote-list-card .table-wrapper::-webkit-scrollbar { height: 8px; }
+        .demand-quote-list-card .table-wrapper::-webkit-scrollbar-track { background: #f0f0f0; border-radius: 0 0 4px 4px; }
+        .demand-quote-list-card .table-wrapper::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        .demand-quote-list-card .table-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.3); }
+        .demand-quote-list-card .pagination { padding: 16px 24px; background: #fafafa; border-radius: 0 0 var(--radius-md) var(--radius-md); }
+        /* 报价明细子表 - 与主表样式保持一致（主子表统一） */
+        #quote-detail-card .card-header { padding: 18px 24px; border-bottom: 1px solid var(--border-color, #e8e8e8); }
+        #quote-detail-card .card-title { font-size: 15px; font-weight: 600; margin: 0; }
+        #quote-detail-card .card-body { padding: 24px 28px; }
+        #quote-detail-card .table-wrapper { max-height: 260px; overflow-x: auto; overflow-y: auto; border-radius: var(--radius-md); border: 1px solid var(--border-color, #e8e8e8); }
+        #quote-detail-card .table-wrapper thead { position: sticky; top: 0; background: #f8f9fa; z-index: 1; }
+        #quote-detail-card .table-wrapper th { padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: rgba(0,0,0,0.65); vertical-align: top; border-bottom: 1px solid var(--border-color, #e8e8e8); }
+        #quote-detail-card .table-wrapper td { padding: 13px 16px; font-size: 13px; color: rgba(0,0,0,0.85); vertical-align: top; border-bottom: 1px solid var(--border-color, #f0f0f0); }
+        #quote-detail-card .table-wrapper tbody tr:last-child td { border-bottom: none; }
+        #quote-detail-card .table-wrapper tbody tr:nth-child(even) { background: #fcfcfd; }
+        #quote-detail-card .table-wrapper tbody tr:hover { background: #f5f8fc; }
+        #quote-detail-card .table-wrapper table { min-width: 900px; width: 100%; border-collapse: collapse; }
+        #quote-detail-card .table-wrapper::-webkit-scrollbar { height: 8px; width: 8px; }
+        #quote-detail-card .table-wrapper::-webkit-scrollbar-track { background: #f0f0f0; border-radius: 4px; }
+        #quote-detail-card .table-wrapper::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        #quote-detail-card .table-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.3); }
+        #quote-detail-card .quote-detail-summary { padding: 16px 24px; text-align: right; font-size: 13px; border-top: 1px solid var(--border-color); background: #fafafa; border-radius: 0 0 var(--radius-md) var(--radius-md); }
+        /* 报价明细：数量、单价、小计列居中对齐 */
+        #quote-detail-card .table-wrapper th:nth-child(4),
+        #quote-detail-card .table-wrapper th:nth-child(7),
+        #quote-detail-card .table-wrapper th:nth-child(8),
+        #quote-detail-card .table-wrapper td:nth-child(4),
+        #quote-detail-card .table-wrapper td:nth-child(7),
+        #quote-detail-card .table-wrapper td:nth-child(8) { text-align: center; }
+        </style>
+        <div class="breadcrumb">
+            <a href="pages/supply-chain-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">需求报价</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">需求报价</span>
+        </div>
+
+        <div class="page-header">
+            <h1 class="page-title">需求报价</h1>
+            <p class="page-description">需求由采购协同推送至本系统，本侧负责需求确认、异议处理、报价邀请与报价汇总。本页数据由采购协同应用中的询价单推送而来；一条询价单按供应商拆分为多条需求报价记录，供应商可在此查看需求、填报报价并协同确认。<strong>「需求方」</strong>即客户档案中的客户（上游客户），列表与筛选中的需求方数据与客户档案一致。</p>
+        </div>
+
+        <div class="filter-bar demand-quote-list-filter">
+            <div class="filter-row">
+                <div class="filter-item filter-item--wide">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="询价单号、报价编号、需求方">
+                </div>
+                <div class="filter-item">
+                    <label>状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="unquoted">未报价</option>
+                        <option value="draft">草稿</option>
+                        <option value="reviewing">审核中</option>
+                        <option value="rejected">已驳回</option>
+                        <option value="approved">已通过</option>
+                        <option value="quoted">已报价</option>
+                        <option value="awarded">已中标</option>
+                        <option value="notawarded">未中标</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>推送状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待推送</option>
+                        <option value="pushed">已推送</option>
+                    </select>
+                </div>
+                <div class="filter-actions">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar demand-quote-list-action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card demand-quote-list-card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">询价单号</th>
+                            <th width="120">报价编号</th>
+                            <th width="150">需求方</th>
+                            <th width="80">需求项</th>
+                            <th width="90">状态</th>
+                            <th width="90">推送状态</th>
+                            <th width="110">推送时间</th>
+                            <th width="110">中标时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="order-table-body">
+                        <tr class="master-row" data-row="1">
+                            <td><input type="checkbox" name="collab-id" value="1"></td>
+                            <td>INQ-2025-001</td>
+                            <td>BJ-2025-001</td>
+                            <td>深圳制造有限公司</td>
+                            <td>2</td>
+                            <td><span class="status-badge status-processing">已报价</span></td>
+                            <td>已推送</td>
+                            <td>2025-01-20 10:00</td>
+                            <td>-</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default btn-quote-view" data-row="1">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-quote-fill" data-row="1">报价</button>
+                            </td>
+                        </tr>
+                        <tr class="master-row" data-row="2">
+                            <td><input type="checkbox" name="collab-id" value="2"></td>
+                            <td>INQ-2025-002</td>
+                            <td>-</td>
+                            <td>深圳制造有限公司</td>
+                            <td>2</td>
+                            <td><span class="status-badge status-default">未报价</span></td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default btn-quote-view" data-row="2">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-quote-fill" data-row="2">报价</button>
+                            </td>
+                        </tr>
+                        <tr class="master-row" data-row="3">
+                            <td><input type="checkbox" name="collab-id" value="3"></td>
+                            <td>INQ-2025-003</td>
+                            <td>BJ-2025-003</td>
+                            <td>深圳制造有限公司</td>
+                            <td>2</td>
+                            <td><span class="status-badge status-success">已中标</span></td>
+                            <td>已推送</td>
+                            <td>2025-01-20 10:00</td>
+                            <td>2025-01-22 14:30</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default btn-quote-view" data-row="3">查看</button>
+                            </td>
+                        </tr>
+                        <tr class="master-row" data-row="4">
+                            <td><input type="checkbox" name="collab-id" value="4"></td>
+                            <td>INQ-2025-004</td>
+                            <td>BJ-2025-004</td>
+                            <td>深圳制造有限公司</td>
+                            <td>2</td>
+                            <td><span class="status-badge status-default">草稿</span></td>
+                            <td>待推送</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default btn-quote-view" data-row="4">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-quote-fill" data-row="4">报价</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-quote-submit-review" data-row="4">提审</button>
+                            </td>
+                        </tr>
+                        <tr class="master-row" data-row="5">
+                            <td><input type="checkbox" name="collab-id" value="5"></td>
+                            <td>INQ-2025-005</td>
+                            <td>BJ-2025-005</td>
+                            <td>深圳制造有限公司</td>
+                            <td>2</td>
+                            <td><span class="status-badge status-processing">审核中</span></td>
+                            <td>待推送</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default btn-quote-view" data-row="5">查看</button>
+                            </td>
+                        </tr>
+                        <tr class="master-row" data-row="6">
+                            <td><input type="checkbox" name="collab-id" value="6"></td>
+                            <td>INQ-2025-006</td>
+                            <td>BJ-2025-006</td>
+                            <td>深圳制造有限公司</td>
+                            <td>2</td>
+                            <td><span class="status-badge status-rejected">已驳回</span></td>
+                            <td>待推送</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default btn-quote-view" data-row="6">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-quote-fill" data-row="6">报价</button>
+                            </td>
+                        </tr>
+                        <tr class="master-row" data-row="7">
+                            <td><input type="checkbox" name="collab-id" value="7"></td>
+                            <td>INQ-2025-007</td>
+                            <td>BJ-2025-007</td>
+                            <td>深圳制造有限公司</td>
+                            <td>2</td>
+                            <td><span class="status-badge status-success">已通过</span></td>
+                            <td>待推送</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default btn-quote-view" data-row="7">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-quote-push" data-row="7">推送</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 <strong id="demand-quote-total-count">7</strong> 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 <strong>1</strong> 页 / 共 <strong>1</strong> 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="quote-detail-card" style="margin-top: 16px;">
+            <div class="card-header">
+                <div class="card-title">报价明细</div>
+            </div>
+            <div class="card-body">
+                <p class="page-description" id="quote-detail-empty" style="margin-bottom: 8px;">
+                    请选择上方一条需求报价记录，查看该条对应的报价明细。
+                </p>
+                <div id="quote-detail-wrapper" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 12px; flex-wrap: wrap;">
+                        <div style="font-size: 13px; color: var(--text-secondary, #595959);">
+                            当前记录：<strong id="quote-detail-inquiry-no" style="margin-right: 4px;">-</strong>
+                            <span id="quote-detail-quote-code">/ -</span>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>物料编码</th>
+                                    <th>物料名称</th>
+                                    <th>规格型号</th>
+                                    <th>数量</th>
+                                    <th>单位</th>
+                                    <th>要求到货日期</th>
+                                    <th>单价</th>
+                                    <th>小计</th>
+                                </tr>
+                            </thead>
+                            <tbody id="quote-detail-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="quote-detail-summary" class="quote-detail-summary" style="display: none; text-align: right;">报价金额合计：<strong id="quote-detail-total-amount">¥0.00</strong></div>
+            </div>
+        </div>
+
+        <!-- 查看需求报价详情弹窗（只读） -->
+    <div class="modal-overlay" id="view-quote-modal">
+        <div class="modal" style="max-width: 920px; width: 95%;" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">需求报价详情</div>
+                <div class="modal-close" data-close-modal="view-quote-modal">×</div>
+            </div>
+            <div class="modal-body" style="padding: 16px;">
+                <p class="page-description" style="margin-bottom: 12px; font-size: 13px;">查看需求方推送的完整需求及当前报价状态，数据与采购协同询价单报价信息同步。</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; margin-bottom: 12px;">
+                    <div class="form-item" style="margin-bottom: 0;">
+                        <label class="form-label">询价单号</label>
+                        <input type="text" class="form-input" id="view-quote-inquiry-no" readonly style="background: #f5f5f5;">
+                    </div>
+                    <div class="form-item" style="margin-bottom: 0;">
+                        <label class="form-label">报价编号</label>
+                        <input type="text" class="form-input" id="view-quote-quote-code" readonly style="background: #f5f5f5;">
+                    </div>
+                    <div class="form-item" style="margin-bottom: 0;">
+                        <label class="form-label">需求方</label>
+                        <input type="text" class="form-input" id="view-quote-demand-party" readonly style="background: #f5f5f5;">
+                    </div>
+                    <div class="form-item" style="margin-bottom: 0;">
+                        <label class="form-label">状态</label>
+                        <input type="text" class="form-input" id="view-quote-status" readonly style="background: #f5f5f5;">
+                    </div>
+                    <div class="form-item" style="margin-bottom: 0;">
+                        <label class="form-label">推送状态</label>
+                        <input type="text" class="form-input" id="view-quote-push-status" readonly style="background: #f5f5f5;">
+                    </div>
+                    <div class="form-item" style="margin-bottom: 0;">
+                        <label class="form-label">推送时间</label>
+                        <input type="text" class="form-input" id="view-quote-push-time" readonly style="background: #f5f5f5;">
+                    </div>
+                    <div class="form-item" style="margin-bottom: 0;">
+                        <label class="form-label">中标时间</label>
+                        <input type="text" class="form-input" id="view-quote-award-time" readonly style="background: #f5f5f5;">
+                    </div>
+                </div>
+                <div class="card" style="padding: 10px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #fafafa; margin-bottom: 12px;">
+                    <div style="font-weight: 600; font-size: 13px; margin-bottom: 6px;">需求项（需求明细）</div>
+                    <div class="table-wrapper" style="max-height: 180px; overflow: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #fff;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                            <thead style="position: sticky; top: 0; background: #fafafa;">
+                                <tr>
+                                    <th style="padding: 6px 8px; text-align: left;">物料编码</th>
+                                    <th style="padding: 6px 8px; text-align: left;">物料名称</th>
+                                    <th style="padding: 6px 8px; text-align: left;">规格型号</th>
+                                    <th style="padding: 6px 8px; text-align: right;">数量</th>
+                                    <th style="padding: 6px 8px; text-align: left;">单位</th>
+                                    <th style="padding: 6px 8px; text-align: left;">要求到货日期</th>
+                                </tr>
+                            </thead>
+                            <tbody id="view-quote-demand-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="view-quote-result-block" style="display: none;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">报价单号</label>
+                            <input type="text" class="form-input" id="view-quote-quote-no" readonly style="background: #f5f5f5;">
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">报价金额</label>
+                            <input type="text" class="form-input" id="view-quote-amount" readonly style="background: #f5f5f5;">
+                        </div>
+                    </div>
+                    <div class="card" style="padding: 10px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #fafafa;">
+                        <div style="font-weight: 600; font-size: 13px; margin-bottom: 6px;">报价明细</div>
+                        <div class="table-wrapper" style="max-height: 160px; overflow: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #fff;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                <thead style="position: sticky; top: 0; background: #fafafa;">
+                                    <tr>
+                                        <th style="padding: 6px 8px; text-align: left;">物料编码</th>
+                                        <th style="padding: 6px 8px; text-align: left;">物料名称</th>
+                                        <th style="padding: 6px 8px; text-align: right;">数量</th>
+                                        <th style="padding: 6px 8px; text-align: left;">单位</th>
+                                        <th style="padding: 6px 8px; text-align: right;">单价</th>
+                                        <th style="padding: 6px 8px; text-align: right;">小计</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="view-quote-detail-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-close-modal="view-quote-modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="view-quote-btn-submit-review" style="display: none;">提审</button>
+                <button type="button" class="btn btn-primary" id="view-quote-btn-push" style="display: none;">推送</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 填报报价弹窗 -->
+    <div class="modal-overlay" id="fill-quote-modal">
+        <div class="modal" style="max-width: 1000px; width: 95%;" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">填报报价</div>
+                <div class="modal-close" data-close-modal="fill-quote-modal">×</div>
+            </div>
+            <div class="modal-body" style="padding: 16px;">
+                <p class="page-description" style="margin-bottom: 12px; font-size: 13px;">根据需求项填写单价与交货信息。保存为草稿后可继续编辑；提交报价后进入审核，审核通过后可推送至采购协同询价单。</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px 16px; margin-bottom: 12px;">
+                    <div class="form-item" style="margin-bottom: 0;">
+                        <label class="form-label">询价单号</label>
+                        <input type="text" class="form-input" id="fill-quote-inquiry-no" readonly style="background: #f5f5f5;">
+                    </div>
+                    <div class="form-item" style="margin-bottom: 0;">
+                        <label class="form-label">报价编号</label>
+                        <input type="text" class="form-input" id="fill-quote-quote-code" readonly style="background: #f5f5f5;">
+                    </div>
+                    <div class="form-item" style="margin-bottom: 0;">
+                        <label class="form-label">需求方</label>
+                        <input type="text" class="form-input" id="fill-quote-demand-party" readonly style="background: #f5f5f5;">
+                    </div>
+                </div>
+                <div class="card" style="padding: 10px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #fafafa; margin-bottom: 12px;">
+                    <div style="font-weight: 600; font-size: 13px; margin-bottom: 6px;">报价明细（需求项自动带出，请填写单价）</div>
+                    <div class="table-wrapper" style="max-height: 240px; overflow: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #fff;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                            <thead style="position: sticky; top: 0; background: #fafafa;">
+                                <tr>
+                                    <th style="padding: 6px 8px; text-align: left;">物料编码</th>
+                                    <th style="padding: 6px 8px; text-align: left;">物料名称</th>
+                                    <th style="padding: 6px 8px; text-align: left;">规格型号</th>
+                                    <th style="padding: 6px 8px; text-align: right;">数量</th>
+                                    <th style="padding: 6px 8px; text-align: left;">单位</th>
+                                    <th style="padding: 6px 8px; text-align: left;">要求到货日期</th>
+                                    <th style="padding: 6px 8px; text-align: right;">单价 <span style="color:#ff4d4f;">*</span></th>
+                                    <th style="padding: 6px 8px; text-align: right;">小计</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fill-quote-detail-body"></tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top: 8px; text-align: right; font-size: 13px;">报价金额合计：<strong id="fill-quote-total-amount">¥0.00</strong></div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-item" style="margin-bottom: 0;">
+                        <label class="form-label">预计交货日期</label>
+                        <input type="date" class="form-input" id="fill-quote-delivery-date">
+                    </div>
+                    <div class="form-item" style="margin-bottom: 0;">
+                        <label class="form-label">报价说明</label>
+                        <input type="text" class="form-input" id="fill-quote-remark" placeholder="选填，如付款方式、质保等">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-close-modal="fill-quote-modal">取消</button>
+                <button type="button" class="btn btn-default" id="btn-fill-quote-save">保存</button>
+                <button type="button" class="btn btn-primary" id="btn-fill-quote-submit">提交报价</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('需求报价 页面已加载');
+
+        (function () {
+            var viewModal = document.getElementById('view-quote-modal');
+            var fillModal = document.getElementById('fill-quote-modal');
+            function openModal(id) {
+                var el = document.getElementById(id);
+                if (el) el.classList.add('active');
+            }
+            function closeModal(id) {
+                var el = document.getElementById(id);
+                if (el) el.classList.remove('active');
+            }
+
+            // 模拟：需求明细数据（与询价单一致，按协同编号）
+            var demandDetailData = {
+                1: [
+                    { materialCode: 'MAT-1001', materialName: '电子元器件A', spec: '型号A1', qty: 1000, unit: '个', deliveryDate: '2025-02-10' },
+                    { materialCode: 'MAT-1002', materialName: '控制器', spec: '型号C1', qty: 50, unit: '台', deliveryDate: '2025-02-15' }
+                ],
+                2: [
+                    { materialCode: 'MAT-1001', materialName: '电子元器件A', spec: '型号A1', qty: 1000, unit: '个', deliveryDate: '2025-02-10' },
+                    { materialCode: 'MAT-1002', materialName: '控制器', spec: '型号C1', qty: 50, unit: '台', deliveryDate: '2025-02-15' }
+                ],
+                3: [
+                    { materialCode: 'MAT-1001', materialName: '电子元器件A', spec: '型号A1', qty: 1000, unit: '个', deliveryDate: '2025-02-10' },
+                    { materialCode: 'MAT-1002', materialName: '控制器', spec: '型号C1', qty: 50, unit: '台', deliveryDate: '2025-02-15' }
+                ],
+                4: [
+                    { materialCode: 'MAT-2001', materialName: '线缆', spec: '型号L1', qty: 500, unit: '米', deliveryDate: '2025-02-20' },
+                    { materialCode: 'MAT-2002', materialName: '接头', spec: '型号J1', qty: 200, unit: '个', deliveryDate: '2025-02-20' }
+                ],
+                5: [
+                    { materialCode: 'MAT-2001', materialName: '线缆', spec: '型号L1', qty: 500, unit: '米', deliveryDate: '2025-02-20' },
+                    { materialCode: 'MAT-2002', materialName: '接头', spec: '型号J1', qty: 200, unit: '个', deliveryDate: '2025-02-20' }
+                ],
+                6: [
+                    { materialCode: 'MAT-2001', materialName: '线缆', spec: '型号L1', qty: 500, unit: '米', deliveryDate: '2025-02-20' },
+                    { materialCode: 'MAT-2002', materialName: '接头', spec: '型号J1', qty: 200, unit: '个', deliveryDate: '2025-02-20' }
+                ],
+                7: [
+                    { materialCode: 'MAT-2001', materialName: '线缆', spec: '型号L1', qty: 500, unit: '米', deliveryDate: '2025-02-20' },
+                    { materialCode: 'MAT-2002', materialName: '接头', spec: '型号J1', qty: 200, unit: '个', deliveryDate: '2025-02-20' }
+                ]
+            };
+            // 模拟：已报价/已中标/草稿/审核中/已驳回/已通过 的报价明细
+            var quoteDetailData = {
+                1: { quoteNo: 'BJ-2025-001-01', amount: '¥128,000', rows: [
+                    { materialCode: 'MAT-1001', materialName: '电子元器件A', qty: 1000, unit: '个', price: '¥98.00', amount: '¥98,000' },
+                    { materialCode: 'MAT-1002', materialName: '控制器', qty: 50, unit: '台', price: '¥600.00', amount: '¥30,000' }
+                ]},
+                3: { quoteNo: 'BJ-2025-001-03', amount: '¥125,680', rows: [
+                    { materialCode: 'MAT-1001', materialName: '电子元器件A', qty: 1000, unit: '个', price: '¥95.00', amount: '¥95,000' },
+                    { materialCode: 'MAT-1002', materialName: '控制器', qty: 50, unit: '台', price: '¥613.60', amount: '¥30,680' }
+                ]},
+                4: { quoteNo: '', amount: '¥85,000', rows: [
+                    { materialCode: 'MAT-2001', materialName: '线缆', qty: 500, unit: '米', price: '¥120.00', amount: '¥60,000' },
+                    { materialCode: 'MAT-2002', materialName: '接头', qty: 200, unit: '个', price: '¥125.00', amount: '¥25,000' }
+                ]},
+                5: { quoteNo: 'BJ-2025-002-05', amount: '¥85,000', rows: [
+                    { materialCode: 'MAT-2001', materialName: '线缆', qty: 500, unit: '米', price: '¥120.00', amount: '¥60,000' },
+                    { materialCode: 'MAT-2002', materialName: '接头', qty: 200, unit: '个', price: '¥125.00', amount: '¥25,000' }
+                ]},
+                6: { quoteNo: 'BJ-2025-002-06', amount: '¥82,000', rows: [
+                    { materialCode: 'MAT-2001', materialName: '线缆', qty: 500, unit: '米', price: '¥115.00', amount: '¥57,500' },
+                    { materialCode: 'MAT-2002', materialName: '接头', qty: 200, unit: '个', price: '¥122.50', amount: '¥24,500' }
+                ]},
+                7: { quoteNo: 'BJ-2025-002-07', amount: '¥84,000', rows: [
+                    { materialCode: 'MAT-2001', materialName: '线缆', qty: 500, unit: '米', price: '¥118.00', amount: '¥59,000' },
+                    { materialCode: 'MAT-2002', materialName: '接头', qty: 200, unit: '个', price: '¥125.00', amount: '¥25,000' }
+                ]}
+            };
+
+            function getRowData(rowIndex) {
+                var tbody = document.getElementById('order-table-body');
+                if (!tbody) return null;
+                var tr = tbody.querySelector('tr:nth-child(' + (parseInt(rowIndex, 10)) + ')');
+                if (!tr || !tr.cells) return null;
+                return {
+                    inquiryNo: tr.cells[1].textContent.trim(),
+                    quoteNo: tr.cells[2].textContent.trim(),
+                    demandParty: tr.cells[3].textContent.trim(),
+                    demandItems: tr.cells[4].textContent.trim(),
+                    status: tr.cells[5].textContent.trim(),
+                    pushStatus: tr.cells[6].textContent.trim(),
+                    pushTime: tr.cells[7].textContent.trim(),
+                    awardTime: tr.cells[8].textContent.trim()
+                };
+            }
+
+            function updateRowStatus(rowIndex, statusHtml, pushStatusText) {
+                var tbody = document.getElementById('order-table-body');
+                if (!tbody) return;
+                var tr = tbody.querySelector('tr:nth-child(' + (parseInt(rowIndex, 10)) + ')');
+                if (!tr || !tr.cells[6]) return;
+                if (statusHtml != null) tr.cells[5].innerHTML = statusHtml;
+                if (pushStatusText != null) tr.cells[6].textContent = pushStatusText;
+            }
+            function updateRowQuoteNo(rowIndex, quoteCode) {
+                var tbody = document.getElementById('order-table-body');
+                if (!tbody) return;
+                var tr = tbody.querySelector('tr:nth-child(' + (parseInt(rowIndex, 10)) + ')');
+                if (!tr || !tr.cells[2]) return;
+                tr.cells[2].textContent = quoteCode || '-';
+            }
+            function updateRowPushTime(rowIndex, pushTime) {
+                var tbody = document.getElementById('order-table-body');
+                if (!tbody) return;
+                var tr = tbody.querySelector('tr:nth-child(' + (parseInt(rowIndex, 10)) + ')');
+                if (!tr || !tr.cells[7]) return;
+                tr.cells[7].textContent = pushTime || '-';
+            }
+
+            function updateRowOperationCell(rowIndex, html) {
+                var tbody = document.getElementById('order-table-body');
+                if (!tbody) return;
+                var tr = tbody.querySelector('tr:nth-child(' + (parseInt(rowIndex, 10)) + ')');
+                if (!tr || !tr.cells[9]) return;
+                tr.cells[9].innerHTML = html;
+            }
+
+            function setSelectedMasterRow(rowIndex) {
+                var tbody = document.getElementById('order-table-body');
+                if (!tbody) return;
+                tbody.querySelectorAll('.master-row').forEach(function (tr) { tr.classList.remove('demand-quote-row--active'); });
+                var tr = tbody.querySelector('.master-row[data-row="' + rowIndex + '"]');
+                if (tr) tr.classList.add('demand-quote-row--active');
+            }
+            function refreshQuoteDetail(rowIndex) {
+                var emptyEl = document.getElementById('quote-detail-empty');
+                var wrapperEl = document.getElementById('quote-detail-wrapper');
+                var tbody = document.getElementById('quote-detail-table-body');
+                var summaryEl = document.getElementById('quote-detail-summary');
+                var totalEl = document.getElementById('quote-detail-total-amount');
+                var inquiryNoEl = document.getElementById('quote-detail-inquiry-no');
+                var quoteCodeEl = document.getElementById('quote-detail-quote-code');
+                if (!tbody) return;
+                var rowData = getRowData(rowIndex);
+                if (emptyEl) emptyEl.style.display = 'none';
+                if (wrapperEl) wrapperEl.style.display = 'block';
+                if (rowData && inquiryNoEl) inquiryNoEl.textContent = rowData.inquiryNo || '-';
+                if (rowData && quoteCodeEl) quoteCodeEl.textContent = '/ ' + (rowData.quoteNo || '-');
+                var demandRows = demandDetailData[rowIndex] || [];
+                var quoteData = quoteDetailData[rowIndex];
+                if (quoteData && quoteData.rows && quoteData.rows.length) {
+                    var rows = quoteData.rows;
+                    var demandList = demandRows;
+                    tbody.innerHTML = rows.map(function (r, i) {
+                        var d = demandList[i] || {};
+                        return '<tr><td>' + (r.materialCode || '-') + '</td><td>' + (r.materialName || '-') + '</td><td>' + (d.spec || '-') + '</td><td>' + (r.qty != null ? r.qty : '-') + '</td><td>' + (r.unit || '-') + '</td><td>' + (d.deliveryDate || '-') + '</td><td>' + (r.price || '-') + '</td><td>' + (r.amount || '-') + '</td></tr>';
+                    }).join('');
+                    if (summaryEl) summaryEl.style.display = 'block';
+                    if (totalEl) totalEl.textContent = quoteData.amount || '¥0.00';
+                } else {
+                    tbody.innerHTML = demandRows.length ? demandRows.map(function (r) {
+                        return '<tr><td>' + (r.materialCode || '-') + '</td><td>' + (r.materialName || '-') + '</td><td>' + (r.spec || '-') + '</td><td>' + (r.qty != null ? r.qty : '-') + '</td><td>' + (r.unit || '-') + '</td><td>' + (r.deliveryDate || '-') + '</td><td>-</td><td>-</td></tr>';
+                    }).join('') : '<tr><td colspan="8" class="table-empty-cell">该条暂无报价明细</td></tr>';
+                    if (summaryEl) summaryEl.style.display = 'none';
+                }
+            }
+
+            var orderTableBody = document.getElementById('order-table-body');
+            function handleViewClick(row) {
+                var data = getRowData(row);
+                if (!data) return;
+                document.getElementById('view-quote-inquiry-no').value = data.inquiryNo;
+                document.getElementById('view-quote-quote-code').value = data.quoteNo || '-';
+                document.getElementById('view-quote-demand-party').value = data.demandParty;
+                document.getElementById('view-quote-status').value = data.status.replace(/<[^>]+>/g, '').trim();
+                document.getElementById('view-quote-push-status').value = data.pushStatus || '-';
+                document.getElementById('view-quote-push-time').value = data.pushTime || '-';
+                document.getElementById('view-quote-award-time').value = data.awardTime || '-';
+                var demandBody = document.getElementById('view-quote-demand-body');
+                var details = demandDetailData[row] || [];
+                demandBody.innerHTML = details.map(function (r) {
+                    return '<tr><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (r.materialCode || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (r.materialName || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (r.spec || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;text-align:right;">' + (r.qty != null ? r.qty : '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (r.unit || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (r.deliveryDate || '-') + '</td></tr>';
+                }).join('');
+                var resultBlock = document.getElementById('view-quote-result-block');
+                var quoteData = quoteDetailData[row];
+                var statusText = data.status.replace(/<[^>]+>/g, '').trim();
+                var showResult = quoteData && (statusText.indexOf('已报价') !== -1 || statusText.indexOf('已中标') !== -1 || statusText.indexOf('草稿') !== -1 || statusText.indexOf('审核中') !== -1 || statusText.indexOf('已驳回') !== -1 || statusText.indexOf('已通过') !== -1);
+                if (showResult && quoteData) {
+                    resultBlock.style.display = 'block';
+                    document.getElementById('view-quote-quote-no').value = quoteData.quoteNo || '-';
+                    document.getElementById('view-quote-amount').value = quoteData.amount;
+                    var detailBody = document.getElementById('view-quote-detail-body');
+                    detailBody.innerHTML = (quoteData.rows || []).map(function (r) {
+                        return '<tr><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (r.materialCode || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (r.materialName || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;text-align:right;">' + (r.qty != null ? r.qty : '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (r.unit || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;text-align:right;">' + (r.price || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;text-align:right;">' + (r.amount || '-') + '</td></tr>';
+                    }).join('');
+                } else {
+                    resultBlock.style.display = 'none';
+                }
+                document.getElementById('view-quote-btn-submit-review').style.display = statusText.indexOf('草稿') !== -1 ? 'inline-block' : 'none';
+                document.getElementById('view-quote-btn-submit-review').setAttribute('data-row', row);
+                document.getElementById('view-quote-btn-push').style.display = (statusText.indexOf('已通过') !== -1 && (data.pushStatus || '').indexOf('待推送') !== -1) ? 'inline-block' : 'none';
+                document.getElementById('view-quote-btn-push').setAttribute('data-row', row);
+                openModal('view-quote-modal');
+            }
+
+            function handleFillClick(row) {
+                fillModal.setAttribute('data-current-row', row);
+                var data = getRowData(row);
+                if (!data) return;
+                document.getElementById('fill-quote-inquiry-no').value = data.inquiryNo;
+                document.getElementById('fill-quote-quote-code').value = data.quoteNo || '-';
+                document.getElementById('fill-quote-demand-party').value = data.demandParty;
+                var details = demandDetailData[row] || [];
+                var tbody = document.getElementById('fill-quote-detail-body');
+                tbody.innerHTML = details.map(function (r, i) {
+                    return '<tr data-index="' + i + '"><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (r.materialCode || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (r.materialName || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (r.spec || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;text-align:right;">' + (r.qty != null ? r.qty : '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (r.unit || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (r.deliveryDate || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;"><input type="number" class="form-input form-input-sm quote-price" data-qty="' + (r.qty || 0) + '" step="0.01" min="0" placeholder="单价" style="width:90px;text-align:right;"></td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;text-align:right;" class="quote-subtotal">-</td></tr>';
+                }).join('');
+                document.getElementById('fill-quote-total-amount').textContent = '¥0.00';
+                document.getElementById('fill-quote-delivery-date').value = '';
+                document.getElementById('fill-quote-remark').value = '';
+                tbody.querySelectorAll('.quote-price').forEach(function (input) {
+                    input.addEventListener('input', function () {
+                        var qty = parseFloat(this.getAttribute('data-qty')) || 0;
+                        var price = parseFloat(this.value) || 0;
+                        var sub = this.closest('tr').querySelector('.quote-subtotal');
+                        if (sub) sub.textContent = isNaN(price) || price === 0 ? '-' : '¥' + (qty * price).toLocaleString('zh-CN', { minimumFractionDigits: 2 });
+                        var total = 0;
+                        tbody.querySelectorAll('.quote-price').forEach(function (inp) {
+                            var p = parseFloat(inp.value) || 0;
+                            var q = parseFloat(inp.getAttribute('data-qty')) || 0;
+                            total += p * q;
+                        });
+                        document.getElementById('fill-quote-total-amount').textContent = '¥' + total.toLocaleString('zh-CN', { minimumFractionDigits: 2 });
+                    });
+                });
+                openModal('fill-quote-modal');
+            }
+
+            if (orderTableBody) {
+                orderTableBody.addEventListener('click', function (e) {
+                    var tr = e.target.closest('.master-row');
+                    if (tr && !e.target.closest('button') && !e.target.closest('input[type="checkbox"]')) {
+                        var row = tr.getAttribute('data-row');
+                        if (row) { setSelectedMasterRow(row); refreshQuoteDetail(row); }
+                        return;
+                    }
+                    var btn = e.target.closest('.btn-quote-view');
+                    if (btn) { e.preventDefault(); handleViewClick(btn.getAttribute('data-row')); return; }
+                    btn = e.target.closest('.btn-quote-fill');
+                    if (btn) { e.preventDefault(); handleFillClick(btn.getAttribute('data-row')); return; }
+                    btn = e.target.closest('.btn-quote-submit-review');
+                    if (btn) {
+                        e.preventDefault();
+                        var row = btn.getAttribute('data-row');
+                        if (confirm('确认提审？提交后状态变为「审核中」。')) {
+                            updateRowStatus(row, '<span class="status-badge status-processing">审核中</span>', null);
+                            updateRowOperationCell(row, '<button type="button" class="btn btn-sm btn-default btn-quote-view" data-row="' + row + '">查看</button>');
+                            alert('已提交审核（原型模拟）。');
+                        }
+                        return;
+                    }
+                    btn = e.target.closest('.btn-quote-push');
+                    if (btn) {
+                        e.preventDefault();
+                        var row = btn.getAttribute('data-row');
+                        if (confirm('确认推送？推送后数据将同步至采购协同询价单，推送状态变为「已推送」。')) {
+                            updateRowStatus(row, null, '已推送');
+                            updateRowPushTime(row, new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(/\//g, '-'));
+                            updateRowOperationCell(row, '<button type="button" class="btn btn-sm btn-default btn-quote-view" data-row="' + row + '">查看</button>');
+                            alert('已推送（原型模拟）。');
+                        }
+                        return;
+                    }
+                });
+            }
+
+            document.getElementById('view-quote-btn-submit-review').addEventListener('click', function () {
+                var row = this.getAttribute('data-row');
+                if (!row) return;
+                if (confirm('确认提审？提交后状态变为「审核中」。')) {
+                    updateRowStatus(row, '<span class="status-badge status-processing">审核中</span>', null);
+                    updateRowOperationCell(row, '<button type="button" class="btn btn-sm btn-default btn-quote-view" data-row="' + row + '">查看</button>');
+                    alert('已提交审核（原型模拟）。');
+                    closeModal('view-quote-modal');
+                }
+            });
+            document.getElementById('view-quote-btn-push').addEventListener('click', function () {
+                var row = this.getAttribute('data-row');
+                if (!row) return;
+                if (confirm('确认推送？推送后数据将同步至采购协同询价单，推送状态变为「已推送」。')) {
+                    updateRowStatus(row, null, '已推送');
+                    updateRowPushTime(row, new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(/\//g, '-'));
+                    var tr = document.querySelector('#order-table-body tr:nth-child(' + row + ')');
+                    if (tr && tr.cells[9]) tr.cells[9].innerHTML = '<button type="button" class="btn btn-sm btn-default btn-quote-view" data-row="' + row + '">查看</button>';
+                    alert('已推送（原型模拟）。');
+                    closeModal('view-quote-modal');
+                }
+            });
+
+            document.getElementById('btn-fill-quote-save').addEventListener('click', function () {
+                var row = fillModal.getAttribute('data-current-row');
+                if (!row) return;
+                updateRowQuoteNo(row, 'BJ-2025-00' + row);
+                updateRowStatus(row, '<span class="status-badge status-default">草稿</span>', '待推送');
+                updateRowOperationCell(row, '<button type="button" class="btn btn-sm btn-default btn-quote-view" data-row="' + row + '">查看</button><button type="button" class="btn btn-sm btn-primary btn-quote-fill" data-row="' + row + '">报价</button><button type="button" class="btn btn-sm btn-primary btn-quote-submit-review" data-row="' + row + '">提审</button>');
+                alert('已保存为草稿（原型模拟）。');
+                closeModal('fill-quote-modal');
+            });
+            document.getElementById('btn-fill-quote-submit').addEventListener('click', function () {
+                var totalEl = document.getElementById('fill-quote-total-amount');
+                var total = totalEl ? totalEl.textContent : '¥0.00';
+                if (total === '¥0.00') {
+                    alert('请至少填写一条物料的单价。');
+                    return;
+                }
+                var row = fillModal.getAttribute('data-current-row');
+                if (!row) return;
+                if (confirm('确认提交报价？提交后进入审核，状态变为「审核中」。')) {
+                    var currentQuoteNo = document.getElementById('fill-quote-quote-code').value;
+                    if (!currentQuoteNo || currentQuoteNo === '-') updateRowQuoteNo(row, 'BJ-2025-00' + row);
+                    updateRowStatus(row, '<span class="status-badge status-processing">审核中</span>', '待推送');
+                    updateRowOperationCell(row, '<button type="button" class="btn btn-sm btn-default btn-quote-view" data-row="' + row + '">查看</button>');
+                    alert('已提交审核（原型模拟）。');
+                    closeModal('fill-quote-modal');
+                }
+            });
+
+            viewModal.querySelectorAll('[data-close-modal="view-quote-modal"]').forEach(function (b) {
+                b.addEventListener('click', function () { closeModal('view-quote-modal'); });
+            });
+            fillModal.querySelectorAll('[data-close-modal="fill-quote-modal"]').forEach(function (b) {
+                b.addEventListener('click', function () { closeModal('fill-quote-modal'); });
+            });
+            viewModal.addEventListener('click', function (e) { if (e.target === viewModal) closeModal('view-quote-modal'); });
+            fillModal.addEventListener('click', function (e) { if (e.target === fillModal) closeModal('fill-quote-modal'); });
+
+            setSelectedMasterRow('1');
+            refreshQuoteDetail('1');
+        })();
+
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+    </div>
+</body>
+</html>

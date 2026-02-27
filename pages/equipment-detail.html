@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备详情</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <!-- 设备状态进度条 -->
+        <div class="card" style="margin-bottom:16px;">
+            <div class="card-body">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                    <span style="font-weight:600;">设备状态：正常运行</span>
+                    <span style="font-size:12px;color:#8c8c8c;">当前阶段：运行阶段</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <div style="flex:1;height:8px;background:#52c41a;border-radius:4px;"></div>
+                    <div style="flex:1;height:8px;background:#52c41a;border-radius:4px;"></div>
+                    <div style="flex:1;height:8px;background:#52c41a;border-radius:4px;"></div>
+                    <div style="flex:1;height:8px;background:#d9d9d9;border-radius:4px;"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:#595959;">
+                    <span>采购</span>
+                    <span>入库</span>
+                    <span>安装</span>
+                    <span>运行</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 基础信息（采购阶段） -->
+        <div class="card">
+            <div class="card-header" style="border-left:3px solid #1890ff;padding-left:12px;display:flex;justify-content:space-between;align-items:center;">
+                <h3 class="card-title">基础信息 <span style="font-size:12px;color:#52c41a;font-weight:normal;">✓ 已完成</span></h3>
+                <button class="btn btn-sm btn-default">编辑</button>
+            </div>
+            <div class="card-body">
+                <div class="form-info-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px 16px;">
+                    <div class="form-info-item"><span class="form-info-label">设备编码</span><span class="form-info-value">EQ-001</span></div>
+                    <div class="form-info-item"><span class="form-info-label">设备名称</span><span class="form-info-value">空压机A</span></div>
+                    <div class="form-info-item"><span class="form-info-label">设备型号</span><span class="form-info-value">AC-2000</span></div>
+                    <div class="form-info-item"><span class="form-info-label">用途分类</span><span class="form-info-value">能源类</span></div>
+                    <div class="form-info-item"><span class="form-info-label">设备子类</span><span class="form-info-value">供气设备</span></div>
+                    <div class="form-info-item"><span class="form-info-label">关键等级</span><span class="form-info-value"><span class="status-badge status-success">A类（关键）</span></span></div>
+                    <div class="form-info-item"><span class="form-info-label">生产厂家</span><span class="form-info-value">XX空压机有限公司</span></div>
+                    <div class="form-info-item"><span class="form-info-label">购置日期</span><span class="form-info-value">2023-06-15</span></div>
+                    <div class="form-info-item"><span class="form-info-label">购置金额</span><span class="form-info-value">150,000 元</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 入库信息 -->
+        <div class="card">
+            <div class="card-header" style="border-left:3px solid #52c41a;padding-left:12px;display:flex;justify-content:space-between;align-items:center;">
+                <h3 class="card-title">入库信息 <span style="font-size:12px;color:#52c41a;font-weight:normal;">✓ 已完成</span></h3>
+                <button class="btn btn-sm btn-default">编辑</button>
+            </div>
+            <div class="card-body">
+                <div class="form-info-grid" style="display:grid;grid-template-columns:1fr 1fr 3fr;gap:12px 16px;">
+                    <div class="form-info-item"><span class="form-info-label">资产编号</span><span class="form-info-value">ZC-2023-001</span></div>
+                    <div class="form-info-item"><span class="form-info-label">入库日期</span><span class="form-info-value">2023-06-20</span></div>
+                    <div class="form-info-item"><span class="form-info-label">存放位置</span><span class="form-info-value">仓库A区-货架3层</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 安装信息 -->
+        <div class="card">
+            <div class="card-header" style="border-left:3px solid #52c41a;padding-left:12px;display:flex;justify-content:space-between;align-items:center;">
+                <h3 class="card-title">安装信息 <span style="font-size:12px;color:#52c41a;font-weight:normal;">✓ 已完成</span></h3>
+                <button class="btn btn-sm btn-default">编辑</button>
+            </div>
+            <div class="card-body">
+                <div class="form-info-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px 16px;">
+                    <div class="form-info-item"><span class="form-info-label">安装位置</span><span class="form-info-value">车间A-产线1</span></div>
+                    <div class="form-info-item"><span class="form-info-label">安装日期</span><span class="form-info-value">2023-07-01</span></div>
+                    <div class="form-info-item"><span class="form-info-label">调试日期</span><span class="form-info-value">2023-07-05</span></div>
+                    <div class="form-info-item"><span class="form-info-label">额定功率</span><span class="form-info-value">75 kW</span></div>
+                    <div class="form-info-item"><span class="form-info-label">额定电压</span><span class="form-info-value">380 V</span></div>
+                    <div class="form-info-item"><span class="form-info-label">出厂日期</span><span class="form-info-value">2023-05-01</span></div>
+                </div>
+                <div style="margin-top:12px;padding-top:12px;border-top:1px dashed #e8e8e8;">
+                    <div class="form-info-item"><span class="form-info-label">技术参数说明</span><span class="form-info-value">排气压力 0.8MPa，排气量 12.5m³/min</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 运行信息 -->
+        <div class="card">
+            <div class="card-header" style="border-left:3px solid #faad14;padding-left:12px;display:flex;justify-content:space-between;align-items:center;">
+                <h3 class="card-title">运行信息 <span style="font-size:12px;color:#faad14;font-weight:normal;">● 进行中</span></h3>
+                <button class="btn btn-sm btn-primary">补充信息</button>
+            </div>
+            <div class="card-body">
+                <div style="background:#fff7e6;border:1px solid #ffd591;border-radius:4px;padding:16px;text-align:center;">
+                    <div style="color:#fa8c16;margin-bottom:8px;">该阶段信息待补充</div>
+                    <div style="font-size:12px;color:#595959;">请补充运行参数、维护计划、专用字段等信息</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 财务信息 -->
+        <div class="card">
+            <div class="card-header" style="border-left:3px solid #d9d9d9;padding-left:12px;display:flex;justify-content:space-between;align-items:center;">
+                <h3 class="card-title">财务信息 <span style="font-size:12px;color:#8c8c8c;font-weight:normal;">○ 待处理</span></h3>
+                <button class="btn btn-sm btn-default" disabled>待补充</button>
+            </div>
+            <div class="card-body">
+                <div style="background:#f5f5f5;border:1px dashed #d9d9d9;border-radius:4px;padding:16px;text-align:center;color:#8c8c8c;">
+                    设备正式运行后，由财务部门补充成本中心、折旧方式等信息
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

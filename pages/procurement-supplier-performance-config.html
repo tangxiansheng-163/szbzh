@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>绩效配置 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">系统配置</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">绩效配置</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">维护供应商绩效评估配置列表，支持新增配置、查看详情、编辑。月度、季度、年度可配置不同的评估维度和评估方式；三者存在递进关系：月度侧重交付与质量，数据可汇总参与季度评估；季度为常规绩效，结果可参与年度综合评估；年度可增加合作/创新等长期维度，用于供应商定级与战略合作。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="配置名称、配置编号">
+                </div>
+                <div class="filter-item">
+                    <label>评估周期</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="monthly">月度</option>
+                        <option value="quarterly">季度</option>
+                        <option value="annual">年度</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="enabled">已启用</option>
+                        <option value="disabled">已停用</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button type="button" class="btn btn-primary" data-open-modal="performance-config-add-modal">+ 新增配置</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">配置编号</th>
+                            <th width="180">配置名称</th>
+                            <th width="80">评估周期</th>
+                            <th width="200">评估方式/维度</th>
+                            <th width="180">维度权重</th>
+                            <th width="80">状态</th>
+                            <th width="110">创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-config-id="1">
+                            <td><input type="checkbox" name="config-id" value="1"></td>
+                            <td>PC-2025-001</td>
+                            <td>供应商季度绩效评估配置</td>
+                            <td>季度</td>
+                            <td><span style="color:#1890ff;">4 维</span> 常规绩效，四维均衡</td>
+                            <td>供货25% 质量30% 价格25% 服务20%</td>
+                            <td class="config-status-cell"><span class="status-badge status-success">已启用</span></td>
+                            <td>2025-01-10</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default btn-performance-config-view" data-config-id="1">查看详情</button>
+                                <button type="button" class="btn btn-sm btn-default btn-performance-config-edit" data-config-id="1">编辑</button>
+                                <button type="button" class="btn btn-sm btn-default btn-config-toggle" data-status="enabled">停用</button>
+                            </td>
+                        </tr>
+                        <tr data-config-id="2">
+                            <td><input type="checkbox" name="config-id" value="2"></td>
+                            <td>PC-2024-002</td>
+                            <td>供应商年度绩效评估配置</td>
+                            <td>年度</td>
+                            <td><span style="color:#fa8c16;">5 维</span> 含合作与创新，综合定级</td>
+                            <td>供货20% 质量25% 价格20% 服务20% 合作15%</td>
+                            <td class="config-status-cell"><span class="status-badge status-default">已停用</span></td>
+                            <td>2024-06-01</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default btn-performance-config-view" data-config-id="2">查看详情</button>
+                                <button type="button" class="btn btn-sm btn-default btn-performance-config-edit" data-config-id="2">编辑</button>
+                                <button type="button" class="btn btn-sm btn-default btn-config-toggle" data-status="disabled">启用</button>
+                            </td>
+                        </tr>
+                        <tr data-config-id="3">
+                            <td><input type="checkbox" name="config-id" value="3"></td>
+                            <td>PC-2025-003</td>
+                            <td>供应商月度绩效评估配置</td>
+                            <td>月度</td>
+                            <td><span style="color:#52c41a;">4 维</span> 侧重交付与质量</td>
+                            <td>供货35% 质量35% 价格15% 服务15%</td>
+                            <td class="config-status-cell"><span class="status-badge status-success">已启用</span></td>
+                            <td>2025-02-01</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default btn-performance-config-view" data-config-id="3">查看详情</button>
+                                <button type="button" class="btn btn-sm btn-default btn-performance-config-edit" data-config-id="3">编辑</button>
+                                <button type="button" class="btn btn-sm btn-default btn-config-toggle" data-status="enabled">停用</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 3 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 查看详情弹窗（只读） -->
+        <div id="performance-config-view-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:640px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">绩效配置详情</span><button type="button" class="modal-close" data-close-modal="performance-config-view-modal">×</button></div>
+                <div class="modal-body" id="performance-config-view-body">
+                    <div class="section-title" style="margin-bottom:12px;">基本信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:13px;">
+                        <div><span style="color:#666;">配置编号：</span><span id="view-config-code">-</span></div>
+                        <div><span style="color:#666;">配置名称：</span><span id="view-config-name">-</span></div>
+                        <div><span style="color:#666;">评估周期：</span><span id="view-config-cycle">-</span></div>
+                        <div><span style="color:#666;">状态：</span><span id="view-config-status">-</span></div>
+                        <div style="grid-column:1/-1;"><span style="color:#666;">维度权重：</span><span id="view-config-weights">-</span></div>
+                        <div style="grid-column:1/-1;"><span style="color:#666;">等级划分：</span><span id="view-config-grades">-</span></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="performance-config-view-modal">关闭</button></div>
+            </div>
+        </div>
+
+        <div id="performance-config-add-modal" class="modal-overlay" data-edit-id="">
+            <div class="modal modal-xl" style="max-width:720px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title" id="performance-config-modal-title">新增绩效配置</span><button type="button" class="modal-close" data-close-modal="performance-config-add-modal">×</button></div>
+                <div class="modal-body" style="overflow-y:auto;flex:1;">
+                    <div class="section-title" style="margin-bottom:12px;">基本信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item" id="modal-config-code-wrap" style="display:none;">
+                            <label class="form-label">配置编号</label>
+                            <input type="text" id="modal-config-code" class="form-input" readonly placeholder="自动生成">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">配置名称</label>
+                            <input type="text" id="modal-config-name" class="form-input" placeholder="如：供应商季度绩效评估配置">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">评估周期</label>
+                            <select id="modal-config-cycle" class="form-select" onchange="typeof window.applyPerformanceCycleDefaults==='function'&&window.applyPerformanceCycleDefaults(this.value)">
+                                <option value="">请选择</option>
+                                <option value="monthly">月度</option>
+                                <option value="quarterly" selected>季度</option>
+                                <option value="annual">年度</option>
+                            </select>
+                        </div>
+                        <div id="modal-cycle-tip-box" style="grid-column:1/-1;background:#f0f7ff;border:1px solid #c5d9f0;border-radius:6px;padding:10px 12px;margin:4px 0 0 0;">
+                            <div style="font-size:12px;color:#1890ff;margin-bottom:4px;">当前周期说明</div>
+                            <div id="modal-cycle-tip" style="color:#333;font-size:13px;line-height:1.5;">季度：常规绩效，四维均衡；结果可参与年度综合评估。</div>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">报表生成日</label>
+                            <input type="text" id="modal-config-report-day" class="form-input" value="周期结束后次月1日" placeholder="如：次月1日、次月5日">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">备注</label>
+                            <input type="text" id="modal-config-remark" class="form-input" placeholder="选填">
+                        </div>
+                    </div>
+
+                    <div class="section-title" style="margin:20px 0 12px;">评估维度与权重</div>
+                    <p id="modal-dimension-desc" style="color:#333;font-size:13px;margin-bottom:12px;font-weight:500;">当前：<span id="modal-dimension-summary">季度，4 维（供货/质量/价格/服务）</span>，权重合计须为 100%。</p>
+                    <div id="modal-dimensions-wrap" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px 16px;">
+                        <div class="form-item">
+                            <label class="form-label">供货（%）</label>
+                            <input type="number" id="modal-w-supply" class="form-input modal-weight-input" value="25" min="0" max="100" style="width:100%;">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">质量（%）</label>
+                            <input type="number" id="modal-w-quality" class="form-input modal-weight-input" value="30" min="0" max="100" style="width:100%;">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">价格（%）</label>
+                            <input type="number" id="modal-w-price" class="form-input modal-weight-input" value="25" min="0" max="100" style="width:100%;">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">服务（%）</label>
+                            <input type="number" id="modal-w-service" class="form-input modal-weight-input" value="20" min="0" max="100" style="width:100%;">
+                        </div>
+                        <div class="form-item" id="modal-dimension-5th" style="display:none;grid-column:1/-1;background:#fffbe6;border:1px solid #ffe58f;border-radius:6px;padding:10px 12px;">
+                            <label class="form-label" style="color:#d48806;">年度专属 · 合作与创新（%）</label>
+                            <input type="number" id="modal-w-coop" class="form-input modal-weight-input" value="0" min="0" max="100" style="width:80px;">
+                        </div>
+                    </div>
+                    <p style="margin-top:8px;font-size:13px;"><span style="color:#666;">当前合计：</span><strong id="modal-weight-sum">100</strong><span style="color:#666;">%</span> <span id="modal-weight-tip" style="margin-left:8px;font-size:12px;color:#c00;"></span></p>
+
+                    <div class="section-title" style="margin:20px 0 12px;">等级划分规则</div>
+                    <p style="color:#666;font-size:13px;margin-bottom:12px;">各等级最低分（≥）与说明，分数须递减（如 A≥85、B≥70、C≥60、D 固定 0）。</p>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="80">等级</th>
+                                    <th width="120">最低分（≥）</th>
+                                    <th>说明</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>A级</td>
+                                    <td><input type="number" id="modal-grade-a-min" class="form-input" value="85" min="0" max="100" style="width:70px;"></td>
+                                    <td><input type="text" id="modal-grade-a-desc" class="form-input" value="优秀供应商" placeholder="选填" style="width:100%;"></td>
+                                </tr>
+                                <tr>
+                                    <td>B级</td>
+                                    <td><input type="number" id="modal-grade-b-min" class="form-input" value="70" min="0" max="100" style="width:70px;"></td>
+                                    <td><input type="text" id="modal-grade-b-desc" class="form-input" value="合格供应商" placeholder="选填" style="width:100%;"></td>
+                                </tr>
+                                <tr>
+                                    <td>C级</td>
+                                    <td><input type="number" id="modal-grade-c-min" class="form-input" value="60" min="0" max="100" style="width:70px;"></td>
+                                    <td><input type="text" id="modal-grade-c-desc" class="form-input" value="待改进" placeholder="选填" style="width:100%;"></td>
+                                </tr>
+                                <tr>
+                                    <td>D级</td>
+                                    <td><input type="number" id="modal-grade-d-min" class="form-input" value="0" min="0" max="100" style="width:70px;" readonly title="最低档固定为0"></td>
+                                    <td><input type="text" id="modal-grade-d-desc" class="form-input" value="不合格" placeholder="选填" style="width:100%;"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="performance-config-add-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="modal-config-save-btn">保存</button>
+                </div>
+            </div>
+        </div>
+        <script>
+        console.log('绩效配置列表 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+            PageInteractions.toggleSelectAll('input[name="config-id"]');
+        }
+        (function checkOpenEditFromUrl() {
+            var params = new URLSearchParams(window.location.search);
+            if (params.get('openEdit') === '1' && params.get('id')) {
+                var id = params.get('id');
+                setTimeout(function() {
+                    document.dispatchEvent(new CustomEvent('performance-config-open-edit', { detail: { id: id } }));
+                }, 100);
+            }
+        })();
+        (function() {
+            document.addEventListener('click', function(e) {
+                var btn = e.target && e.target.closest ? e.target.closest('.btn-config-toggle') : null;
+                if (!btn) return;
+                var status = btn.getAttribute('data-status');
+                var row = btn.closest('tr');
+                var statusCell = row && row.querySelector('.config-status-cell');
+                if (status === 'enabled') {
+                    if (!confirm('停用后该配置将不再参与自动生成供应商评估报表，确定停用？')) return;
+                    if (statusCell) statusCell.innerHTML = '<span class="status-badge status-default">已停用</span>';
+                    btn.textContent = '启用';
+                    btn.setAttribute('data-status', 'disabled');
+                } else {
+                    if (!confirm('确定启用该配置？启用后将按周期参与自动生成评估报表。')) return;
+                    if (statusCell) statusCell.innerHTML = '<span class="status-badge status-success">已启用</span>';
+                    btn.textContent = '停用';
+                    btn.setAttribute('data-status', 'enabled');
+                }
+            });
+        })();
+        (function () {
+            var PERF_CONFIG_MOCK = {
+                1: { code: 'PC-2025-001', name: '供应商季度绩效评估配置', cycle: 'quarterly', reportDay: '周期结束后次月1日', remark: '用于季度常规绩效评估，四维均衡。', status: 'enabled', supply: 25, quality: 30, price: 25, service: 20, coop: 0, gradeA: 85, gradeB: 70, gradeC: 60, gradeD: 0, descA: '优秀供应商', descB: '合格供应商', descC: '待改进', descD: '不合格' },
+                2: { code: 'PC-2024-002', name: '供应商年度绩效评估配置', cycle: 'annual', reportDay: '次年1月15日', remark: '', status: 'disabled', supply: 20, quality: 25, price: 20, service: 20, coop: 15, gradeA: 85, gradeB: 70, gradeC: 60, gradeD: 0, descA: '优秀供应商', descB: '合格供应商', descC: '待改进', descD: '不合格' },
+                3: { code: 'PC-2025-003', name: '供应商月度绩效评估配置', cycle: 'monthly', reportDay: '次月1日', remark: '', status: 'enabled', supply: 35, quality: 35, price: 15, service: 15, coop: 0, gradeA: 85, gradeB: 70, gradeC: 60, gradeD: 0, descA: '优秀供应商', descB: '合格供应商', descC: '待改进', descD: '不合格' }
+            };
+
+            function setModalAddMode() {
+                var overlay = document.getElementById('performance-config-add-modal');
+                if (!overlay) return;
+                overlay.setAttribute('data-edit-id', '');
+                var titleEl = document.getElementById('performance-config-modal-title');
+                if (titleEl) titleEl.textContent = '新增绩效配置';
+                var codeWrap = document.getElementById('modal-config-code-wrap');
+                if (codeWrap) codeWrap.style.display = 'none';
+                document.getElementById('modal-config-code').value = '';
+                document.getElementById('modal-config-name').value = '';
+                document.getElementById('modal-config-report-day').value = '';
+                document.getElementById('modal-config-remark').value = '';
+                var cycleSelect = document.getElementById('modal-config-cycle');
+                if (cycleSelect) cycleSelect.value = 'quarterly';
+                if (typeof window.applyPerformanceCycleDefaults === 'function') window.applyPerformanceCycleDefaults('quarterly');
+                var ga = document.getElementById('modal-grade-a-min'); if (ga) ga.value = 85;
+                var gb = document.getElementById('modal-grade-b-min'); if (gb) gb.value = 70;
+                var gc = document.getElementById('modal-grade-c-min'); if (gc) gc.value = 60;
+                var gd = document.getElementById('modal-grade-d-min'); if (gd) gd.value = 0;
+                var da = document.getElementById('modal-grade-a-desc'); if (da) da.value = '优秀供应商';
+                var db = document.getElementById('modal-grade-b-desc'); if (db) db.value = '合格供应商';
+                var dc = document.getElementById('modal-grade-c-desc'); if (dc) dc.value = '待改进';
+                var dd = document.getElementById('modal-grade-d-desc'); if (dd) dd.value = '不合格';
+            }
+
+            function openEditModal(configId) {
+                var data = PERF_CONFIG_MOCK[configId];
+                if (!data) return;
+                var overlay = document.getElementById('performance-config-add-modal');
+                if (!overlay) return;
+                overlay.setAttribute('data-edit-id', String(configId));
+                var titleEl = document.getElementById('performance-config-modal-title');
+                if (titleEl) titleEl.textContent = '编辑绩效配置';
+                var codeWrap = document.getElementById('modal-config-code-wrap');
+                if (codeWrap) codeWrap.style.display = 'block';
+                document.getElementById('modal-config-code').value = data.code || '';
+                document.getElementById('modal-config-name').value = data.name || '';
+                document.getElementById('modal-config-report-day').value = data.reportDay || '';
+                document.getElementById('modal-config-remark').value = data.remark || '';
+                var cycleSelect = document.getElementById('modal-config-cycle');
+                if (cycleSelect) cycleSelect.value = data.cycle || 'quarterly';
+                if (typeof window.applyPerformanceCycleDefaults === 'function') window.applyPerformanceCycleDefaults(data.cycle || 'quarterly');
+                document.getElementById('modal-w-supply').value = data.supply;
+                document.getElementById('modal-w-quality').value = data.quality;
+                document.getElementById('modal-w-price').value = data.price;
+                document.getElementById('modal-w-service').value = data.service;
+                var wCoop = document.getElementById('modal-w-coop'); if (wCoop) wCoop.value = data.coop || 0;
+                document.getElementById('modal-grade-a-min').value = data.gradeA; document.getElementById('modal-grade-a-desc').value = data.descA || '';
+                document.getElementById('modal-grade-b-min').value = data.gradeB; document.getElementById('modal-grade-b-desc').value = data.descB || '';
+                document.getElementById('modal-grade-c-min').value = data.gradeC; document.getElementById('modal-grade-c-desc').value = data.descC || '';
+                document.getElementById('modal-grade-d-min').value = data.gradeD; document.getElementById('modal-grade-d-desc').value = data.descD || '';
+                if (typeof window.updateWeightSum === 'function') window.updateWeightSum(); else updateWeightSum();
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function openViewModal(configId) {
+                var data = PERF_CONFIG_MOCK[configId];
+                if (!data) return;
+                var cycleText = data.cycle === 'monthly' ? '月度' : (data.cycle === 'quarterly' ? '季度' : '年度');
+                var statusText = data.status === 'enabled' ? '已启用' : '已停用';
+                var weights = '供货' + data.supply + '% 质量' + data.quality + '% 价格' + data.price + '% 服务' + data.service + '%';
+                if (data.coop > 0) weights += ' 合作' + data.coop + '%';
+                var grades = 'A≥' + data.gradeA + ' ' + (data.descA || '') + '，B≥' + data.gradeB + ' ' + (data.descB || '') + '，C≥' + data.gradeC + ' ' + (data.descC || '') + '，D ' + (data.descD || '');
+                document.getElementById('view-config-code').textContent = data.code || '-';
+                document.getElementById('view-config-name').textContent = data.name || '-';
+                document.getElementById('view-config-cycle').textContent = cycleText;
+                document.getElementById('view-config-status').textContent = statusText;
+                document.getElementById('view-config-weights').textContent = weights;
+                document.getElementById('view-config-grades').textContent = grades;
+                var overlay = document.getElementById('performance-config-view-modal');
+                if (overlay) { overlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
+            }
+
+            document.addEventListener('click', function(e) {
+                var addBtn = e.target && e.target.closest ? e.target.closest('[data-open-modal="performance-config-add-modal"]') : null;
+                if (addBtn) { setModalAddMode(); return; }
+                var viewBtn = e.target && e.target.closest ? e.target.closest('.btn-performance-config-view') : null;
+                if (viewBtn) {
+                    e.preventDefault();
+                    var id = viewBtn.getAttribute('data-config-id');
+                    if (id) openViewModal(id);
+                    return;
+                }
+                var editBtn = e.target && e.target.closest ? e.target.closest('.btn-performance-config-edit') : null;
+                if (editBtn) {
+                    e.preventDefault();
+                    var id = editBtn.getAttribute('data-config-id');
+                    if (id) openEditModal(id);
+                    return;
+                }
+            });
+
+            document.addEventListener('performance-config-open-edit', function(ev) {
+                var id = (ev && ev.detail && ev.detail.id) ? ev.detail.id : null;
+                if (id) openEditModal(String(id));
+            });
+
+            (function checkOpenEditFromStorage() {
+                try {
+                    var openEditId = sessionStorage.getItem('performance-config-open-edit-id');
+                    if (openEditId) {
+                        sessionStorage.removeItem('performance-config-open-edit-id');
+                        setTimeout(function() { openEditModal(openEditId); }, 80);
+                    }
+                } catch (e) {}
+            })();
+
+            var defaults = {
+                monthly: {
+                    supply: 35, quality: 35, price: 15, service: 15, coop: 0,
+                    tip: '月度：侧重交付与质量，用于日常管控；数据可汇总参与季度评估。',
+                    summary: '月度，4 维（供货/质量/价格/服务，侧重供货与质量）',
+                    namePlaceholder: '如：供应商月度绩效评估配置',
+                    reportDay: '次月1日'
+                },
+                quarterly: {
+                    supply: 25, quality: 30, price: 25, service: 20, coop: 0,
+                    tip: '季度：常规绩效，四维均衡；结果可参与年度综合评估。',
+                    summary: '季度，4 维（供货/质量/价格/服务）',
+                    namePlaceholder: '如：供应商季度绩效评估配置',
+                    reportDay: '周期结束后次月1日'
+                },
+                annual: {
+                    supply: 20, quality: 25, price: 20, service: 20, coop: 15,
+                    tip: '年度：综合定级与战略合作，含合作与创新等长期维度。',
+                    summary: '年度，5 维（供货/质量/价格/服务 + 合作与创新）',
+                    namePlaceholder: '如：供应商年度绩效评估配置',
+                    reportDay: '次年1月15日'
+                }
+            };
+
+            function updateWeightSum() {
+                var doc = document;
+                var cycleSelect = doc.getElementById('modal-config-cycle');
+                var cycle = cycleSelect ? cycleSelect.value : '';
+                var wSupply = doc.getElementById('modal-w-supply');
+                var wQuality = doc.getElementById('modal-w-quality');
+                var wPrice = doc.getElementById('modal-w-price');
+                var wService = doc.getElementById('modal-w-service');
+                var wCoop = doc.getElementById('modal-w-coop');
+                var sumEl = doc.getElementById('modal-weight-sum');
+                var tipEl = doc.getElementById('modal-weight-tip');
+                var sum = (wSupply ? parseInt(wSupply.value || 0, 10) : 0) + (wQuality ? parseInt(wQuality.value || 0, 10) : 0) + (wPrice ? parseInt(wPrice.value || 0, 10) : 0) + (wService ? parseInt(wService.value || 0, 10) : 0);
+                if (cycle === 'annual' && wCoop) sum += parseInt(wCoop.value || 0, 10);
+                if (sumEl) sumEl.textContent = sum;
+                if (tipEl) {
+                    if (sum === 100) tipEl.textContent = '';
+                    else if (sum < 100) tipEl.textContent = '（未满100%）';
+                    else tipEl.textContent = '（超过100%）';
+                }
+            }
+
+            function applyPerformanceCycleDefaults(cycle) {
+                var doc = document;
+                var d = defaults[cycle];
+                if (!d) return;
+                var cycleTip = doc.getElementById('modal-cycle-tip');
+                var dimensionSummary = doc.getElementById('modal-dimension-summary');
+                var configName = doc.getElementById('modal-config-name');
+                var reportDay = doc.getElementById('modal-config-report-day');
+                var wSupply = doc.getElementById('modal-w-supply');
+                var wQuality = doc.getElementById('modal-w-quality');
+                var wPrice = doc.getElementById('modal-w-price');
+                var wService = doc.getElementById('modal-w-service');
+                var wCoop = doc.getElementById('modal-w-coop');
+                var dim5th = doc.getElementById('modal-dimension-5th');
+                if (cycleTip) cycleTip.textContent = d.tip;
+                if (dimensionSummary) dimensionSummary.textContent = d.summary;
+                if (configName) configName.placeholder = d.namePlaceholder || '';
+                if (reportDay) reportDay.value = d.reportDay || '';
+                if (wSupply) wSupply.value = d.supply;
+                if (wQuality) wQuality.value = d.quality;
+                if (wPrice) wPrice.value = d.price;
+                if (wService) wService.value = d.service;
+                if (wCoop) wCoop.value = d.coop;
+                if (dim5th) {
+                    if (cycle === 'annual') {
+                        dim5th.style.display = 'block';
+                        dim5th.style.gridColumn = '1 / -1';
+                    } else {
+                        dim5th.style.display = 'none';
+                        if (wCoop) wCoop.value = 0;
+                    }
+                }
+                updateWeightSum();
+            }
+
+            window.applyPerformanceCycleDefaults = applyPerformanceCycleDefaults;
+
+            var cycleSelect = document.getElementById('modal-config-cycle');
+            if (cycleSelect) applyPerformanceCycleDefaults(cycleSelect.value);
+
+            ['modal-w-supply', 'modal-w-quality', 'modal-w-price', 'modal-w-service', 'modal-w-coop'].forEach(function (id) {
+                var el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', updateWeightSum);
+                    el.addEventListener('change', updateWeightSum);
+                }
+            });
+
+            function getDimensionSummary(cycle, hasCoop) {
+                if (cycle === 'annual' && hasCoop) return '<span style="color:#fa8c16;">5 维</span> 含合作与创新，综合定级';
+                if (cycle === 'monthly') return '<span style="color:#52c41a;">4 维</span> 侧重交付与质量';
+                return '<span style="color:#1890ff;">4 维</span> 常规绩效，四维均衡';
+            }
+            function getWeightsText() {
+                var doc = document;
+                var s = (doc.getElementById('modal-w-supply') || {}).value || 0;
+                var q = (doc.getElementById('modal-w-quality') || {}).value || 0;
+                var p = (doc.getElementById('modal-w-price') || {}).value || 0;
+                var sv = (doc.getElementById('modal-w-service') || {}).value || 0;
+                var text = '供货' + s + '% 质量' + q + '% 价格' + p + '% 服务' + sv + '%';
+                var coop = doc.getElementById('modal-w-coop');
+                if (coop && parseInt(coop.value, 10) > 0) text += ' 合作' + coop.value + '%';
+                return text;
+            }
+
+            var saveBtn = document.getElementById('modal-config-save-btn');
+            if (saveBtn) {
+                saveBtn.addEventListener('click', function () {
+                    var name = (document.getElementById('modal-config-name') || {}).value;
+                    if (!name || !name.trim()) { alert('请填写配置名称'); return; }
+                    var sumEl = document.getElementById('modal-weight-sum');
+                    var sum = sumEl ? parseInt(sumEl.textContent, 10) : 0;
+                    if (sum !== 100) { alert('维度权重合计须为 100%，当前为 ' + sum + '%'); return; }
+                    var overlay = document.getElementById('performance-config-add-modal');
+                    var editId = overlay ? overlay.getAttribute('data-edit-id') : '';
+                    if (editId) {
+                        var cycleSelect = document.getElementById('modal-config-cycle');
+                        var cycle = cycleSelect ? cycleSelect.value : '';
+                        var coopVal = parseInt((document.getElementById('modal-w-coop') || {}).value, 10) || 0;
+                        var row = document.querySelector('tr[data-config-id="' + editId + '"]');
+                        if (row) {
+                            var cells = row.querySelectorAll('td');
+                            if (cells.length >= 6) {
+                                cells[1].textContent = (document.getElementById('modal-config-code') || {}).value || '';
+                                cells[2].textContent = name;
+                                cells[3].textContent = cycle === 'monthly' ? '月度' : (cycle === 'quarterly' ? '季度' : '年度');
+                                cells[4].innerHTML = getDimensionSummary(cycle, cycle === 'annual' && coopVal > 0);
+                                cells[5].textContent = getWeightsText();
+                            }
+                        }
+                        var data = PERF_CONFIG_MOCK[editId];
+                        if (data) {
+                            data.code = (document.getElementById('modal-config-code') || {}).value || data.code;
+                            data.name = name;
+                            data.cycle = cycle;
+                            data.reportDay = (document.getElementById('modal-config-report-day') || {}).value || '';
+                            data.remark = (document.getElementById('modal-config-remark') || {}).value || '';
+                            data.supply = parseInt((document.getElementById('modal-w-supply') || {}).value, 10) || 0;
+                            data.quality = parseInt((document.getElementById('modal-w-quality') || {}).value, 10) || 0;
+                            data.price = parseInt((document.getElementById('modal-w-price') || {}).value, 10) || 0;
+                            data.service = parseInt((document.getElementById('modal-w-service') || {}).value, 10) || 0;
+                            data.coop = parseInt((document.getElementById('modal-w-coop') || {}).value, 10) || 0;
+                            data.gradeA = parseInt((document.getElementById('modal-grade-a-min') || {}).value, 10); data.descA = (document.getElementById('modal-grade-a-desc') || {}).value || '';
+                            data.gradeB = parseInt((document.getElementById('modal-grade-b-min') || {}).value, 10); data.descB = (document.getElementById('modal-grade-b-desc') || {}).value || '';
+                            data.gradeC = parseInt((document.getElementById('modal-grade-c-min') || {}).value, 10); data.descC = (document.getElementById('modal-grade-c-desc') || {}).value || '';
+                            data.gradeD = parseInt((document.getElementById('modal-grade-d-min') || {}).value, 10); data.descD = (document.getElementById('modal-grade-d-desc') || {}).value || '';
+                        }
+                    }
+                    if (overlay) { overlay.classList.remove('active'); document.body.style.overflow = ''; }
+                    alert('保存成功');
+                });
+            }
+        })();
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新建采购订单 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">采购执行</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/procurement-order-list.html" class="breadcrumb-item">采购订单</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">新建订单</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">创建采购订单，包括订单基本信息、物料明细、交付要求、质量标准、付款条件等；订单创建后需审批通过方可推送至供应商。</p>
+        </div>
+
+        <form id="order-create-form" name="order-create-form">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">订单基本信息</h3>
+                </div>
+                <div class="card-body">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px 20px;">
+                        <div class="form-item">
+                            <label class="form-label required">订单编号</label>
+                            <input type="text" class="form-input" placeholder="系统自动生成" readonly id="order-code" name="order-code" value="PO-2025-XXX">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">订单类型</label>
+                            <select class="form-select" id="order-type" name="order-type">
+                                <option value="normal" selected>常规订单</option>
+                                <option value="urgent">紧急订单</option>
+                                <option value="supplement">补充协议</option>
+                                <option value="framework">框架合同</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">供应商</label>
+                            <div style="display:flex;gap:8px;">
+                                <input type="text" class="form-input" placeholder="选择供应商" readonly id="supplier-code" name="supplier-code">
+                                <button type="button" class="btn btn-default" onclick="alert('打开供应商选择器')">选择</button>
+                            </div>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">供应商联系人</label>
+                            <input type="text" class="form-input" placeholder="自动填充" readonly id="supplier-contact" name="supplier-contact">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">供应商联系电话</label>
+                            <input type="tel" class="form-input" placeholder="自动填充" readonly id="supplier-phone" name="supplier-phone">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">采购员</label>
+                            <input type="text" class="form-input" placeholder="自动填充或手工录入" id="buyer-name" name="buyer-name" value="张采购">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">下单日期</label>
+                            <input type="date" class="form-input" required id="order-date" name="order-date" value="2025-01-29">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">要求交期</label>
+                            <input type="date" class="form-input" required id="delivery-date" name="delivery-date">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">交货地址</label>
+                            <input type="text" class="form-input" placeholder="默认供应商地址" id="delivery-address" name="delivery-address">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">付款条件</label>
+                            <select class="form-select" id="payment-terms" name="payment-terms">
+                                <option value="prepay">预付款</option>
+                                <option value="net30">货到30天</option>
+                                <option value="net60">货到60天</option>
+                                <option value="net90">货到90天</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">质保期</label>
+                            <input type="text" class="form-input" placeholder="如：12个月" id="warranty" name="warranty">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">物料明细</h3>
+                    <button type="button" class="btn btn-sm btn-primary" id="btn-add-order-item" onclick="addOrderItem()">+ 添加物料</button>
+                </div>
+                <div class="card-body">
+                    <div class="table-wrapper">
+                        <table class="output-table">
+                            <thead>
+                                <tr>
+                                    <th width="50">序号</th>
+                                    <th width="150">物料编码</th>
+                                    <th width="200">物料名称</th>
+                                    <th width="150">规格型号</th>
+                                    <th width="100">数量</th>
+                                    <th width="80">单位</th>
+                                    <th width="100">单价</th>
+                                    <th width="100">金额</th>
+                                    <th width="100">要求交期</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="order-items-tbody">
+                                <tr class="order-item-row">
+                                    <td class="item-seq">1</td>
+                                    <td>
+                                        <div style="display:flex;gap:4px;">
+                                            <input type="text" class="form-input form-input-sm" placeholder="物料编码" style="flex:1;" id="item-code-1" name="item-code-1">
+                                            <button type="button" class="btn btn-sm btn-link" onclick="selectMaterial(1)">选择</button>
+                                        </div>
+                                    </td>
+                                    <td><input type="text" class="form-input form-input-sm" placeholder="自动填充" readonly id="item-name-1" name="item-name-1"></td>
+                                    <td><input type="text" class="form-input form-input-sm" placeholder="自动填充" readonly id="item-spec-1" name="item-spec-1"></td>
+                                    <td><input type="number" class="form-input form-input-sm" placeholder="数量" min="0.0001" step="0.0001" id="item-qty-1" name="item-qty-1" onchange="calculateAmount(1)"></td>
+                                    <td><input type="text" class="form-input form-input-sm" placeholder="单位" readonly id="item-unit-1" name="item-unit-1"></td>
+                                    <td><input type="number" class="form-input form-input-sm" placeholder="单价" min="0" step="0.01" id="item-price-1" name="item-price-1" onchange="calculateAmount(1)"></td>
+                                    <td><input type="number" class="form-input form-input-sm" placeholder="金额" readonly id="item-amount-1" name="item-amount-1"></td>
+                                    <td><input type="date" class="form-input form-input-sm" id="item-delivery-1" name="item-delivery-1"></td>
+                                    <td><button type="button" class="btn btn-sm btn-link btn-remove-item" onclick="removeOrderItem(this)">删除</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="display:flex;justify-content:flex-end;margin-top:12px;padding:12px;background:#f5f5f5;border-radius:4px;">
+                        <div style="font-size:14px;font-weight:600;">订单总金额：<span id="order-total-amount" style="color:#1890ff;font-size:16px;">¥0.00</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">交付要求与质量标准</h3>
+                </div>
+                <div class="card-body">
+                    <div style="display:grid;grid-template-columns:1fr;gap:16px;">
+                        <div class="form-item">
+                            <label class="form-label">交付要求</label>
+                            <textarea class="form-textarea" rows="3" placeholder="详细说明交付要求，如：包装要求、运输方式、到货时间等" id="delivery-requirements" name="delivery-requirements"></textarea>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">质量标准</label>
+                            <textarea class="form-textarea" rows="3" placeholder="质量标准要求，如：检验标准、合格率要求等" id="quality-standards" name="quality-standards"></textarea>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">其他要求</label>
+                            <textarea class="form-textarea" rows="2" placeholder="其他特殊要求" id="other-requirements" name="other-requirements"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">备注</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-item">
+                        <label class="form-label">备注</label>
+                        <textarea class="form-textarea" rows="3" placeholder="其他补充说明" id="order-remark" name="order-remark"></textarea>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        console.log('新建采购订单 页面已加载');
+        var itemIndex = 1;
+
+        // 订单来源固定为"人工创建"
+        var ORDER_SOURCE_VALUE = 'manual';
+        var ORDER_SOURCE_TEXT = '人工创建';
+
+        function isInOrderModal() {
+            var overlay = document.getElementById('order-create-modal');
+            var form = document.getElementById('order-create-form');
+            return !!(overlay && form && overlay.contains(form));
+        }
+
+        window.syncItemActionsBySource = function () {
+            var sourceSelect = document.getElementById('order-source');
+            var val = sourceSelect ? (sourceSelect.value || 'plan') : 'plan';
+            var addBtn = document.getElementById('btn-add-order-item');
+            var allowEditItems = (val === 'manual');
+            if (addBtn) addBtn.style.display = allowEditItems ? '' : 'none';
+            document.querySelectorAll('.btn-remove-item').forEach(function (btn) {
+                btn.style.display = allowEditItems ? '' : 'none';
+            });
+            // 数量在“需求申请/采购计划/询价单”来源下也不允许改动
+            document.querySelectorAll('input[id^="item-qty-"]').forEach(function (input) {
+                input.readOnly = !allowEditItems;
+                if (!allowEditItems) {
+                    input.classList.add('input-readonly-like');
+                } else {
+                    input.classList.remove('input-readonly-like');
+                }
+            });
+        };
+
+        window.onOrderSourceChange = function() {
+            var sourceSelect = document.getElementById('order-source');
+            if (!sourceSelect) return;
+            var val = sourceSelect.value || 'plan';
+            var wrap = document.getElementById('source-doc-wrap');
+            var labelEl = document.getElementById('source-doc-label');
+            var inputEl = document.getElementById('source-doc-code');
+            if (!wrap || !labelEl || !inputEl) return;
+            if (val === 'manual') {
+                wrap.style.display = 'none';
+                inputEl.value = '';
+            } else {
+                wrap.style.display = '';
+                var baseLabel = ORDER_SOURCE_LABEL_MAP[val] || '来源单据';
+                labelEl.textContent = baseLabel + '编号';
+                inputEl.placeholder = '选择' + baseLabel;
+            }
+
+            // 根据来源控制是否允许自由维护物料明细
+            window.syncItemActionsBySource();
+        }
+
+        window.openSourceSelector = function() {
+            var sourceSelect = document.getElementById('order-source');
+            var val = sourceSelect ? (sourceSelect.value || 'plan') : 'plan';
+            var baseLabel = ORDER_SOURCE_LABEL_MAP[val] || '来源单据';
+            alert('打开' + baseLabel + '选择器，选择后自动带出供应商与物料明细（原型中为内置样例数据演示）');
+
+            // 模拟选择了一张来源单据
+            var inputEl = document.getElementById('source-doc-code');
+            if (inputEl) {
+                var prefix = (baseLabel || '来源单据').substr(0, 2).toUpperCase();
+                inputEl.value = prefix + '-2025-001';
+            }
+
+            // 根据不同来源，模拟带出不同的供应商与明细
+            var supplierInput = document.getElementById('supplier-code');
+            var contactInput = document.getElementById('supplier-contact');
+            var phoneInput = document.getElementById('supplier-phone');
+            var buyerInput = document.getElementById('buyer-name');
+            var deliveryDateInput = document.getElementById('delivery-date');
+
+            var demoSupplier = '';
+            var demoContact = '';
+            var demoPhone = '';
+            var demoItems = [];
+
+            if (val === 'demand') {
+                demoSupplier = '深圳市电子科技有限公司';
+                demoContact = '李需求';
+                demoPhone = '13800000001';
+                demoItems = [
+                    { code: 'MAT-1001', name: '控制器', spec: '型号 A1', qty: 10, unit: '台', price: 0, delivery: '2025-02-20' },
+                    { code: 'MAT-1002', name: '传感器', spec: 'φ10', qty: 50, unit: '只', price: 0, delivery: '2025-02-25' }
+                ];
+            } else if (val === 'plan') {
+                demoSupplier = '上海精密机械制造有限公司';
+                demoContact = '王计划';
+                demoPhone = '13800000002';
+                demoItems = [
+                    { code: 'MAT-2001', name: '机加工件', spec: 'Φ20×50', qty: 100, unit: '件', price: 0, delivery: '2025-03-01' },
+                    { code: 'MAT-2002', name: '轴承', spec: '6205', qty: 40, unit: '套', price: 0, delivery: '2025-03-05' }
+                ];
+            } else if (val === 'inquiry') {
+                // 来源为询价单：自动带出“已中标”的供应商及其报价明细（示例）
+                demoSupplier = '广州华南电子有限公司（中标）';
+                demoContact = '赵询价';
+                demoPhone = '13800000003';
+                demoItems = [
+                    { code: 'MAT-3001', name: '电源模块', spec: '24V/10A', qty: 20, unit: '个', price: 380.00, delivery: '2025-02-28' },
+                    { code: 'MAT-3002', name: '接线端子', spec: '10 位', qty: 200, unit: '条', price: 8.50, delivery: '2025-03-02' }
+                ];
+            } else {
+                // 人工创建不强制带出数据
+                demoSupplier = '';
+                demoContact = '';
+                demoPhone = '';
+                demoItems = [];
+            }
+
+            if (supplierInput) supplierInput.value = demoSupplier;
+            if (contactInput) contactInput.value = demoContact;
+            if (phoneInput) phoneInput.value = demoPhone;
+            if (buyerInput) {
+                // 不同来源给一个示例采购员，实际可由登录人或业务规则带出
+                if (val === 'demand') buyerInput.value = '张采购';
+                else if (val === 'plan') buyerInput.value = '李采购';
+                else if (val === 'inquiry') buyerInput.value = '王采购';
+            }
+            if (deliveryDateInput && demoItems.length) {
+                // 要求交期默认取明细中最晚的需求日期
+                var maxDate = demoItems.reduce(function (acc, it) {
+                    return acc > it.delivery ? acc : it.delivery;
+                }, demoItems[0].delivery);
+                deliveryDateInput.value = maxDate;
+            }
+
+            // 将来源单据的明细自动带入“物料明细”表格
+            var tbody = document.getElementById('order-items-tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            itemIndex = 0;
+
+            if (!demoItems.length) {
+                // 没有样例明细时，保留一行空行供手工添加
+                addOrderItem();
+                return;
+            }
+
+            demoItems.forEach(function (item) {
+                itemIndex++;
+                var newRow = document.createElement('tr');
+                newRow.className = 'order-item-row';
+                newRow.innerHTML =
+                    '<td class="item-seq">' + itemIndex + '</td>' +
+                    '<td><div style="display:flex;gap:4px;">' +
+                    '<input type="text" class="form-input form-input-sm" placeholder="物料编码" style="flex:1;" ' +
+                    'id="item-code-' + itemIndex + '" name="item-code-' + itemIndex + '" value="' + item.code + '">' +
+                    '<button type="button" class="btn btn-sm btn-link" onclick="selectMaterial(' + itemIndex + ')">选择</button>' +
+                    '</div></td>' +
+                    '<td><input type="text" class="form-input form-input-sm" placeholder="自动填充" ' +
+                    'id="item-name-' + itemIndex + '" name="item-name-' + itemIndex + '" value="' + item.name + '"></td>' +
+                    '<td><input type="text" class="form-input form-input-sm" placeholder="自动填充" ' +
+                    'id="item-spec-' + itemIndex + '" name="item-spec-' + itemIndex + '" value="' + item.spec + '"></td>' +
+                    '<td><input type="number" class="form-input form-input-sm" placeholder="数量" min="0.0001" step="0.0001" ' +
+                    'id="item-qty-' + itemIndex + '" name="item-qty-' + itemIndex + '" value="' + item.qty + '" onchange="calculateAmount(' + itemIndex + ')"></td>' +
+                    '<td><input type="text" class="form-input form-input-sm" placeholder="单位" ' +
+                    'id="item-unit-' + itemIndex + '" name="item-unit-' + itemIndex + '" value="' + item.unit + '"></td>' +
+                    '<td><input type="number" class="form-input form-input-sm" placeholder="单价" min="0" step="0.01" ' +
+                    'id="item-price-' + itemIndex + '" name="item-price-' + itemIndex + '" value="' + (item.price || 0) + '" onchange="calculateAmount(' + itemIndex + ')"></td>' +
+                    '<td><input type="number" class="form-input form-input-sm" placeholder="金额" readonly ' +
+                    'id="item-amount-' + itemIndex + '" name="item-amount-' + itemIndex + '"></td>' +
+                    '<td><input type="date" class="form-input form-input-sm" ' +
+                    'id="item-delivery-' + itemIndex + '" name="item-delivery-' + itemIndex + '" value="' + (item.delivery || '') + '"></td>' +
+                    '<td><button type="button" class="btn btn-sm btn-link btn-remove-item" onclick="removeOrderItem(this)">删除</button></td>';
+                tbody.appendChild(newRow);
+                calculateAmount(itemIndex);
+            });
+            refreshSeq();
+            // 重新根据来源控制明细编辑按钮显示
+            window.syncItemActionsBySource();
+        }
+
+        window.handleCancel = function() {
+            if (isInOrderModal() && typeof PageInteractions !== 'undefined') {
+                PageInteractions.closeModal('order-create-modal');
+            } else if (typeof PageInteractions !== 'undefined') {
+                PageInteractions.navigateToList('pages/procurement-order-list.html');
+            } else {
+                try { window.history.back(); } catch (e) {}
+            }
+        }
+
+        window.addOrderItem = function() {
+            itemIndex++;
+            var tbody = document.getElementById('order-items-tbody');
+            var newRow = document.createElement('tr');
+            newRow.className = 'order-item-row';
+            newRow.innerHTML = '<td class="item-seq">' + itemIndex + '</td><td><div style="display:flex;gap:4px;"><input type="text" class="form-input form-input-sm" placeholder="物料编码" style="flex:1;" id="item-code-' + itemIndex + '" name="item-code-' + itemIndex + '"><button type="button" class="btn btn-sm btn-link" onclick="selectMaterial(' + itemIndex + ')">选择</button></div></td><td><input type="text" class="form-input form-input-sm" placeholder="自动填充" readonly id="item-name-' + itemIndex + '" name="item-name-' + itemIndex + '"></td><td><input type="text" class="form-input form-input-sm" placeholder="自动填充" readonly id="item-spec-' + itemIndex + '" name="item-spec-' + itemIndex + '"></td><td><input type="number" class="form-input form-input-sm" placeholder="数量" min="0.0001" step="0.0001" id="item-qty-' + itemIndex + '" name="item-qty-' + itemIndex + '" onchange="calculateAmount(' + itemIndex + ')"></td><td><input type="text" class="form-input form-input-sm" placeholder="单位" readonly id="item-unit-' + itemIndex + '" name="item-unit-' + itemIndex + '"></td><td><input type="number" class="form-input form-input-sm" placeholder="单价" min="0" step="0.01" id="item-price-' + itemIndex + '" name="item-price-' + itemIndex + '" onchange="calculateAmount(' + itemIndex + ')"></td><td><input type="number" class="form-input form-input-sm" placeholder="金额" readonly id="item-amount-' + itemIndex + '" name="item-amount-' + itemIndex + '"></td><td><input type="date" class="form-input form-input-sm" id="item-delivery-' + itemIndex + '" name="item-delivery-' + itemIndex + '"></td><td><button type="button" class="btn btn-sm btn-link btn-remove-item" onclick="removeOrderItem(this)">删除</button></td>';
+            tbody.appendChild(newRow);
+            refreshSeq();
+            // 新增行后，同样依据当前来源决定是否展示“删除”按钮
+            window.syncItemActionsBySource();
+        }
+
+        window.removeOrderItem = function(btn) {
+            var tbody = document.getElementById('order-items-tbody');
+            if (tbody.querySelectorAll('.order-item-row').length <= 1) {
+                alert('至少保留一行物料明细');
+                return;
+            }
+            btn.closest('tr').remove();
+            refreshSeq();
+            calculateTotal();
+        }
+
+        window.refreshSeq = function() {
+            var rows = document.querySelectorAll('.order-item-row');
+            rows.forEach(function(row, index) {
+                row.querySelector('.item-seq').textContent = index + 1;
+            });
+        }
+
+        window.selectMaterial = function(index) {
+            alert('打开物料选择器，选择物料后自动填充物料名称、规格、单位等信息');
+            // 模拟选择物料
+            document.getElementById('item-name-' + index).value = '示例物料名称';
+            document.getElementById('item-spec-' + index).value = '规格型号示例';
+            document.getElementById('item-unit-' + index).value = '件';
+        }
+
+        window.calculateAmount = function(index) {
+            var qty = parseFloat(document.getElementById('item-qty-' + index).value) || 0;
+            var price = parseFloat(document.getElementById('item-price-' + index).value) || 0;
+            var amount = qty * price;
+            document.getElementById('item-amount-' + index).value = amount.toFixed(2);
+            calculateTotal();
+        }
+
+        window.calculateTotal = function() {
+            var total = 0;
+            document.querySelectorAll('[id^="item-amount-"]').forEach(function(input) {
+                total += parseFloat(input.value) || 0;
+            });
+            document.getElementById('order-total-amount').textContent = '¥' + total.toFixed(2);
+        }
+
+        window.saveDraft = function() {
+            // 基本验证（草稿可以保存不完整数据）
+            var supplier = document.getElementById('supplier-code').value;
+            var hasItems = false;
+            document.querySelectorAll('[id^="item-code-"]').forEach(function(input) {
+                if (input.value) hasItems = true;
+            });
+
+            // 计算行数（有物料编码的行数）
+            var materialCount = 0;
+            document.querySelectorAll('.order-item-row').forEach(function(row) {
+                var code = row.querySelector('[id^="item-code-"]');
+                if (code && code.value) materialCount++;
+            });
+
+            // 构造写回列表页的摘要数据（状态为"草稿"）
+            var totalText = document.getElementById('order-total-amount').textContent || '¥0.00';
+            var orderNo = document.getElementById('order-code').value || 'PO-2025-XXX';
+            var supplierName = document.getElementById('supplier-code').value || '';
+            var orderDate = document.getElementById('order-date').value || '';
+            var deliveryDate = document.getElementById('delivery-date').value || '-';
+            var buyerName = document.getElementById('buyer-name') ? document.getElementById('buyer-name').value : '';
+            // 订单来源固定为"人工创建"
+            var sourceText = ORDER_SOURCE_TEXT;
+
+            var summaryData = {
+                orderNo: orderNo,
+                supplier: supplierName,
+                orderAmount: totalText.replace(/^¥/, '') || '0.00',
+                statusText: '草稿',
+                orderDate: orderDate,
+                deliveryDate: deliveryDate,
+                materialCount: materialCount ? (materialCount + '种') : '0种',
+                receiptProgress: '-',
+                creator: buyerName || '系统用户',
+                buyer: buyerName || '系统用户',
+                sourceText: sourceText
+            };
+            try {
+                sessionStorage.setItem('newOrderFromDemand', JSON.stringify(summaryData));
+            } catch (err) {}
+
+            alert('✅ 订单已保存为草稿');
+            if (isInOrderModal() && typeof PageInteractions !== 'undefined') {
+                PageInteractions.closeModal('order-create-modal');
+            } else if (typeof PageInteractions !== 'undefined') {
+                PageInteractions.navigateToList('pages/procurement-order-list.html');
+            }
+        }
+
+        document.getElementById('order-create-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // 表单验证
+            var supplier = document.getElementById('supplier-code').value;
+            var deliveryDate = document.getElementById('delivery-date').value;
+            if (!supplier) {
+                alert('请选择供应商');
+                return;
+            }
+            if (!deliveryDate) {
+                alert('请填写要求交期');
+                return;
+            }
+            var hasItems = false;
+            document.querySelectorAll('[id^="item-code-"]').forEach(function(input) {
+                if (input.value) hasItems = true;
+            });
+            if (!hasItems) {
+                alert('请至少添加一行物料明细');
+                return;
+            }
+
+            // 计算行数（有物料编码的行数）
+            var materialCount = 0;
+            document.querySelectorAll('.order-item-row').forEach(function(row) {
+                var code = row.querySelector('[id^="item-code-"]');
+                if (code && code.value) materialCount++;
+            });
+
+            // 构造写回列表页的摘要数据（复用 newOrderFromDemand 机制）
+            var totalText = document.getElementById('order-total-amount').textContent || '¥0.00';
+            var orderNo = document.getElementById('order-code').value || '';
+            var supplierName = document.getElementById('supplier-code').value || '';
+            var orderDate = document.getElementById('order-date').value || '';
+            var deliveryDate = document.getElementById('delivery-date').value || '-';
+            var buyerName = document.getElementById('buyer-name') ? document.getElementById('buyer-name').value : '';
+            // 订单来源固定为"人工创建"
+            var sourceText = ORDER_SOURCE_TEXT;
+            var summaryData = {
+                orderNo: orderNo,
+                supplier: supplierName,
+                orderAmount: totalText.replace(/^¥/, '') || '0.00',
+                statusText: '审批中',
+                orderDate: orderDate,
+                deliveryDate: deliveryDate,
+                materialCount: materialCount ? (materialCount + '种') : '0种',
+                receiptProgress: '-',
+                creator: buyerName || '系统用户',
+                buyer: buyerName || '系统用户',
+                sourceText: sourceText
+            };
+            try {
+                sessionStorage.setItem('newOrderFromDemand', JSON.stringify(summaryData));
+            } catch (err) {}
+
+            alert('✅ 订单已提交审批');
+
+            if (isInOrderModal() && typeof PageInteractions !== 'undefined') {
+                PageInteractions.closeModal('order-create-modal');
+            } else if (typeof PageInteractions !== 'undefined') {
+                PageInteractions.navigateToList('pages/procurement-order-list.html');
+            }
+        });
+
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+
+        // 初始化来源联动显示 & 绑定弹窗底部“提交审批”按钮
+        try {
+            onOrderSourceChange();
+            // 初始进来时，根据默认来源控制一次物料编辑按钮的显示
+            window.syncItemActionsBySource();
+            var srcSel = document.getElementById('order-source');
+            if (srcSel) {
+                srcSel.addEventListener('change', onOrderSourceChange);
+            }
+
+            // 如果当前是作为弹窗内容使用，则让弹窗底部按钮触发表单提交或保存
+            if (isInOrderModal()) {
+                // 绑定"保存"按钮（保存为草稿）
+                var modalSave = document.getElementById('order-create-save-btn');
+                if (modalSave) {
+                    modalSave.addEventListener('click', function() {
+                        if (typeof window.saveDraft === 'function') {
+                            window.saveDraft();
+                        }
+                    });
+                }
+                // 绑定"提交审批"按钮
+                var modalSubmit = document.getElementById('order-create-submit-btn');
+                if (modalSubmit) {
+                    modalSubmit.addEventListener('click', function() {
+                        var form = document.getElementById('order-create-form');
+                        if (form) {
+                            form.dispatchEvent(new Event('submit', { cancelable: true }));
+                        }
+                    });
+                }
+            }
+        } catch (e) {}
+    </script>
+</body>
+</html>

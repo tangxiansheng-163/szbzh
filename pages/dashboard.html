@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工作台 - 设计协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <span class="breadcrumb-item active">工作台</span>
+        </div>
+        <div class="page-header">
+            <p class="page-description">BOM 全生命周期管理，快捷入口与待办概览</p>
+        </div>
+
+        <div class="dashboard-stats">
+            <a href="pages/tech-task-list.html" class="stat-card">
+                <div class="stat-icon blue">📋</div>
+                <div class="stat-content">
+                    <div class="stat-label">技术任务</div>
+                    <div class="stat-value">12</div>
+                </div>
+            </a>
+            <a href="pages/design-task-list.html" class="stat-card">
+                <div class="stat-icon green">✏️</div>
+                <div class="stat-content">
+                    <div class="stat-label">设计任务</div>
+                    <div class="stat-value">28</div>
+                </div>
+            </a>
+            <a href="pages/design-task-execute.html" class="stat-card">
+                <div class="stat-icon blue">▶️</div>
+                <div class="stat-content">
+                    <div class="stat-label">执行工作台</div>
+                    <div class="stat-value">3</div>
+                </div>
+            </a>
+            <a href="pages/design-task-review.html" class="stat-card">
+                <div class="stat-icon orange">✓</div>
+                <div class="stat-content">
+                    <div class="stat-label">待我审核</div>
+                    <div class="stat-value">2</div>
+                </div>
+            </a>
+            <a href="pages/change-request-list.html" class="stat-card">
+                <div class="stat-icon orange">📝</div>
+                <div class="stat-content">
+                    <div class="stat-label">待审批变更</div>
+                    <div class="stat-value">5</div>
+                </div>
+            </a>
+            <a href="pages/ebom-list.html" class="stat-card">
+                <div class="stat-icon purple">📊</div>
+                <div class="stat-content">
+                    <div class="stat-label">BOM版本</div>
+                    <div class="stat-value">156</div>
+                </div>
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">我的待办</h3>
+                <a href="pages/todo-list.html" class="btn btn-sm btn-default">查看全部</a>
+            </div>
+            <div class="card-body dashboard-todo">
+                <a href="pages/tech-task-detail.html?id=1" class="todo-item">
+                    <div class="todo-main">
+                        <span class="todo-title">技术任务 TT-2025-001 需要拆解</span>
+                        <span class="todo-desc">新产品研发</span>
+                    </div>
+                    <span class="status-badge status-warning">待处理</span>
+                </a>
+                <a href="pages/change-review-detail.html?id=1" class="todo-item">
+                    <div class="todo-main">
+                        <span class="todo-title">EBOM变更会审待评审</span>
+                        <span class="todo-desc">PROD-001 智能控制器</span>
+                    </div>
+                    <span class="status-badge status-processing">评审中</span>
+                </a>
+                <a href="pages/mbom-review.html" class="todo-item">
+                    <div class="todo-main">
+                        <span class="todo-title">MBOM评审需要参与</span>
+                        <span class="todo-desc">PROD-002 传感器模块</span>
+                    </div>
+                    <span class="status-badge status-warning">待参与</span>
+                </a>
+                <a href="pages/design-task-review.html" class="todo-item">
+                    <div class="todo-main">
+                        <span class="todo-title">设计任务待我审核</span>
+                        <span class="todo-desc">传感器模块结构设计、电源模块电气设计</span>
+                    </div>
+                    <span class="status-badge status-warning">待审核</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

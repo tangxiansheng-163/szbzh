@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>退货单详情 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">采购执行</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/procurement-return-list.html" class="breadcrumb-item">退货单</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">详情</span>
+        </div>
+
+        <div class="page-header">
+            <h2 class="page-title">退货单详情</h2>
+            <p class="page-description">查看退货单详细信息，包括退货物料、退货原因、退货进度等。</p>
+        </div>
+
+        <!-- 基本信息 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">基本信息</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+                    <div class="form-item">
+                        <label class="form-label">退货单号</label>
+                        <div class="form-value">RET-2025-001</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">关联采购订单</label>
+                        <div class="form-value">
+                            <a href="pages/procurement-order-detail.html?id=1" style="color:#1890ff;">PO-2025-001</a>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">关联处理单</label>
+                        <div class="form-value">
+                            <a href="pages/procurement-unqualified-handle-detail.html?id=1" style="color:#1890ff;">UH-2025-001</a>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">供应商</label>
+                        <div class="form-value">深圳市电子科技有限公司</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">退货状态</label>
+                        <div class="form-value">
+                            <span class="status-badge status-warning">待审批</span>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">来源</label>
+                        <div class="form-value" id="return-detail-source">
+                            <span class="status-badge" style="background:#e6f7ff;color:#1890ff;">会审创建</span>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">申请日期</label>
+                        <div class="form-value">2025-01-22</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">申请人</label>
+                        <div class="form-value">采购-张采购</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">审批日期</label>
+                        <div class="form-value">-</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">同步状态</label>
+                        <div class="form-value">
+                            <span class="status-badge status-success">已同步</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 退货物料明细 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">退货物料明细</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table class="list-table-nowrap">
+                        <thead>
+                            <tr>
+                                <th width="80">序号</th>
+                                <th width="120">物料编码</th>
+                                <th width="200">物料名称</th>
+                                <th width="100">规格型号</th>
+                                <th width="80">单位</th>
+                                <th width="100">退货数量</th>
+                                <th width="120">退货单价</th>
+                                <th width="120">退货金额</th>
+                                <th width="150">不合格项</th>
+                                <th>退货原因</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>MAT-001</td>
+                                <td>电子元件A</td>
+                                <td>规格A</td>
+                                <td>个</td>
+                                <td>50</td>
+                                <td>¥2.50</td>
+                                <td>¥125.00</td>
+                                <td>尺寸偏差、外观缺陷</td>
+                                <td>质量问题，不符合验收标准</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 退货进度 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">退货进度</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                    <div class="form-item">
+                        <label class="form-label">退货日期</label>
+                        <div class="form-value">-</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">供应商确认日期</label>
+                        <div class="form-value">-</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">退款日期</label>
+                        <div class="form-value">-</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">退款金额</label>
+                        <div class="form-value">¥125.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 备注信息 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">备注信息</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-item">
+                    <label class="form-label">备注</label>
+                    <div class="form-value" style="min-height:60px;padding:12px;background:#fafafa;border-radius:4px;">会审确定：尺寸偏差和外观缺陷不符合验收标准，决定退货处理。</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 操作按钮：仅手工创建时显示审批 -->
+        <div class="action-bar" style="margin-top:20px;">
+            <div class="action-left">
+                <button class="btn btn-primary btn-approve-return" data-id="1" id="return-detail-approve-btn" style="display:none;">审批</button>
+                <button class="btn btn-default" onclick="history.back();">返回</button>
+            </div>
+        </div>
+
+        <script>
+        console.log('退货单详情 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+        (function() {
+            var sourceEl = document.getElementById('return-detail-source');
+            var approveBtn = document.getElementById('return-detail-approve-btn');
+            var isManual = sourceEl && sourceEl.textContent.indexOf('手工创建') !== -1;
+            if (approveBtn && isManual) approveBtn.style.display = '';
+            document.querySelectorAll('.btn-approve-return').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    if (confirm('确定对该退货单执行审批？')) alert('审批已通过，已自动推送至对应供应商的供应链协同应用（退货单）。');
+                });
+            });
+        })();
+        </script>
+    </div>
+</body>
+</html>

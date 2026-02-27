@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>采购统计 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <style>
+        /* 采购统计 - 优化后的样式 */
+        .proc-stat-wrap { max-width: 100%; margin: 0; }
+        
+        /* 筛选区：紧凑设计 */
+        .proc-stat-filter { background: var(--bg-card); border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+        .proc-stat-filter-inner { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 12px; }
+        .proc-stat-filter-item { display: flex; flex-direction: column; gap: 4px; min-width: 120px; }
+        .proc-stat-filter-item label { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
+        .proc-stat-filter-item .form-select, .proc-stat-filter-item .form-input { width: 100%; padding: 5px 8px; font-size: 12px; }
+        .proc-stat-filter-actions { display: flex; align-items: flex-end; gap: 6px; margin-left: auto; }
+        .proc-stat-filter-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color); flex-wrap: wrap; gap: 6px; }
+        .proc-stat-filter-hint { font-size: 11px; color: var(--text-tertiary); }
+        .proc-stat-filter-export { display: flex; gap: 6px; }
+        
+        /* KPI卡片：紧凑布局，6个一行 */
+        .proc-stat-kpi { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 12px; }
+        .proc-stat-kpi-card { background: var(--bg-card); border-radius: var(--radius-sm); padding: 10px 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+        .proc-stat-kpi-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+        .proc-stat-kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--border-color); }
+        .proc-stat-kpi-card.primary::before { background: #1890ff; }
+        .proc-stat-kpi-card.success::before { background: #52c41a; }
+        .proc-stat-kpi-card.warning::before { background: #faad14; }
+        .proc-stat-kpi-card.danger::before { background: #ff4d4f; }
+        .proc-stat-kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+        .proc-stat-kpi-label { font-size: 11px; color: var(--text-secondary); font-weight: 500; line-height: 1.3; }
+        .proc-stat-kpi-icon { font-size: 14px; opacity: 0.3; }
+        .proc-stat-kpi-value { font-size: 18px; font-weight: 700; color: var(--text-primary); line-height: 1.2; font-variant-numeric: tabular-nums; margin-bottom: 4px; }
+        .proc-stat-kpi-card.primary .proc-stat-kpi-value { color: #1890ff; }
+        .proc-stat-kpi-card.success .proc-stat-kpi-value { color: #52c41a; }
+        .proc-stat-kpi-card.warning .proc-stat-kpi-value { color: #faad14; }
+        .proc-stat-kpi-card.danger .proc-stat-kpi-value { color: #ff4d4f; }
+        .proc-stat-kpi-desc { font-size: 10px; color: var(--text-tertiary); line-height: 1.3; }
+        .proc-stat-kpi-trend { font-size: 10px; margin-top: 2px; display: flex; align-items: center; gap: 2px; }
+        .proc-stat-kpi-trend.up { color: #52c41a; }
+        .proc-stat-kpi-trend.down { color: #ff4d4f; }
+        .proc-stat-kpi-trend.flat { color: var(--text-tertiary); }
+        
+        /* 区块样式 */
+        .proc-stat-section { margin-bottom: 12px; }
+        .proc-stat-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 6px; }
+        .proc-stat-section-title { font-size: 13px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 6px; }
+        .proc-stat-section-title::before { content: ''; width: 2px; height: 12px; background: #1890ff; border-radius: 1px; }
+        
+        /* 图表区：紧凑布局 */
+        .proc-stat-charts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+        .proc-stat-chart-card { background: var(--bg-card); border-radius: var(--radius-sm); padding: 10px 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
+        .proc-stat-chart-card.full { grid-column: 1 / -1; }
+        .proc-stat-chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .proc-stat-chart-title { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+        .proc-stat-chart-actions { display: flex; gap: 4px; }
+        .proc-stat-chart-placeholder { min-height: 160px; background: linear-gradient(135deg, var(--bg-fill) 0%, rgba(24,144,255,0.05) 100%); border-radius: var(--radius-sm); border: 1px dashed var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-tertiary); font-size: 11px; text-align: center; padding: 16px; }
+        .proc-stat-chart-placeholder.compact { min-height: 140px; padding: 12px; }
+        .proc-stat-chart-placeholder.wide { min-height: 200px; }
+        .proc-stat-chart-placeholder-icon { font-size: 24px; margin-bottom: 6px; opacity: 0.5; }
+        
+        /* 表格区：紧凑设计 */
+        .proc-stat-table-tabs { display: flex; gap: 2px; flex-wrap: wrap; background: var(--bg-fill); padding: 2px; border-radius: var(--radius-sm); }
+        .proc-stat-table-tab { padding: 6px 12px; font-size: 12px; color: var(--text-secondary); background: transparent; border: none; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s; font-weight: 500; }
+        .proc-stat-table-tab:hover { color: var(--text-primary); background: var(--bg-card); }
+        .proc-stat-table-tab.active { color: #1890ff; font-weight: 600; background: var(--bg-card); box-shadow: var(--shadow-sm); }
+        .proc-stat-table-panes { position: relative; }
+        .proc-stat-table-pane { display: none; animation: fadeIn 0.3s; }
+        .proc-stat-table-pane.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .proc-stat-table-section .card { margin-bottom: 0; }
+        .proc-stat-table-section .table-wrapper { padding: 0; }
+        .proc-stat-table-section table { font-size: 12px; line-height: 1.4; width: 100%; }
+        .proc-stat-table-section th { background: var(--bg-fill); font-weight: 600; color: var(--text-primary); }
+        .proc-stat-table-section th, .proc-stat-table-section td { padding: 8px 10px; text-align: left; }
+        .proc-stat-table-section tbody tr { transition: background 0.2s; }
+        .proc-stat-table-section tbody tr:hover { background: rgba(24,144,255,0.05); }
+        .proc-stat-table-section tbody tr:nth-child(even) { background: rgba(0,0,0,0.02); }
+        .proc-stat-table-section td { font-variant-numeric: tabular-nums; }
+        .proc-stat-sum-row { background: var(--bg-fill) !important; font-weight: 600; }
+        .proc-stat-sum-row td { border-top: 1px solid var(--border-color); padding-top: 8px; }
+        .proc-stat-table-section a { color: #1890ff; text-decoration: none; font-weight: 500; }
+        .proc-stat-table-section a:hover { text-decoration: underline; }
+        
+        /* 响应式 */
+        @media (max-width: 1600px) {
+            .proc-stat-kpi { grid-template-columns: repeat(3, 1fr); }
+            .proc-stat-charts { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 1200px) {
+            .proc-stat-kpi { grid-template-columns: repeat(2, 1fr); }
+            .proc-stat-charts { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .proc-stat-kpi { grid-template-columns: 1fr; }
+            .proc-stat-filter-actions { margin-left: 0; width: 100%; }
+        }
+        </style>
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">报表统计</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">采购统计</span>
+        </div>
+
+        <div class="page-header">
+            <h1 class="page-title">采购统计</h1>
+            <p class="page-description">全面分析采购规模、结构、效率与质量，支持多维度统计与可视化展示，助力采购决策优化。</p>
+        </div>
+
+        <div class="proc-stat-wrap">
+            <!-- 筛选区 -->
+            <div class="proc-stat-filter">
+                <div class="proc-stat-filter-inner">
+                    <div class="proc-stat-filter-item">
+                        <label>统计时段</label>
+                        <select class="form-select">
+                            <option value="month">月度</option>
+                            <option value="quarter">季度</option>
+                            <option value="year">年度</option>
+                            <option value="custom">自定义</option>
+                        </select>
+                    </div>
+                    <div class="proc-stat-filter-item">
+                        <label>开始日期</label>
+                        <input type="date" class="form-input" value="2025-01-01">
+                    </div>
+                    <div class="proc-stat-filter-item">
+                        <label>结束日期</label>
+                        <input type="date" class="form-input" value="2025-01-31">
+                    </div>
+                    <div class="proc-stat-filter-item">
+                        <label>物料类型</label>
+                        <select class="form-select">
+                            <option value="">全部</option>
+                            <option value="elec">电子元器件</option>
+                            <option value="struct">结构件</option>
+                            <option value="pack">包装辅材</option>
+                            <option value="equip">设备及备件</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    <div class="proc-stat-filter-item">
+                        <label>采购组织</label>
+                        <select class="form-select">
+                            <option value="">全部</option>
+                            <option value="org1">深圳采购中心</option>
+                            <option value="org2">上海采购中心</option>
+                            <option value="org3">北京采购中心</option>
+                        </select>
+                    </div>
+                    <div class="proc-stat-filter-item">
+                        <label>供应商</label>
+                        <select class="form-select">
+                            <option value="">全部</option>
+                            <option value="sup1">华强电子</option>
+                            <option value="sup2">京东方科技</option>
+                            <option value="sup3">中芯国际</option>
+                            <option value="sup4">立讯精密</option>
+                        </select>
+                    </div>
+                    <div class="proc-stat-filter-item">
+                        <label>订单状态</label>
+                        <select class="form-select">
+                            <option value="">全部</option>
+                            <option value="pending">待确认</option>
+                            <option value="confirmed">已确认</option>
+                            <option value="delivered">已交付</option>
+                            <option value="completed">已完成</option>
+                        </select>
+                    </div>
+                    <div class="proc-stat-filter-actions">
+                        <button class="btn btn-primary">查询</button>
+                        <button class="btn btn-default">重置</button>
+                    </div>
+                </div>
+                <div class="proc-stat-filter-footer">
+                    <span class="proc-stat-filter-hint">📊 数据截止：2025-01-31 18:00 | 统计范围：2025年1月 | 共45笔订单</span>
+                    <div class="proc-stat-filter-export">
+                        <button class="btn btn-default">📥 导出 Excel</button>
+                        <button class="btn btn-default">📄 导出 PDF</button>
+                        <button class="btn btn-default">📊 生成报告</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 核心指标（6个） -->
+            <div class="proc-stat-kpi">
+                <div class="proc-stat-kpi-card primary">
+                    <div class="proc-stat-kpi-header">
+                        <div class="proc-stat-kpi-label">采购总金额</div>
+                        <div class="proc-stat-kpi-icon">💰</div>
+                    </div>
+                    <div class="proc-stat-kpi-value">¥258.6万</div>
+                    <div class="proc-stat-kpi-desc">环比 +5.2% · 同比 +12.3%</div>
+                    <div class="proc-stat-kpi-trend up">↑ 较上月增长 ¥12.8万</div>
+                </div>
+                <div class="proc-stat-kpi-card success">
+                    <div class="proc-stat-kpi-header">
+                        <div class="proc-stat-kpi-label">订单总数</div>
+                        <div class="proc-stat-kpi-icon">📋</div>
+                    </div>
+                    <div class="proc-stat-kpi-value">45</div>
+                    <div class="proc-stat-kpi-desc">环比 +8笔 · 同比 +6笔</div>
+                    <div class="proc-stat-kpi-trend up">↑ 订单量持续增长</div>
+                </div>
+                <div class="proc-stat-kpi-card warning">
+                    <div class="proc-stat-kpi-header">
+                        <div class="proc-stat-kpi-label">询价转成交率</div>
+                        <div class="proc-stat-kpi-icon">📈</div>
+                    </div>
+                    <div class="proc-stat-kpi-value">66.2%</div>
+                    <div class="proc-stat-kpi-desc">环比 +2.1% · 目标 70%</div>
+                    <div class="proc-stat-kpi-trend up">↑ 效率提升中</div>
+                </div>
+                <div class="proc-stat-kpi-card">
+                    <div class="proc-stat-kpi-header">
+                        <div class="proc-stat-kpi-label">物料种类</div>
+                        <div class="proc-stat-kpi-icon">📦</div>
+                    </div>
+                    <div class="proc-stat-kpi-value">102</div>
+                    <div class="proc-stat-kpi-desc">覆盖 5 大类型</div>
+                    <div class="proc-stat-kpi-trend flat">— 种类稳定</div>
+                </div>
+                <div class="proc-stat-kpi-card success">
+                    <div class="proc-stat-kpi-header">
+                        <div class="proc-stat-kpi-label">平均订单金额</div>
+                        <div class="proc-stat-kpi-icon">💵</div>
+                    </div>
+                    <div class="proc-stat-kpi-value">¥5.75万</div>
+                    <div class="proc-stat-kpi-desc">环比 +1.2% · 同比 +3.5%</div>
+                    <div class="proc-stat-kpi-trend up">↑ 订单价值提升</div>
+                </div>
+                <div class="proc-stat-kpi-card">
+                    <div class="proc-stat-kpi-header">
+                        <div class="proc-stat-kpi-label">交付及时率</div>
+                        <div class="proc-stat-kpi-icon">⏰</div>
+                    </div>
+                    <div class="proc-stat-kpi-value">94.5%</div>
+                    <div class="proc-stat-kpi-desc">环比 +1.8% · 目标 95%</div>
+                    <div class="proc-stat-kpi-trend up">↑ 接近目标</div>
+                </div>
+            </div>
+
+            <!-- 图表区：优化布局 -->
+            <div class="proc-stat-section">
+                <div class="proc-stat-section-header">
+                    <span class="proc-stat-section-title">数据可视化分析</span>
+                    <div class="proc-stat-chart-actions">
+                        <button class="btn btn-sm btn-default">切换视图</button>
+                    </div>
+                </div>
+                <div class="proc-stat-charts">
+                    <div class="proc-stat-chart-card full">
+                        <div class="proc-stat-chart-header">
+                            <div class="proc-stat-chart-title">采购金额趋势分析（折线图）</div>
+                            <div class="proc-stat-chart-actions">
+                                <button class="btn btn-sm btn-default">月度</button>
+                                <button class="btn btn-sm btn-default">周度</button>
+                            </div>
+                        </div>
+                        <div class="proc-stat-chart-placeholder wide">
+                            <div class="proc-stat-chart-placeholder-icon">📊</div>
+                            <div>按月/周展示采购金额趋势，支持环比/同比对比</div>
+                            <div style="font-size: 11px; margin-top: 8px; opacity: 0.7;">可切换时间粒度，支持多系列对比</div>
+                        </div>
+                    </div>
+                    <div class="proc-stat-chart-card">
+                        <div class="proc-stat-chart-header">
+                            <div class="proc-stat-chart-title">物料类型占比（饼图）</div>
+                        </div>
+                        <div class="proc-stat-chart-placeholder compact">
+                            <div class="proc-stat-chart-placeholder-icon">🥧</div>
+                            <div>电子元器件 48% · 结构件 20% · 包装 15% · 设备 12% · 其他 5%</div>
+                        </div>
+                    </div>
+                    <div class="proc-stat-chart-card">
+                        <div class="proc-stat-chart-header">
+                            <div class="proc-stat-chart-title">询价与成交对比（柱状图）</div>
+                        </div>
+                        <div class="proc-stat-chart-placeholder compact">
+                            <div class="proc-stat-chart-placeholder-icon">📊</div>
+                            <div>询价次数、成交次数按月/周对比分析</div>
+                        </div>
+                    </div>
+                    <div class="proc-stat-chart-card">
+                        <div class="proc-stat-chart-header">
+                            <div class="proc-stat-chart-title">供应商金额 TOP5（柱状图）</div>
+                        </div>
+                        <div class="proc-stat-chart-placeholder compact">
+                            <div class="proc-stat-chart-placeholder-icon">📊</div>
+                            <div>华强电子 38% · 京东方 25% · 中芯 19% · 立讯 11% · 其他 7%</div>
+                        </div>
+                    </div>
+                    <div class="proc-stat-chart-card">
+                        <div class="proc-stat-chart-header">
+                            <div class="proc-stat-chart-title">订单状态分布（环形图）</div>
+                        </div>
+                        <div class="proc-stat-chart-placeholder compact">
+                            <div class="proc-stat-chart-placeholder-icon">⭕</div>
+                            <div>已确认 60% · 已交付 25% · 已完成 10% · 待确认 5%</div>
+                        </div>
+                    </div>
+                    <div class="proc-stat-chart-card">
+                        <div class="proc-stat-chart-header">
+                            <div class="proc-stat-chart-title">采购组织对比（柱状图）</div>
+                        </div>
+                        <div class="proc-stat-chart-placeholder compact">
+                            <div class="proc-stat-chart-placeholder-icon">📊</div>
+                            <div>深圳中心 45% · 上海中心 35% · 北京中心 20%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 统计表：Tab切换 -->
+            <div class="proc-stat-section proc-stat-table-section">
+                <div class="proc-stat-section-header">
+                    <div class="proc-stat-table-tabs">
+                        <button type="button" class="proc-stat-table-tab active" data-tab="inq">询价与成交</button>
+                        <button type="button" class="proc-stat-table-tab" data-tab="type">物料类型</button>
+                        <button type="button" class="proc-stat-table-tab" data-tab="supplier">供应商</button>
+                        <button type="button" class="proc-stat-table-tab" data-tab="amount">金额分布</button>
+                        <button type="button" class="proc-stat-table-tab" data-tab="org">采购组织</button>
+                        <button type="button" class="proc-stat-table-tab" data-tab="change">订单变更</button>
+                        <button type="button" class="proc-stat-table-tab" data-tab="return">退货统计</button>
+                        <button type="button" class="proc-stat-table-tab" data-tab="detail">采购明细</button>
+                    </div>
+                    <button class="btn btn-sm btn-default">📥 导出</button>
+                </div>
+                <div class="proc-stat-table-panes">
+                    <div class="proc-stat-table-pane active" id="pane-inq">
+                        <div class="card">
+                            <div class="table-wrapper">
+                                <table class="list-table-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>供应商</th>
+                                            <th>询价次数</th>
+                                            <th>报价次数</th>
+                                            <th>成交次数</th>
+                                            <th>成交率</th>
+                                            <th>成交金额(元)</th>
+                                            <th>平均订单金额</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><a href="pages/procurement-stat-supplier.html">华强电子有限公司</a></td><td>18</td><td>15</td><td>12</td><td>66.7%</td><td>980,000</td><td>81,667</td></tr>
+                                        <tr><td><a href="pages/procurement-stat-supplier.html">京东方科技集团</a></td><td>12</td><td>10</td><td>8</td><td>66.7%</td><td>650,000</td><td>81,250</td></tr>
+                                        <tr><td><a href="pages/procurement-stat-supplier.html">中芯国际半导体</a></td><td>10</td><td>8</td><td>6</td><td>60.0%</td><td>480,000</td><td>80,000</td></tr>
+                                        <tr><td><a href="pages/procurement-stat-supplier.html">立讯精密工业</a></td><td>14</td><td>11</td><td>9</td><td>64.3%</td><td>280,000</td><td>31,111</td></tr>
+                                        <tr><td>其他供应商</td><td>14</td><td>12</td><td>10</td><td>71.4%</td><td>190,000</td><td>19,000</td></tr>
+                                        <tr class="proc-stat-sum-row"><td><strong>合计</strong></td><td><strong>68</strong></td><td><strong>56</strong></td><td><strong>45</strong></td><td><strong>66.2%</strong></td><td><strong>2,580,000</strong></td><td><strong>57,333</strong></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="proc-stat-table-pane" id="pane-type">
+                        <div class="card">
+                            <div class="table-wrapper">
+                                <table class="list-table-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>物料类型</th>
+                                            <th>物料种类</th>
+                                            <th>采购金额(元)</th>
+                                            <th>金额占比</th>
+                                            <th>订单数量</th>
+                                            <th>平均单价</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><a href="pages/procurement-stat-cost.html">电子元器件</a></td><td>45</td><td>1,250,000</td><td>48.4%</td><td>18</td><td>27,778</td></tr>
+                                        <tr><td><a href="pages/procurement-stat-cost.html">结构件</a></td><td>28</td><td>520,000</td><td>20.2%</td><td>12</td><td>43,333</td></tr>
+                                        <tr><td><a href="pages/procurement-stat-cost.html">包装辅材</a></td><td>15</td><td>380,000</td><td>14.7%</td><td>8</td><td>47,500</td></tr>
+                                        <tr><td><a href="pages/procurement-stat-cost.html">设备及备件</a></td><td>8</td><td>320,000</td><td>12.4%</td><td>5</td><td>64,000</td></tr>
+                                        <tr><td>其他</td><td>6</td><td>110,000</td><td>4.3%</td><td>2</td><td>55,000</td></tr>
+                                        <tr class="proc-stat-sum-row"><td><strong>合计</strong></td><td><strong>102</strong></td><td><strong>2,580,000</strong></td><td><strong>100%</strong></td><td><strong>45</strong></td><td><strong>57,333</strong></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="proc-stat-table-pane" id="pane-supplier">
+                        <div class="card">
+                            <div class="table-wrapper">
+                                <table class="list-table-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>供应商</th>
+                                            <th>订单数量</th>
+                                            <th>订单占比</th>
+                                            <th>采购金额(元)</th>
+                                            <th>金额占比</th>
+                                            <th>平均订单金额</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><a href="pages/procurement-stat-supplier.html">华强电子有限公司</a></td><td>12</td><td>26.7%</td><td>980,000</td><td>38.0%</td><td>81,667</td></tr>
+                                        <tr><td><a href="pages/procurement-stat-supplier.html">京东方科技集团</a></td><td>8</td><td>17.8%</td><td>650,000</td><td>25.2%</td><td>81,250</td></tr>
+                                        <tr><td><a href="pages/procurement-stat-supplier.html">中芯国际半导体</a></td><td>6</td><td>13.3%</td><td>480,000</td><td>18.6%</td><td>80,000</td></tr>
+                                        <tr><td><a href="pages/procurement-stat-supplier.html">立讯精密工业</a></td><td>9</td><td>20.0%</td><td>280,000</td><td>10.9%</td><td>31,111</td></tr>
+                                        <tr><td>其他供应商</td><td>10</td><td>22.2%</td><td>190,000</td><td>7.4%</td><td>19,000</td></tr>
+                                        <tr class="proc-stat-sum-row"><td><strong>合计</strong></td><td><strong>45</strong></td><td><strong>100%</strong></td><td><strong>2,580,000</strong></td><td><strong>100%</strong></td><td><strong>57,333</strong></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="proc-stat-table-pane" id="pane-amount">
+                        <div class="card">
+                            <div class="table-wrapper">
+                                <table class="list-table-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>金额区间</th>
+                                            <th>订单数量</th>
+                                            <th>数量占比</th>
+                                            <th>总金额(元)</th>
+                                            <th>金额占比</th>
+                                            <th>平均金额</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>0-1万</td><td>8</td><td>17.8%</td><td>52,000</td><td>2.0%</td><td>6,500</td></tr>
+                                        <tr><td>1万-5万</td><td>15</td><td>33.3%</td><td>385,000</td><td>14.9%</td><td>25,667</td></tr>
+                                        <tr><td>5万-10万</td><td>12</td><td>26.7%</td><td>820,000</td><td>31.8%</td><td>68,333</td></tr>
+                                        <tr><td>10万-50万</td><td>7</td><td>15.6%</td><td>985,000</td><td>38.2%</td><td>140,714</td></tr>
+                                        <tr><td>50万以上</td><td>3</td><td>6.7%</td><td>338,000</td><td>13.1%</td><td>112,667</td></tr>
+                                        <tr class="proc-stat-sum-row"><td><strong>合计</strong></td><td><strong>45</strong></td><td><strong>100%</strong></td><td><strong>2,580,000</strong></td><td><strong>100%</strong></td><td><strong>57,333</strong></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="proc-stat-table-pane" id="pane-org">
+                        <div class="card">
+                            <div class="table-wrapper">
+                                <table class="list-table-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>采购组织</th>
+                                            <th>订单数量</th>
+                                            <th>订单占比</th>
+                                            <th>采购金额(元)</th>
+                                            <th>金额占比</th>
+                                            <th>平均订单金额</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>深圳采购中心</td><td>20</td><td>44.4%</td><td>1,161,000</td><td>45.0%</td><td>58,050</td></tr>
+                                        <tr><td>上海采购中心</td><td>16</td><td>35.6%</td><td>903,000</td><td>35.0%</td><td>56,438</td></tr>
+                                        <tr><td>北京采购中心</td><td>9</td><td>20.0%</td><td>516,000</td><td>20.0%</td><td>57,333</td></tr>
+                                        <tr class="proc-stat-sum-row"><td><strong>合计</strong></td><td><strong>45</strong></td><td><strong>100%</strong></td><td><strong>2,580,000</strong></td><td><strong>100%</strong></td><td><strong>57,333</strong></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="proc-stat-table-pane" id="pane-change">
+                        <div class="card">
+                            <div class="table-wrapper">
+                                <table class="list-table-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>变更原因</th>
+                                            <th>变更单数</th>
+                                            <th>占比</th>
+                                            <th>涉及订单金额(元)</th>
+                                            <th>主要供应商</th>
+                                            <th>平均变更金额</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>数量调整</td><td>5</td><td>38.5%</td><td>125,000</td><td>华强电子</td><td>25,000</td></tr>
+                                        <tr><td>交期变更</td><td>4</td><td>30.8%</td><td>98,000</td><td>京东方科技</td><td>24,500</td></tr>
+                                        <tr><td>价格变更</td><td>2</td><td>15.4%</td><td>65,000</td><td>中芯国际</td><td>32,500</td></tr>
+                                        <tr><td>物料替换</td><td>2</td><td>15.4%</td><td>42,000</td><td>立讯精密</td><td>21,000</td></tr>
+                                        <tr class="proc-stat-sum-row"><td><strong>合计</strong></td><td><strong>13</strong></td><td><strong>100%</strong></td><td><strong>330,000</strong></td><td>—</td><td><strong>25,385</strong></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="proc-stat-table-pane" id="pane-return">
+                        <div class="card">
+                            <div class="table-wrapper">
+                                <table class="list-table-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>退货原因</th>
+                                            <th>退货单数</th>
+                                            <th>退货数量</th>
+                                            <th>退货金额(元)</th>
+                                            <th>涉及供应商</th>
+                                            <th>平均退货金额</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>质量问题</td><td>3</td><td>850</td><td>28,500</td><td>华强电子、京东方</td><td>9,500</td></tr>
+                                        <tr><td>错发</td><td>1</td><td>200</td><td>6,200</td><td>立讯精密</td><td>6,200</td></tr>
+                                        <tr><td>损坏</td><td>1</td><td>50</td><td>3,800</td><td>包装供应商A</td><td>3,800</td></tr>
+                                        <tr><td>超量</td><td>1</td><td>100</td><td>2,100</td><td>中芯国际</td><td>2,100</td></tr>
+                                        <tr class="proc-stat-sum-row"><td><strong>合计</strong></td><td><strong>6</strong></td><td><strong>1,200</strong></td><td><strong>40,600</strong></td><td>—</td><td><strong>6,767</strong></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="proc-stat-table-pane" id="pane-detail">
+                        <div class="card">
+                            <div class="table-wrapper">
+                                <table class="list-table-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>物料编码</th>
+                                            <th>物料名称</th>
+                                            <th>物料类型</th>
+                                            <th>采购数量</th>
+                                            <th>采购金额(元)</th>
+                                            <th>涉及订单数</th>
+                                            <th>主要供应商</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>M-E-001</td><td>主控芯片 STM32</td><td>电子元器件</td><td>5,000</td><td>180,000</td><td>3</td><td>华强电子</td></tr>
+                                        <tr><td>M-E-002</td><td>电源模块 12V</td><td>电子元器件</td><td>3,200</td><td>128,000</td><td>2</td><td>京东方科技</td></tr>
+                                        <tr><td>M-S-001</td><td>铝合金外壳</td><td>结构件</td><td>2,000</td><td>95,000</td><td>4</td><td>立讯精密</td></tr>
+                                        <tr><td>M-P-001</td><td>防静电包装袋</td><td>包装辅材</td><td>50,000</td><td>45,000</td><td>2</td><td>包装供应商A</td></tr>
+                                        <tr><td>M-E-003</td><td>传感器模块</td><td>电子元器件</td><td>1,500</td><td>210,000</td><td>2</td><td>中芯国际</td></tr>
+                                        <tr><td>M-E-004</td><td>显示屏模组</td><td>电子元器件</td><td>800</td><td>320,000</td><td>1</td><td>京东方科技</td></tr>
+                                        <tr><td>M-S-002</td><td>PCB电路板</td><td>结构件</td><td>1,200</td><td>156,000</td><td>3</td><td>华强电子</td></tr>
+                                        <tr><td>M-E-005</td><td>连接器组件</td><td>电子元器件</td><td>3,500</td><td>87,500</td><td>2</td><td>立讯精密</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="pagination">
+                                <span class="pagination-info">共 102 条记录，每页显示 8 条</span>
+                                <div class="pagination-controls">
+                                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                                    <span class="pagination-page">第 1 / 13 页</span>
+                                    <button class="btn btn-sm btn-default">下一页</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function(){
+            // Tab切换功能
+            document.querySelectorAll('.proc-stat-table-tab').forEach(function(btn){
+                btn.addEventListener('click', function(){
+                    var tab = this.dataset.tab;
+                    document.querySelectorAll('.proc-stat-table-tab').forEach(function(b){ b.classList.remove('active'); });
+                    document.querySelectorAll('.proc-stat-table-pane').forEach(function(p){ p.classList.remove('active'); });
+                    this.classList.add('active');
+                    var pane = document.getElementById('pane-' + tab);
+                    if (pane) pane.classList.add('active');
+                });
+            });
+            
+            // 按钮交互
+            if (typeof PageInteractions !== 'undefined') { 
+                PageInteractions.initButtons(); 
+            }
+        })();
+    </script>
+</body>
+</html>

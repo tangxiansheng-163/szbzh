@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>供应链概览 - 供应链协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <span class="breadcrumb-item active">工作台</span>
+        </div>
+        <div class="page-header">
+            <p class="page-description">供应链协同全流程管理，快捷入口与待办概览</p>
+        </div>
+
+        <div class="dashboard-stats">
+            <a href="pages/supply-chain-order-list.html" class="stat-card">
+                <div class="stat-icon blue">🛒</div>
+                <div class="stat-content">
+                    <div class="stat-label">协同订单</div>
+                    <div class="stat-value">68</div>
+                </div>
+            </a>
+            <a href="pages/supply-chain-demand-collaboration.html" class="stat-card">
+                <div class="stat-icon green">📋</div>
+                <div class="stat-content">
+                    <div class="stat-label">需求报价</div>
+                    <div class="stat-value">42</div>
+                </div>
+            </a>
+            <a href="pages/supply-chain-contract-list.html" class="stat-card">
+                <div class="stat-icon purple">📄</div>
+                <div class="stat-content">
+                    <div class="stat-label">协同合同</div>
+                    <div class="stat-value">35</div>
+                </div>
+            </a>
+            <a href="pages/supply-chain-return-order-list.html" class="stat-card">
+                <div class="stat-icon red">⚠️</div>
+                <div class="stat-content">
+                    <div class="stat-label">异常处理</div>
+                    <div class="stat-value">12</div>
+                </div>
+            </a>
+            <a href="pages/supply-chain-settlement-list.html" class="stat-card">
+                <div class="stat-icon teal">💰</div>
+                <div class="stat-content">
+                    <div class="stat-label">结算管理</div>
+                    <div class="stat-value">28</div>
+                </div>
+            </a>
+            <a href="pages/supply-chain-supplier-performance.html" class="stat-card">
+                <div class="stat-icon orange">⭐</div>
+                <div class="stat-content">
+                    <div class="stat-label">供应商绩效</div>
+                    <div class="stat-value">18</div>
+                </div>
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">我的待办</h3>
+                <a href="pages/supply-chain-todo.html" class="btn btn-sm btn-default">查看全部</a>
+            </div>
+            <div class="card-body dashboard-todo">
+                <a href="pages/supply-chain-order-list.html" class="todo-item">
+                    <div class="todo-main">
+                        <span class="todo-title">订单管理</span>
+                        <span class="todo-desc">SO-2025-089 原材料采购订单</span>
+                    </div>
+                    <span class="status-badge status-processing">执行中</span>
+                </a>
+                <a href="pages/supply-chain-return-order-list.html" class="todo-item">
+                    <div class="todo-main">
+                        <span class="todo-title">退货单待处理</span>
+                        <span class="todo-desc">RT-2025-001 待供应商确认</span>
+                    </div>
+                    <span class="status-badge status-warning">待处理</span>
+                </a>
+                <a href="pages/supply-chain-contract-list.html" class="todo-item">
+                    <div class="todo-main">
+                        <span class="todo-title">合同管理</span>
+                        <span class="todo-desc">CT-2025-042 长期合作协议</span>
+                    </div>
+                    <span class="status-badge status-warning">待签章</span>
+                </a>
+                <a href="pages/supply-chain-settlement-list.html" class="todo-item">
+                    <div class="todo-main">
+                        <span class="todo-title">结算单待审核</span>
+                        <span class="todo-desc">ST-2025-156 2025年1月结算单</span>
+                    </div>
+                    <span class="status-badge status-warning">待审核</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

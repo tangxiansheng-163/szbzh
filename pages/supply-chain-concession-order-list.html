@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>让步接收单 - 供应链协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/supply-chain-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">异常处理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">让步接收单</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">让步接收单由采购协同应用下推至本系统，本侧负责接收、查看与执行跟踪。不支持新建或编辑，仅可查看详情与跟踪状态。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="让步单号、订单编号、供应商名称、物料编码">
+                </div>
+                <div class="filter-item">
+                    <label>接收状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="draft">草稿</option>
+                        <option value="submitted">已提交</option>
+                        <option value="approved">已审批</option>
+                        <option value="received">已接收</option>
+                        <option value="rejected">已驳回</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="130">让步单号</th>
+                            <th width="120">关联订单</th>
+                            <th width="150">供应商</th>
+                            <th width="120">物料编码</th>
+                            <th width="100">让步原因</th>
+                            <th width="90">接收状态</th>
+                            <th width="110">申请日期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="concession-id" value="1"></td>
+                            <td>CN-2025-001</td>
+                            <td>PO-2025-010</td>
+                            <td>深圳市电子科技</td>
+                            <td>MAT-001</td>
+                            <td>轻微外观偏差</td>
+                            <td><span class="status-badge status-success">已接收</span></td>
+                            <td>2025-02-05</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="concession-detail-modal">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="concession-id" value="2"></td>
+                            <td>CN-2025-002</td>
+                            <td>PO-2025-007</td>
+                            <td>上海精密机械</td>
+                            <td>MAT-002</td>
+                            <td>尺寸超差在允收范围</td>
+                            <td><span class="status-badge status-processing">已审批</span></td>
+                            <td>2025-02-02</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="concession-detail-modal">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 2 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 让步接收单详情弹窗（只读，含明细） -->
+        <div id="concession-detail-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:800px;max-height:90vh;overflow:auto;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">让步接收单详情</span>
+                    <button type="button" class="modal-close" data-close-modal="concession-detail-modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="section-title" style="margin-bottom:12px;">单头信息</div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px 24px;font-size:13px;margin-bottom:20px;">
+                        <div><span style="color:#666;">让步单号：</span><span id="view-concession-no">CN-2025-001</span></div>
+                        <div><span style="color:#666;">关联订单：</span><span id="view-concession-order">PO-2025-010</span></div>
+                        <div><span style="color:#666;">供应商：</span><span id="view-concession-supplier">深圳市电子科技</span></div>
+                        <div><span style="color:#666;">接收状态：</span><span id="view-concession-status"><span class="status-badge status-success">已接收</span></span></div>
+                        <div><span style="color:#666;">申请日期：</span><span id="view-concession-date">2025-02-05</span></div>
+                        <div><span style="color:#666;">申请人：</span><span id="view-concession-applicant">-</span></div>
+                    </div>
+                    <div class="section-title" style="margin-bottom:8px;">让步明细</div>
+                    <div class="table-wrapper" style="max-height:260px;overflow:auto;border:1px solid var(--border-color,#e8e8e8);border-radius:6px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="50">序号</th>
+                                    <th width="120">物料编码</th>
+                                    <th width="160">物料名称</th>
+                                    <th width="120">规格型号</th>
+                                    <th width="80">数量</th>
+                                    <th width="50">单位</th>
+                                    <th width="140">让步原因</th>
+                                    <th width="100">备注</th>
+                                </tr>
+                            </thead>
+                            <tbody id="concession-detail-tbody">
+                                <tr><td>1</td><td>MAT-001</td><td>电子元器件A</td><td>10KΩ ±5%</td><td>1000</td><td>个</td><td>轻微外观偏差</td><td>-</td></tr>
+                                <tr><td>2</td><td>MAT-005</td><td>电容C</td><td>100μF</td><td>500</td><td>个</td><td>尺寸在允差内</td><td>-</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="concession-detail-modal">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            console.log('让步接收单 页面已加载');
+            if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+            document.querySelectorAll('[data-open-modal="concession-detail-modal"]').forEach(function(btn) { if (!btn.hasAttribute('data-bound')) { btn.setAttribute('data-bound','1'); btn.addEventListener('click', function() { var row = this.closest('tr'); if (row) { var c = row.querySelectorAll('td'); if (c.length >= 9) { var set = function(id, v) { var el = document.getElementById(id); if (el) el.innerHTML = v; }; set('view-concession-no', c[1].textContent.trim()); set('view-concession-order', c[2].textContent.trim()); set('view-concession-supplier', c[3].textContent.trim()); set('view-concession-status', c[6].innerHTML); set('view-concession-date', c[7].textContent.trim()); } } }); } });
+            document.querySelectorAll('.action-left .btn-default').forEach(function(btn) {
+                if (btn.textContent.indexOf('导出') !== -1) btn.addEventListener('click', function() { if (confirm('确定导出当前列表？')) alert('导出成功，文件已下载。'); });
+            });
+        </script>
+    </div>
+</body>
+</html>

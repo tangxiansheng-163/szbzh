@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>供应商评估 - 供应链协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/supply-chain-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">供应商绩效协同</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">供应商评估</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">评估供应商绩效，包括交付能力、质量水平、服务能力、协同能力等综合评估。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>供应商</label>
+                    <input type="text" class="form-input" placeholder="供应商名称">
+                </div>
+                <div class="filter-item">
+                    <label>评估周期</label>
+                    <select class="form-select">
+                        <option value="month">月度</option>
+                        <option value="quarter">季度</option>
+                        <option value="year">年度</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>周期</label>
+                    <input type="month" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary">+ 新建评估</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">评估编号</th>
+                            <th width="150">供应商</th>
+                            <th width="100">评估周期</th>
+                            <th width="100">交付评分</th>
+                            <th width="100">质量评分</th>
+                            <th width="100">服务评分</th>
+                            <th width="100">综合评分</th>
+                            <th width="120">评估日期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="eval-id" value="1"></td>
+                            <td>EVAL-2025-001</td>
+                            <td>深圳市电子科技</td>
+                            <td>2025-01</td>
+                            <td>95.5分</td>
+                            <td>98.2分</td>
+                            <td>94.5分</td>
+                            <td>96.0分</td>
+                            <td>2025-01-25</td>
+                            <td>
+                                <button class="btn btn-sm btn-default">查看</button>
+                                <button class="btn btn-sm btn-primary">详情</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 1 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('供应商评估 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

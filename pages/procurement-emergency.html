@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>应急处理 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">预警与应急</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">应急处理</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">处理采购过程中的紧急情况，包括紧急采购、应急响应、快速审批等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="应急单号、物料名称">
+                </div>
+                <div class="filter-item">
+                    <label>应急类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="urgent-purchase">紧急采购</option>
+                        <option value="supply-shortage">供应短缺</option>
+                        <option value="quality-issue">质量问题</option>
+                        <option value="delivery-delay">交付延期</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>处理状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待处理</option>
+                        <option value="processing">处理中</option>
+                        <option value="resolved">已解决</option>
+                        <option value="closed">已关闭</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary" style="background: #ff4d4f;">+ 新建应急单</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">应急单号</th>
+                            <th width="150">物料名称</th>
+                            <th width="100">应急类型</th>
+                            <th width="100">紧急程度</th>
+                            <th width="150">问题描述</th>
+                            <th width="100">处理状态</th>
+                            <th width="120">创建时间</th>
+                            <th width="120">处理人</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="emergency-id" value="1"></td>
+                            <td>EMG-2025-001</td>
+                            <td>电子元器件A</td>
+                            <td>供应短缺</td>
+                            <td><span class="status-badge status-error">紧急</span></td>
+                            <td>供应商产能不足，影响生产</td>
+                            <td><span class="status-badge status-processing">处理中</span></td>
+                            <td>2025-01-22 10:30</td>
+                            <td>张采购</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-emergency-detail.html" data-id="1">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-handle-emergency" data-id="1">处理</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="emergency-id" value="2"></td>
+                            <td>EMG-2025-002</td>
+                            <td>PCB板</td>
+                            <td>质量问题</td>
+                            <td><span class="status-badge status-warning">重要</span></td>
+                            <td>批次质量问题，需紧急更换</td>
+                            <td><span class="status-badge status-success">已解决</span></td>
+                            <td>2025-01-20 14:20</td>
+                            <td>李采购</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-emergency-detail.html" data-id="2">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 2 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            console.log('应急处理 页面已加载');
+            if (typeof PageInteractions !== 'undefined') {
+                PageInteractions.initButtons();
+            }
+            document.querySelectorAll('.btn-handle-emergency').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    if (confirm('确定处理该应急单？')) alert('已进入处理流程。');
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>

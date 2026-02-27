@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实时监测 - 能源管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/energy-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">能源在线监测</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">实时监测</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">实时监测能源消耗情况，包括实时功率、累计消耗量、能耗趋势等；支持按ECC层级、能源类型、设备状态等多维度监测。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>ECC层级</label>
+                    <select class="form-select">
+                        <option value="">全部层级</option>
+                        <option value="factory">工厂</option>
+                        <option value="workshop">车间</option>
+                        <option value="line">产线</option>
+                        <option value="equipment">设备</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>能源类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="electricity">电</option>
+                        <option value="water">水</option>
+                        <option value="steam">蒸汽</option>
+                        <option value="gas">天然气</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>设备状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="running">运行</option>
+                        <option value="standby">待机</option>
+                        <option value="fault">故障</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">实时能耗概览</h3>
+                <div style="display:flex;gap:12px;">
+                    <span style="font-size:14px;color:#595959;">更新时间：<span id="update-time">2025-01-29 14:30:25</span></span>
+                    <button class="btn btn-sm btn-default">刷新</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+                    <div style="padding:16px;background:#f5f5f5;border-radius:8px;">
+                        <div style="font-size:14px;color:#8c8c8c;margin-bottom:8px;">实时功率</div>
+                        <div style="font-size:24px;font-weight:600;color:#1890ff;">2.5 MW</div>
+                    </div>
+                    <div style="padding:16px;background:#f5f5f5;border-radius:8px;">
+                        <div style="font-size:14px;color:#8c8c8c;margin-bottom:8px;">今日累计</div>
+                        <div style="font-size:24px;font-weight:600;color:#52c41a;">58.2 MWh</div>
+                    </div>
+                    <div style="padding:16px;background:#f5f5f5;border-radius:8px;">
+                        <div style="font-size:14px;color:#8c8c8c;margin-bottom:8px;">本月累计</div>
+                        <div style="font-size:24px;font-weight:600;color:#fa8c16;">1,245.6 MWh</div>
+                    </div>
+                    <div style="padding:16px;background:#f5f5f5;border-radius:8px;">
+                        <div style="font-size:14px;color:#8c8c8c;margin-bottom:8px;">当前告警</div>
+                        <div style="font-size:24px;font-weight:600;color:#ff4d4f;">6</div>
+                    </div>
+                </div>
+                <div id="energy-monitor-chart" style="width:100%;height:400px;"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">设备实时监测</h3>
+            </div>
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="120">设备编码</th>
+                            <th width="150">设备名称</th>
+                            <th width="100">ECC层级</th>
+                            <th width="80">能源类型</th>
+                            <th width="100">实时功率</th>
+                            <th width="100">累计消耗</th>
+                            <th width="90">设备状态</th>
+                            <th width="90">数据状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>EQ-001</td>
+                            <td>空压机A</td>
+                            <td>车间A-产线1</td>
+                            <td>电</td>
+                            <td>125.5 kW</td>
+                            <td>2,856.2 kWh</td>
+                            <td><span class="status-badge status-published">运行</span></td>
+                            <td><span class="status-badge status-success">正常</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/energy-equipment-detail.html" data-id="EQ-001">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>EQ-002</td>
+                            <td>空压机B</td>
+                            <td>车间A-产线2</td>
+                            <td>电</td>
+                            <td>118.3 kW</td>
+                            <td>2,745.8 kWh</td>
+                            <td><span class="status-badge status-published">运行</span></td>
+                            <td><span class="status-badge status-success">正常</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/energy-equipment-detail.html" data-id="EQ-002">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>EQ-003</td>
+                            <td>冷却塔</td>
+                            <td>车间B-产线1</td>
+                            <td>水</td>
+                            <td>15.2 m³/h</td>
+                            <td>365.5 m³</td>
+                            <td><span class="status-badge status-warning">待机</span></td>
+                            <td><span class="status-badge status-success">正常</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/energy-equipment-detail.html" data-id="EQ-003">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('实时监测 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+        // 模拟实时更新
+        function renderChart() {
+            if (typeof echarts === 'undefined') { console.warn('ECharts未加载'); return; }
+            var el = document.getElementById('energy-monitor-chart');
+            if (!el) return;
+            var chart = echarts.init(el);
+            var option = {
+                title: { text: '24小时能耗趋势', left: 'center', textStyle: { fontSize: 16 } },
+                tooltip: { trigger: 'axis' },
+                xAxis: { type: 'category', data: ['00:00','04:00','08:00','12:00','16:00','20:00','24:00'] },
+                yAxis: { type: 'value', name: '功率(kW)' },
+                series: [{
+                    name: '实时功率',
+                    type: 'line',
+                    data: [120, 95, 180, 220, 250, 200, 150],
+                    smooth: true,
+                    itemStyle: { color: '#1890ff' },
+                    areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(24,144,255,0.3)' }, { offset: 1, color: 'rgba(24,144,255,0.1)' }] } }
+                }]
+            };
+            chart.setOption(option);
+            window.addEventListener('resize', function(){ try { chart.resize(); } catch(e){} });
+        }
+        // 按需加载 ECharts（避免强刷时全局阻塞），并提供多源兜底
+        if (typeof echarts !== 'undefined') {
+            renderChart();
+        } else {
+            function renderFallbackSvg() {
+                var el = document.getElementById('energy-monitor-chart');
+                if (!el) return;
+                var data = [120, 95, 180, 220, 250, 200, 150];
+                var labels = ['00:00','04:00','08:00','12:00','16:00','20:00','24:00'];
+                var w=860,h=400,p=44;
+                var max=Math.max.apply(null,data), min=Math.min.apply(null,data);
+                if (max === min) { max += 1; }
+                function x(i){ return p + (w-2*p)*(i/(data.length-1)); }
+                function y(v){ return p + (h-2*p)*(1-((v-min)/(max-min))); }
+                var pts = data.map(function(v,i){ return x(i)+','+y(v); }).join(' ');
+                var area = pts + ' ' + x(data.length-1)+','+(h-p) + ' ' + x(0)+','+(h-p);
+                var xLabels = labels.map(function(t,i){ return '<text x="'+x(i)+'" y="'+(h-p+22)+'" text-anchor="middle" font-size="12" fill="#8c8c8c">'+t+'</text>'; }).join('');
+                el.innerHTML =
+                    '<svg width="100%" height="400" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg">'+
+                      '<rect x="0" y="0" width="'+w+'" height="'+h+'" fill="#fff"/>'+
+                      '<text x="'+p+'" y="26" font-size="16" font-weight="600" fill="#262626">24小时能耗趋势（离线SVG预览）</text>'+
+                      '<g stroke="#e8e8e8" stroke-dasharray="4 4">'+
+                        '<line x1="'+p+'" y1="'+y(min)+'" x2="'+(w-p)+'" y2="'+y(min)+'"/>'+
+                        '<line x1="'+p+'" y1="'+y((min+max)/2)+'" x2="'+(w-p)+'" y2="'+y((min+max)/2)+'"/>'+
+                        '<line x1="'+p+'" y1="'+y(max)+'" x2="'+(w-p)+'" y2="'+y(max)+'"/>'+
+                      '</g>'+
+                      '<polygon points="'+area+'" fill="rgba(24,144,255,0.12)"/>'+
+                      '<polyline points="'+pts+'" fill="none" stroke="#1890ff" stroke-width="3"/>'+
+                      data.map(function(v,i){ return '<circle cx="'+x(i)+'" cy="'+y(v)+'" r="4" fill="#1890ff"/>'; }).join('')+
+                      xLabels+
+                    '</svg>';
+            }
+            // 加速：本地优先，默认不尝试外网 CDN；如需 CDN，可设置 window.__USE_ECHARTS_CDN__ = true
+            var ENABLE_CDN = (typeof window.__USE_ECHARTS_CDN__ !== 'undefined') ? !!window.__USE_ECHARTS_CDN__ : false;
+            var srcList = ENABLE_CDN ? [
+                'assets/vendor/echarts.min.js',
+                'https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js',
+                'https://cdn.bootcdn.net/ajax/libs/echarts/5.4.3/echarts.min.js',
+                'https://unpkg.com/echarts@5.4.3/dist/echarts.min.js'
+            ] : [
+                'assets/vendor/echarts.min.js'
+            ];
+            var idx = 0;
+            function tryNext() {
+                if (idx >= srcList.length) {
+                    // 离线兜底：渲染轻量 SVG 折线图，保证预览可用
+                    renderFallbackSvg();
+                    return;
+                }
+                var s = document.createElement('script');
+                s.src = srcList[idx++];
+                s.setAttribute('data-echarts-lib', '1');
+                s.onload = function(){ setTimeout(renderChart, 0); };
+                s.onerror = function(){ try { s.remove(); } catch(e){}; tryNext(); };
+                document.head.appendChild(s);
+            }
+            tryNext();
+        }
+    </script>
+</body>
+</html>

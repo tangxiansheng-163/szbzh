@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订单编辑 - 供应链协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/supply-chain-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">订单协同</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/supply-chain-order-list.html" class="breadcrumb-item">订单管理</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">编辑</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">仅人工创建订单允许编辑；采购下推订单不允许编辑，列表与详情不提供编辑入口。本页为人工创建订单的编辑表单，全部信息可编辑。</p>
+        </div>
+
+        <form id="order-edit-form">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">订单基本信息</h3>
+                </div>
+                <div class="card-body">
+                    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 24px;">
+                        <div class="form-item">
+                            <label class="form-label">订单编号</label>
+                            <input type="text" class="form-input" value="SO-2025-002" readonly>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">订单来源</label>
+                            <input type="text" class="form-input" value="人工创建" readonly style="background:#f5f5f5;">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">来源单号</label>
+                            <input type="text" class="form-input" value="-" readonly style="background:#f5f5f5;">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">订单状态</label>
+                            <input type="text" class="form-input" value="待确认" readonly>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">需求方</label>
+                            <input type="text" class="form-input" value="上海精密机械制造有限公司" placeholder="可修改">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">需求方联系人</label>
+                            <input type="text" class="form-input" value="王经理" placeholder="可修改">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">联系电话</label>
+                            <input type="tel" class="form-input" value="13800000002" placeholder="可修改">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">创建人</label>
+                            <input type="text" class="form-input" value="李协同" readonly>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">下单日期</label>
+                            <input type="date" class="form-input" value="2025-01-20">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">要求交期</label>
+                            <input type="date" class="form-input" value="2025-03-05">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">付款条件</label>
+                            <select class="form-select">
+                                <option value="prepay">预付款</option>
+                                <option value="net30" selected>货到30天</option>
+                                <option value="net60">货到60天</option>
+                                <option value="net90">货到90天</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">质保期</label>
+                            <input type="text" class="form-input" value="12个月">
+                        </div>
+                        <div class="form-item" style="grid-column:1 / span 2;">
+                            <label class="form-label">交货地点</label>
+                            <input type="text" class="form-input" value="上海市嘉定区工业园区1号仓库" placeholder="可修改">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">物料明细</h3>
+                    <button type="button" class="btn btn-sm btn-primary">+ 添加物料</button>
+                </div>
+                <div class="card-body">
+                    <div class="table-wrapper" style="max-height:360px;overflow:auto;">
+                        <table class="output-table">
+                            <thead>
+                                <tr>
+                                    <th width="50">序号</th>
+                                    <th width="140">物料编码</th>
+                                    <th width="200">物料名称</th>
+                                    <th width="150">规格型号</th>
+                                    <th width="90">数量</th>
+                                    <th width="70">单位</th>
+                                    <th width="100">单价</th>
+                                    <th width="110">金额</th>
+                                    <th width="110">要求到货日期</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>MAT-2001</td>
+                                    <td>机加工件</td>
+                                    <td>Φ20×50</td>
+                                    <td>100</td>
+                                    <td>件</td>
+                                    <td>¥450.00</td>
+                                    <td>¥45,000.00</td>
+                                    <td>2025-03-01</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>MAT-2002</td>
+                                    <td>轴承</td>
+                                    <td>6205</td>
+                                    <td>40</td>
+                                    <td>套</td>
+                                    <td>¥875.00</td>
+                                    <td>¥35,000.00</td>
+                                    <td>2025-03-05</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>MAT-2003</td>
+                                    <td>紧固件套</td>
+                                    <td>标准</td>
+                                    <td>10</td>
+                                    <td>套</td>
+                                    <td>¥1,850.00</td>
+                                    <td>¥18,500.00</td>
+                                    <td>2025-03-05</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top:12px;text-align:right;font-size:13px;">合计金额：<strong>¥98,500.00</strong></div>
+                </div>
+            </div>
+
+            <div class="action-bar" style="margin-top:16px;">
+                <div class="action-left">
+                    <button type="button" class="btn btn-default" onclick="if(typeof PageLoader!=='undefined')PageLoader.loadPage('pages/supply-chain-order-list.html');else location.href='pages/supply-chain-order-list.html';">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script>
+        document.getElementById('order-edit-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('订单已保存（原型模拟）。');
+            if (typeof PageLoader !== 'undefined' && PageLoader.loadPage) {
+                PageLoader.loadPage('pages/supply-chain-order-detail.html');
+            } else {
+                location.href = 'pages/supply-chain-order-detail.html';
+            }
+        });
+    </script>
+</body>
+</html>

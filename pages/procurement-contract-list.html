@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>采购合同 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">合同订单</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">采购合同</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">采购合同来源包括：<strong>需求申请生成</strong>、<strong>采购计划生成</strong>、<strong>询价单生成</strong>、<strong>人工创建</strong>。本页管理采购合同全生命周期，包括合同创建、审批、签署、执行、变更、到期提醒等；支持合同风险控制与合规管理。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="合同编号、供应商名称、合同名称">
+                </div>
+                <div class="filter-item">
+                    <label>合同来源</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="demand">需求申请</option>
+                        <option value="plan">采购计划</option>
+                        <option value="inquiry">询价单</option>
+                        <option value="manual">人工创建</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>合同状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="draft">草稿</option>
+                        <option value="pending">待审批</option>
+                        <option value="approved">已通过</option>
+                        <option value="pending_confirm">待确认</option>
+                        <option value="rejected">已驳回</option>
+                        <option value="signed">已签署</option>
+                        <option value="executing">执行中</option>
+                        <option value="terminated">已终止</option>
+                        <option value="completed">已完成</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>供应商</label>
+                    <input type="text" class="form-input" placeholder="供应商名称">
+                </div>
+                <div class="filter-item">
+                    <label>合同类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="framework">框架合同</option>
+                        <option value="single">单次合同</option>
+                        <option value="service">服务合同</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>推送状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pushed">已推送</option>
+                        <option value="failed">推送失败</option>
+                        <option value="not_pushed">未推送</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary btn-create-modal"
+                        data-modal="contract-create-modal"
+                        data-title="新建采购合同"
+                        data-url="pages/procurement-contract-create.html">
+                    + 新建合同
+                </button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">合同编号</th>
+                            <th width="180">合同名称</th>
+                            <th width="100">合同来源</th>
+                            <th width="150">供应商</th>
+                            <th width="100">合同类型</th>
+                            <th width="100">合同金额</th>
+                            <th width="100">签署日期</th>
+                            <th width="100">到期日期</th>
+                            <th width="90">合同状态</th>
+                            <th width="90">推送状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="contract-id" value="1"></td>
+                            <td>CT-2025-001</td>
+                            <td>电子元器件年度框架采购合同</td>
+                            <td><span class="contract-source-badge source-demand">需求申请</span></td>
+                            <td>深圳市电子科技有限公司</td>
+                            <td>框架合同</td>
+                            <td>¥5,000,000.00</td>
+                            <td>2025-01-01</td>
+                            <td>2025-12-31</td>
+                            <td><span class="status-badge status-published">执行中</span></td>
+                            <td><span class="push-status-badge push-pushed">已推送</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-contract-detail.html" data-id="1">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="contract-id" value="2"></td>
+                            <td>CT-2025-002</td>
+                            <td>精密机械零部件采购合同</td>
+                            <td><span class="contract-source-badge source-plan">采购计划</span></td>
+                            <td>上海精密机械制造有限公司</td>
+                            <td>单次合同</td>
+                            <td>¥850,000.00</td>
+                            <td>2025-01-15</td>
+                            <td>2025-06-15</td>
+                            <td><span class="status-badge status-published">执行中</span></td>
+                            <td><span class="push-status-badge push-pushed">已推送</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-contract-detail.html" data-id="2">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="contract-id" value="3"></td>
+                            <td>CT-2025-003</td>
+                            <td>基于询价单 RFQ-2025-001 的采购合同</td>
+                            <td><span class="contract-source-badge source-inquiry">询价单</span></td>
+                            <td>北京贸易有限公司</td>
+                            <td>单次合同</td>
+                            <td>¥200,000.00</td>
+                            <td>2025-01-10</td>
+                            <td>2025-12-31</td>
+                            <td><span class="status-badge status-warning">待审批</span></td>
+                            <td><span class="push-status-badge push-not">—</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-contract-detail.html" data-id="3">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="contract-id" value="4"></td>
+                            <td>CT-2025-004</td>
+                            <td>物流运输服务合同</td>
+                            <td><span class="contract-source-badge source-manual">人工创建</span></td>
+                            <td>北京贸易有限公司</td>
+                            <td>服务合同</td>
+                            <td>¥180,000.00</td>
+                            <td>2025-01-08</td>
+                            <td>2025-12-31</td>
+                            <td><span class="status-badge status-published">执行中</span></td>
+                            <td><span class="push-status-badge push-pushed">已推送</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-contract-detail.html" data-id="4">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="contract-id" value="5"></td>
+                            <td>CT-2025-005</td>
+                            <td>办公耗材采购合同（草稿）</td>
+                            <td><span class="contract-source-badge source-manual">人工创建</span></td>
+                            <td>广州办公用品有限公司</td>
+                            <td>单次合同</td>
+                            <td>¥50,000.00</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td><span class="status-badge status-draft">草稿</span></td>
+                            <td><span class="push-status-badge push-not">—</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-contract-detail.html" data-id="5">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/procurement-contract-edit.html" data-id="5">编辑</button>
+                                <button class="btn btn-sm btn-default btn-contract-delete" data-id="5">删除</button>
+                                <button class="btn btn-sm btn-primary btn-contract-submit" data-id="5">提审</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="contract-id" value="6"></td>
+                            <td>CT-2025-006</td>
+                            <td>设备采购合同（需求申请草稿）</td>
+                            <td><span class="contract-source-badge source-demand">需求申请</span></td>
+                            <td>深圳市电子科技有限公司</td>
+                            <td>单次合同</td>
+                            <td>¥320,000.00</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td><span class="status-badge status-draft">草稿</span></td>
+                            <td><span class="push-status-badge push-not">—</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-contract-detail.html" data-id="6">查看</button>
+                                <button class="btn btn-sm btn-default btn-contract-delete" data-id="6">删除</button>
+                                <button class="btn btn-sm btn-primary btn-contract-submit" data-id="6">提审</button>
+                            </td>
+                        </tr>
+                        <tr id="contract-row-7" data-contract-no="CT-2025-007">
+                            <td><input type="checkbox" name="contract-id" value="7"></td>
+                            <td>CT-2025-007</td>
+                            <td>原材料采购合同（已通过待推送）</td>
+                            <td><span class="contract-source-badge source-plan">采购计划</span></td>
+                            <td>广州化工有限公司</td>
+                            <td>单次合同</td>
+                            <td>¥280,000.00</td>
+                            <td>—</td>
+                            <td>2025-12-31</td>
+                            <td class="pc-row-7-status"><span class="status-badge status-approved">已通过</span></td>
+                            <td class="pc-row-7-push"><span class="push-status-badge push-not-pushed">未推送</span></td>
+                            <td class="pc-row-7-ops">
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-contract-detail.html" data-id="7">查看</button>
+                                <button class="btn btn-sm btn-primary btn-contract-push" data-id="7">推送</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="contract-id" value="8"></td>
+                            <td>CT-2025-008</td>
+                            <td>设备采购合同（已签署可生成订单）</td>
+                            <td><span class="contract-source-badge source-demand">需求申请</span></td>
+                            <td>深圳市电子科技有限公司</td>
+                            <td>框架合同</td>
+                            <td>¥1,200,000.00</td>
+                            <td>2025-02-01</td>
+                            <td>2026-01-31</td>
+                            <td><span class="status-badge status-signed">已签署</span></td>
+                            <td><span class="push-status-badge push-pushed">已推送</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-contract-detail.html" data-id="8">查看</button>
+                                <button class="btn btn-sm btn-primary btn-contract-gen-order" data-id="8">生成采购订单</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 8 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+        <style>
+        .contract-source-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+        .contract-source-badge.source-demand { background: #e6f7ff; color: #1890ff; }
+        .contract-source-badge.source-plan { background: #f9f0ff; color: #722ed1; }
+        .contract-source-badge.source-inquiry { background: #fff7e6; color: #d46b08; }
+        .contract-source-badge.source-manual { background: #f6ffed; color: #52c41a; }
+        .status-badge.status-draft { background: #f5f5f5; color: #8c8c8c; }
+        .status-badge.status-rejected { background: #fff2f0; color: #cf1322; }
+        .status-badge.status-approved { background: #e6f7ff; color: #1890ff; }
+        .status-badge.status-signed { background: #f6ffed; color: #52c41a; }
+        .status-badge.status-pending-confirm { background: #fff7e6; color: #d46b08; }
+        .push-status-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        .push-status-badge.push-pushed { background: #f6ffed; color: #52c41a; }
+        .push-status-badge.push-failed { background: #fff2f0; color: #cf1322; }
+        .push-status-badge.push-not-pushed { background: #fff7e6; color: #d46b08; }
+        .push-status-badge.push-not { color: #bfbfbf; }
+        </style>
+
+        <!-- 新建合同弹窗（点击「+ 新建合同」时由 PageInteractions.openModal 注入 procurement-contract-create.html 内容） -->
+        <div id="contract-create-modal" class="modal-overlay">
+            <div class="modal modal--wide">
+                <div class="modal-header">
+                    <div class="modal-title">新建采购合同</div>
+                    <div class="modal-close" data-close-modal="contract-create-modal">×</div>
+                </div>
+                <div class="modal-body">
+                    <!-- 动态加载 pages/procurement-contract-create.html 的表单内容 -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="contract-create-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="contract-create-save-btn">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 待确认：查看附件并确认 专用弹窗（列表直接操作，不依赖查看详情） -->
+        <div id="pc-confirm-attach-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center;flex-direction:row;">
+            <div class="modal" style="background:#fff;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);min-width:480px;max-width:560px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;">
+                <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #f0f0f0;">
+                    <div class="modal-title">查看附件并确认</div>
+                    <div class="modal-close" id="pc-confirm-attach-modal-close" style="cursor:pointer;font-size:18px;">×</div>
+                </div>
+                <div class="modal-body" style="padding:16px;overflow:auto;flex:1;">
+                    <p class="page-description" style="margin-bottom:12px;font-size:13px;">供应链协同已上传合同附件并确认，附件已同步至此。可下载查看，可补充资料后点击「确认」，合同状态将变更为已签署，补充资料将同步回供应链。</p>
+                    <div class="form-label" style="margin-bottom:6px;">来自供应链的附件</div>
+                    <div id="pc-confirm-from-sc-list" style="min-height:50px;max-height:160px;overflow:auto;padding:8px;border:1px solid #f0f0f0;border-radius:4px;background:#fafafa;margin-bottom:16px;"></div>
+                    <div class="form-label" style="margin-bottom:6px;">补充资料上传</div>
+                    <div style="margin-bottom:8px;"><button type="button" class="btn btn-default btn-sm" id="pc-confirm-supplement-btn">补充资料上传</button></div>
+                    <div id="pc-confirm-supplement-list" style="min-height:40px;padding:8px;border:1px solid #f0f0f0;border-radius:4px;background:#fafafa;"></div>
+                </div>
+                <div class="modal-footer" style="padding:12px 16px;border-top:1px solid #f0f0f0;text-align:right;">
+                    <button type="button" class="btn btn-default" id="pc-confirm-attach-cancel">取消</button>
+                    <button type="button" class="btn btn-primary" id="pc-confirm-attach-ok">确认</button>
+                </div>
+            </div>
+        </div>
+        <!-- 补充资料上传小弹窗 -->
+        <div id="pc-confirm-supplement-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1001;align-items:center;justify-content:center;flex-direction:row;">
+            <div class="modal" style="background:#fff;border-radius:8px;min-width:400px;max-width:480px;">
+                <div class="modal-header" style="padding:12px 16px;border-bottom:1px solid #f0f0f0;">补充资料上传</div>
+                <div class="modal-body" style="padding:16px;">
+                    <input type="file" id="pc-confirm-supplement-file" multiple style="font-size:13px;">
+                    <button type="button" class="btn btn-default btn-sm" id="pc-confirm-supplement-add" style="margin-left:8px;">添加</button>
+                    <div id="pc-confirm-supplement-modal-list" style="min-height:50px;margin-top:10px;padding:8px;border:1px solid #e8e8e8;border-radius:4px;background:#fafafa;"></div>
+                </div>
+                <div class="modal-footer" style="padding:12px 16px;border-top:1px solid #f0f0f0;text-align:right;">
+                    <button type="button" class="btn btn-default" id="pc-confirm-supplement-modal-cancel">取消</button>
+                    <button type="button" class="btn btn-primary" id="pc-confirm-supplement-modal-ok">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 查看详情、编辑：使用 main 中全局 list-view-modal / edit-modal，无需在本页重复定义 -->
+
+        <script>
+        console.log('采购合同列表 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+            PageInteractions.toggleSelectAll('input[name="contract-id"]');
+        }
+        document.querySelectorAll('.btn-contract-delete').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var id = this.getAttribute('data-id');
+                if (!confirm('确定要删除该合同吗？')) return;
+                var tr = this.closest('tr');
+                if (tr) { tr.remove(); }
+                alert('已删除（原型模拟）。');
+            });
+        });
+        document.querySelectorAll('.btn-contract-submit').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var id = this.getAttribute('data-id');
+                if (!confirm('确定提交该合同审批吗？')) return;
+                var tr = this.closest('tr');
+                var statusTd = tr && tr.querySelector('td:nth-child(10)');
+                if (statusTd) {
+                    statusTd.innerHTML = '<span class="status-badge status-warning">待审批</span>';
+                }
+                var opTd = tr && tr.querySelector('td:last-child');
+                if (opTd) {
+                    opTd.innerHTML = '<button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-contract-detail.html" data-id="' + id + '">查看</button>';
+                }
+                alert('已提交审批（原型模拟）。');
+            });
+        });
+        document.querySelectorAll('.btn-contract-push').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var id = this.getAttribute('data-id');
+                if (!confirm('确定将该合同推送到供应链协同（合同协同-合同管理）吗？')) return;
+                var tr = this.closest('tr');
+                var pushTd = tr && tr.querySelector('td:nth-child(11)');
+                if (pushTd) {
+                    pushTd.innerHTML = '<span class="push-status-badge push-pushed">已推送</span>';
+                }
+                var opTd = tr && tr.querySelector('td:last-child');
+                if (opTd) {
+                    opTd.innerHTML = '<button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-contract-detail.html" data-id="' + id + '">查看</button>';
+                }
+                alert('已推送到供应链协同（原型模拟）。请在供应链协同-合同协同-合同管理中上传合同附件并确认，确认后本合同中状态将变更为「待确认」，可在列表中点击「查看附件并确认」操作。');
+            });
+        });
+        document.querySelectorAll('.btn-contract-gen-order').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var id = this.getAttribute('data-id');
+                if (!confirm('确定根据该合同明细生成采购订单吗？订单将下推至采购订单页面并同步至供应链协同-订单协同-订单管理。')) return;
+                alert('已生成采购订单并同步至供应链协同-订单管理（原型模拟）。');
+            });
+        });
+
+        (function() {
+            var STORAGE_PC_FROM_SC = 'pc_contract_7_attachments_from_sc';
+            var STORAGE_PC_SUPPLEMENT = 'pc_contract_7_attachments_supplement';
+            var STORAGE_PC_CONFIRMED = 'pc_contract_7_confirmed';
+            var STORAGE_SC_FROM_PC = 'sc_contract_3_attachments_from_pc';
+            var STORAGE_PC_STATUS = 'pc_contract_7_status';
+
+            function formatSize(bytes) {
+                if (!bytes) return '0 B';
+                if (bytes < 1024) return bytes + ' B';
+                if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+                return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+            }
+
+            function syncRow7() {
+                var tr = document.getElementById('contract-row-7');
+                if (!tr) return;
+                var status = '';
+                try { status = localStorage.getItem(STORAGE_PC_STATUS) || ''; } catch (e) {}
+                var statusTd = tr.querySelector('.pc-row-7-status');
+                var pushTd = tr.querySelector('.pc-row-7-push');
+                var opTd = tr.querySelector('.pc-row-7-ops');
+                if (!statusTd || !opTd) return;
+                if (status === 'pending_confirm') {
+                    statusTd.innerHTML = '<span class="status-badge status-pending-confirm">待确认</span>';
+                    if (pushTd) pushTd.innerHTML = '<span class="push-status-badge push-pushed">已推送</span>';
+                    opTd.innerHTML = '<button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-contract-detail.html" data-id="7">查看</button>' +
+                        '<button type="button" class="btn btn-sm btn-primary btn-confirm-attach" data-id="7">查看附件并确认</button>';
+                    if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+                    opTd.querySelector('.btn-confirm-attach').addEventListener('click', openConfirmAttachModal);
+                } else if (status === 'signed') {
+                    statusTd.innerHTML = '<span class="status-badge status-signed">已签署</span>';
+                    if (pushTd) pushTd.innerHTML = '<span class="push-status-badge push-pushed">已推送</span>';
+                    opTd.innerHTML = '<button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-contract-detail.html" data-id="7">查看</button>' +
+                        '<button class="btn btn-sm btn-primary btn-contract-gen-order" data-id="7">生成采购订单</button>';
+                    if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+                    opTd.querySelector('.btn-contract-gen-order').addEventListener('click', function() {
+                        if (!confirm('确定根据该合同明细生成采购订单吗？订单将下推至采购订单页面并同步至供应链协同-订单协同-订单管理。')) return;
+                        alert('已生成采购订单并同步至供应链协同-订单管理（原型模拟）。');
+                    });
+                }
+            }
+            syncRow7();
+
+            var confirmModal = document.getElementById('pc-confirm-attach-modal');
+            var fromScList = document.getElementById('pc-confirm-from-sc-list');
+            var supplementList = document.getElementById('pc-confirm-supplement-list');
+            var supplementModal = document.getElementById('pc-confirm-supplement-modal');
+            var supplementFile = document.getElementById('pc-confirm-supplement-file');
+            var supplementModalList = document.getElementById('pc-confirm-supplement-modal-list');
+            var supplementPending = [];
+
+            function renderConfirmFromScList() {
+                if (!fromScList) return;
+                try {
+                    var raw = localStorage.getItem(STORAGE_PC_FROM_SC);
+                    var arr = raw ? JSON.parse(raw) : [];
+                    if (arr.length === 0) {
+                        fromScList.innerHTML = '<span style="color:#999;font-size:13px;">暂无来自供应链的附件</span>';
+                        return;
+                    }
+                    fromScList.innerHTML = arr.map(function(f, i) {
+                        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:13px;">' +
+                            '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;">' + (f.name || '未命名') + '</span>' +
+                            '<span style="color:#8c8c8c;">' + formatSize(f.size) + '</span>' +
+                            '<a href="#" class="pc-confirm-download" data-i="' + i + '" style="margin-left:8px;">下载</a></div>';
+                    }).join('');
+                    fromScList.querySelectorAll('.pc-confirm-download').forEach(function(a) {
+                        a.addEventListener('click', function(e) { e.preventDefault(); alert('下载（原型模拟）'); });
+                    });
+                } catch (e) { fromScList.innerHTML = '<span style="color:#999;">暂无</span>'; }
+            }
+            function renderConfirmSupplementList() {
+                if (!supplementList) return;
+                try {
+                    var raw = localStorage.getItem(STORAGE_PC_SUPPLEMENT);
+                    var arr = raw ? JSON.parse(raw) : [];
+                    if (arr.length === 0) {
+                        supplementList.innerHTML = '<span style="color:#999;font-size:13px;">暂未上传补充资料</span>';
+                        return;
+                    }
+                    supplementList.innerHTML = arr.map(function(f) {
+                        return '<div style="display:flex;align-items:center;padding:4px 0;font-size:13px;"><span style="flex:1;">' + (f.name || '未命名') + '</span><span style="color:#8c8c8c;">' + formatSize(f.size) + '</span></div>';
+                    }).join('');
+                } catch (e) { supplementList.innerHTML = '<span style="color:#999;">暂未上传</span>'; }
+            }
+
+            function openConfirmAttachModal() {
+                renderConfirmFromScList();
+                renderConfirmSupplementList();
+                if (confirmModal) { confirmModal.style.display = 'flex'; confirmModal.style.position = 'fixed'; }
+            }
+            function closeConfirmAttachModal() {
+                if (confirmModal) confirmModal.style.display = 'none';
+            }
+
+            document.getElementById('pc-confirm-attach-modal-close').addEventListener('click', closeConfirmAttachModal);
+            document.getElementById('pc-confirm-attach-cancel').addEventListener('click', closeConfirmAttachModal);
+
+            document.getElementById('pc-confirm-supplement-btn').addEventListener('click', function() {
+                try {
+                    var raw = localStorage.getItem(STORAGE_PC_SUPPLEMENT);
+                    supplementPending = raw ? JSON.parse(raw) : [];
+                } catch (e) { supplementPending = []; }
+                renderSupplementModalList();
+                if (supplementModal) { supplementModal.style.display = 'flex'; supplementModal.style.position = 'fixed'; }
+                if (supplementFile) supplementFile.value = '';
+            });
+            function renderSupplementModalList() {
+                if (!supplementModalList) return;
+                supplementModalList.innerHTML = supplementPending.map(function(f, i) {
+                    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;margin-bottom:6px;background:#fff;border-radius:4px;font-size:13px;">' +
+                        '<span>' + (f.name || '未命名') + '</span><span style="color:#8c8c8c;">' + formatSize(f.size) + '</span>' +
+                        '<span class="pc-supp-del" data-i="' + i + '" style="color:#ff4d4f;cursor:pointer;">删除</span></div>';
+                }).join('');
+                supplementModalList.querySelectorAll('.pc-supp-del').forEach(function(el) {
+                    el.addEventListener('click', function() {
+                        supplementPending.splice(parseInt(this.getAttribute('data-i'), 10), 1);
+                        renderSupplementModalList();
+                    });
+                });
+            }
+            document.getElementById('pc-confirm-supplement-add').addEventListener('click', function() {
+                if (!supplementFile || !supplementFile.files.length) { alert('请先选择文件'); return; }
+                for (var i = 0; i < supplementFile.files.length; i++) {
+                    var f = supplementFile.files[i];
+                    supplementPending.push({ name: f.name, size: f.size });
+                }
+                supplementFile.value = '';
+                renderSupplementModalList();
+            });
+            document.getElementById('pc-confirm-supplement-modal-ok').addEventListener('click', function() {
+                try { localStorage.setItem(STORAGE_PC_SUPPLEMENT, JSON.stringify(supplementPending)); } catch (e) {}
+                renderConfirmSupplementList();
+                if (supplementModal) supplementModal.style.display = 'none';
+            });
+            document.getElementById('pc-confirm-supplement-modal-cancel').addEventListener('click', function() {
+                if (supplementModal) supplementModal.style.display = 'none';
+            });
+
+            document.getElementById('pc-confirm-attach-ok').addEventListener('click', function() {
+                try {
+                    var supp = localStorage.getItem(STORAGE_PC_SUPPLEMENT);
+                    var suppArr = supp ? JSON.parse(supp) : [];
+                    localStorage.setItem(STORAGE_PC_CONFIRMED, '1');
+                    localStorage.setItem(STORAGE_SC_FROM_PC, JSON.stringify(suppArr));
+                    localStorage.setItem(STORAGE_PC_STATUS, 'signed');
+                } catch (e) {}
+                closeConfirmAttachModal();
+                syncRow7();
+                alert('确认成功。合同状态已变更为已签署；补充资料已同步至供应链协同-合同管理（原型模拟）。');
+            });
+        })();
+        </script>
+    </div>
+</body>
+</html>

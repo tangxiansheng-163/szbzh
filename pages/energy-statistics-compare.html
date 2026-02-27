@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>对比分析 - 能源管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/energy-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">能源统计分析</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">对比分析</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">对比分析能源消耗，包括同期对比、环比对比、计划对比等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>对比类型</label>
+                    <select class="form-select">
+                        <option value="year-on-year">同比</option>
+                        <option value="month-on-month">环比</option>
+                        <option value="plan">计划对比</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>基准周期</label>
+                    <input type="month" class="form-input">
+                </div>
+                <div class="filter-item">
+                    <label>对比周期</label>
+                    <input type="month" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">能耗对比分析</h3>
+            </div>
+            <div class="card-body">
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-label">基准周期能耗</div>
+                        <div class="stat-value">1,250,000 kWh</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">对比周期能耗</div>
+                        <div class="stat-value">1,180,000 kWh</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">变化量</div>
+                        <div class="stat-value" style="color: #52c41a;">-70,000 kWh</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">变化率</div>
+                        <div class="stat-value" style="color: #52c41a;">-5.6%</div>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; padding: 20px; background: #f5f5f5; border-radius: 4px; text-align: center; color: #999;">
+                    对比分析图表展示区域（可集成ECharts等图表库）
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('对比分析 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

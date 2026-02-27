@@ -1,0 +1,2060 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>询价单列表 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">采购管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">询价单</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理询价单列表。询价单来源：需求申请直接生成、采购计划直接生成、手动创建。询价单状态：未执行、执行中、已完成、已终止。主表支持按关键词、来源、状态、创建日期筛选，操作列支持「查看」。</p>
+            <p class="page-description" style="margin-top: 6px;">下方为「报价信息」模块：点击主表某行询价单可切换显示该询价单下的报价列表。报价状态分为：未报价、已报价、已中标、未中标。未报价无操作；已报价可操作「详情」「中标」；已中标可操作「详情」「生成合同订单」；未中标可操作「详情」。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="询价编号、创建人">
+                </div>
+                <div class="filter-item">
+                    <label>来源</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="demand">需求申请</option>
+                        <option value="plan">采购计划</option>
+                        <option value="manual">手动创建</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="not_started">未执行</option>
+                        <option value="in_progress">执行中</option>
+                        <option value="completed">已完成</option>
+                        <option value="terminated">已终止</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>创建日期</label>
+                    <input type="date" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button type="button" class="btn btn-primary" id="btn-new-inquiry">+ 新建询价</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">询价编号</th>
+                            <th width="100">来源</th>
+                            <th width="90">供应商数</th>
+                            <th width="90">状态</th>
+                            <th width="80">创建人</th>
+                            <th width="110">创建日期</th>
+                            <th width="110">起效日期</th>
+                            <th width="110">截止日期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quote-table-body">
+                        <tr class="inquiry-row" data-inquiry-id="1" style="cursor: pointer;">
+                            <td><input type="checkbox" name="quote-id" value="1"></td>
+                            <td>RFQ-2025-001</td>
+                            <td>需求申请</td>
+                            <td>3家</td>
+                            <td><span class="status-badge status-success">已完成</span></td>
+                            <td>张采购</td>
+                            <td>2025-01-10</td>
+                            <td>2025-01-12</td>
+                            <td>2025-01-20</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default btn-view-inquiry" data-inquiry-id="1">查看</button>
+                                <button type="button" class="btn btn-sm btn-default btn-inquiry-compare" data-inquiry-id="1">比价表</button>
+                            </td>
+                        </tr>
+                        <tr class="inquiry-row" data-inquiry-id="2" style="cursor: pointer;">
+                            <td><input type="checkbox" name="quote-id" value="2"></td>
+                            <td>RFQ-2025-002</td>
+                            <td>采购计划</td>
+                            <td>2家</td>
+                            <td><span class="status-badge status-success">已完成</span></td>
+                            <td>李采购</td>
+                            <td>2025-01-08</td>
+                            <td>2025-01-10</td>
+                            <td>2025-01-18</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default btn-view-inquiry" data-inquiry-id="2">查看</button>
+                                <button type="button" class="btn btn-sm btn-default btn-inquiry-compare" data-inquiry-id="2">比价表</button>
+                            </td>
+                        </tr>
+                        <tr class="inquiry-row" data-inquiry-id="3" style="cursor: pointer;">
+                            <td><input type="checkbox" name="quote-id" value="3"></td>
+                            <td>RFQ-2025-003</td>
+                            <td>手动创建</td>
+                            <td>3家</td>
+                            <td><span class="status-badge status-processing">执行中</span></td>
+                            <td>王采购</td>
+                            <td>2025-01-12</td>
+                            <td>2025-01-14</td>
+                            <td>2025-01-22</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default btn-view-inquiry" data-inquiry-id="3">查看</button>
+                                <button type="button" class="btn btn-sm btn-default btn-add-quote" data-id="3">添加报价</button>
+                                <button type="button" class="btn btn-sm btn-default btn-inquiry-compare" data-inquiry-id="3">比价表</button>
+                            </td>
+                        </tr>
+                        <tr class="inquiry-row" data-inquiry-id="4" style="cursor: pointer;">
+                            <td><input type="checkbox" name="quote-id" value="4"></td>
+                            <td>RFQ-2025-004</td>
+                            <td>需求申请</td>
+                            <td>2家</td>
+                            <td><span class="status-badge status-warning">已终止</span></td>
+                            <td>赵采购</td>
+                            <td>2025-01-15</td>
+                            <td>2025-01-17</td>
+                            <td>2025-01-25</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default btn-view-inquiry" data-inquiry-id="4">查看</button>
+                            </td>
+                        </tr>
+                        <tr class="inquiry-row" data-inquiry-id="5" style="cursor: pointer;">
+                            <td><input type="checkbox" name="quote-id" value="5"></td>
+                            <td>RFQ-2025-005</td>
+                            <td>采购计划</td>
+                            <td>0家</td>
+                            <td><span class="status-badge status-default">未执行</span></td>
+                            <td>孙采购</td>
+                            <td>2025-01-18</td>
+                            <td>2025-01-20</td>
+                            <td>2025-01-28</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default btn-view-inquiry" data-inquiry-id="5">查看</button>
+                                <button type="button" class="btn btn-sm btn-default btn-add-quote" data-id="5">添加报价</button>
+                                <button type="button" class="btn btn-sm btn-default btn-inquiry-delete" data-inquiry-id="5">删除</button>
+                            </td>
+                        </tr>
+                        <tr class="inquiry-row" data-inquiry-id="6" style="cursor: pointer;">
+                            <td><input type="checkbox" name="quote-id" value="6"></td>
+                            <td>RFQ-2024-012</td>
+                            <td>手动创建</td>
+                            <td>2家</td>
+                            <td><span class="status-badge status-success">已完成</span></td>
+                            <td>周采购</td>
+                            <td>2024-12-03</td>
+                            <td>2024-12-05</td>
+                            <td>2024-12-15</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default btn-view-inquiry" data-inquiry-id="6">查看</button>
+                                <button type="button" class="btn btn-sm btn-default btn-inquiry-compare" data-inquiry-id="6">比价表</button>
+                            </td>
+                        </tr>
+                        <tr class="inquiry-row" data-inquiry-id="7" style="cursor: pointer;">
+                            <td><input type="checkbox" name="quote-id" value="7"></td>
+                            <td>RFQ-2024-008</td>
+                            <td>需求申请</td>
+                            <td>1家</td>
+                            <td><span class="status-badge status-processing">执行中</span></td>
+                            <td>吴采购</td>
+                            <td>2024-11-18</td>
+                            <td>2024-11-20</td>
+                            <td>2024-11-28</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default btn-view-inquiry" data-inquiry-id="7">查看</button>
+                                <button type="button" class="btn btn-sm btn-default btn-add-quote" data-id="7">添加报价</button>
+                                <button type="button" class="btn btn-sm btn-default btn-inquiry-compare" data-inquiry-id="7">比价表</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 <strong id="quote-total-count">7</strong> 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 16px;">
+            <div class="card-header" style="margin-bottom: 12px;">
+                <span class="card-title">报价信息</span>
+                <span class="text-muted" id="quote-detail-tip" style="margin-left: 8px; font-size: 13px;">请选择上方询价单查看报价信息</span>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="120">供应商名称</th>
+                            <th width="80">联系人</th>
+                            <th width="120">联系电话</th>
+                            <th width="120">报价单号</th>
+                            <th width="100">报价金额</th>
+                            <th width="90">状态</th>
+                            <th width="100">生成状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quote-detail-table-body">
+                        <tr id="quote-detail-empty">
+                            <td colspan="7" class="text-muted" style="text-align: center; padding: 24px;">请点击上方询价单行查看该询价单下的报价信息</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 新建询价弹窗（按来源：需求申请选单+带出需求明细 / 采购计划选单+带出采购明细 / 手动创建+手动明细） -->
+        <div class="modal-overlay" id="new-inquiry-modal">
+            <div class="modal" style="max-width: 900px; width: 95%;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <div class="modal-title">新建询价</div>
+                    <div class="modal-close" data-close-modal="new-inquiry-modal">×</div>
+                </div>
+                <div class="modal-body" style="padding: 16px;">
+                    <!-- 1. 询价编号、来源（两列布局） -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">询价编号</label>
+                            <input type="text" class="form-input" id="new-inquiry-no" placeholder="提交后自动生成" readonly style="background: #f5f5f5;">
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">来源 <span style="color: #ff4d4f;">*</span></label>
+                            <select class="form-select" id="new-inquiry-source">
+                                <option value="demand">需求申请</option>
+                                <option value="plan">采购计划</option>
+                                <option value="manual">手动创建</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- 2. 根据来源动态变化的字段（紧跟在来源后面，不含明细） -->
+                    <!-- 来源=需求申请：选择需求申请单（多选）+ 起效/截止 -->
+                    <div id="new-inquiry-block-demand" style="display: none; margin-bottom: 10px;">
+                        <div class="form-item" style="margin-bottom: 10px;">
+                            <label class="form-label">选择需求申请单（多选） <span style="color: #ff4d4f;">*</span></label>
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                                <button type="button" class="btn btn-sm btn-default" id="btn-pick-demands">选择需求申请单</button>
+                                <span class="text-muted" style="font-size: 12px;" id="new-inquiry-demand-count-tip">已选 0 个</span>
+                            </div>
+                            <div id="new-inquiry-demand-tags" style="display: flex; flex-wrap: wrap; gap: 6px; min-height: 32px; padding: 6px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #fafafa;"></div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div class="form-item" style="margin-bottom: 0;">
+                                <label class="form-label">起效日期 <span style="color: #ff4d4f;">*</span></label>
+                                <input type="date" class="form-input" id="new-inquiry-effective-dp">
+                            </div>
+                            <div class="form-item" style="margin-bottom: 0;">
+                                <label class="form-label">截止日期 <span style="color: #ff4d4f;">*</span></label>
+                                <input type="date" class="form-input" id="new-inquiry-deadline-dp">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 来源=采购计划：选择采购计划单 + 起效/截止 -->
+                    <div id="new-inquiry-block-plan" style="display: none; margin-bottom: 10px;">
+                        <div class="form-item" style="margin-bottom: 10px;">
+                            <label class="form-label">选择采购计划单 <span style="color: #ff4d4f;">*</span></label>
+                            <select class="form-select" id="new-inquiry-plan-id" style="max-width: 400px;">
+                                <option value="">请选择采购计划单</option>
+                            </select>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div class="form-item" style="margin-bottom: 0;">
+                                <label class="form-label">起效日期 <span style="color: #ff4d4f;">*</span></label>
+                                <input type="date" class="form-input" id="new-inquiry-effective-dp">
+                            </div>
+                            <div class="form-item" style="margin-bottom: 0;">
+                                <label class="form-label">截止日期 <span style="color: #ff4d4f;">*</span></label>
+                                <input type="date" class="form-input" id="new-inquiry-deadline-dp">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 来源=手动创建：起效/截止 -->
+                    <div id="new-inquiry-block-manual" style="display: none; margin-bottom: 10px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div class="form-item" style="margin-bottom: 0;">
+                                <label class="form-label">起效日期 <span style="color: #ff4d4f;">*</span></label>
+                                <input type="date" class="form-input" id="new-inquiry-effective">
+                            </div>
+                            <div class="form-item" style="margin-bottom: 0;">
+                                <label class="form-label">截止日期 <span style="color: #ff4d4f;">*</span></label>
+                                <input type="date" class="form-input" id="new-inquiry-deadline">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 3. 创建人 -->
+                    <div class="form-item" style="margin-bottom: 10px;">
+                        <label class="form-label">创建人</label>
+                        <input type="text" class="form-input" id="new-inquiry-creator" placeholder="当前用户" value="当前用户" style="max-width: 300px;">
+                    </div>
+                    <!-- 5. 备注 -->
+                    <div class="form-item" style="margin-bottom: 10px;">
+                        <label class="form-label">备注</label>
+                        <textarea class="form-input" id="new-inquiry-remark" rows="2" placeholder="选填" style="resize: vertical;"></textarea>
+                    </div>
+                    <!-- 6. 供应商（多选）：弹窗内搜索+表格多选，已选以标签展示 -->
+                    <div class="form-item" style="margin-bottom: 10px;">
+                        <label class="form-label">供应商（多选） <span style="color: #ff4d4f;">*</span></label>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                            <button type="button" class="btn btn-sm btn-default" id="btn-pick-suppliers">选择供应商</button>
+                            <span class="text-muted" style="font-size: 12px;" id="new-inquiry-supplier-count-tip">已选 0 家</span>
+                        </div>
+                        <div id="new-inquiry-supplier-tags" style="display: flex; flex-wrap: wrap; gap: 6px; min-height: 32px; padding: 6px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #fafafa;"></div>
+                    </div>
+                    <!-- 供应商选择弹窗：搜索 + 表格多选 -->
+                    <div class="modal-overlay" id="supplier-picker-modal">
+                        <div class="modal" style="max-width: 640px; width: 95%;" onclick="event.stopPropagation()">
+                            <div class="modal-header">
+                                <div class="modal-title">选择供应商</div>
+                                <div class="modal-close" data-close-modal="supplier-picker-modal">×</div>
+                            </div>
+                            <div class="modal-body" style="padding: 16px;">
+                                <div class="form-item" style="margin-bottom: 10px;">
+                                    <input type="text" class="form-input" id="supplier-picker-keyword" placeholder="输入供应商编码、名称搜索">
+                                </div>
+                                <div class="table-wrapper" style="max-height: 300px; overflow: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                        <thead style="position: sticky; top: 0; background: #fafafa;">
+                                            <tr>
+                                                <th style="width: 40px; padding: 6px 8px; text-align: center;"><input type="checkbox" id="supplier-picker-select-all" title="全选本页"></th>
+                                                <th style="padding: 6px 8px; text-align: left;">供应商编码</th>
+                                                <th style="padding: 6px 8px; text-align: left;">供应商名称</th>
+                                                <th style="padding: 6px 8px; text-align: left;">联系人</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="supplier-picker-tbody"></tbody>
+                                    </table>
+                                </div>
+                                <p class="text-muted" style="font-size: 11px; margin-top: 6px; margin-bottom: 0;" id="supplier-picker-summary">共 0 条，支持关键词搜索</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-close-modal="supplier-picker-modal">取消</button>
+                                <button type="button" class="btn btn-primary" id="btn-supplier-picker-confirm">确定</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 需求申请单选择弹窗：搜索 + 表格多选 -->
+                    <div class="modal-overlay" id="demand-picker-modal">
+                        <div class="modal" style="max-width: 640px; width: 95%;" onclick="event.stopPropagation()">
+                            <div class="modal-header">
+                                <div class="modal-title">选择需求申请单</div>
+                                <div class="modal-close" data-close-modal="demand-picker-modal">×</div>
+                            </div>
+                            <div class="modal-body" style="padding: 16px;">
+                                <div class="form-item" style="margin-bottom: 10px;">
+                                    <input type="text" class="form-input" id="demand-picker-keyword" placeholder="输入需求申请单编号、名称搜索">
+                                </div>
+                                <div class="table-wrapper" style="max-height: 300px; overflow: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                        <thead style="position: sticky; top: 0; background: #fafafa;">
+                                            <tr>
+                                                <th style="width: 40px; padding: 6px 8px; text-align: center;"><input type="checkbox" id="demand-picker-select-all" title="全选本页"></th>
+                                                <th style="padding: 6px 8px; text-align: left;">需求申请单编号</th>
+                                                <th style="padding: 6px 8px; text-align: left;">需求申请单名称</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="demand-picker-tbody"></tbody>
+                                    </table>
+                                </div>
+                                <p class="text-muted" style="font-size: 11px; margin-top: 6px; margin-bottom: 0;" id="demand-picker-summary">共 0 条，支持关键词搜索</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-close-modal="demand-picker-modal">取消</button>
+                                <button type="button" class="btn btn-primary" id="btn-demand-picker-confirm">确定</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 7. 明细（放在最后） -->
+                    <!-- 来源=需求申请：需求明细 -->
+                    <div id="new-inquiry-detail-demand" style="display: none; margin-bottom: 0;">
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">需求明细（根据所选需求单带出）</label>
+                            <div class="table-wrapper" style="max-height: 200px; overflow: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                    <thead style="position: sticky; top: 0; background: #fafafa;">
+                                        <tr>
+                                            <th style="padding: 6px 8px; text-align: left;">物料编码</th>
+                                            <th style="padding: 6px 8px; text-align: left;">物料名称</th>
+                                            <th style="padding: 6px 8px; text-align: left;">规格型号</th>
+                                            <th style="padding: 6px 8px; text-align: right;">需求数量</th>
+                                            <th style="padding: 6px 8px; text-align: left;">单位</th>
+                                            <th style="padding: 6px 8px; text-align: left;">需求到货日期</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="new-inquiry-demand-detail-body"></tbody>
+                                </table>
+                            </div>
+                            <p class="text-muted" style="font-size: 11px; margin-top: 4px; margin-bottom: 0;" id="new-inquiry-demand-detail-tip">请先选择需求申请单，系统将带出该单的需求明细。</p>
+                        </div>
+                    </div>
+                    <!-- 来源=采购计划：采购明细 -->
+                    <div id="new-inquiry-detail-plan" style="display: none; margin-bottom: 0;">
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">采购明细（根据所选计划带出）</label>
+                            <div class="table-wrapper" style="max-height: 200px; overflow: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                    <thead style="position: sticky; top: 0; background: #fafafa;">
+                                        <tr>
+                                            <th style="padding: 6px 8px; text-align: left;">物料编码</th>
+                                            <th style="padding: 6px 8px; text-align: left;">物料名称</th>
+                                            <th style="padding: 6px 8px; text-align: left;">规格型号</th>
+                                            <th style="padding: 6px 8px; text-align: right;">数量</th>
+                                            <th style="padding: 6px 8px; text-align: left;">单位</th>
+                                            <th style="padding: 6px 8px; text-align: left;">需求到货日期</th>
+                                            <th style="padding: 6px 8px; text-align: right;">预算金额</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="new-inquiry-plan-detail-body"></tbody>
+                                </table>
+                            </div>
+                            <p class="text-muted" style="font-size: 11px; margin-top: 4px; margin-bottom: 0;" id="new-inquiry-plan-detail-tip">请先选择采购计划单，系统将带出该计划的采购明细。</p>
+                        </div>
+                    </div>
+                    <!-- 来源=手动创建：手动录入明细 -->
+                    <div id="new-inquiry-detail-manual" style="display: none; margin-bottom: 0;">
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">询价明细（手动录入）</label>
+                            <div class="table-wrapper" style="max-height: 180px; overflow: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                    <thead style="position: sticky; top: 0; background: #fafafa;">
+                                        <tr>
+                                            <th style="padding: 6px 8px; text-align: left;">物料编码</th>
+                                            <th style="padding: 6px 8px; text-align: left;">物料名称</th>
+                                            <th style="padding: 6px 8px; text-align: left;">规格型号</th>
+                                            <th style="padding: 6px 8px; text-align: right;">数量</th>
+                                            <th style="padding: 6px 8px; text-align: left;">单位</th>
+                                            <th style="padding: 6px 8px; text-align: left;">需求到货日期</th>
+                                            <th style="padding: 6px 8px; width: 50px;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="new-inquiry-manual-detail-body"></tbody>
+                                </table>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-default" id="btn-new-inquiry-add-line" style="margin-top: 6px;">+ 新增一行</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="new-inquiry-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="btn-new-inquiry-submit">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 查看询价单弹窗（只读） -->
+        <div class="modal-overlay" id="view-inquiry-modal">
+            <div class="modal" style="max-width: 960px; width: 95%;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <div class="modal-title">询价单详情</div>
+                    <div class="modal-close" data-close-modal="view-inquiry-modal">×</div>
+                </div>
+                <div class="modal-body" style="padding: 16px;">
+                    <!-- 1. 询价编号、来源（两列布局） -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">询价编号</label>
+                            <input type="text" class="form-input" id="view-inquiry-no" readonly style="background: #f5f5f5;">
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">来源</label>
+                            <input type="text" class="form-input" id="view-inquiry-source" readonly style="background: #f5f5f5;">
+                        </div>
+                    </div>
+                    <!-- 2. 根据来源动态显示：需求申请单/采购计划单 -->
+                    <div id="view-inquiry-block-demand" style="display: none; margin-bottom: 10px;">
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">需求申请单</label>
+                            <div id="view-inquiry-demand-tags" style="display: flex; flex-wrap: wrap; gap: 6px; min-height: 32px; padding: 6px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #fafafa;"></div>
+                        </div>
+                    </div>
+                    <div id="view-inquiry-block-plan" style="display: none; margin-bottom: 10px;">
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">采购计划单</label>
+                            <input type="text" class="form-input" id="view-inquiry-plan-id" readonly style="background: #f5f5f5;">
+                        </div>
+                    </div>
+                    <!-- 3. 供应商数、状态、创建人（三列布局） -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">供应商数</label>
+                            <input type="text" class="form-input" id="view-inquiry-supplier-count" readonly style="background: #f5f5f5;">
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">状态</label>
+                            <input type="text" class="form-input" id="view-inquiry-status" readonly style="background: #f5f5f5;">
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">创建人</label>
+                            <input type="text" class="form-input" id="view-inquiry-creator" readonly style="background: #f5f5f5;">
+                        </div>
+                    </div>
+                    <!-- 4. 创建日期、起效日期、截止日期（三列布局） -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">创建日期</label>
+                            <input type="text" class="form-input" id="view-inquiry-create-date" readonly style="background: #f5f5f5;">
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">起效日期</label>
+                            <input type="text" class="form-input" id="view-inquiry-effective" readonly style="background: #f5f5f5;">
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">截止日期</label>
+                            <input type="text" class="form-input" id="view-inquiry-deadline" readonly style="background: #f5f5f5;">
+                        </div>
+                    </div>
+                    <!-- 5. 备注 -->
+                    <div class="form-item" style="margin-bottom: 10px;">
+                        <label class="form-label">备注</label>
+                        <textarea class="form-input" id="view-inquiry-remark" readonly rows="2" style="background: #f5f5f5; resize: vertical;"></textarea>
+                    </div>
+                    <!-- 6. 参与供应商（点击行切换报价明细） -->
+                    <div class="card" style="margin-bottom: 10px; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #fafafa;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <div style="font-weight: 600; font-size: 13px;">参与供应商</div>
+                            <span class="text-muted" id="view-inquiry-quote-summary" style="font-size: 12px;">共 0 条</span>
+                        </div>
+                        <div class="table-wrapper" style="max-height: 200px; overflow: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #fff;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                <thead style="position: sticky; top: 0; background: #fafafa;">
+                                    <tr>
+                                        <th style="padding: 6px 8px; text-align: left; width: 18%;">供应商</th>
+                                        <th style="padding: 6px 8px; text-align: left; width: 14%;">联系人</th>
+                                        <th style="padding: 6px 8px; text-align: left; width: 14%;">联系电话</th>
+                                        <th style="padding: 6px 8px; text-align: left; width: 16%;">报价单号</th>
+                                        <th style="padding: 6px 8px; text-align: right; width: 12%;">报价金额</th>
+                                        <th style="padding: 6px 8px; text-align: left; width: 10%;">状态</th>
+                                        <th style="padding: 6px 8px; text-align: left; width: 10%;">生成状态</th>
+                                        <th style="padding: 6px 8px; text-align: left; width: 10%;">是否中标</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="view-inquiry-quote-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- 7. 报价明细（跟随供应商行切换） -->
+                    <div class="card" style="margin-bottom: 10px; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #fafafa;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <div style="font-weight: 600; font-size: 13px;">报价明细</div>
+                            <span class="text-muted" id="view-inquiry-quote-detail-summary" style="font-size: 12px;">未选择供应商</span>
+                        </div>
+                        <div class="table-wrapper" style="max-height: 220px; overflow: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #fff;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                <thead style="position: sticky; top: 0; background: #fafafa;">
+                                    <tr>
+                                        <th style="padding: 6px 8px; text-align: left;">物料编码</th>
+                                        <th style="padding: 6px 8px; text-align: left;">物料名称</th>
+                                        <th style="padding: 6px 8px; text-align: left;">规格型号</th>
+                                        <th style="padding: 6px 8px; text-align: right;">数量</th>
+                                        <th style="padding: 6px 8px; text-align: left;">单位</th>
+                                        <th style="padding: 6px 8px; text-align: left;">需求到货日期</th>
+                                        <th style="padding: 6px 8px; text-align: right;">单价</th>
+                                        <th style="padding: 6px 8px; text-align: right;">小计</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="view-inquiry-quote-detail-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- 8. 明细（根据来源动态显示） -->
+                    <!-- 来源=手动创建：询价明细 -->
+                    <div id="view-inquiry-detail-manual" style="display: none; margin-bottom: 0;">
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">询价明细</label>
+                            <div class="table-wrapper" style="max-height: 200px; overflow: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                    <thead style="position: sticky; top: 0; background: #fafafa;">
+                                        <tr>
+                                            <th style="padding: 6px 8px; text-align: left;">物料编码</th>
+                                            <th style="padding: 6px 8px; text-align: left;">物料名称</th>
+                                            <th style="padding: 6px 8px; text-align: left;">规格型号</th>
+                                            <th style="padding: 6px 8px; text-align: right;">数量</th>
+                                            <th style="padding: 6px 8px; text-align: left;">单位</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="view-inquiry-manual-detail-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="view-inquiry-modal">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加报价弹窗 -->
+        <div class="modal-overlay" id="add-quote-modal">
+            <div class="modal" style="max-width: 1100px; width: 95%;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <div class="modal-title">添加报价</div>
+                    <div class="modal-close" data-close-modal="add-quote-modal">×</div>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="add-quote-inquiry-id" value="">
+                    <p class="page-description" style="margin-bottom: 12px; font-size: 13px;">为当前询价单添加一条供应商报价，保存后将显示在下方报价信息列表中。</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">询价单</label>
+                            <input type="text" class="form-input" id="add-quote-inquiry-no" readonly style="background: #f5f5f5;">
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">报价单号</label>
+                            <input type="text" class="form-input" id="add-quote-quote-no" placeholder="提交后自动生成" readonly style="background:#f5f5f5;">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">供应商名称 <span style="color: #ff4d4f;">*</span></label>
+                            <input type="text" class="form-input" id="add-quote-supplier" placeholder="供应商名称" required>
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">报价金额</label>
+                            <input type="text" class="form-input" id="add-quote-amount" placeholder="自动汇总明细小计" readonly style="background:#f5f5f5;">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-item" style="margin-bottom: 12px;">
+                            <label class="form-label">联系人</label>
+                            <input type="text" class="form-input" id="add-quote-contact" placeholder="联系人">
+                        </div>
+                        <div class="form-item" style="margin-bottom: 12px;">
+                            <label class="form-label">联系电话</label>
+                            <input type="text" class="form-input" id="add-quote-phone" placeholder="联系电话">
+                        </div>
+                    </div>
+                    <!-- 报价明细录入（自动带出，不支持新增行） -->
+                    <div class="card" style="padding: 10px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #fafafa;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <div style="font-weight: 600; font-size: 13px;">报价明细</div>
+                            <span class="text-muted" style="font-size: 12px;">明细基于询价单自动带出，不支持新增</span>
+                        </div>
+                        <div class="table-wrapper" style="max-height: 220px; overflow: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #fff;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                <thead style="position: sticky; top: 0; background: #fafafa;">
+                                    <tr>
+                                        <th style="padding: 6px 8px; text-align: left;">物料编码</th>
+                                        <th style="padding: 6px 8px; text-align: left;">物料名称</th>
+                                        <th style="padding: 6px 8px; text-align: left;">规格型号</th>
+                                        <th style="padding: 6px 8px; text-align: right;">数量</th>
+                                        <th style="padding: 6px 8px; text-align: left;">单位</th>
+                                        <th style="padding: 6px 8px; text-align: left;">需求到货日期</th>
+                                        <th style="padding: 6px 8px; text-align: right;">单价</th>
+                                        <th style="padding: 6px 8px; text-align: right;">小计</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="add-quote-detail-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="add-quote-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="btn-add-quote-submit">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 比价表弹窗（与采购计划列表比价表一致） -->
+        <style>
+        .compare-modal-table { table-layout: fixed; width: 100%; }
+        .compare-modal-table th, .compare-modal-table td { text-align: center !important; vertical-align: middle !important; }
+        .compare-modal-table .compare-lowest { background: #e6ffed; color: #389e0d; font-weight: 600; }
+        .compare-modal-table tfoot td { background: #fafafa; font-weight: 600; border-top: 2px solid var(--border-color, #e8e8e8); padding: 12px 16px; box-sizing: border-box; }
+        .compare-modal-table tfoot td.compare-lowest { background: #e6ffed; color: #389e0d; text-align: center !important; vertical-align: middle !important; padding: 12px 16px; box-sizing: border-box; }
+        .compare-modal-table tbody td:last-child, .compare-modal-table tfoot td:last-child { display: table-cell !important; padding-right: 16px !important; }
+        </style>
+        <div class="modal-overlay" id="inquiry-compare-modal">
+            <div class="modal" style="max-width:1100px; width: 95%;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <div class="modal-title" id="inquiry-compare-modal-title">比价表</div>
+                    <div class="modal-close" data-close-modal="inquiry-compare-modal">×</div>
+                </div>
+                <div class="modal-body">
+                    <p class="page-description" style="margin-bottom:12px;font-size:13px;">展示本询价单下各物料的供应商报价对比，便于比价与选定供应商（原型为静态示例）。</p>
+                    <div class="table-wrapper">
+                        <table class="compare-modal-table">
+                            <thead>
+                                <tr>
+                                    <th width="100">物料编码</th>
+                                    <th width="140">物料名称</th>
+                                    <th width="100">规格型号</th>
+                                    <th width="80">数量</th>
+                                    <th width="80">单位</th>
+                                    <th width="120">供应商A单价</th>
+                                    <th width="120">供应商B单价</th>
+                                    <th width="120">供应商C单价</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inquiry-compare-modal-body"></tbody>
+                            <tfoot id="inquiry-compare-modal-foot">
+                                <tr>
+                                    <td colspan="5" style="text-align:center;font-weight:600;">总合计</td>
+                                    <td id="inquiry-compare-modal-total-a"></td>
+                                    <td id="inquiry-compare-modal-total-b"></td>
+                                    <td id="inquiry-compare-modal-total-c"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="inquiry-compare-modal">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 根据中标报价生成合同订单弹窗 -->
+        <div class="modal-overlay" id="quote-create-order-modal">
+            <div class="modal" style="max-width: 1100px; width: 96%;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <div class="modal-title">根据中标报价生成合同订单</div>
+                    <div class="modal-close" data-close-modal="quote-create-order-modal">×</div>
+                </div>
+                <div class="modal-body" style="padding: 16px;">
+                    <input type="hidden" id="quote-order-inquiry-id" value="">
+                    <input type="hidden" id="quote-order-quote-index" value="">
+                    <!-- 合同信息（与需求申请页生成合同订单弹窗一致） -->
+                    <div class="section-title" style="margin-bottom:8px; font-size:13px; font-weight:600;">合同信息</div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 20px; margin-bottom: 16px; font-size: 13px;">
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">合同模板 <span style="color:#ff4d4f;">*</span></label>
+                            <select class="form-select form-input-sm" id="quote-order-contract-template" required style="width:100%;">
+                                <option value="">请选择合同模板</option>
+                                <option value="framework">采购框架合同模板</option>
+                                <option value="single">单次采购合同模板</option>
+                                <option value="material">物料采购合同模板</option>
+                                <option value="custom">自定义模板</option>
+                            </select>
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">合同编号</label>
+                            <input type="text" class="form-input form-input-sm" id="quote-order-contract-no" placeholder="可留空由系统生成" style="width:100%;">
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">合同名称 <span style="color:#ff4d4f;">*</span></label>
+                            <input type="text" class="form-input form-input-sm" id="quote-order-contract-name" placeholder="如：基于询价单的采购合同" required style="width:100%;">
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">合同类型</label>
+                            <select class="form-select form-input-sm" id="quote-order-contract-type" style="width:100%;">
+                                <option value="framework">框架合同</option>
+                                <option value="single">单次订单</option>
+                                <option value="supplement">补充协议</option>
+                            </select>
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">签订日期</label>
+                            <input type="date" class="form-input form-input-sm" id="quote-order-contract-date" style="width:100%;">
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">有效期起</label>
+                            <input type="date" class="form-input form-input-sm" id="quote-order-contract-start" style="width:100%;">
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">有效期止</label>
+                            <input type="date" class="form-input form-input-sm" id="quote-order-contract-end" style="width:100%;">
+                        </div>
+                    </div>
+                    <!-- 订单信息 -->
+                    <div class="section-title" style="margin-bottom:8px; font-size:13px; font-weight:600;">订单信息</div>
+                    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 20px; margin-bottom: 16px; font-size: 13px;">
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">采购订单编号</label>
+                            <input type="text" class="form-input" id="quote-order-no" readonly style="background:#f5f5f5;">
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">供应商名称</label>
+                            <input type="text" class="form-input" id="quote-order-supplier" readonly style="background:#f5f5f5;">
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">询价单号</label>
+                            <input type="text" class="form-input" id="quote-order-inquiry-no" readonly style="background:#f5f5f5;">
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">报价单号</label>
+                            <input type="text" class="form-input" id="quote-order-quote-no" readonly style="background:#f5f5f5;">
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">订单金额（含税）</label>
+                            <input type="text" class="form-input" id="quote-order-amount" readonly style="background:#f5f5f5;">
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">下单日期 <span style="color:#ff4d4f;">*</span></label>
+                            <input type="date" class="form-input" id="quote-order-date" required>
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">要求交期 <span style="color:#ff4d4f;">*</span></label>
+                            <input type="date" class="form-input" id="quote-order-latest-delivery" required>
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">付款条件</label>
+                            <select class="form-select form-input-sm" id="quote-order-payment-terms" style="width:100%;">
+                                <option value="">请选择</option>
+                                <option value="prepay">预付款</option>
+                                <option value="net30">货到30天</option>
+                                <option value="net60">货到60天</option>
+                                <option value="net90">货到90天</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">交货地点</label>
+                            <input type="text" class="form-input form-input-sm" id="quote-order-delivery-address" placeholder="默认供应商地址" style="width:100%;">
+                        </div>
+                        <div class="form-item" style="margin-bottom: 0;">
+                            <label class="form-label">采购员</label>
+                            <input type="text" class="form-input" id="quote-order-buyer" placeholder="自动带出或手工录入" style="width:100%;">
+                        </div>
+                    </div>
+                    <!-- 2. 采购明细（来自中标报价明细，含税单价、税率可编辑，含税金额、不含税金额自动计算，与需求申请页生成合同订单一致） -->
+                    <div class="card" style="padding: 10px; border:1px solid var(--border-color); border-radius: var(--radius-sm); background:#fafafa;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <div style="font-weight:600;font-size:13px;">采购明细</div>
+                            <span class="text-muted" id="quote-order-detail-summary" style="font-size:12px;">共 0 条</span>
+                        </div>
+                        <div class="table-wrapper" style="max-height:280px; overflow:auto; border:1px solid var(--border-color); border-radius:var(--radius-sm); background:#fff;">
+                            <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                                <thead style="position:sticky; top:0; background:#fafafa;">
+                                    <tr>
+                                        <th style="padding:8px 10px; text-align:left;">物料编码</th>
+                                        <th style="padding:8px 10px; text-align:left;">物料名称</th>
+                                        <th style="padding:8px 10px; text-align:left;">规格型号</th>
+                                        <th style="padding:8px 10px; text-align:right;">需求数量</th>
+                                        <th style="padding:8px 10px; text-align:left;">单位</th>
+                                        <th style="padding:8px 10px; text-align:left;">需求到货日期</th>
+                                        <th style="padding:8px 10px; text-align:right;">报价单价</th>
+                                        <th style="padding:8px 10px; text-align:right;">含税单价</th>
+                                        <th style="padding:8px 10px; text-align:right;">税率(%)</th>
+                                        <th style="padding:8px 10px; text-align:right;">含税金额</th>
+                                        <th style="padding:8px 10px; text-align:right;">不含税金额</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="quote-order-detail-body"></tbody>
+                            </table>
+                        </div>
+                        <p class="modal-desc" style="margin-top:8px; text-align:right; font-size:13px; font-weight:600; color:rgba(0,0,0,0.85);">合计含税金额：<strong id="quote-order-total-tax">0.00</strong>　合计不含税金额：<strong id="quote-order-total-notax">0.00</strong></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="quote-create-order-modal">取消</button>
+                    <button type="button" class="btn btn-default" id="btn-quote-order-preview">合同预览</button>
+                    <button type="button" class="btn btn-default" id="btn-quote-order-save-contract">保存合同</button>
+                    <button type="button" class="btn btn-primary" id="btn-quote-order-submit">确定生成合同订单</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        console.log('询价单列表 页面已加载');
+        // 模拟：供应商列表（用于新建询价-选择供应商，支持搜索；可扩展为成百上千条）
+        var SUPPLIER_LIST = [
+            { id: '1', code: 'SUP-001', name: '华东机电有限公司', contact: '陈经理' },
+            { id: '2', code: 'SUP-002', name: '南方设备供应商', contact: '林主管' },
+            { id: '3', code: 'SUP-003', name: '北方工业集团', contact: '王经理' },
+            { id: '4', code: 'SUP-004', name: '东方配件厂', contact: '刘经理' },
+            { id: '5', code: 'SUP-005', name: '西部机械', contact: '马主管' },
+            { id: '6', code: 'SUP-006', name: '深圳电子科技', contact: '张工' },
+            { id: '7', code: 'SUP-007', name: '广州精密仪器', contact: '李工' },
+            { id: '8', code: 'SUP-008', name: '苏州机械制造', contact: '赵经理' },
+            { id: '9', code: 'SUP-009', name: '南京电气设备', contact: '孙主管' },
+            { id: '10', code: 'SUP-010', name: '杭州自动化设备', contact: '周工' },
+            { id: '11', code: 'SUP-011', name: '武汉重工机械', contact: '吴经理' },
+            { id: '12', code: 'SUP-012', name: '成都配件供应', contact: '郑主管' },
+            { id: '13', code: 'SUP-013', name: '西安工业集团', contact: '冯工' },
+            { id: '14', code: 'SUP-014', name: '重庆机电贸易', contact: '曹经理' },
+            { id: '15', code: 'SUP-015', name: '天津设备有限公司', contact: '彭主管' }
+        ];
+        // 新建询价：已选供应商（多选结果，用于标签展示与提交）
+        var newInquirySelectedSuppliers = [];
+        var newInquirySelectedDemands = []; // 已选的需求申请单ID数组
+        var viewInquiryPreferredSupplier = ''; // 查看弹窗优先选中的供应商
+        var addQuoteDetails = []; // 添加报价时的明细缓存（自动带出，金额自动汇总）
+        // 模拟：需求申请单列表（用于新建询价-来源=需求申请）
+        var DEMAND_LIST = [
+            { id: 'REQ-2025-001', title: '设备采购需求', details: [
+                { materialCode: 'EQ-1001', materialName: '数控机床', spec: 'XK7132', qty: 3, unit: '台', deliveryDate: '2025-02-28' },
+                { materialCode: 'EQ-2001', materialName: '空压机', spec: '30kW', qty: 2, unit: '台', deliveryDate: '2025-03-05' }
+            ]},
+            { id: 'REQ-2025-002', title: '办公设备需求', details: [
+                { materialCode: 'OF-1001', materialName: '电脑', spec: 'i7/16G', qty: 10, unit: '台', deliveryDate: '2025-02-15' }
+            ]}
+        ];
+        // 模拟：采购计划单列表（用于新建询价-来源=采购计划）
+        var PLAN_LIST = [
+            { id: 'PP-2025-003', name: '2025年1月月度采购计划', details: [
+                { materialCode: 'EQ-1001', materialName: '数控机床', spec: 'XK7132', qty: 3, unit: '台', deliveryDate: '2025-02-28', budgetAmount: '¥420,000.00' },
+                { materialCode: 'EQ-2001', materialName: '空压机', spec: '30kW', qty: 2, unit: '台', deliveryDate: '2025-03-05', budgetAmount: '¥85,000.00' }
+            ]},
+            { id: 'PP-2025-004', name: '2025年Q1备件采购计划', details: [
+                { materialCode: 'SP-3001', materialName: '轴承', spec: '6208', qty: 100, unit: '个', deliveryDate: '2025-03-31', budgetAmount: '¥12,000.00' }
+            ]}
+        ];
+        // 各询价单的详细信息（用于查看弹窗）
+        var inquiryDetailData = {
+            1: { source: 'demand', sourceText: '需求申请', demandIds: ['REQ-2025-001'], planId: '', manualDetails: [], remark: '' },
+            2: { source: 'plan', sourceText: '采购计划', demandIds: [], planId: 'PP-2025-003', manualDetails: [], remark: '' },
+            3: { source: 'manual', sourceText: '手动创建', demandIds: [], planId: '', manualDetails: [
+                { materialCode: 'EQ-1001', materialName: '数控机床', spec: 'XK7132', qty: 3, unit: '台', deliveryDate: '2025-02-28' }
+            ], remark: '' },
+            4: { source: 'demand', sourceText: '需求申请', demandIds: ['REQ-2025-002'], planId: '', manualDetails: [], remark: '' },
+            5: { source: 'plan', sourceText: '采购计划', demandIds: [], planId: 'PP-2025-004', manualDetails: [], remark: '' },
+            6: { source: 'manual', sourceText: '手动创建', demandIds: [], planId: '', manualDetails: [{ materialCode: 'OF-1001', materialName: '电脑', spec: 'i7/16G', qty: 10, unit: '台' }], remark: '' },
+            7: { source: 'demand', sourceText: '需求申请', demandIds: ['REQ-2025-001', 'REQ-2025-002'], planId: '', manualDetails: [], remark: '合并多个需求申请单' }
+        };
+        // 报价明细数据（按询价单ID + 供应商名称）
+        var quoteDetailData = {
+            1: {
+                '华东机电有限公司': [
+                    { materialCode: 'EQ-1001', materialName: '数控机床', spec: 'XK7132', qty: 3, unit: '台', price: '¥41,000', amount: '¥123,000' },
+                    { materialCode: 'EQ-2001', materialName: '空压机', spec: '30kW', qty: 2, unit: '台', price: '¥42,000', amount: '¥84,000' }
+                ],
+                '南方设备供应商': [
+                    { materialCode: 'EQ-1001', materialName: '数控机床', spec: 'XK7132', qty: 3, unit: '台', price: '¥45,000', amount: '¥135,000' }
+                ],
+                '北方工业集团': [
+                    { materialCode: 'EQ-2001', materialName: '空压机', spec: '30kW', qty: 2, unit: '台', price: '¥39,000', amount: '¥78,000' }
+                ]
+            },
+            2: {
+                '华东机电有限公司': [
+                    { materialCode: 'OF-1001', materialName: '电脑', spec: 'i7/16G', qty: 10, unit: '台', price: '¥8,200', amount: '¥82,000' }
+                ],
+                '南方设备供应商': [
+                    { materialCode: 'OF-1001', materialName: '电脑', spec: 'i7/16G', qty: 10, unit: '台', price: '¥8,650', amount: '¥86,500' }
+                ]
+            }
+        };
+        // 各询价单下的报价信息（报价单）数据。状态：未报价、已报价、已中标、未中标
+        var quoteDataByInquiry = {
+            1: [
+                { supplierName: '华东机电有限公司', contact: '陈经理', phone: '021-88881234', quoteNo: 'BJ-2025-001-01', amount: '¥128,000', status: '已中标', statusClass: 'status-success', details: [
+                    { materialCode: 'EQ-1001', materialName: '数控机床', spec: 'XK7132', qty: 3, unit: '台', deliveryDate: '2025-02-28', price: '¥41,000', amount: '¥123,000' },
+                    { materialCode: 'EQ-2001', materialName: '空压机', spec: '30kW', qty: 2, unit: '台', deliveryDate: '2025-03-05', price: '¥2,500', amount: '¥5,000' }
+                ]},
+                { supplierName: '南方设备供应商', contact: '林主管', phone: '020-66667890', quoteNo: 'BJ-2025-001-02', amount: '¥135,000', status: '未中标', statusClass: 'status-warning', details: [
+                    { materialCode: 'EQ-1001', materialName: '数控机床', spec: 'XK7132', qty: 3, unit: '台', deliveryDate: '2025-02-28', price: '¥43,000', amount: '¥129,000' },
+                    { materialCode: 'EQ-2001', materialName: '空压机', spec: '30kW', qty: 2, unit: '台', deliveryDate: '2025-03-05', price: '¥3,000', amount: '¥6,000' }
+                ]},
+                { supplierName: '北方工业集团', contact: '王经理', phone: '010-55551234', quoteNo: 'BJ-2025-001-03', amount: '¥132,000', status: '未中标', statusClass: 'status-warning', details: [
+                    { materialCode: 'EQ-2001', materialName: '空压机', spec: '30kW', qty: 2, unit: '台', deliveryDate: '2025-03-05', price: '¥66,000', amount: '¥132,000' }
+                ]}
+            ],
+            2: [
+                { supplierName: '华东机电有限公司', contact: '陈经理', phone: '021-88881234', quoteNo: 'BJ-2025-002-01', amount: '¥86,500', status: '未中标', statusClass: 'status-warning', details: [
+                    { materialCode: 'OF-1001', materialName: '电脑', spec: 'i7/16G', qty: 10, unit: '台', deliveryDate: '2025-02-15', price: '¥8,650', amount: '¥86,500' }
+                ]},
+                { supplierName: '南方设备供应商', contact: '林主管', phone: '020-66667890', quoteNo: 'BJ-2025-002-02', amount: '¥82,000', status: '已中标', statusClass: 'status-success', details: [
+                    { materialCode: 'OF-1001', materialName: '电脑', spec: 'i7/16G', qty: 10, unit: '台', deliveryDate: '2025-02-15', price: '¥8,200', amount: '¥82,000' }
+                ]}
+            ],
+            3: [
+                { supplierName: '华东机电有限公司', contact: '陈经理', phone: '021-88881234', quoteNo: 'BJ-2025-003-01', amount: '¥256,000', status: '已报价', statusClass: 'status-processing' },
+                { supplierName: '南方设备供应商', contact: '林主管', phone: '020-66667890', quoteNo: '', amount: '-', status: '未报价', statusClass: 'status-default' },
+                { supplierName: '北方工业集团', contact: '王经理', phone: '010-55551234', quoteNo: '', amount: '-', status: '未报价', statusClass: 'status-default' },
+                { supplierName: '东方配件厂', contact: '刘经理', phone: '0571-88889999', quoteNo: 'BJ-2025-003-04', amount: '¥248,000', status: '已中标', statusClass: 'status-success' },
+                { supplierName: '西部机械', contact: '马主管', phone: '028-66667777', quoteNo: 'BJ-2025-003-05', amount: '¥262,000', status: '未中标', statusClass: 'status-warning' }
+            ],
+            4: [
+                { supplierName: '华东机电有限公司', contact: '陈经理', phone: '021-88881234', quoteNo: 'BJ-2025-004-01', amount: '¥45,000', status: '未中标', statusClass: 'status-warning' },
+                { supplierName: '南方设备供应商', contact: '林主管', phone: '020-66667890', quoteNo: 'BJ-2025-004-02', amount: '¥48,200', status: '未中标', statusClass: 'status-warning' }
+            ],
+            5: [
+                { supplierName: '华东机电有限公司', contact: '陈经理', phone: '021-88881234', quoteNo: '', amount: '-', status: '未报价', statusClass: 'status-default' },
+                { supplierName: '南方设备供应商', contact: '林主管', phone: '020-66667890', quoteNo: '', amount: '-', status: '未报价', statusClass: 'status-default' }
+            ],
+            6: [
+                { supplierName: '华东机电有限公司', contact: '陈经理', phone: '021-88881234', quoteNo: 'BJ-2024-012-01', amount: '¥98,000', status: '已中标', statusClass: 'status-success' },
+                { supplierName: '南方设备供应商', contact: '林主管', phone: '020-66667890', quoteNo: 'BJ-2024-012-02', amount: '¥102,000', status: '未中标', statusClass: 'status-warning' }
+            ],
+            7: [
+                { supplierName: '北方工业集团', contact: '王经理', phone: '010-55551234', quoteNo: 'BJ-2024-008-01', amount: '¥67,800', status: '已报价', statusClass: 'status-processing' },
+                { supplierName: '华东机电有限公司', contact: '陈经理', phone: '021-88881234', quoteNo: '', amount: '-', status: '未报价', statusClass: 'status-default' }
+            ]
+        };
+        function renderQuoteDetail(inquiryId) {
+            var tbody = document.getElementById('quote-detail-table-body');
+            var tip = document.getElementById('quote-detail-tip');
+            if (!tbody) return;
+            var list = quoteDataByInquiry[inquiryId];
+            if (!list || list.length === 0) {
+                tip.textContent = '当前询价单暂无报价信息';
+                tbody.innerHTML = '<tr id="quote-detail-empty"><td colspan="8" class="text-muted" style="text-align: center; padding: 24px;">暂无报价数据</td></tr>';
+                return;
+            }
+            tip.textContent = '询价单 ID ' + inquiryId + ' 共 ' + list.length + ' 条报价';
+            function quoteStatusClass(s) {
+                if (!s) return 'status-default';
+                if (s === '已中标') return 'status-success';
+                if (s === '未中标') return 'status-warning';
+                if (s === '已报价') return 'status-processing';
+                if (s === '未报价') return 'status-default';
+                return 'status-default';
+            }
+            function actionButtons(r, inquiryId, i) {
+                var s = r.status || '';
+                if (s === '未报价') return '-';
+                var detail = '<button type="button" class="btn btn-sm btn-default btn-quote-detail" data-id="' + inquiryId + '" data-index="' + i + '">详情</button>';
+                if (s === '已报价') return detail + ' <button type="button" class="btn btn-sm btn-default btn-quote-award" data-id="' + inquiryId + '" data-index="' + i + '">中标</button>';
+                // 已中标时：只有生成状态为「未生成」才显示「生成合同订单」按钮
+                if (s === '已中标' && !r.orderGenerated) {
+                    return detail + ' <button type="button" class="btn btn-sm btn-primary btn-quote-create-order" data-id="' + inquiryId + '" data-index="' + i + '">生成合同订单</button>';
+                }
+                if (s === '已中标' && r.orderGenerated) return detail;
+                if (s === '未中标') return detail;
+                return detail;
+            }
+            var html = '';
+            for (var i = 0; i < list.length; i++) {
+                var r = list[i];
+                var statusCls = r.statusClass || quoteStatusClass(r.status);
+                var quoteNoDisplay = (r.status === '未报价') ? '-' : (r.quoteNo || '-');
+                var genStatus = '-';
+                if (r.status === '已中标') {
+                    genStatus = r.orderGenerated ? '已生成' : '未生成';
+                }
+                html += '<tr><td>' + (r.supplierName || '-') + '</td><td>' + (r.contact || '-') + '</td><td>' + (r.phone || '-') + '</td><td>' + quoteNoDisplay + '</td><td>' + (r.amount || '-') + '</td><td><span class="status-badge ' + statusCls + '">' + (r.status || '-') + '</span></td><td>' + genStatus + '</td><td>' + actionButtons(r, inquiryId, i) + '</td></tr>';
+            }
+            tbody.innerHTML = html;
+        }
+        (function () {
+            function consumeInquiry(key) {
+                var raw = sessionStorage.getItem(key);
+                if (!raw) return;
+                try {
+                    var data = JSON.parse(raw);
+                    sessionStorage.removeItem(key);
+                    var tbody = document.getElementById('quote-table-body');
+                    if (tbody && data.inquiryNo) {
+                        var nextId = 1 + [].slice.call(tbody.querySelectorAll('input[name="quote-id"]')).reduce(function (max, el) { var v = parseInt(el.value, 10); return isNaN(v) ? max : Math.max(max, v); }, 0);
+                        if (!quoteDataByInquiry[nextId]) quoteDataByInquiry[nextId] = [];
+                        var sourceText = (data.source === 'demand' || data.source === '需求申请') ? '需求申请' : ((data.source === 'plan' || data.source === '采购计划') ? '采购计划' : '手动创建');
+                        var supplierCount = data.quoteSupplierCount || (data.suppliers ? (data.suppliers.length + '家') : '0家');
+                        var statusText = data.statusText || '未执行';
+                        var statusClass = (statusText === '已完成') ? 'status-success' : ((statusText === '执行中') ? 'status-processing' : ((statusText === '已终止') ? 'status-warning' : 'status-default'));
+                        var addQuoteBtn = (statusText !== '已完成' && statusText !== '已终止') ? ' <button type="button" class="btn btn-sm btn-default btn-add-quote" data-id="' + nextId + '">添加报价</button>' : '';
+                        var compareBtn = (statusText === '执行中' || statusText === '已完成') ? ' <button type="button" class="btn btn-sm btn-default btn-inquiry-compare" data-inquiry-id="' + nextId + '">比价表</button>' : '';
+                        var tr = document.createElement('tr');
+                        tr.className = 'inquiry-row';
+                        tr.setAttribute('data-inquiry-id', nextId);
+                        tr.style.cursor = 'pointer';
+                        var deleteBtn = (statusText === '未执行') ? ' <button type="button" class="btn btn-sm btn-default btn-inquiry-delete" data-inquiry-id="' + nextId + '">删除</button>' : '';
+                        tr.innerHTML = '<td><input type="checkbox" name="quote-id" value="' + nextId + '"></td>' +
+                            '<td>' + (data.inquiryNo || '') + '</td>' +
+                            '<td>' + sourceText + '</td>' +
+                            '<td>' + supplierCount + '</td>' +
+                            '<td><span class="status-badge ' + statusClass + '">' + statusText + '</span></td>' +
+                            '<td>' + (data.creator || '当前用户') + '</td>' +
+                            '<td>' + (data.createDate || data.inquiryDate || new Date().toISOString().slice(0, 10)) + '</td>' +
+                            '<td>' + (data.effectiveDate || data.inquiryDate || '-') + '</td>' +
+                            '<td>' + (data.deadline || '-') + '</td>' +
+                            '<td><button type="button" class="btn btn-sm btn-default btn-view-inquiry" data-inquiry-id="' + nextId + '">查看</button>' + addQuoteBtn + compareBtn + deleteBtn + '</td>';
+                        tbody.insertBefore(tr, tbody.firstChild);
+                        var countEl = document.getElementById('quote-total-count');
+                        if (countEl) countEl.textContent = tbody.querySelectorAll('tr').length;
+                        if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+                    }
+                } catch (e) {}
+            }
+            consumeInquiry('newInquiryFromDemand');
+            consumeInquiry('newInquiryFromPlan');
+        })();
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+        function openModal(id) {
+            var el = document.getElementById(id);
+            if (el) { el.classList.add('active'); document.body.style.overflow = 'hidden'; }
+        }
+        function closeModal(id) {
+            var el = document.getElementById(id);
+            if (el) { el.classList.remove('active'); document.body.style.overflow = ''; }
+        }
+        (function bindNewInquiryModal() {
+            var sourceEl = document.getElementById('new-inquiry-source');
+            var blockDemand = document.getElementById('new-inquiry-block-demand');
+            var blockPlan = document.getElementById('new-inquiry-block-plan');
+            var blockManual = document.getElementById('new-inquiry-block-manual');
+            var detailDemand = document.getElementById('new-inquiry-detail-demand');
+            var detailPlan = document.getElementById('new-inquiry-detail-plan');
+            var detailManual = document.getElementById('new-inquiry-detail-manual');
+            function switchNewInquiryBlock() {
+                var v = sourceEl ? sourceEl.value : '';
+                if (blockDemand) blockDemand.style.display = v === 'demand' ? 'block' : 'none';
+                if (blockPlan) blockPlan.style.display = v === 'plan' ? 'block' : 'none';
+                if (blockManual) blockManual.style.display = v === 'manual' ? 'block' : 'none';
+                if (detailDemand) detailDemand.style.display = v === 'demand' ? 'block' : 'none';
+                if (detailPlan) detailPlan.style.display = v === 'plan' ? 'block' : 'none';
+                if (detailManual) detailManual.style.display = v === 'manual' ? 'block' : 'none';
+                if (v === 'demand') { renderNewInquiryDemandTags(); }
+                if (v === 'plan') { fillPlanOptions(); var pid = document.getElementById('new-inquiry-plan-id'); if (pid && pid.value) fillPlanDetail(pid.value); }
+                if (v === 'manual') { renderManualDetailRows(); }
+            }
+            function fillDemandDetail() {
+                var tbody = document.getElementById('new-inquiry-demand-detail-body');
+                var tip = document.getElementById('new-inquiry-demand-detail-tip');
+                if (!tbody) return;
+                if (!newInquirySelectedDemands || !newInquirySelectedDemands.length) {
+                    tbody.innerHTML = '';
+                    if (tip) tip.textContent = '请先选择需求申请单，系统将带出该单的需求明细。';
+                    return;
+                }
+                var allDetails = [];
+                newInquirySelectedDemands.forEach(function(demandId) {
+                    var d = DEMAND_LIST.find(function(x) { return x.id === demandId; });
+                    if (d && d.details && d.details.length) {
+                        allDetails = allDetails.concat(d.details);
+                    }
+                });
+                if (!allDetails.length) {
+                    tbody.innerHTML = '';
+                    if (tip) tip.textContent = '所选需求单暂无明细。';
+                    return;
+                }
+                tbody.innerHTML = allDetails.map(function(row) {
+                    return '<tr><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (row.materialCode || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (row.materialName || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (row.spec || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;text-align:right;">' + (row.qty != null ? row.qty : '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (row.unit || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (row.deliveryDate || '-') + '</td></tr>';
+                }).join('');
+                if (tip) tip.textContent = '已带出 ' + allDetails.length + ' 条需求明细（来自 ' + newInquirySelectedDemands.length + ' 个需求申请单）。';
+            }
+            function renderNewInquiryDemandTags() {
+                var container = document.getElementById('new-inquiry-demand-tags');
+                var tip = document.getElementById('new-inquiry-demand-count-tip');
+                if (!container) return;
+                container.innerHTML = newInquirySelectedDemands.map(function(demandId) {
+                    var d = DEMAND_LIST.find(function(x) { return x.id === demandId; });
+                    var displayText = demandId + (d ? (' ' + d.title) : '');
+                    return '<span class="demand-tag" style="display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:#e6f7ff;border:1px solid #91d5ff;border-radius:4px;font-size:13px;">' + displayText + ' <button type="button" class="btn-remove-demand-tag" data-id="' + (demandId || '').replace(/"/g, '&quot;') + '" style="background:none;border:none;cursor:pointer;padding:0;color:#1890ff;">×</button></span>';
+                }).join('');
+                if (tip) tip.textContent = '已选 ' + newInquirySelectedDemands.length + ' 个';
+                fillDemandDetail();
+            }
+            function fillPlanOptions() {
+                var sel = document.getElementById('new-inquiry-plan-id');
+                if (!sel) return;
+                sel.innerHTML = '<option value="">请选择采购计划单</option>';
+                PLAN_LIST.forEach(function(p) { var opt = document.createElement('option'); opt.value = p.id; opt.textContent = p.id + ' ' + p.name; sel.appendChild(opt); });
+            }
+            function fillPlanDetail(planId) {
+                var tbody = document.getElementById('new-inquiry-plan-detail-body');
+                var tip = document.getElementById('new-inquiry-plan-detail-tip');
+                if (!tbody) return;
+                var p = PLAN_LIST.find(function(x) { return x.id === planId; });
+                if (!p || !p.details || !p.details.length) { tbody.innerHTML = ''; if (tip) tip.textContent = '该计划暂无采购明细。'; return; }
+                tbody.innerHTML = p.details.map(function(row) {
+                    return '<tr><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (row.materialCode || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (row.materialName || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (row.spec || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;text-align:right;">' + (row.qty != null ? row.qty : '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (row.unit || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (row.deliveryDate || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;text-align:right;">' + (row.budgetAmount || '-') + '</td></tr>';
+                }).join('');
+                if (tip) tip.textContent = '已带出 ' + p.details.length + ' 条采购明细。';
+            }
+            var manualDetailRows = [];
+            function renderManualDetailRows() {
+                var tbody = document.getElementById('new-inquiry-manual-detail-body');
+                if (!tbody) return;
+                tbody.innerHTML = manualDetailRows.map(function(row, i) {
+                    return '<tr><td style="padding:6px 8px;"><input type="text" class="form-input manual-code" data-i="' + i + '" value="' + (row.materialCode || '') + '" placeholder="物料编码" style="width:100%;"></td><td style="padding:6px 8px;"><input type="text" class="form-input manual-name" data-i="' + i + '" value="' + (row.materialName || '') + '" placeholder="物料名称" style="width:100%;"></td><td style="padding:6px 8px;"><input type="text" class="form-input manual-spec" data-i="' + i + '" value="' + (row.spec || '') + '" placeholder="规格型号" style="width:100%;"></td><td style="padding:6px 8px;"><input type="number" class="form-input manual-qty" data-i="' + i + '" value="' + (row.qty != null ? row.qty : '') + '" placeholder="数量" style="width:100%;"></td><td style="padding:6px 8px;"><input type="text" class="form-input manual-unit" data-i="' + i + '" value="' + (row.unit || '') + '" placeholder="单位" style="width:100%;"></td><td style="padding:6px 8px;"><input type="date" class="form-input manual-delivery" data-i="' + i + '" value="' + (row.deliveryDate || '') + '" style="width:100%;"></td><td style="padding:6px 8px;"><button type="button" class="btn btn-sm btn-default btn-remove-manual-line" data-i="' + i + '">删除</button></td></tr>';
+                }).join('');
+                tbody.querySelectorAll('.btn-remove-manual-line').forEach(function(btn) {
+                    btn.addEventListener('click', function() { var i = parseInt(this.getAttribute('data-i'), 10); manualDetailRows.splice(i, 1); renderManualDetailRows(); });
+                });
+            }
+            document.getElementById('btn-new-inquiry-add-line') && document.getElementById('btn-new-inquiry-add-line').addEventListener('click', function() {
+                manualDetailRows.push({ materialCode: '', materialName: '', spec: '', qty: '', unit: '', deliveryDate: '' });
+                renderManualDetailRows();
+            });
+            if (sourceEl) sourceEl.addEventListener('change', switchNewInquiryBlock);
+            if (document.getElementById('new-inquiry-plan-id')) document.getElementById('new-inquiry-plan-id').addEventListener('change', function() { fillPlanDetail(this.value); });
+            // 删除需求申请单标签的事件监听
+            document.addEventListener('click', function(e) {
+                var t = e.target && (e.target.classList.contains('btn-remove-demand-tag') ? e.target : e.target.closest && e.target.closest('.btn-remove-demand-tag'));
+                if (!t || !t.getAttribute('data-id')) return;
+                var demandId = t.getAttribute('data-id');
+                var idx = newInquirySelectedDemands.indexOf(demandId);
+                if (idx >= 0) { newInquirySelectedDemands.splice(idx, 1); renderNewInquiryDemandTags(); }
+            });
+            var btn = document.getElementById('btn-new-inquiry');
+            var overlay = document.getElementById('new-inquiry-modal');
+            if (btn) btn.addEventListener('click', function() {
+                document.getElementById('new-inquiry-no').value = '';
+                sourceEl.value = 'demand';
+                document.getElementById('new-inquiry-plan-id').value = '';
+                document.getElementById('new-inquiry-effective').value = '';
+                document.getElementById('new-inquiry-deadline').value = '';
+                document.getElementById('new-inquiry-effective-dp').value = '';
+                document.getElementById('new-inquiry-deadline-dp').value = '';
+                var d = new Date();
+                document.getElementById('new-inquiry-effective-dp').value = d.toISOString().slice(0, 10);
+                document.getElementById('new-inquiry-deadline-dp').value = '';
+                document.getElementById('new-inquiry-creator').value = '当前用户';
+                document.getElementById('new-inquiry-remark').value = '';
+                newInquirySelectedSuppliers.length = 0;
+                renderNewInquirySupplierTags();
+                newInquirySelectedDemands.length = 0;
+                renderNewInquiryDemandTags();
+                manualDetailRows.length = 0;
+                switchNewInquiryBlock();
+                openModal('new-inquiry-modal');
+            });
+            function renderNewInquirySupplierTags() {
+                var container = document.getElementById('new-inquiry-supplier-tags');
+                var tip = document.getElementById('new-inquiry-supplier-count-tip');
+                if (!container) return;
+                container.innerHTML = newInquirySelectedSuppliers.map(function(name) {
+                    return '<span class="supplier-tag" style="display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:#e6f7ff;border:1px solid #91d5ff;border-radius:4px;font-size:13px;">' + (name || '') + ' <button type="button" class="btn-remove-supplier-tag" data-name="' + (name || '').replace(/"/g, '&quot;') + '" style="background:none;border:none;cursor:pointer;padding:0;color:#1890ff;">×</button></span>';
+                }).join('');
+                if (tip) tip.textContent = '已选 ' + newInquirySelectedSuppliers.length + ' 家';
+            }
+            document.addEventListener('click', function(e) {
+                var t = e.target && (e.target.classList.contains('btn-remove-supplier-tag') ? e.target : e.target.closest && e.target.closest('.btn-remove-supplier-tag'));
+                if (!t || !t.getAttribute('data-name')) return;
+                var name = t.getAttribute('data-name');
+                var idx = newInquirySelectedSuppliers.indexOf(name);
+                if (idx >= 0) { newInquirySelectedSuppliers.splice(idx, 1); renderNewInquirySupplierTags(); }
+            });
+            (function bindSupplierPickerModal() {
+                var overlay = document.getElementById('supplier-picker-modal');
+                var keywordEl = document.getElementById('supplier-picker-keyword');
+                var tbody = document.getElementById('supplier-picker-tbody');
+                var summaryEl = document.getElementById('supplier-picker-summary');
+                var selectAllEl = document.getElementById('supplier-picker-select-all');
+                function filterSuppliers() {
+                    var kw = (keywordEl && keywordEl.value) ? keywordEl.value.trim().toLowerCase() : '';
+                    if (!kw) return SUPPLIER_LIST.slice();
+                    return SUPPLIER_LIST.filter(function(s) {
+                        return (s.code && s.code.toLowerCase().indexOf(kw) >= 0) || (s.name && s.name.toLowerCase().indexOf(kw) >= 0) || (s.contact && s.contact.toLowerCase().indexOf(kw) >= 0);
+                    });
+                }
+                function renderPickerTable() {
+                    var list = filterSuppliers();
+                    if (!tbody) return;
+                    tbody.innerHTML = list.map(function(s) {
+                        var checked = newInquirySelectedSuppliers.indexOf(s.name) >= 0 ? ' checked' : '';
+                        return '<tr><td style="padding:8px 10px;text-align:center;"><input type="checkbox" class="supplier-picker-cb" value="' + (s.name || '').replace(/"/g, '&quot;') + '"' + checked + '></td><td style="padding:8px 10px;">' + (s.code || '-') + '</td><td style="padding:8px 10px;">' + (s.name || '-') + '</td><td style="padding:8px 10px;">' + (s.contact || '-') + '</td></tr>';
+                    }).join('');
+                    if (summaryEl) summaryEl.textContent = '共 ' + list.length + ' 条，支持关键词搜索';
+                    if (selectAllEl) selectAllEl.checked = list.length > 0 && list.every(function(s) { return newInquirySelectedSuppliers.indexOf(s.name) >= 0; });
+                }
+                document.getElementById('btn-pick-suppliers') && document.getElementById('btn-pick-suppliers').addEventListener('click', function() {
+                    if (keywordEl) keywordEl.value = '';
+                    renderPickerTable();
+                    openModal('supplier-picker-modal');
+                });
+                keywordEl && keywordEl.addEventListener('input', renderPickerTable);
+                selectAllEl && selectAllEl.addEventListener('change', function() {
+                    var list = filterSuppliers();
+                    var names = list.map(function(s) { return s.name; });
+                    if (this.checked) { names.forEach(function(n) { if (newInquirySelectedSuppliers.indexOf(n) < 0) newInquirySelectedSuppliers.push(n); }); }
+                    else { newInquirySelectedSuppliers = newInquirySelectedSuppliers.filter(function(n) { return names.indexOf(n) < 0; }); }
+                    renderPickerTable();
+                    renderNewInquirySupplierTags();
+                });
+                document.getElementById('btn-supplier-picker-confirm') && document.getElementById('btn-supplier-picker-confirm').addEventListener('click', function() {
+                    var listInView = filterSuppliers();
+                    var namesInView = listInView.map(function(s) { return s.name; });
+                    var checked = overlay.querySelectorAll('.supplier-picker-cb:checked');
+                    var checkedNames = [];
+                    checked.forEach(function(cb) { if (cb.value) checkedNames.push(cb.value); });
+                    newInquirySelectedSuppliers = newInquirySelectedSuppliers.filter(function(n) { return namesInView.indexOf(n) < 0; }).concat(checkedNames);
+                    renderNewInquirySupplierTags();
+                    closeModal('supplier-picker-modal');
+                });
+                if (overlay && !overlay.getAttribute('data-bound')) {
+                    overlay.setAttribute('data-bound', '1');
+                    overlay.addEventListener('click', function(e) { if (e.target === overlay) closeModal('supplier-picker-modal'); });
+                    overlay.querySelectorAll('[data-close-modal="supplier-picker-modal"]').forEach(function(b) { b.addEventListener('click', function() { closeModal('supplier-picker-modal'); }); });
+                }
+            })();
+            // 需求申请单选择弹窗绑定
+            (function bindDemandPickerModal() {
+                var overlay = document.getElementById('demand-picker-modal');
+                var keywordEl = document.getElementById('demand-picker-keyword');
+                var tbody = document.getElementById('demand-picker-tbody');
+                var summaryEl = document.getElementById('demand-picker-summary');
+                var selectAllEl = document.getElementById('demand-picker-select-all');
+                function filterDemands() {
+                    var kw = (keywordEl && keywordEl.value) ? keywordEl.value.trim().toLowerCase() : '';
+                    if (!kw) return DEMAND_LIST.slice();
+                    return DEMAND_LIST.filter(function(d) {
+                        return (d.id && d.id.toLowerCase().indexOf(kw) >= 0) || (d.title && d.title.toLowerCase().indexOf(kw) >= 0);
+                    });
+                }
+                function renderPickerTable() {
+                    var list = filterDemands();
+                    if (!tbody) return;
+                    tbody.innerHTML = list.map(function(d) {
+                        var checked = newInquirySelectedDemands.indexOf(d.id) >= 0 ? ' checked' : '';
+                        return '<tr><td style="padding:6px 8px;text-align:center;"><input type="checkbox" class="demand-picker-cb" value="' + (d.id || '').replace(/"/g, '&quot;') + '"' + checked + '></td><td style="padding:6px 8px;">' + (d.id || '-') + '</td><td style="padding:6px 8px;">' + (d.title || '-') + '</td></tr>';
+                    }).join('');
+                    if (summaryEl) summaryEl.textContent = '共 ' + list.length + ' 条，支持关键词搜索';
+                    if (selectAllEl) selectAllEl.checked = list.length > 0 && list.every(function(d) { return newInquirySelectedDemands.indexOf(d.id) >= 0; });
+                }
+                document.getElementById('btn-pick-demands') && document.getElementById('btn-pick-demands').addEventListener('click', function() {
+                    if (keywordEl) keywordEl.value = '';
+                    renderPickerTable();
+                    openModal('demand-picker-modal');
+                });
+                keywordEl && keywordEl.addEventListener('input', renderPickerTable);
+                selectAllEl && selectAllEl.addEventListener('change', function() {
+                    var list = filterDemands();
+                    var ids = list.map(function(d) { return d.id; });
+                    if (this.checked) { ids.forEach(function(id) { if (newInquirySelectedDemands.indexOf(id) < 0) newInquirySelectedDemands.push(id); }); }
+                    else { newInquirySelectedDemands = newInquirySelectedDemands.filter(function(id) { return ids.indexOf(id) < 0; }); }
+                    renderPickerTable();
+                    renderNewInquiryDemandTags();
+                });
+                document.getElementById('btn-demand-picker-confirm') && document.getElementById('btn-demand-picker-confirm').addEventListener('click', function() {
+                    var listInView = filterDemands();
+                    var idsInView = listInView.map(function(d) { return d.id; });
+                    var checked = overlay.querySelectorAll('.demand-picker-cb:checked');
+                    var checkedIds = [];
+                    checked.forEach(function(cb) { if (cb.value) checkedIds.push(cb.value); });
+                    newInquirySelectedDemands = newInquirySelectedDemands.filter(function(id) { return idsInView.indexOf(id) < 0; }).concat(checkedIds);
+                    renderNewInquiryDemandTags();
+                    closeModal('demand-picker-modal');
+                });
+                if (overlay && !overlay.getAttribute('data-bound')) {
+                    overlay.setAttribute('data-bound', '1');
+                    overlay.addEventListener('click', function(e) { if (e.target === overlay) closeModal('demand-picker-modal'); });
+                    overlay.querySelectorAll('[data-close-modal="demand-picker-modal"]').forEach(function(b) { b.addEventListener('click', function() { closeModal('demand-picker-modal'); }); });
+                }
+            })();
+            if (overlay && !overlay.getAttribute('data-bound')) {
+                overlay.setAttribute('data-bound', '1');
+                overlay.addEventListener('click', function(e) { if (e.target === overlay) closeModal('new-inquiry-modal'); });
+                overlay.querySelectorAll('[data-close-modal="new-inquiry-modal"]').forEach(function(b) { b.addEventListener('click', function() { closeModal('new-inquiry-modal'); }); });
+            }
+            var submit = document.getElementById('btn-new-inquiry-submit');
+            if (submit) submit.addEventListener('click', function() {
+                var sourceVal = sourceEl ? sourceEl.value : '';
+                var effective, deadline;
+                if (sourceVal === 'demand') {
+                    if (!newInquirySelectedDemands || !newInquirySelectedDemands.length) { alert('请至少选择一个需求申请单。'); return; }
+                    var hasDetails = false;
+                    newInquirySelectedDemands.forEach(function(demandId) {
+                        var dem = DEMAND_LIST.find(function(x) { return x.id === demandId; });
+                        if (dem && dem.details && dem.details.length) { hasDetails = true; }
+                    });
+                    if (!hasDetails) { alert('所选需求单暂无明细，无法生成询价单。'); return; }
+                    effective = document.getElementById('new-inquiry-effective-dp') && document.getElementById('new-inquiry-effective-dp').value;
+                    deadline = document.getElementById('new-inquiry-deadline-dp') && document.getElementById('new-inquiry-deadline-dp').value;
+                } else if (sourceVal === 'plan') {
+                    var planId = document.getElementById('new-inquiry-plan-id') && document.getElementById('new-inquiry-plan-id').value;
+                    if (!planId) { alert('请选择采购计划单。'); return; }
+                    var pln = PLAN_LIST.find(function(x) { return x.id === planId; });
+                    if (!pln || !pln.details || !pln.details.length) { alert('所选计划暂无采购明细，无法生成询价单。'); return; }
+                    effective = document.getElementById('new-inquiry-effective-dp') && document.getElementById('new-inquiry-effective-dp').value;
+                    deadline = document.getElementById('new-inquiry-deadline-dp') && document.getElementById('new-inquiry-deadline-dp').value;
+                } else {
+                    effective = document.getElementById('new-inquiry-effective') && document.getElementById('new-inquiry-effective').value;
+                    deadline = document.getElementById('new-inquiry-deadline') && document.getElementById('new-inquiry-deadline').value;
+                    var tbodyManual = document.getElementById('new-inquiry-manual-detail-body');
+                    var rows = tbodyManual ? tbodyManual.querySelectorAll('tr') : [];
+                    var hasLine = false;
+                    for (var ri = 0; ri < rows.length; ri++) {
+                        var code = (rows[ri].querySelector('.manual-code') && rows[ri].querySelector('.manual-code').value) || '';
+                        var name = (rows[ri].querySelector('.manual-name') && rows[ri].querySelector('.manual-name').value) || '';
+                        var spec = (rows[ri].querySelector('.manual-spec') && rows[ri].querySelector('.manual-spec').value) || '';
+                        var qty = (rows[ri].querySelector('.manual-qty') && rows[ri].querySelector('.manual-qty').value) || '';
+                        var unit = (rows[ri].querySelector('.manual-unit') && rows[ri].querySelector('.manual-unit').value) || '';
+                        var delivery = (rows[ri].querySelector('.manual-delivery') && rows[ri].querySelector('.manual-delivery').value) || '';
+                        if (code || name || spec || qty || unit || delivery) { hasLine = true; break; }
+                    }
+                    if (!hasLine) { alert('手动创建时请至少新增一行询价明细并填写内容（含需求到货日期）。'); return; }
+                }
+                if (!newInquirySelectedSuppliers.length) { alert('请至少选择一家供应商。'); return; }
+                var selectedSuppliers = newInquirySelectedSuppliers.slice();
+                if (!effective || !deadline) { alert('请填写起效日期和截止日期。'); return; }
+                var tbody = document.getElementById('quote-table-body');
+                var nextId = 1 + [].slice.call(tbody.querySelectorAll('input[name="quote-id"]')).reduce(function(m, el) { var v = parseInt(el.value, 10); return isNaN(v) ? m : Math.max(m, v); }, 0);
+                var sourceText = sourceVal === 'demand' ? '需求申请' : (sourceVal === 'plan' ? '采购计划' : '手动创建');
+                var inquiryNo = 'RFQ-' + new Date().getFullYear() + '-' + String(nextId).padStart(3, '0');
+                document.getElementById('new-inquiry-no').value = inquiryNo;
+                if (!quoteDataByInquiry[nextId]) quoteDataByInquiry[nextId] = [];
+                selectedSuppliers.forEach(function(name) {
+                    quoteDataByInquiry[nextId].push({ supplierName: name, contact: '-', phone: '-', quoteNo: '', amount: '-', status: '未报价', statusClass: 'status-default' });
+                });
+                var supplierCountText = selectedSuppliers.length + '家';
+                var creator = document.getElementById('new-inquiry-creator').value || '当前用户';
+                var remark = document.getElementById('new-inquiry-remark').value || '';
+                // 保存询价单详细信息
+                    var detailData = {
+                    source: sourceVal,
+                    sourceText: sourceText,
+                    demandIds: sourceVal === 'demand' ? newInquirySelectedDemands.slice() : [],
+                    planId: sourceVal === 'plan' ? (document.getElementById('new-inquiry-plan-id') && document.getElementById('new-inquiry-plan-id').value) : '',
+                    manualDetails: sourceVal === 'manual' ? (function() {
+                        var tbodyManual = document.getElementById('new-inquiry-manual-detail-body');
+                        var rows = tbodyManual ? tbodyManual.querySelectorAll('tr') : [];
+                        var details = [];
+                        for (var ri = 0; ri < rows.length; ri++) {
+                            var code = (rows[ri].querySelector('.manual-code') && rows[ri].querySelector('.manual-code').value) || '';
+                            var name = (rows[ri].querySelector('.manual-name') && rows[ri].querySelector('.manual-name').value) || '';
+                            var spec = (rows[ri].querySelector('.manual-spec') && rows[ri].querySelector('.manual-spec').value) || '';
+                            var qty = (rows[ri].querySelector('.manual-qty') && rows[ri].querySelector('.manual-qty').value) || '';
+                            var unit = (rows[ri].querySelector('.manual-unit') && rows[ri].querySelector('.manual-unit').value) || '';
+                            var delivery = (rows[ri].querySelector('.manual-delivery') && rows[ri].querySelector('.manual-delivery').value) || '';
+                            if (code || name || spec || qty || unit || delivery) {
+                                details.push({ materialCode: code, materialName: name, spec: spec, qty: qty, unit: unit, deliveryDate: delivery });
+                            }
+                        }
+                        return details;
+                    })() : [],
+                    remark: remark
+                };
+                inquiryDetailData[nextId] = detailData;
+                var tr = document.createElement('tr');
+                tr.className = 'inquiry-row';
+                tr.setAttribute('data-inquiry-id', nextId);
+                tr.style.cursor = 'pointer';
+                        tr.innerHTML = '<td><input type="checkbox" name="quote-id" value="' + nextId + '"></td><td>' + inquiryNo + '</td><td>' + sourceText + '</td><td>' + supplierCountText + '</td><td><span class="status-badge status-default">未执行</span></td><td>' + creator + '</td><td>' + new Date().toISOString().slice(0, 10) + '</td><td>' + effective + '</td><td>' + deadline + '</td><td><button type="button" class="btn btn-sm btn-default btn-view-inquiry" data-inquiry-id="' + nextId + '">查看</button> <button type="button" class="btn btn-sm btn-default btn-add-quote" data-id="' + nextId + '">添加报价</button> <button type="button" class="btn btn-sm btn-default btn-inquiry-delete" data-inquiry-id="' + nextId + '">删除</button></td>';
+                tbody.insertBefore(tr, tbody.firstChild);
+                var countEl = document.getElementById('quote-total-count');
+                if (countEl) countEl.textContent = tbody.querySelectorAll('tr').length;
+                closeModal('new-inquiry-modal');
+            });
+            document.addEventListener('click', function(e) {
+                var t = e.target && e.target.classList && e.target.classList.contains('btn-remove-manual-line') ? e.target : (e.target.closest && e.target.closest('.btn-remove-manual-line'));
+                if (t) { var i = parseInt(t.getAttribute('data-i'), 10); if (!isNaN(i)) { manualDetailRows.splice(i, 1); renderManualDetailRows(); } }
+            });
+        })();
+        (function bindViewInquiryModal() {
+            var overlay = document.getElementById('view-inquiry-modal');
+            if (overlay && !overlay.getAttribute('data-bound')) {
+                overlay.setAttribute('data-bound', '1');
+                overlay.addEventListener('click', function(e) { if (e.target === overlay) closeModal('view-inquiry-modal'); });
+                overlay.querySelectorAll('[data-close-modal="view-inquiry-modal"]').forEach(function(b) { b.addEventListener('click', function() { closeModal('view-inquiry-modal'); }); });
+            }
+        })();
+        (function bindAddQuoteModal() {
+            var overlay = document.getElementById('add-quote-modal');
+            if (overlay && !overlay.getAttribute('data-bound')) {
+                overlay.setAttribute('data-bound', '1');
+                overlay.addEventListener('click', function(e) { if (e.target === overlay) closeModal('add-quote-modal'); });
+                overlay.querySelectorAll('[data-close-modal="add-quote-modal"]').forEach(function(b) { b.addEventListener('click', function() { closeModal('add-quote-modal'); }); });
+            }
+            function renderAddQuoteDetails() {
+                var tbody = document.getElementById('add-quote-detail-body');
+                if (!tbody) return;
+                tbody.innerHTML = addQuoteDetails.map(function(row, i) {
+                    return '<tr class="add-quote-detail-row" data-i="' + i + '">' +
+                        '<td style="padding:6px 8px;"><input type="text" class="form-input aq-code" data-i="' + i + '" value="' + (row.materialCode || '') + '" placeholder="物料编码" style="width:100%;" readonly></td>' +
+                        '<td style="padding:6px 8px;"><input type="text" class="form-input aq-name" data-i="' + i + '" value="' + (row.materialName || '') + '" placeholder="物料名称" style="width:100%;" readonly></td>' +
+                        '<td style="padding:6px 8px;"><input type="text" class="form-input aq-spec" data-i="' + i + '" value="' + (row.spec || '') + '" placeholder="规格型号" style="width:100%;" readonly></td>' +
+                        '<td style="padding:6px 8px;"><input type="number" class="form-input aq-qty" data-i="' + i + '" value="' + (row.qty != null ? row.qty : '') + '" placeholder="数量" style="width:100%;" readonly></td>' +
+                        '<td style="padding:6px 8px;"><input type="text" class="form-input aq-unit" data-i="' + i + '" value="' + (row.unit || '') + '" placeholder="单位" style="width:100%;" readonly></td>' +
+                        '<td style="padding:6px 8px;"><input type="date" class="form-input aq-delivery" data-i="' + i + '" value="' + (row.deliveryDate || '') + '" style="width:100%;" readonly></td>' +
+                        '<td style="padding:6px 8px;"><input type="number" step="0.01" class="form-input aq-price" data-i="' + i + '" value="' + (row.price != null ? row.price : '') + '" placeholder="单价" style="width:100%;"></td>' +
+                        '<td style="padding:6px 8px;"><input type="text" class="form-input aq-amount" data-i="' + i + '" value="' + (row.amount || '') + '" placeholder="自动计算小计" style="width:100%;" readonly></td>' +
+                    '</tr>';
+                }).join('');
+            }
+            var submit = document.getElementById('btn-add-quote-submit');
+            if (submit) submit.addEventListener('click', function() {
+                var inquiryId = parseInt(document.getElementById('add-quote-inquiry-id').value, 10);
+                var supplier = (document.getElementById('add-quote-supplier').value || '').trim();
+                if (!supplier) { alert('请填写供应商名称。'); return; }
+                // 收集明细
+                var detailRows = [];
+                var tbody = document.getElementById('add-quote-detail-body');
+                var trs = tbody ? tbody.querySelectorAll('.add-quote-detail-row') : [];
+                trs.forEach(function(tr){
+                    var codeInput = tr.querySelector('.aq-code');
+                    var nameInput = tr.querySelector('.aq-name');
+                    var specInput = tr.querySelector('.aq-spec');
+                    var qtyInput = tr.querySelector('.aq-qty');
+                    var unitInput = tr.querySelector('.aq-unit');
+                    var deliveryInput = tr.querySelector('.aq-delivery');
+                    var priceInput = tr.querySelector('.aq-price');
+                    var code = codeInput ? codeInput.value : '';
+                    var name = nameInput ? nameInput.value : '';
+                    var spec = specInput ? specInput.value : '';
+                    var qty = qtyInput ? qtyInput.value : '';
+                    var unit = unitInput ? unitInput.value : '';
+                    var delivery = deliveryInput ? deliveryInput.value : '';
+                    var price = priceInput ? priceInput.value : '';
+                    // 自动小计
+                    var numericQty = parseFloat(qty);
+                    var numericPrice = parseFloat(price);
+                    var autoAmount = (!isNaN(numericQty) && !isNaN(numericPrice)) ? (numericQty * numericPrice).toFixed(2) : '';
+                    detailRows.push({
+                        materialCode: code,
+                        materialName: name,
+                        spec: spec,
+                        qty: qty || '',
+                        unit: unit,
+                        deliveryDate: delivery,
+                        price: price || '',
+                        amount: autoAmount ? ('¥' + autoAmount) : '-'
+                    });
+                });
+                addQuoteDetails = detailRows;
+                // 汇总金额
+                var total = 0;
+                var hasAmount = false;
+                detailRows.forEach(function(r){
+                    var a = (r.amount || '').replace(/[¥,\s]/g, '');
+                    var v = parseFloat(a);
+                    if (!isNaN(v)) { total += v; hasAmount = true; }
+                });
+                var amount = hasAmount ? ('¥' + total.toFixed(2)) : '-';
+                var status = hasAmount ? '已报价' : '未报价';
+                var statusClass = hasAmount ? 'status-processing' : 'status-default';
+                // 自动生成报价单号（基于询价单号+序号）
+                var quoteNoInput = document.getElementById('add-quote-quote-no');
+                var inquiryNoVal = document.getElementById('add-quote-inquiry-no').value || ('RFQ-' + inquiryId);
+                var existingList = quoteDataByInquiry[inquiryId] || [];
+                var seq = existingList.length + 1;
+                var baseQuoteNo = inquiryNoVal.replace(/^RFQ/, 'BJ');
+                var quoteNo = baseQuoteNo + '-' + String(seq).padStart(2, '0');
+                if (quoteNoInput) quoteNoInput.value = quoteNo;
+                var amountInput = document.getElementById('add-quote-amount');
+                if (amountInput) amountInput.value = amount;
+                if (!quoteDataByInquiry[inquiryId]) quoteDataByInquiry[inquiryId] = [];
+                quoteDataByInquiry[inquiryId].push({
+                    supplierName: supplier,
+                    contact: (document.getElementById('add-quote-contact').value || '').trim() || '-',
+                    phone: (document.getElementById('add-quote-phone').value || '').trim() || '-',
+                    quoteNo: hasAmount ? quoteNo : '',
+                    amount: amount,
+                    status: status,
+                    statusClass: statusClass,
+                    details: addQuoteDetails.slice()
+                });
+                closeModal('add-quote-modal');
+                var selectedRow = document.querySelector('#quote-table-body tr.inquiry-row.selected');
+                if (selectedRow && selectedRow.getAttribute('data-inquiry-id') === String(inquiryId)) renderQuoteDetail(inquiryId);
+            });
+            // 打开弹窗时重置
+            document.addEventListener('click', function (e) {
+                var t = e.target && (e.target.classList.contains('btn-add-quote') ? e.target : e.target.closest && e.target.closest('.btn-add-quote'));
+                if (!t) return;
+                // 根据询价单来源，自动带出明细
+                var inquiryId = t.getAttribute('data-id');
+                var row = document.querySelector('#quote-table-body tr.inquiry-row[data-inquiry-id="' + inquiryId + '"]');
+                var sourceText = row && row.cells ? row.cells[2].textContent.trim() : '';
+                var detailData = inquiryDetailData[parseInt(inquiryId, 10)] || {};
+                var sourceVal = (sourceText === '需求申请' ? 'demand' : (sourceText === '采购计划' ? 'plan' : 'manual'));
+                var lines = [];
+                if (sourceVal === 'demand' && detailData.demandIds && detailData.demandIds.length) {
+                    detailData.demandIds.forEach(function(did){
+                        var d = DEMAND_LIST.find(function(x){ return x.id === did; });
+                        if (d && d.details) lines = lines.concat(d.details);
+                    });
+                } else if (sourceVal === 'plan' && detailData.planId) {
+                    var p = PLAN_LIST.find(function(x){ return x.id === detailData.planId; });
+                    if (p && p.details) lines = lines.concat(p.details);
+                } else if (sourceVal === 'manual' && detailData.manualDetails) {
+                    lines = detailData.manualDetails.slice();
+                }
+                // 规范字段
+                addQuoteDetails = lines.map(function(l){
+                    return {
+                        materialCode: l.materialCode || '',
+                        materialName: l.materialName || '',
+                        spec: l.spec || '',
+                        qty: l.qty != null ? l.qty : '',
+                        unit: l.unit || '',
+                        deliveryDate: l.deliveryDate || '',
+                        price: '',
+                        amount: ''
+                    };
+                });
+                renderAddQuoteDetails();
+                // 重置金额显示
+                var amountInput = document.getElementById('add-quote-amount');
+                if (amountInput) amountInput.value = '';
+            });
+        })();
+        function selectInquiryRow(row) {
+            var id = row && row.getAttribute('data-inquiry-id');
+            if (!id) return;
+            document.querySelectorAll('#quote-table-body tr.inquiry-row').forEach(function (r) { r.classList.remove('selected'); r.style.backgroundColor = ''; });
+            row.classList.add('selected');
+            row.style.backgroundColor = 'var(--table-row-selected-bg, #f0f7ff)';
+            renderQuoteDetail(parseInt(id, 10));
+        }
+        document.getElementById('quote-table-body').addEventListener('click', function (e) {
+            var row = e.target && (e.target.closest && e.target.closest('tr.inquiry-row'));
+            if (!row || e.target.type === 'checkbox' || (e.target.classList && (e.target.classList.contains('btn-view-inquiry') || e.target.closest('.btn-view-inquiry') || e.target.classList.contains('btn-add-quote') || e.target.closest('.btn-add-quote') || e.target.classList.contains('btn-inquiry-compare') || e.target.closest('.btn-inquiry-compare')))) return;
+            selectInquiryRow(row);
+        });
+        var firstRow = document.querySelector('#quote-table-body tr.inquiry-row');
+        if (firstRow) selectInquiryRow(firstRow);
+        var compareRowsHtml = '<tr><td>EQ-1001</td><td>数控机床</td><td>XK7132</td><td>3</td><td>台</td><td>¥140,000.00</td><td>¥145,000.00</td><td class="compare-lowest">¥139,333.33</td></tr>' +
+            '<tr><td>EQ-2001</td><td>空压机</td><td>30kW</td><td>2</td><td>台</td><td>¥42,500.00</td><td class="compare-lowest">¥41,000.00</td><td>¥43,000.00</td></tr>';
+        function openInquiryCompareModal(inquiryId) {
+            var overlay = document.getElementById('inquiry-compare-modal');
+            var titleEl = document.getElementById('inquiry-compare-modal-title');
+            var bodyEl = document.getElementById('inquiry-compare-modal-body');
+            var footEl = document.getElementById('inquiry-compare-modal-foot');
+            var totalA = document.getElementById('inquiry-compare-modal-total-a');
+            var totalB = document.getElementById('inquiry-compare-modal-total-b');
+            var totalC = document.getElementById('inquiry-compare-modal-total-c');
+            if (!overlay || !bodyEl) return;
+            var row = document.querySelector('#quote-table-body tr.inquiry-row[data-inquiry-id="' + inquiryId + '"]');
+            var inquiryNo = row && row.cells && row.cells[1] ? row.cells[1].textContent.trim() : ('RFQ-' + inquiryId);
+            if (titleEl) titleEl.textContent = '比价表 - ' + inquiryNo;
+            if (bodyEl) bodyEl.innerHTML = compareRowsHtml;
+            if (footEl) footEl.style.display = 'table-footer-group';
+            if (totalA) { totalA.textContent = '¥505,000.00'; totalA.classList.remove('compare-lowest'); }
+            if (totalB) { totalB.textContent = '¥517,000.00'; totalB.classList.remove('compare-lowest'); }
+            if (totalC) { totalC.textContent = '¥504,000.00'; totalC.classList.add('compare-lowest'); }
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeInquiryCompareModal() {
+            var overlay = document.getElementById('inquiry-compare-modal');
+            if (overlay) { overlay.classList.remove('active'); document.body.style.overflow = ''; }
+        }
+        (function bindInquiryCompareModal() {
+            var overlay = document.getElementById('inquiry-compare-modal');
+            if (overlay && !overlay.getAttribute('data-inquiry-compare-bound')) {
+                overlay.setAttribute('data-inquiry-compare-bound', '1');
+                overlay.addEventListener('click', function(e) { if (e.target === overlay) closeInquiryCompareModal(); });
+                var closeBtns = overlay.querySelectorAll('[data-close-modal="inquiry-compare-modal"]');
+                closeBtns.forEach(function(btn) { btn.addEventListener('click', function() { closeInquiryCompareModal(); }); });
+            }
+        })();
+
+        // 根据中标报价生成合同订单：打开 & 填充
+        function openQuoteCreateOrderModal(inquiryId, quoteIndex) {
+            var overlay = document.getElementById('quote-create-order-modal');
+            var tbody = document.getElementById('quote-order-detail-body');
+            var summaryEl = document.getElementById('quote-order-detail-summary');
+            if (!overlay || !tbody) return;
+            var list = quoteDataByInquiry[inquiryId] || [];
+            var q = list[quoteIndex] || {};
+            // 基本信息
+            var inquiryRow = document.querySelector('#quote-table-body tr.inquiry-row[data-inquiry-id="' + inquiryId + '"]');
+            var inquiryNo = inquiryRow && inquiryRow.cells ? inquiryRow.cells[1].textContent.trim() : ('RFQ-' + inquiryId);
+            var orderNoEl = document.getElementById('quote-order-no');
+            var supplierEl = document.getElementById('quote-order-supplier');
+            var inquiryNoEl = document.getElementById('quote-order-inquiry-no');
+            var quoteNoEl = document.getElementById('quote-order-quote-no');
+            var amountEl = document.getElementById('quote-order-amount');
+            var dateEl = document.getElementById('quote-order-date');
+            var latestEl = document.getElementById('quote-order-latest-delivery');
+            document.getElementById('quote-order-inquiry-id').value = inquiryId;
+            document.getElementById('quote-order-quote-index').value = quoteIndex;
+            // 生成合同订单号（PO-YYYY-xxx）
+            var today = new Date();
+            var baseYear = today.getFullYear();
+            var seq = Math.floor(Math.random() * 900) + 100;
+            var poNo = 'PO-' + baseYear + '-' + String(seq);
+            if (orderNoEl) orderNoEl.value = poNo;
+            if (supplierEl) supplierEl.value = q.supplierName || '';
+            if (inquiryNoEl) inquiryNoEl.value = inquiryNo;
+            if (quoteNoEl) quoteNoEl.value = q.quoteNo || '';
+            if (amountEl) amountEl.value = q.amount || '-';
+            if (dateEl) dateEl.value = today.toISOString().slice(0, 10);
+            if (latestEl) {
+                var d7 = new Date(today);
+                d7.setDate(d7.getDate() + 15);
+                latestEl.value = d7.toISOString().slice(0, 10);
+            }
+            // 合同信息默认值
+            var contractTpl = document.getElementById('quote-order-contract-template');
+            var contractNo = document.getElementById('quote-order-contract-no');
+            var contractName = document.getElementById('quote-order-contract-name');
+            var contractType = document.getElementById('quote-order-contract-type');
+            var contractDate = document.getElementById('quote-order-contract-date');
+            var contractStart = document.getElementById('quote-order-contract-start');
+            var contractEnd = document.getElementById('quote-order-contract-end');
+            if (contractTpl && contractTpl.options.length > 1) contractTpl.value = 'single';
+            if (contractNo) contractNo.value = '';
+            if (contractName) contractName.value = '基于询价单 ' + (inquiryNo || '') + ' 的采购合同';
+            if (contractType) contractType.value = 'single';
+            if (contractDate) contractDate.value = today.toISOString().slice(0, 10);
+            if (contractStart) contractStart.value = today.toISOString().slice(0, 10);
+            if (contractEnd) {
+                var endDate = new Date(today);
+                endDate.setFullYear(endDate.getFullYear() + 1);
+                contractEnd.value = endDate.toISOString().slice(0, 10);
+            }
+            // 订单信息：付款条件、交货地点、采购员
+            var paymentEl = document.getElementById('quote-order-payment-terms');
+            var deliveryAddrEl = document.getElementById('quote-order-delivery-address');
+            var buyerEl = document.getElementById('quote-order-buyer');
+            if (paymentEl) paymentEl.value = '';
+            if (deliveryAddrEl) deliveryAddrEl.value = '';
+            if (buyerEl) buyerEl.value = '当前用户';
+            // 明细来自报价明细（若无，则为空）；字段与需求申请页生成合同订单一致：含税单价、税率可编辑，含税金额、不含税金额自动计算
+            var rows = q.details || [];
+            var tdStyle = 'padding:8px 10px;font-size:13px;border-bottom:1px solid #f0f0f0;';
+            var inputStyle = 'width:100%;min-width:60px;padding:6px 8px;font-size:13px;border:1px solid #d9d9d9;border-radius:4px;box-sizing:border-box;';
+            tbody.innerHTML = rows.map(function(r, i) {
+                var numericQty = parseFloat(r.qty);
+                var numericPrice = parseFloat((r.price || '').toString().replace(/[¥,\s]/g, ''));
+                var unitPrice = numericPrice && !isNaN(numericPrice) ? numericPrice.toFixed(2) : '';
+                var taxRate = (r.taxRate != null && r.taxRate !== '') ? r.taxRate : '13';
+                var amountTax = (!isNaN(numericQty) && !isNaN(numericPrice)) ? (numericQty * numericPrice).toFixed(2) : '';
+                var amountNotax = amountTax && taxRate !== '' && parseFloat(taxRate) >= 0 ? (parseFloat(amountTax) / (1 + parseFloat(taxRate) / 100)).toFixed(2) : '';
+                return '<tr data-i="' + i + '">' +
+                    '<td style="' + tdStyle + '">' + (r.materialCode || '-') + '</td>' +
+                    '<td style="' + tdStyle + '">' + (r.materialName || '-') + '</td>' +
+                    '<td style="' + tdStyle + '">' + (r.spec || '-') + '</td>' +
+                    '<td style="' + tdStyle + ';text-align:right;">' + (r.qty != null ? r.qty : '-') + '</td>' +
+                    '<td style="' + tdStyle + '">' + (r.unit || '-') + '</td>' +
+                    '<td style="' + tdStyle + '">' + (r.deliveryDate || '-') + '</td>' +
+                    '<td style="' + tdStyle + ';text-align:right;">' + (r.price != null ? r.price : '-') + '</td>' +
+                    '<td style="' + tdStyle + ';text-align:right;"><input type="text" class="form-input quote-order-unit-price" data-i="' + i + '" value="' + (unitPrice || '') + '" style="' + inputStyle + '"></td>' +
+                    '<td style="' + tdStyle + ';text-align:right;"><input type="text" class="form-input quote-order-tax-rate" data-i="' + i + '" value="' + (taxRate || '') + '" placeholder="如13" style="' + inputStyle + '"></td>' +
+                    '<td style="' + tdStyle + ';text-align:right;"><input type="text" class="form-input quote-order-amount-tax" data-i="' + i + '" value="' + (amountTax || '') + '" readonly style="' + inputStyle + ';background:#f5f5f5;"></td>' +
+                    '<td style="' + tdStyle + ';text-align:right;"><input type="text" class="form-input quote-order-amount-notax" data-i="' + i + '" value="' + (amountNotax || '') + '" readonly style="' + inputStyle + ';background:#f5f5f5;"></td>' +
+                '</tr>';
+            }).join('');
+            if (summaryEl) summaryEl.textContent = '共 ' + rows.length + ' 条';
+            var totalTaxEl = document.getElementById('quote-order-total-tax');
+            var totalNotaxEl = document.getElementById('quote-order-total-notax');
+            function recalcRow(tr) {
+                var cells = tr.querySelectorAll('td');
+                if (cells.length < 11) return;
+                var qtyText = (cells[3] && cells[3].textContent) ? cells[3].textContent.trim() : '';
+                var qty = parseFloat(qtyText.replace(/[,]/g, '')) || 0;
+                var priceInput = tr.querySelector('.quote-order-unit-price');
+                var rateInput = tr.querySelector('.quote-order-tax-rate');
+                var taxAmountInput = tr.querySelector('.quote-order-amount-tax');
+                var notaxAmountInput = tr.querySelector('.quote-order-amount-notax');
+                if (!priceInput || !taxAmountInput || !notaxAmountInput) return;
+                var price = parseFloat(String(priceInput.value).replace(/,/g, '')) || 0;
+                var rate = parseFloat(String(rateInput && rateInput.value).replace(/,/g, '')) || 0;
+                var amountTax = price * qty;
+                var amountNotax = (rate >= 0 && rate <= 100) ? amountTax / (1 + rate / 100) : amountTax;
+                taxAmountInput.value = amountTax.toFixed(2);
+                notaxAmountInput.value = amountNotax.toFixed(2);
+            }
+            function recalcTotals() {
+                var sumTax = 0, sumNotax = 0;
+                tbody.querySelectorAll('tr').forEach(function(tr) {
+                    recalcRow(tr);
+                    var taxInput = tr.querySelector('.quote-order-amount-tax');
+                    var notaxInput = tr.querySelector('.quote-order-amount-notax');
+                    if (taxInput && taxInput.value) sumTax += parseFloat(String(taxInput.value).replace(/,/g, '')) || 0;
+                    if (notaxInput && notaxInput.value) sumNotax += parseFloat(String(notaxInput.value).replace(/,/g, '')) || 0;
+                });
+                if (totalTaxEl) totalTaxEl.textContent = sumTax.toFixed(2);
+                if (totalNotaxEl) totalNotaxEl.textContent = sumNotax.toFixed(2);
+                if (amountEl) amountEl.value = sumTax > 0 ? ('¥' + sumTax.toFixed(2)) : '-';
+            }
+            tbody.querySelectorAll('.quote-order-unit-price, .quote-order-tax-rate').forEach(function(input) {
+                input.addEventListener('input', recalcTotals);
+                input.addEventListener('change', recalcTotals);
+            });
+            recalcTotals();
+            // 绑定关闭
+            if (!overlay.getAttribute('data-quote-order-bound')) {
+                overlay.setAttribute('data-quote-order-bound', '1');
+                overlay.addEventListener('click', function(e){
+                    if (e.target === overlay) {
+                        overlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                });
+                overlay.querySelectorAll('[data-close-modal="quote-create-order-modal"]').forEach(function(btn){
+                    btn.addEventListener('click', function(){
+                        overlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    });
+                });
+                var submitBtn = document.getElementById('btn-quote-order-submit');
+                if (submitBtn) {
+                    submitBtn.addEventListener('click', function(){
+                        if (!supplierEl || !supplierEl.value) {
+                            alert('供应商名称不能为空');
+                            return;
+                        }
+                        var tplEl = document.getElementById('quote-order-contract-template');
+                        if (tplEl && !tplEl.value) {
+                            alert('请先选择合同模板');
+                            return;
+                        }
+                        var nameEl = document.getElementById('quote-order-contract-name');
+                        if (nameEl && !nameEl.value.trim()) {
+                            alert('请填写合同名称');
+                            return;
+                        }
+                        if (amountEl && (!amountEl.value || amountEl.value === '-')) {
+                            if (!confirm('当前订单金额为 0，确认继续生成合同订单吗？')) return;
+                        }
+                        // 标记对应报价已生成合同订单
+                        var qList = quoteDataByInquiry[inquiryId] || [];
+                        var idx = parseInt(document.getElementById('quote-order-quote-index').value, 10);
+                        if (!isNaN(idx) && qList[idx]) {
+                            qList[idx].orderGenerated = true;
+                        }
+                        overlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                        alert('采购订单已生成（原型模拟，不跳转页面）。');
+                        // 刷新下方报价信息与查看弹窗中的参与供应商生成状态展示
+                        renderQuoteDetail(parseInt(inquiryId, 10));
+                        if (document.getElementById('view-inquiry-modal') && document.getElementById('view-inquiry-modal').classList.contains('active')) {
+                            openInquiryModalWithSupplier(inquiryId, supplierEl.value || '');
+                        }
+                    });
+                }
+                var previewBtn = document.getElementById('btn-quote-order-preview');
+                if (previewBtn) {
+                    previewBtn.addEventListener('click', function() {
+                        var tplEl = document.getElementById('quote-order-contract-template');
+                        var tplText = tplEl && tplEl.options[tplEl.selectedIndex] ? tplEl.options[tplEl.selectedIndex].text : '';
+                        alert('合同预览：将根据所选模板「' + (tplText || '') + '」及当前填写的合同信息、订单信息、采购明细生成预览（原型模拟）。');
+                    });
+                }
+                var saveContractBtn = document.getElementById('btn-quote-order-save-contract');
+                if (saveContractBtn) {
+                    saveContractBtn.addEventListener('click', function() {
+                        var tplEl = document.getElementById('quote-order-contract-template');
+                        if (tplEl && !tplEl.value) {
+                            alert('请先选择合同模板');
+                            return;
+                        }
+                        var nameEl = document.getElementById('quote-order-contract-name');
+                        if (nameEl && !nameEl.value.trim()) {
+                            alert('请填写合同名称');
+                            return;
+                        }
+                        alert('合同已保存为草稿（原型模拟），可继续编辑后生成合同订单。');
+                    });
+                }
+            }
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function openInquiryModalWithSupplier(inquiryId, preferredSupplier) {
+            var inquiryIdNum = parseInt(inquiryId, 10);
+            var row = document.querySelector('#quote-table-body tr.inquiry-row[data-inquiry-id="' + inquiryId + '"]');
+            if (!row || !row.cells) return;
+            document.getElementById('view-inquiry-no').value = row.cells[1].textContent.trim();
+            document.getElementById('view-inquiry-no').setAttribute('data-inquiry-id', inquiryId);
+            var sourceText = row.cells[2].textContent.trim();
+            document.getElementById('view-inquiry-source').value = sourceText;
+            document.getElementById('view-inquiry-supplier-count').value = row.cells[3].textContent.trim();
+            document.getElementById('view-inquiry-status').value = row.cells[4].textContent.trim();
+            document.getElementById('view-inquiry-creator').value = row.cells[5].textContent.trim();
+            document.getElementById('view-inquiry-create-date').value = row.cells[6].textContent.trim();
+            document.getElementById('view-inquiry-effective').value = row.cells[7].textContent.trim();
+            document.getElementById('view-inquiry-deadline').value = row.cells[8].textContent.trim();
+            // 报价情况填充 + 绑定点击切换报价明细（直接使用 quoteDataByInquiry 中的 details）
+            var quoteTbody = document.getElementById('view-inquiry-quote-body');
+            var quoteSummary = document.getElementById('view-inquiry-quote-summary');
+            var quoteList = quoteDataByInquiry[inquiryIdNum] || [];
+            var selectedSupplierName = preferredSupplier || viewInquiryPreferredSupplier || '';
+            if (quoteTbody) {
+                quoteTbody.innerHTML = quoteList.map(function(q) {
+                    var statusText = q.status || '未报价';
+                    var isAward = statusText === '已中标' ? '是' : '否';
+                    var displayAmount = (statusText === '未报价') ? '-' : (q.amount || '-');
+                    var genStatus = '-';
+                    if (statusText === '已中标') {
+                        genStatus = q.orderGenerated ? '已生成' : '未生成';
+                    }
+                    return '<tr class="view-quote-row" data-supplier="' + (q.supplierName || '').replace(/"/g, '&quot;') + '">' +
+                        '<td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (q.supplierName || '-') + '</td>' +
+                        '<td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (q.contact || '-') + '</td>' +
+                        '<td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (q.phone || '-') + '</td>' +
+                        '<td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (q.quoteNo || '') + '</td>' +
+                        '<td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;text-align:right;">' + displayAmount + '</td>' +
+                        '<td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + statusText + '</td>' +
+                        '<td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + genStatus + '</td>' +
+                        '<td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + isAward + '</td>' +
+                    '</tr>';
+                }).join('');
+            }
+            if (quoteSummary) quoteSummary.textContent = '共 ' + quoteList.length + ' 条';
+            function renderQuoteDetail(supplierName) {
+                var detailSummary = document.getElementById('view-inquiry-quote-detail-summary');
+                var detailBody = document.getElementById('view-inquiry-quote-detail-body');
+                if (detailSummary) detailSummary.textContent = supplierName ? ('当前供应商：' + supplierName) : '未选择供应商';
+                if (!detailBody) return;
+                if (!supplierName) { detailBody.innerHTML = ''; return; }
+                var q = quoteList.find(function(x){ return (x.supplierName || '') === supplierName; });
+                var rows = (q && q.status === '未报价') ? [] : ((q && q.details) ? q.details : []);
+                detailBody.innerHTML = rows.map(function(r) {
+                    return '<tr>' +
+                        '<td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (r.materialCode || '-') + '</td>' +
+                        '<td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (r.materialName || '-') + '</td>' +
+                        '<td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (r.spec || '-') + '</td>' +
+                        '<td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;text-align:right;">' + (r.qty != null ? r.qty : '-') + '</td>' +
+                        '<td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (r.unit || '-') + '</td>' +
+                        '<td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (r.deliveryDate || '-') + '</td>' +
+                        '<td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;text-align:right;">' + (r.price || '-') + '</td>' +
+                        '<td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;text-align:right;">' + (r.amount || '-') + '</td>' +
+                    '</tr>';
+                }).join('');
+            }
+            // 默认选中
+            if (quoteList.length) {
+                if (!selectedSupplierName) selectedSupplierName = quoteList[0].supplierName || '';
+                renderQuoteDetail(selectedSupplierName);
+                // 高亮
+                if (quoteTbody) {
+                    var rows = quoteTbody.querySelectorAll('.view-quote-row');
+                    rows.forEach(function(r){ r.style.background=''; });
+                    var targetRow = Array.prototype.find.call(rows, function(r){ return r.getAttribute('data-supplier') === selectedSupplierName; });
+                    if (targetRow) targetRow.style.background = '#e6f7ff';
+                }
+            } else {
+                renderQuoteDetail('');
+            }
+            // 点击切换
+            if (quoteTbody) {
+                quoteTbody.querySelectorAll('.view-quote-row').forEach(function(trEl) {
+                    trEl.addEventListener('click', function() {
+                        quoteTbody.querySelectorAll('.view-quote-row').forEach(function(r){ r.style.background=''; });
+                        this.style.background = '#e6f7ff';
+                        var sup = this.getAttribute('data-supplier') || '';
+                        renderQuoteDetail(sup);
+                    });
+                });
+            }
+            // 根据来源显示对应的动态字段和明细（优先使用表格中的来源文本）
+            var detailData = inquiryDetailData[inquiryIdNum] || {};
+            var sourceVal = (sourceText === '需求申请' ? 'demand' : (sourceText === '采购计划' ? 'plan' : 'manual'));
+            // 隐藏所有动态块
+            document.getElementById('view-inquiry-block-demand').style.display = 'none';
+            document.getElementById('view-inquiry-block-plan').style.display = 'none';
+            document.getElementById('view-inquiry-detail-manual').style.display = 'none';
+            // 根据来源显示对应的块
+            if (sourceVal === 'demand') {
+                var demandTagsEl = document.getElementById('view-inquiry-demand-tags');
+                if (demandTagsEl && detailData.demandIds && detailData.demandIds.length) {
+                    demandTagsEl.innerHTML = detailData.demandIds.map(function(demandId) {
+                        var d = DEMAND_LIST.find(function(x) { return x.id === demandId; });
+                        var displayText = demandId + (d ? (' ' + d.title) : '');
+                        return '<span class="demand-tag" style="display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:#e6f7ff;border:1px solid #91d5ff;border-radius:4px;font-size:13px;">' + displayText + '</span>';
+                    }).join('');
+                } else {
+                    demandTagsEl.innerHTML = '';
+                }
+                document.getElementById('view-inquiry-block-demand').style.display = 'block';
+            } else if (sourceVal === 'plan') {
+                var planIdEl = document.getElementById('view-inquiry-plan-id');
+                if (planIdEl) planIdEl.value = detailData.planId || '';
+                document.getElementById('view-inquiry-block-plan').style.display = 'block';
+            } else {
+                // 手动创建：填充询价明细
+                var manualTbody = document.getElementById('view-inquiry-manual-detail-body');
+                if (manualTbody && detailData.manualDetails && detailData.manualDetails.length) {
+                    manualTbody.innerHTML = detailData.manualDetails.map(function(row) {
+                        return '<tr><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (row.materialCode || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (row.materialName || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (row.spec || '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;text-align:right;">' + (row.qty != null ? row.qty : '-') + '</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;">' + (row.unit || '-') + '</td></tr>';
+                    }).join('');
+                }
+                document.getElementById('view-inquiry-detail-manual').style.display = 'block';
+            }
+            // 填充备注
+            var remarkEl = document.getElementById('view-inquiry-remark');
+            if (remarkEl) remarkEl.value = detailData.remark || '';
+            openModal('view-inquiry-modal');
+            // 重置首选
+            viewInquiryPreferredSupplier = '';
+        }
+        document.addEventListener('click', function (e) {
+            var t = e.target && (e.target.classList.contains('btn-view-inquiry') ? e.target : e.target.closest && e.target.closest('.btn-view-inquiry'));
+            if (t) {
+                e.preventDefault(); e.stopPropagation();
+                viewInquiryPreferredSupplier = '';
+                openInquiryModalWithSupplier(t.getAttribute('data-inquiry-id'), '');
+                return;
+            }
+            t = e.target && (e.target.classList.contains('btn-inquiry-compare') ? e.target : e.target.closest && e.target.closest('.btn-inquiry-compare'));
+            if (t) { e.preventDefault(); e.stopPropagation(); openInquiryCompareModal(t.getAttribute('data-inquiry-id')); return; }
+            t = e.target && (e.target.classList.contains('btn-add-quote') ? e.target : e.target.closest && e.target.closest('.btn-add-quote'));
+            if (t) {
+                e.preventDefault(); e.stopPropagation();
+                var inquiryId = t.getAttribute('data-id');
+                var row = document.querySelector('#quote-table-body tr.inquiry-row[data-inquiry-id="' + inquiryId + '"]');
+                document.getElementById('add-quote-inquiry-id').value = inquiryId;
+                document.getElementById('add-quote-inquiry-no').value = row && row.cells ? row.cells[1].textContent.trim() : ('RFQ-' + inquiryId);
+                document.getElementById('add-quote-supplier').value = '';
+                document.getElementById('add-quote-contact').value = '';
+                document.getElementById('add-quote-phone').value = '';
+                document.getElementById('add-quote-quote-no').value = '';
+                openModal('add-quote-modal');
+                return;
+            }
+            t = e.target && (e.target.classList.contains('btn-quote-detail') ? e.target : e.target.closest && e.target.closest('.btn-quote-detail'));
+            if (t) {
+                e.preventDefault();
+                e.stopPropagation();
+                var inquiryId = t.getAttribute('data-id');
+                var idx = parseInt(t.getAttribute('data-index'), 10);
+                var list = quoteDataByInquiry[inquiryId] || [];
+                var supName = (list[idx] && list[idx].supplierName) ? list[idx].supplierName : '';
+                viewInquiryPreferredSupplier = supName;
+                openInquiryModalWithSupplier(inquiryId, supName);
+                return;
+            }
+            t = e.target && (e.target.classList.contains('btn-quote-award') ? e.target : e.target.closest && e.target.closest('.btn-quote-award'));
+            if (t) { e.preventDefault(); if (confirm('确定将该报价设为中标？')) alert('已设为中标（原型模拟）'); return; }
+            t = e.target && (e.target.classList.contains('btn-quote-create-order') ? e.target : e.target.closest && e.target.closest('.btn-quote-create-order'));
+            if (t) {
+                e.preventDefault();
+                e.stopPropagation();
+                var inquiryIdForOrder = t.getAttribute('data-id');
+                var idxForOrder = parseInt(t.getAttribute('data-index'), 10);
+                openQuoteCreateOrderModal(inquiryIdForOrder, idxForOrder);
+                return;
+            }
+            // 删除询价单（仅未执行状态），二次确认
+            t = e.target && (e.target.classList.contains('btn-inquiry-delete') ? e.target : e.target.closest && e.target.closest('.btn-inquiry-delete'));
+            if (t) {
+                e.preventDefault();
+                e.stopPropagation();
+                var inquiryId = t.getAttribute('data-inquiry-id');
+                if (!inquiryId) return;
+                if (!confirm('确定要删除该询价单吗？删除后将无法恢复。')) return;
+                var row = document.querySelector('#quote-table-body tr.inquiry-row[data-inquiry-id="' + inquiryId + '"]');
+                if (row && row.parentNode) {
+                    var wasSelected = row.classList.contains('selected');
+                    row.parentNode.removeChild(row);
+                    // 更新总条数
+                    var tbody = document.getElementById('quote-table-body');
+                    var countEl = document.getElementById('quote-total-count');
+                    if (tbody && countEl) countEl.textContent = tbody.querySelectorAll('tr.inquiry-row').length;
+                    // 删除内存中的数据
+                    if (quoteDataByInquiry[inquiryId]) delete quoteDataByInquiry[inquiryId];
+                    if (inquiryDetailData[inquiryId]) delete inquiryDetailData[inquiryId];
+                    // 如果是当前选中行，被删后自动选中第一行并刷新下方报价信息
+                    if (wasSelected) {
+                        var firstRow = tbody && tbody.querySelector('tr.inquiry-row');
+                        if (firstRow) {
+                            selectInquiryRow(firstRow);
+                        } else {
+                            // 没有任何询价单时，清空下方报价信息区域
+                            var quoteBody = document.getElementById('quote-detail-body');
+                            var quoteTip = document.getElementById('quote-detail-tip');
+                            if (quoteBody) quoteBody.innerHTML = '<tr id="quote-detail-empty"><td colspan="7" class="text-muted" style="text-align: center; padding: 24px;">暂无报价数据</td></tr>';
+                            if (quoteTip) quoteTip.textContent = '请选择左侧列表中的一条询价单，以查看对应的报价信息。';
+                        }
+                    }
+                }
+                return;
+            }
+        });
+        </script>
+    </div>
+</body>
+</html>

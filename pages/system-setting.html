@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统设置</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">系统配置</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">系统设置</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">配置系统名称、Logo、时区、日期格式等基础参数；配置 ERP/MES/WMS 接口地址、认证、超时等；配置业务规则参数。</p>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="section-title">基础配置</div>
+                <div class="form-info-grid">
+                    <div class="form-info-item"><span class="form-info-label">系统名称</span><span class="form-info-value">设计协同系统</span></div>
+                    <div class="form-info-item"><span class="form-info-label">时区</span><span class="form-info-value">Asia/Shanghai</span></div>
+                    <div class="form-info-item"><span class="form-info-label">日期格式</span><span class="form-info-value">yyyy-MM-dd</span></div>
+                    <div class="form-info-item"><span class="form-info-label">时间格式</span><span class="form-info-value">HH:mm:ss</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top:16px;">
+            <div class="card-body">
+                <div class="section-title">接口配置</div>
+                <div class="table-wrapper">
+                    <table class="output-table">
+                        <thead>
+                            <tr>
+                                <th>接口</th>
+                                <th>地址</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ERP 接口</td>
+                                <td>http://erp.internal/api</td>
+                                <td><span class="status-badge status-success">正常</span></td>
+                                <td><button class="btn btn-sm btn-default" data-open-modal="sys-interface-config-modal">配置</button></td>
+                            </tr>
+                            <tr>
+                                <td>MES 接口</td>
+                                <td>http://mes.internal/api</td>
+                                <td><span class="status-badge status-success">正常</span></td>
+                                <td><button class="btn btn-sm btn-default" data-open-modal="sys-interface-config-modal">配置</button></td>
+                            </tr>
+                            <tr>
+                                <td>WMS 接口</td>
+                                <td>http://wms.internal/api</td>
+                                <td><span class="status-badge status-success">正常</span></td>
+                                <td><button class="btn btn-sm btn-default" data-open-modal="sys-interface-config-modal">配置</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top:16px;">
+            <div class="card-body">
+                <div class="section-title">业务参数</div>
+                <div class="table-wrapper">
+                    <table class="output-table">
+                        <thead>
+                            <tr>
+                                <th>参数名称</th>
+                                <th>参数键</th>
+                                <th>参数值</th>
+                                <th>说明</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>审批超时时长(小时)</td>
+                                <td>approval.timeout.hours</td>
+                                <td>4</td>
+                                <td>审批超时预警阈值</td>
+                                <td><button class="btn btn-sm btn-default" data-open-modal="sys-param-edit-modal">编辑</button></td>
+                            </tr>
+                            <tr>
+                                <td>会话超时(分钟)</td>
+                                <td>session.timeout.minutes</td>
+                                <td>30</td>
+                                <td>用户无操作自动登出时间</td>
+                                <td><button class="btn btn-sm btn-default" data-open-modal="sys-param-edit-modal">编辑</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="sys-interface-config-modal" class="modal-overlay">
+            <div class="modal" style="max-width:520px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">接口配置</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <div class="form-item"><label class="form-label required">接口地址</label><input type="text" class="form-input" value="http://erp.internal/api"></div>
+                    <div class="form-item"><label class="form-label">超时(秒)</label><input type="number" class="form-input" value="30"></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="sys-interface-config-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="sys-interface-config-modal" onclick="alert('✅ 配置已保存')">保存</button></div>
+            </div>
+        </div>
+        <div id="sys-param-edit-modal" class="modal-overlay">
+            <div class="modal" style="max-width:480px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">编辑业务参数</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <div class="form-item"><label class="form-label">参数名称</label><input type="text" class="form-input" value="审批超时时长(小时)" readonly></div>
+                    <div class="form-item"><label class="form-label">参数值</label><input type="number" class="form-input" value="4"></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="sys-param-edit-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="sys-param-edit-modal" onclick="alert('✅ 已保存')">保存</button></div>
+            </div>
+        </div>
+    </div>
+    <script>if(typeof PageInteractions!=='undefined')PageInteractions.initButtons();</script>
+</body>
+</html>

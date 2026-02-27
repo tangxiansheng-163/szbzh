@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>不合格处理会审 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">采购执行</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/procurement-unqualified-handle-list.html" class="breadcrumb-item">不合格处理单</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">会审</span>
+        </div>
+
+        <div class="page-header">
+            <h2 class="page-title">不合格处理会审</h2>
+            <p class="page-description">对不合格物料进行会审，确定处理方式（退货/换货/让步接收），并创建对应的处理单据。</p>
+        </div>
+
+        <!-- 基本信息 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">基本信息</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+                    <div class="form-item">
+                        <label class="form-label">处理单号</label>
+                        <div class="form-value">UH-2025-001</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">关联采购订单</label>
+                        <div class="form-value">
+                            <a href="pages/procurement-order-detail.html?id=1" style="color:#1890ff;">PO-2025-001</a>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">供应商</label>
+                        <div class="form-value">深圳市电子科技有限公司</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">会审状态</label>
+                        <div class="form-value">
+                            <span class="status-badge status-processing">会审中</span>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">会审发起时间</label>
+                        <div class="form-value">2025-01-22 14:00</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">会审发起人</label>
+                        <div class="form-value">采购-张采购</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 会审处理明细 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">会审处理明细</h3>
+                <p style="font-size:12px;color:#8c8c8c;margin:0;font-weight:normal;">请为每个不合格物料确定处理方式，系统将根据选择自动创建对应的处理单据。</p>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table class="list-table-nowrap">
+                        <thead>
+                            <tr>
+                                <th width="60">序号</th>
+                                <th width="120">物料编码</th>
+                                <th width="200">物料名称</th>
+                                <th width="100">规格型号</th>
+                                <th width="80">单位</th>
+                                <th width="100">不合格数量</th>
+                                <th width="150">不合格项</th>
+                                <th width="150">处理方式 <span style="color:#ff4d4f;">*</span></th>
+                                <th width="200">处理说明</th>
+                                <th width="120">关联单据</th>
+                            </tr>
+                        </thead>
+                        <tbody id="review-detail-tbody">
+                            <tr>
+                                <td>1</td>
+                                <td>MAT-001</td>
+                                <td>电子元件A</td>
+                                <td>规格A</td>
+                                <td>个</td>
+                                <td>50</td>
+                                <td>尺寸偏差、外观缺陷</td>
+                                <td>
+                                    <select class="form-select handle-type-select" data-material-code="MAT-001" data-material-name="电子元件A" data-qty="50" style="width:100%;">
+                                        <option value="">请选择</option>
+                                        <option value="return">退货</option>
+                                        <option value="exchange">换货</option>
+                                        <option value="concession">让步接收</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-input handle-remark-input" placeholder="填写处理说明（可选）" style="width:100%;">
+                                </td>
+                                <td class="related-doc-cell">-</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>MAT-002</td>
+                                <td>电子元件B</td>
+                                <td>规格B</td>
+                                <td>个</td>
+                                <td>30</td>
+                                <td>性能不达标</td>
+                                <td>
+                                    <select class="form-select handle-type-select" data-material-code="MAT-002" data-material-name="电子元件B" data-qty="30" style="width:100%;">
+                                        <option value="">请选择</option>
+                                        <option value="return">退货</option>
+                                        <option value="exchange">换货</option>
+                                        <option value="concession">让步接收</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-input handle-remark-input" placeholder="填写处理说明（可选）" style="width:100%;">
+                                </td>
+                                <td class="related-doc-cell">-</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>MAT-003</td>
+                                <td>电路板</td>
+                                <td>PCB-001</td>
+                                <td>块</td>
+                                <td>10</td>
+                                <td>焊接不良、功能异常</td>
+                                <td>
+                                    <select class="form-select handle-type-select" data-material-code="MAT-003" data-material-name="电路板" data-qty="10" style="width:100%;">
+                                        <option value="">请选择</option>
+                                        <option value="return">退货</option>
+                                        <option value="exchange">换货</option>
+                                        <option value="concession">让步接收</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-input handle-remark-input" placeholder="填写处理说明（可选）" style="width:100%;">
+                                </td>
+                                <td class="related-doc-cell">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 会审意见 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">会审意见</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-item">
+                    <label class="form-label">会审意见</label>
+                    <textarea class="form-textarea" id="review-opinion" rows="4" placeholder="填写会审意见（可选）"></textarea>
+                </div>
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px;">
+                    <div class="form-item">
+                        <label class="form-label">会审参与人</label>
+                        <div class="form-value">采购-张采购、质量-李质检、技术-王工</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">会审日期</label>
+                        <div class="form-value">2025-01-22</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="action-bar" style="margin-top:20px;">
+            <div class="action-left">
+                <button class="btn btn-primary" id="btn-submit-review">提交会审</button>
+                <button class="btn btn-default" onclick="history.back();">取消</button>
+            </div>
+        </div>
+
+        <script>
+        console.log('不合格处理会审 页面已加载');
+        
+        // 处理方式选择变化时，更新关联单据显示
+        document.querySelectorAll('.handle-type-select').forEach(function(select) {
+            select.addEventListener('change', function() {
+                var row = this.closest('tr');
+                var relatedDocCell = row.querySelector('.related-doc-cell');
+                var handleType = this.value;
+                var materialCode = this.getAttribute('data-material-code');
+                var materialName = this.getAttribute('data-material-name');
+                var qty = this.getAttribute('data-qty');
+                
+                if (handleType) {
+                    var docTypeText = {
+                        'return': '退货单',
+                        'exchange': '换货单',
+                        'concession': '让步接收单'
+                    };
+                    relatedDocCell.innerHTML = '<span style="color:#8c8c8c;">待创建' + docTypeText[handleType] + '</span>';
+                } else {
+                    relatedDocCell.innerHTML = '-';
+                }
+            });
+        });
+        
+        // 提交会审
+        document.getElementById('btn-submit-review').addEventListener('click', function() {
+            var selects = document.querySelectorAll('.handle-type-select');
+            var hasUnselected = false;
+            var handleDetails = [];
+            
+            selects.forEach(function(select) {
+                if (!select.value) {
+                    hasUnselected = true;
+                } else {
+                    var row = select.closest('tr');
+                    var remarkInput = row.querySelector('.handle-remark-input');
+                    handleDetails.push({
+                        materialCode: select.getAttribute('data-material-code'),
+                        materialName: select.getAttribute('data-material-name'),
+                        qty: select.getAttribute('data-qty'),
+                        handleType: select.value,
+                        remark: remarkInput ? remarkInput.value.trim() : ''
+                    });
+                }
+            });
+            
+            if (hasUnselected) {
+                alert('请为所有物料选择处理方式');
+                return;
+            }
+            
+            // 统计各类型单据数量
+            var returnCount = handleDetails.filter(function(d) { return d.handleType === 'return'; }).length;
+            var exchangeCount = handleDetails.filter(function(d) { return d.handleType === 'exchange'; }).length;
+            var concessionCount = handleDetails.filter(function(d) { return d.handleType === 'concession'; }).length;
+            
+            var confirmMsg = '确定提交会审结果？\n\n';
+            confirmMsg += '处理明细：\n';
+            confirmMsg += '- 退货：' + returnCount + ' 种物料\n';
+            confirmMsg += '- 换货：' + exchangeCount + ' 种物料\n';
+            confirmMsg += '- 让步接收：' + concessionCount + ' 种物料\n\n';
+            confirmMsg += '系统将自动创建对应的处理单据。';
+            
+            if (confirm(confirmMsg)) {
+                // 模拟创建单据
+                var createdDocs = [];
+                handleDetails.forEach(function(detail) {
+                    var docNo = '';
+                    var docType = '';
+                    if (detail.handleType === 'return') {
+                        docNo = 'RET-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+                        docType = '退货单';
+                    } else if (detail.handleType === 'exchange') {
+                        docNo = 'EXC-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+                        docType = '换货单';
+                    } else if (detail.handleType === 'concession') {
+                        docNo = 'CON-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+                        docType = '让步接收单';
+                    }
+                    createdDocs.push({ docNo: docNo, docType: docType, materialName: detail.materialName });
+                });
+                
+                // 更新关联单据显示
+                selects.forEach(function(select, idx) {
+                    var row = select.closest('tr');
+                    var relatedDocCell = row.querySelector('.related-doc-cell');
+                    var detail = handleDetails[idx];
+                    var doc = createdDocs[idx];
+                    if (doc) {
+                        var docUrl = '';
+                        if (detail.handleType === 'return') {
+                            docUrl = 'pages/procurement-return-detail.html';
+                        } else if (detail.handleType === 'exchange') {
+                            docUrl = 'pages/procurement-exchange-detail.html';
+                        } else if (detail.handleType === 'concession') {
+                            docUrl = 'pages/procurement-concession-detail.html';
+                        }
+                        relatedDocCell.innerHTML = '<a href="' + docUrl + '?no=' + doc.docNo + '" style="color:#1890ff;">' + doc.docNo + '</a>';
+                    }
+                });
+                
+                alert('✅ 会审已提交\n\n已创建以下单据：\n' + createdDocs.map(function(d) { return d.docNo + '（' + d.docType + '）'; }).join('\n') + '\n\n单据已同步至供应链协同应用。');
+                
+                // 实际应用中这里应该：
+                // 1. 提交会审结果到后端
+                // 2. 后端创建对应的退货单/换货单/让步接收单
+                // 3. 同步单据到供应链协同应用
+                // 4. 更新不合格处理单状态为"已会审"
+                // 5. 跳转到不合格处理单列表或详情页
+            }
+        });
+        
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+        </script>
+    </div>
+</body>
+</html>

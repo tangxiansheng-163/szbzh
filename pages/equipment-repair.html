@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>维修管理 - 设备管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/equipment-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">维护管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">维修管理</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理设备维修任务，包括维修申请、维修派工、维修执行、维修验收等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="维修单号、设备名称">
+                </div>
+                <div class="filter-item">
+                    <label>维修状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待派工</option>
+                        <option value="assigned">已派工</option>
+                        <option value="repairing">维修中</option>
+                        <option value="testing">测试中</option>
+                        <option value="completed">已完成</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>故障等级</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="high">高</option>
+                        <option value="medium">中</option>
+                        <option value="low">低</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary">+ 新建维修单</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">维修单号</th>
+                            <th width="150">设备名称</th>
+                            <th width="100">故障等级</th>
+                            <th width="150">故障描述</th>
+                            <th width="120">维修人</th>
+                            <th width="100">维修状态</th>
+                            <th width="120">申请时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="repair-id" value="1"></td>
+                            <td>REP-2025-001</td>
+                            <td>生产设备A-001</td>
+                            <td><span class="status-badge status-error">高</span></td>
+                            <td>设备异常停机，无法启动</td>
+                            <td>维修员A</td>
+                            <td><span class="status-badge status-processing">维修中</span></td>
+                            <td>2025-01-22 10:30</td>
+                            <td>
+                                <button class="btn btn-sm btn-default">查看</button>
+                                <button class="btn btn-sm btn-primary">跟踪</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="repair-id" value="2"></td>
+                            <td>REP-2025-002</td>
+                            <td>安全设备B-002</td>
+                            <td><span class="status-badge status-warning">中</span></td>
+                            <td>传感器故障，需要更换</td>
+                            <td>维修员B</td>
+                            <td><span class="status-badge status-success">已完成</span></td>
+                            <td>2025-01-20 14:20</td>
+                            <td>
+                                <button class="btn btn-sm btn-default">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 2 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('维修管理 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

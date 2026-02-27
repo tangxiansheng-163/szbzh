@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>变更单详情</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <!-- 面包屑 -->
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">变更管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">变更单详情</span>
+        </div>
+
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <p class="page-description">查看变更单信息、方案与执行进度</p>
+        </div>
+
+        <!-- 操作栏 -->
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">← 返回列表</button>
+                <button class="btn btn-primary">编辑</button>
+            </div>
+            <div class="action-right">
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs"><div class="tab-list"><div class="tab-item active" onclick="switchTab(event, '0')">基本信息</div><div class="tab-item " onclick="switchTab(event, '1')">变更方案</div><div class="tab-item " onclick="switchTab(event, '2')">执行进度</div><div class="tab-item " onclick="switchTab(event, '3')">验证结果</div></div></div>
+
+        <!-- Tab Content -->
+        <div class="tab-pane active" id="tab-pane-0">    <div class="card"><div class="card-body"><p>基本信息内容区域</p></div></div></div><div class="tab-pane " id="tab-pane-1">    <div class="card"><div class="card-body"><p>变更方案内容区域</p></div></div></div><div class="tab-pane " id="tab-pane-2">    <div class="card"><div class="card-body"><p>执行进度内容区域</p></div></div></div><div class="tab-pane " id="tab-pane-3">    <div class="card"><div class="card-body"><p>验证结果内容区域</p></div></div></div>
+    </div>
+
+    <script>
+        function switchTab(event, index) {
+            const tabs = document.querySelectorAll('.tab-item');
+            const panes = document.querySelectorAll('.tab-pane');
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+            panes.forEach(pane => pane.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById('tab-pane-' + index).classList.add('active');
+        }
+    </script>
+</body>
+</html>

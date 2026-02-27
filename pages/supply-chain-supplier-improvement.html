@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>改进跟踪 - 供应链协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/supply-chain-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">供应商绩效协同</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">改进跟踪</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">跟踪供应商改进计划，包括改进目标、改进措施、改进进度、改进效果评估等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>供应商</label>
+                    <input type="text" class="form-input" placeholder="供应商名称">
+                </div>
+                <div class="filter-item">
+                    <label>改进状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="planned">计划中</option>
+                        <option value="executing">执行中</option>
+                        <option value="completed">已完成</option>
+                        <option value="closed">已关闭</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary">+ 新建改进计划</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">改进编号</th>
+                            <th width="150">供应商</th>
+                            <th width="200">改进目标</th>
+                            <th width="100">改进进度</th>
+                            <th width="100">改进状态</th>
+                            <th width="120">计划完成时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="improvement-id" value="1"></td>
+                            <td>IMPROVE-2025-001</td>
+                            <td>深圳市电子科技</td>
+                            <td>提升交付及时率至98%</td>
+                            <td>60%</td>
+                            <td><span class="status-badge status-processing">执行中</span></td>
+                            <td>2025-03-31</td>
+                            <td>
+                                <button class="btn btn-sm btn-default">查看</button>
+                                <button class="btn btn-sm btn-primary">跟踪</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 1 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('改进跟踪 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>同步日志</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">系统联动</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">同步日志</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">查询 PLM 与 ERP、MES、WMS 之间的数据同步日志，支持按源系统、目标系统、同步类型、结果筛选，用于排查同步异常。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>源系统</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="plm">PLM</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>目标系统</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="erp">ERP</option>
+                        <option value="mes">MES</option>
+                        <option value="wms">WMS</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>同步类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="mbom">MBOM 下发</option>
+                        <option value="material">物料同步</option>
+                        <option value="process">工艺路线</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>同步结果</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="success">成功</option>
+                        <option value="failed">失败</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>时间范围</label>
+                    <input type="date" class="form-input"> 至 <input type="date" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>同步时间</th>
+                            <th>源系统</th>
+                            <th>目标系统</th>
+                            <th>同步类型</th>
+                            <th>同步对象</th>
+                            <th>结果</th>
+                            <th>说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2025-01-28 10:25:32</td>
+                            <td>PLM</td>
+                            <td>WMS</td>
+                            <td>配料 BOM</td>
+                            <td>PROD-001</td>
+                            <td><span class="status-badge status-success">成功</span></td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td>2025-01-28 10:20:15</td>
+                            <td>PLM</td>
+                            <td>MES</td>
+                            <td>领料清单</td>
+                            <td>MBOM-001</td>
+                            <td><span class="status-badge status-success">成功</span></td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td>2025-01-28 10:15:08</td>
+                            <td>PLM</td>
+                            <td>ERP</td>
+                            <td>MBOM 下发</td>
+                            <td>MBOM-001</td>
+                            <td><span class="status-badge status-success">成功</span></td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td>2025-01-28 09:30:22</td>
+                            <td>PLM</td>
+                            <td>ERP</td>
+                            <td>MBOM 下发</td>
+                            <td>MBOM-002</td>
+                            <td><span class="status-badge status-error">失败</span></td>
+                            <td>物料 M003 在 ERP 中不存在</td>
+                        </tr>
+                        <tr>
+                            <td>2025-01-28 08:00:05</td>
+                            <td>PLM</td>
+                            <td>WMS</td>
+                            <td>物料主数据</td>
+                            <td>增量 15 条</td>
+                            <td><span class="status-badge status-success">成功</span></td>
+                            <td>—</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 5 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>if(typeof PageInteractions!=='undefined')PageInteractions.initButtons();</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品单耗 - 能源管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/energy-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">能源计划与单耗管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">产品单耗</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理产品单耗，包括单耗标准制定、单耗统计、单耗对比、单耗优化等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>产品</label>
+                    <input type="text" class="form-input" placeholder="产品编码、产品名称">
+                </div>
+                <div class="filter-item">
+                    <label>统计周期</label>
+                    <select class="form-select">
+                        <option value="month">月度</option>
+                        <option value="quarter">季度</option>
+                        <option value="year">年度</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary">+ 新建单耗标准</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">产品编码</th>
+                            <th width="200">产品名称</th>
+                            <th width="100">标准单耗</th>
+                            <th width="100">实际单耗</th>
+                            <th width="100">单耗偏差</th>
+                            <th width="100">完成数量</th>
+                            <th width="120">统计周期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="consumption-id" value="1"></td>
+                            <td>PROD-001</td>
+                            <td>产品A</td>
+                            <td>50 kWh/件</td>
+                            <td>48 kWh/件</td>
+                            <td style="color: #52c41a;">-4%</td>
+                            <td>1,000件</td>
+                            <td>2025-01</td>
+                            <td>
+                                <button class="btn btn-sm btn-default">查看</button>
+                                <button class="btn btn-sm btn-default">编辑</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 1 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('产品单耗 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

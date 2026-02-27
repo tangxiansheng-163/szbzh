@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OEE监控 - 设备管理协同系统</title>
+    <style>
+        /* 页面基础样式 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: #f0f2f5; color: #262626; }
+        .content-wrapper { padding: 16px 20px; }
+        
+        /* 面包屑导航 */
+        .breadcrumb { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; font-size: 14px; }
+        .breadcrumb-item { color: #1890ff; cursor: pointer; }
+        .breadcrumb-item:hover { color: #40a9ff; }
+        .breadcrumb-item.active { color: #262626; cursor: default; }
+        .breadcrumb-separator { color: #8c8c8c; }
+        
+        /* 统计卡片 */
+        .stat-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .stat-label {
+            font-size: 13px;
+            color: #8c8c8c;
+        }
+        
+        /* 设备项 */
+        .device-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        .device-item:hover { background: #f5f5f5; }
+        .device-item.active { background: #e6f7ff; }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; }
+        .status-dot.running { background: #52c41a; }
+        .status-dot.warning { background: #faad14; }
+        .status-dot.stopped { background: #ff4d4f; }
+        .status-dot.offline { background: #d9d9d9; }
+        
+        /* 分类 */
+        .category-item { border-bottom: 1px solid #f0f0f0; }
+        .category-header {
+            padding: 10px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        .category-header:hover { background: #f5f5f5; }
+        .category-header.active { background: #e6f7ff; }
+        .expand-icon { width: 10px; height: 10px; transition: transform 0.2s; color: #8c8c8c; }
+        .expand-icon.active { transform: rotate(90deg); color: #1890ff; }
+        
+        /* 设备信息卡片 */
+        .device-info-card { 
+            background: #fff; 
+            border-radius: 8px; 
+            padding: 20px; 
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            margin-bottom: 16px;
+        }
+        .device-info-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 16px; 
+        }
+        .device-title { display: flex; align-items: center; gap: 12px; }
+        .device-title h2 { font-size: 18px; font-weight: 600; color: #262626; }
+        .device-status-badge { 
+            font-size: 12px; 
+            padding: 4px 10px; 
+            border-radius: 4px; 
+            font-weight: 500; 
+        }
+        .device-status-badge.running { background: #f6ffed; color: #52c41a; }
+        .device-status-badge.warning { background: #fffbe6; color: #faad14; }
+        .device-status-badge.stopped { background: #fff2f0; color: #ff4d4f; }
+        .device-meta { 
+            display: flex; 
+            gap: 24px; 
+            font-size: 13px; 
+            color: #595959; 
+        }
+        .device-meta span { display: flex; align-items: center; gap: 6px; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            background: #fff;
+            color: #262626;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn:hover { border-color: #1890ff; color: #1890ff; }
+        .btn-primary { background: #1890ff; border-color: #1890ff; color: #fff; }
+        .btn-primary:hover { background: #40a9ff; border-color: #40a9ff; }
+        .btn-default { background: #fff; }
+        
+        /* 图表区域 */
+        .chart-section { 
+            background: #fff; 
+            border-radius: 8px; 
+            padding: 20px; 
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05); 
+            margin-bottom: 16px;
+        }
+        .chart-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-start; 
+            margin-bottom: 16px; 
+        }
+        .chart-title { 
+            font-size: 15px; 
+            font-weight: 600; 
+            color: #262626; 
+        }
+        #trendChart { width: 100%; height: 320px; }
+        #dataTableView { display: none; }
+        
+        /* 表格 */
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+        th { background: #fafafa; font-weight: 600; color: #262626; font-size: 12px; }
+        tr:hover { background: #f5f5f5; }
+        
+        /* 图例 */
+        .legend-container {
+            display: none;
+        }
+        .legend-items {
+            display: flex;
+            gap: 24px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #595959;
+        }
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        /* 图表类型切换器 */
+        .chart-type-switcher {
+            display: flex;
+            gap: 4px;
+            background: #f5f5f5;
+            padding: 2px;
+            border-radius: 4px;
+        }
+        .chart-type-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #595959;
+            transition: all 0.2s;
+        }
+        .chart-type-btn:hover { background: #e6f7ff; color: #1890ff; }
+        .chart-type-btn.active { background: #1890ff; color: #fff; }
+        
+        /* 时间筛选 */
+        .time-filter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .time-select {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            background: #fff;
+        }
+        .time-select:hover { border-color: #1890ff; }
+        
+        /* 自定义日期范围 */
+        .custom-date-range {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+        }
+        .custom-date-range.hidden { display: none; }
+        .custom-date-range input {
+            padding: 6px 10px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .custom-date-range input:focus { outline: none; border-color: #1890ff; }
+        .apply-btn {
+            padding: 6px 12px;
+            background: #1890ff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .apply-btn:hover { background: #40a9ff; }
+        
+        /* 设备复选框 */
+        .device-checkbox {
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            accent-color: #1890ff;
+        }
+        .device-checkbox:disabled {
+            cursor: not-allowed;
+            opacity: 0.4;
+        }
+        .device-item.selected {
+            background: #e6f7ff;
+        }
+        
+        /* OEE详情卡片 */
+        .oee-detail-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .oee-detail-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .oee-detail-header {
+            font-size: 15px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 16px;
+        }
+        .oee-metric-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .oee-metric-item:last-child { border-bottom: none; }
+        .oee-metric-label {
+            font-size: 13px;
+            color: #595959;
+        }
+        .oee-metric-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+        }
+        .oee-metric-value.good { color: #52c41a; }
+        .oee-metric-value.warning { color: #faad14; }
+        .oee-metric-value.bad { color: #ff4d4f; }
+        
+        /* OEE环形图容器 */
+        .oee-gauge-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/equipment-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">运行监控</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">OEE监控</span>
+        </div>
+
+        <!-- 顶部统计卡片 -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px;">
+            <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div class="stat-value" style="color: white;" id="statOee">79.2%</div>
+                <div class="stat-label" style="color: rgba(255,255,255,0.8);">整体OEE</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white;">
+                <div class="stat-value" style="color: white;" id="statAvailability">92.5%</div>
+                <div class="stat-label" style="color: rgba(255,255,255,0.8);">时间稼动率</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                <div class="stat-value" style="color: white;" id="statPerformance">88.3%</div>
+                <div class="stat-label" style="color: rgba(255,255,255,0.8);">性能稼动率</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                <div class="stat-value" style="color: white;" id="statQuality">96.8%</div>
+                <div class="stat-label" style="color: rgba(255,255,255,0.8);">良品率</div>
+            </div>
+        </div>
+
+        <!-- 主内容区：左侧分类树 + 右侧详情 -->
+        <div style="display: flex; gap: 16px;">
+            <!-- 左侧设备分类树 -->
+            <div style="width: 240px; background: #fff; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); display: flex; flex-direction: column;">
+                <!-- 搜索框 -->
+                <div style="padding: 12px; border-bottom: 1px solid #f0f0f0;">
+                    <div style="position: relative;">
+                        <input type="text" placeholder="搜索设备" style="width: 100%; padding: 6px 10px 6px 28px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px;">
+                        <svg style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #8c8c8c;" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- 用途分类树 -->
+                <div style="flex: 1; overflow-y: auto; padding: 8px 0;">
+                    <!-- 生产设备分类 -->
+                    <div class="category-item">
+                        <div class="category-header active" onclick="toggleCategory(this)">
+                            <svg class="expand-icon active" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span style="font-weight: 500; flex: 1; font-size: 13px;">生产设备</span>
+                            <span style="background: #1890ff; color: white; padding: 1px 6px; border-radius: 8px; font-size: 10px;">86</span>
+                        </div>
+                        <div class="category-devices" style="display: block;">
+                            <div class="device-item active" data-device-id="EQ-001" onclick="selectDevice(this, 'EQ-001')">
+                                <input type="checkbox" class="device-checkbox" checked onchange="toggleDeviceSelection(event, 'EQ-001')">
+                                <svg style="width: 14px; height: 14px; color: #1890ff;" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 12px; font-weight: 500;">EQ-001</div>
+                                    <div style="font-size: 10px; color: #8c8c8c; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">数控机床-A01</div>
+                                </div>
+                                <span class="status-dot running"></span>
+                            </div>
+                            <div class="device-item" data-device-id="EQ-002" onclick="selectDevice(this, 'EQ-002')">
+                                <input type="checkbox" class="device-checkbox" onchange="toggleDeviceSelection(event, 'EQ-002')">
+                                <svg style="width: 14px; height: 14px; color: #8c8c8c;" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 12px; font-weight: 500;">EQ-002</div>
+                                    <div style="font-size: 10px; color: #8c8c8c; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">数控车床-A02</div>
+                                </div>
+                                <span class="status-dot running"></span>
+                            </div>
+                            <div class="device-item" data-device-id="EQ-003" onclick="selectDevice(this, 'EQ-003')">
+                                <input type="checkbox" class="device-checkbox" onchange="toggleDeviceSelection(event, 'EQ-003')">
+                                <svg style="width: 14px; height: 14px; color: #8c8c8c;" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 12px; font-weight: 500;">EQ-003</div>
+                                    <div style="font-size: 10px; color: #8c8c8c; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">加工中心-001</div>
+                                </div>
+                                <span class="status-dot warning"></span>
+                            </div>
+                            <div class="device-item" data-device-id="EQ-004" onclick="selectDevice(this, 'EQ-004')">
+                                <input type="checkbox" class="device-checkbox" onchange="toggleDeviceSelection(event, 'EQ-004')">
+                                <svg style="width: 14px; height: 14px; color: #8c8c8c;" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 12px; font-weight: 500;">EQ-004</div>
+                                    <div style="font-size: 10px; color: #8c8c8c; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">铣床-005</div>
+                                </div>
+                                <span class="status-dot running"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 能源设备分类 -->
+                    <div class="category-item">
+                        <div class="category-header" onclick="toggleCategory(this)">
+                            <svg class="expand-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span style="font-weight: 500; flex: 1; font-size: 13px;">能源设备</span>
+                            <span style="background: #f0f0f0; color: #595959; padding: 1px 6px; border-radius: 8px; font-size: 10px;">32</span>
+                        </div>
+                        <div class="category-devices" style="display: none;">
+                            <div class="device-item" data-device-id="EN-001" onclick="selectDevice(this, 'EN-001')">
+                                <input type="checkbox" class="device-checkbox" onchange="toggleDeviceSelection(event, 'EN-001')">
+                                <svg style="width: 14px; height: 14px; color: #8c8c8c;" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 12px; font-weight: 500;">EN-001</div>
+                                    <div style="font-size: 10px; color: #8c8c8c; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">空压机-001</div>
+                                </div>
+                                <span class="status-dot running"></span>
+                            </div>
+                            <div class="device-item" data-device-id="EN-002" onclick="selectDevice(this, 'EN-002')">
+                                <input type="checkbox" class="device-checkbox" onchange="toggleDeviceSelection(event, 'EN-002')">
+                                <svg style="width: 14px; height: 14px; color: #8c8c8c;" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 12px; font-weight: 500;">EN-002</div>
+                                    <div style="font-size: 10px; color: #8c8c8c; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">循环水泵-002</div>
+                                </div>
+                                <span class="status-dot running"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 安环设备分类 -->
+                    <div class="category-item">
+                        <div class="category-header" onclick="toggleCategory(this)">
+                            <svg class="expand-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span style="font-weight: 500; flex: 1; font-size: 13px;">安环设备</span>
+                            <span style="background: #f0f0f0; color: #595959; padding: 1px 6px; border-radius: 8px; font-size: 10px;">24</span>
+                        </div>
+                        <div class="category-devices" style="display: none;">
+                            <div class="device-item" data-device-id="SF-001" onclick="selectDevice(this, 'SF-001')">
+                                <input type="checkbox" class="device-checkbox" onchange="toggleDeviceSelection(event, 'SF-001')">
+                                <svg style="width: 14px; height: 14px; color: #8c8c8c;" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 12px; font-weight: 500;">SF-001</div>
+                                    <div style="font-size: 10px; color: #8c8c8c; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">烟雾探测器-S01</div>
+                                </div>
+                                <span class="status-dot running"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧详情区 -->
+            <div style="flex: 1; min-width: 0;">
+                <!-- 设备信息卡片 -->
+                <div class="device-info-card" id="deviceInfoCard">
+                    <div class="device-info-header">
+                        <div class="device-title" id="deviceTitle">
+                            <h2>数控机床-A01</h2>
+                            <span class="device-status-badge running" id="deviceStatus">● 正常运行</span>
+                        </div>
+                        <button class="btn btn-default" onclick="exportData()">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                            导出数据
+                        </button>
+                    </div>
+                    <div class="device-meta" id="deviceMeta">
+                        <span>
+                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                            统计周期: 24小时
+                        </span>
+                        <span>
+                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
+                            计划运行时间: 20小时
+                        </span>
+                        <span>
+                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                            数据更新: 2025-02-14 08:00:00
+                        </span>
+                    </div>
+                </div>
+
+                <!-- OEE详情 -->
+                <div class="oee-detail-section" style="margin-bottom: 16px;">
+                    <!-- 左侧：OEE环形图 -->
+                    <div class="oee-detail-card">
+                        <div class="oee-detail-header">OEE综合效率</div>
+                        <div class="oee-gauge-container">
+                            <div id="oeeGauge" style="width: 280px; height: 280px;"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- 右侧：详细指标 -->
+                    <div class="oee-detail-card">
+                        <div class="oee-detail-header">效率构成指标</div>
+                        <div class="oee-metric-item">
+                            <span class="oee-metric-label">时间稼动率</span>
+                            <span class="oee-metric-value good" id="metricAvailability">92.5%</span>
+                        </div>
+                        <div class="oee-metric-item">
+                            <span class="oee-metric-label">计划运行时间</span>
+                            <span class="oee-metric-value" id="metricPlannedTime">20.0小时</span>
+                        </div>
+                        <div class="oee-metric-item">
+                            <span class="oee-metric-label">实际运行时间</span>
+                            <span class="oee-metric-value" id="metricActualTime">18.5小时</span>
+                        </div>
+                        <div class="oee-metric-item" style="border-top: 1px dashed #f0f0f0; padding-top: 16px;">
+                            <span class="oee-metric-label">性能稼动率</span>
+                            <span class="oee-metric-value good" id="metricPerformance">88.3%</span>
+                        </div>
+                        <div class="oee-metric-item">
+                            <span class="oee-metric-label">标准节拍</span>
+                            <span class="oee-metric-value" id="metricStandardCycle">0.9分钟/件</span>
+                        </div>
+                        <div class="oee-metric-item" style="border-top: 1px dashed #f0f0f0; padding-top: 16px;">
+                            <span class="oee-metric-label">良品率</span>
+                            <span class="oee-metric-value good" id="metricQuality">96.8%</span>
+                        </div>
+                        <div class="oee-metric-item">
+                            <span class="oee-metric-label">总产量</span>
+                            <span class="oee-metric-value" id="metricTotalProducts">1250件</span>
+                        </div>
+                        <div class="oee-metric-item">
+                            <span class="oee-metric-label">良品数</span>
+                            <span class="oee-metric-value" id="metricGoodProducts">1210件</span>
+                        </div>
+                        <div class="oee-metric-item" style="border-top: 2px solid #f0f0f0; padding-top: 16px; margin-top: 4px;">
+                            <span class="oee-metric-label">OEE = 时间稼动率 × 性能稼动率 × 良品率</span>
+                            <span class="oee-metric-value warning" id="metricOee">79.2%</span>
+                        </div>
+                        <div class="oee-metric-item">
+                            <span class="oee-metric-label">目标OEE</span>
+                            <span class="oee-metric-value">85.0%</span>
+                        </div>
+                        <div class="oee-metric-item">
+                            <span class="oee-metric-label">差距</span>
+                            <span class="oee-metric-value bad" id="metricGap">-5.8%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 趋势图 -->
+                <div class="chart-section">
+                    <div class="chart-header">
+                        <span class="chart-title" id="chartTitle">OEE趋势分析</span>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div class="time-filter">
+                                <select class="time-select" id="timeRange" onchange="changeTimeRange(this.value)">
+                                    <option value="1h">1小时</option>
+                                    <option value="6h">6小时</option>
+                                    <option value="24h" selected>24小时</option>
+                                    <option value="7d">7天</option>
+                                    <option value="30d">30天</option>
+                                    <option value="custom">自定义范围</option>
+                                </select>
+                            </div>
+                            <!-- 自定义日期范围 -->
+                            <div class="custom-date-range hidden" id="customDateRange" style="border: none; padding: 0; margin: 0;">
+                                <input type="datetime-local" id="startDate">
+                                <span style="color: #8c8c8c;">至</span>
+                                <input type="datetime-local" id="endDate">
+                                <button class="apply-btn" onclick="applyCustomDateRange()">
+                                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div class="legend-items" id="chartLegend">
+                            <div class="legend-item">
+                                <div class="legend-dot" style="background: #1890ff;"></div>
+                                <span>OEE</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-dot" style="background: #52c41a;"></div>
+                                <span>时间稼动率</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-dot" style="background: #faad14;"></div>
+                                <span>性能稼动率</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-dot" style="background: #722ed1;"></div>
+                                <span>良品率</span>
+                            </div>
+                        </div>
+                        <div class="chart-type-switcher">
+                            <button class="chart-type-btn active" onclick="switchChartType('line')">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 3v18h18"></path>
+                                    <path d="M19 17l-5-5-4 4-5-5"></path>
+                                </svg>
+                                折线图
+                            </button>
+                            <button class="chart-type-btn" onclick="switchChartType('bar')">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="10" width="4" height="10"></rect>
+                                    <rect x="9" y="6" width="4" height="14"></rect>
+                                    <rect x="15" y="8" width="4" height="12"></rect>
+                                </svg>
+                                柱状图
+                            </button>
+                            <button class="chart-type-btn" onclick="switchChartType('table')">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                                    <path d="M3 9h18"></path>
+                                    <path d="M3 15h18"></path>
+                                    <path d="M9 3v18"></path>
+                                    <path d="M15 3v18"></path>
+                                </svg>
+                                数据表
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="trendChart"></div>
+                    
+                    <!-- 数据表格视图 -->
+                    <div id="dataTableView">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>时间</th>
+                                        <th>OEE</th>
+                                        <th>时间稼动率</th>
+                                        <th>性能稼动率</th>
+                                        <th>良品率</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="chartTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script>
+        // 检查页面是否仍然有效
+        function isPageValid() {
+            return document.getElementById('metricOee') !== null;
+        }
+        
+        let trendChart = null;
+        let oeeGaugeChart = null;
+        let currentDevice = 'EQ-001';
+        let currentTimeRange = '24h';
+        let currentChartType = 'line';
+        let selectedDevices = ['EQ-001'];
+        let isMultiSelectMode = false;
+        let chartData = { hours: [], oee: [], availability: [], performance: [], quality: [] };
+        
+        const deviceData = {
+            'EQ-001': { 
+                name: '数控机床-A01', 
+                category: '生产设备',
+                status: 'running',
+                oee: 79.2,
+                availability: 92.5,
+                performance: 88.3,
+                quality: 96.8,
+                plannedTime: 20,
+                actualTime: 18.5,
+                totalProducts: 1250,
+                goodProducts: 1210,
+                standardCycle: 0.9
+            },
+            'EQ-002': { 
+                name: '数控车床-A02', 
+                category: '生产设备',
+                status: 'running',
+                oee: 82.5,
+                availability: 94.2,
+                performance: 90.1,
+                quality: 97.3,
+                plannedTime: 22,
+                actualTime: 20.7,
+                totalProducts: 1480,
+                goodProducts: 1440,
+                standardCycle: 0.85
+            },
+            'EQ-003': { 
+                name: '加工中心-001', 
+                category: '生产设备',
+                status: 'warning',
+                oee: 75.8,
+                availability: 89.5,
+                performance: 85.2,
+                quality: 95.1,
+                plannedTime: 18,
+                actualTime: 16.1,
+                totalProducts: 920,
+                goodProducts: 875,
+                standardCycle: 1.0
+            },
+            'EQ-004': { 
+                name: '铣床-005', 
+                category: '生产设备',
+                status: 'running',
+                oee: 84.7,
+                availability: 95.8,
+                performance: 89.6,
+                quality: 98.2,
+                plannedTime: 20,
+                actualTime: 19.2,
+                totalProducts: 1100,
+                goodProducts: 1080,
+                standardCycle: 0.95
+            },
+            'EN-001': { 
+                name: '空压机-001', 
+                category: '能源设备',
+                status: 'running',
+                oee: 88.6,
+                availability: 96.8,
+                performance: 92.3,
+                quality: 99.2,
+                plannedTime: 24,
+                actualTime: 23.2,
+                totalProducts: 1,
+                goodProducts: 1,
+                standardCycle: 1.0
+            },
+            'EN-002': { 
+                name: '循环水泵-002', 
+                category: '能源设备',
+                status: 'running',
+                oee: 86.2,
+                availability: 94.5,
+                performance: 90.8,
+                quality: 99.8,
+                plannedTime: 24,
+                actualTime: 22.7,
+                totalProducts: 1,
+                goodProducts: 1,
+                standardCycle: 1.0
+            },
+            'SF-001': { 
+                name: '烟雾探测器-S01', 
+                category: '安环设备',
+                status: 'running',
+                oee: 92.5,
+                availability: 98.2,
+                performance: 95.1,
+                quality: 99.1,
+                plannedTime: 24,
+                actualTime: 23.6,
+                totalProducts: 1,
+                goodProducts: 1,
+                standardCycle: 1.0
+            }
+        };
+        
+        function initPage() {
+            setTimeout(() => {
+                initTrendChart();
+                initOeeGauge();
+                generateChartData();
+                updateTrendChart();
+                updateTableData();
+            }, 100);
+        }
+        
+        function initTrendChart() {
+            const chartDom = document.getElementById('trendChart');
+            if (!chartDom) return;
+            chartDom.style.height = '320px';
+            chartDom.style.display = 'block';
+            trendChart = echarts.init(chartDom);
+        }
+        
+        function initOeeGauge() {
+            const gaugeDom = document.getElementById('oeeGauge');
+            if (!gaugeDom) return;
+            oeeGaugeChart = echarts.init(gaugeDom);
+            updateOeeGauge(79.2);
+        }
+        
+        function updateOeeGauge(value) {
+            if (!oeeGaugeChart) return;
+            
+            let color;
+            if (value >= 85) {
+                color = '#52c41a';
+            } else if (value >= 70) {
+                color = '#faad14';
+            } else {
+                color = '#ff4d4f';
+            }
+            
+            const option = {
+                series: [{
+                    type: 'gauge',
+                    startAngle: 90,
+                    endAngle: -270,
+                    pointer: {
+                        show: false
+                    },
+                    progress: {
+                        show: true,
+                        overlap: false,
+                        roundCap: true,
+                        clip: false,
+                        itemStyle: {
+                            color: color
+                        }
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            width: 40,
+                            color: [[1, '#f0f0f0']]
+                        }
+                    },
+                    splitLine: {
+                        show: false
+                    },
+                    axisTick: {
+                        show: false
+                    },
+                    axisLabel: {
+                        show: false
+                    },
+                    title: {
+                        show: false
+                    },
+                    detail: {
+                        valueAnimation: true,
+                        fontSize: 40,
+                        fontWeight: 'bold',
+                        color: color,
+                        offsetCenter: [0, '5%'],
+                        formatter: '{value}%'
+                    },
+                    data: [{
+                        value: value
+                    }]
+                }]
+            };
+            
+            oeeGaugeChart.setOption(option);
+        }
+        
+        function generateChartData() {
+            const hours = [];
+            const oee = [];
+            const availability = [];
+            const performance = [];
+            const quality = [];
+            
+            const device = deviceData[currentDevice];
+            const baseOee = device ? device.oee : 79.2;
+            const baseAvailability = device ? device.availability : 92.5;
+            const basePerformance = device ? device.performance : 88.3;
+            const baseQuality = device ? device.quality : 96.8;
+            
+            for (let i = 23; i >= 0; i--) {
+                const date = new Date();
+                date.setHours(date.getHours() - i);
+                hours.push(date.getHours().toString().padStart(2, '0') + ':00');
+                
+                oee.push(Math.max(0, Math.min(100, baseOee + (Math.random() - 0.5) * 10)));
+                availability.push(Math.max(0, Math.min(100, baseAvailability + (Math.random() - 0.5) * 8)));
+                performance.push(Math.max(0, Math.min(100, basePerformance + (Math.random() - 0.5) * 12)));
+                quality.push(Math.max(0, Math.min(100, baseQuality + (Math.random() - 0.5) * 5)));
+            }
+            
+            chartData = { hours, oee, availability, performance, quality };
+        }
+        
+        function updateTrendChart() {
+            if (!trendChart) return;
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: function(params) {
+                        let result = params[0].axisValue + '<br/>';
+                        params.forEach(param => {
+                            result += param.marker + param.seriesName + ': ' + param.value.toFixed(1) + '%<br/>';
+                        });
+                        return result;
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    top: '10%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: chartData.hours,
+                    axisLabel: { fontSize: 11 }
+                },
+                yAxis: {
+                    type: 'value',
+                    min: 0,
+                    max: 100,
+                    axisLabel: { fontSize: 11, formatter: '{value}%' }
+                },
+                legend: {
+                    show: false
+                },
+                series: [
+                    {
+                        name: 'OEE',
+                        type: currentChartType === 'bar' ? 'bar' : 'line',
+                        data: chartData.oee,
+                        smooth: true,
+                        itemStyle: { color: '#1890ff' },
+                        lineStyle: { width: 2 },
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0, y: 0, x2: 0, y2: 1,
+                                colorStops: [
+                                    { offset: 0, color: 'rgba(24, 144, 255, 0.3)' },
+                                    { offset: 1, color: 'rgba(24, 144, 255, 0.05)' }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        name: '时间稼动率',
+                        type: currentChartType === 'bar' ? 'bar' : 'line',
+                        data: chartData.availability,
+                        smooth: true,
+                        itemStyle: { color: '#52c41a' },
+                        lineStyle: { width: 2 }
+                    },
+                    {
+                        name: '性能稼动率',
+                        type: currentChartType === 'bar' ? 'bar' : 'line',
+                        data: chartData.performance,
+                        smooth: true,
+                        itemStyle: { color: '#faad14' },
+                        lineStyle: { width: 2 }
+                    },
+                    {
+                        name: '良品率',
+                        type: currentChartType === 'bar' ? 'bar' : 'line',
+                        data: chartData.quality,
+                        smooth: true,
+                        itemStyle: { color: '#722ed1' },
+                        lineStyle: { width: 2 }
+                    }
+                ]
+            };
+            
+            trendChart.setOption(option);
+        }
+        
+        function updateTableData() {
+            const tbody = document.getElementById('chartTableBody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            chartData.hours.forEach((hour, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${hour}</td>
+                    <td>${chartData.oee[index].toFixed(1)}%</td>
+                    <td>${chartData.availability[index].toFixed(1)}%</td>
+                    <td>${chartData.performance[index].toFixed(1)}%</td>
+                    <td>${chartData.quality[index].toFixed(1)}%</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        function switchChartType(type) {
+            if (!isPageValid()) return;
+            currentChartType = type;
+            
+            document.querySelectorAll('.chart-type-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.chart-type-btn').classList.add('active');
+            
+            if (type === 'table') {
+                document.getElementById('trendChart').style.display = 'none';
+                document.getElementById('dataTableView').style.display = 'block';
+                const legend = document.getElementById('chartLegend');
+                if (legend) legend.style.visibility = 'hidden';
+                updateTableData();
+            } else {
+                document.getElementById('trendChart').style.display = 'block';
+                document.getElementById('dataTableView').style.display = 'none';
+                const legend = document.getElementById('chartLegend');
+                if (legend) legend.style.visibility = 'visible';
+                updateTrendChart();
+            }
+        }
+        
+        function changeTimeRange(range) {
+            if (!isPageValid()) return;
+            currentTimeRange = range;
+            
+            const customRangeEl = document.getElementById('customDateRange');
+            if (range === 'custom') {
+                customRangeEl.classList.remove('hidden');
+                const now = new Date();
+                const start = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                document.getElementById('startDate').value = formatDateTimeLocal(start);
+                document.getElementById('endDate').value = formatDateTimeLocal(now);
+            } else {
+                customRangeEl.classList.add('hidden');
+                generateChartData();
+                if (currentChartType === 'table') {
+                    updateTableData();
+                } else {
+                    updateTrendChart();
+                }
+            }
+        }
+        
+        function formatDateTimeLocal(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+        
+        function applyCustomDateRange() {
+            if (!isPageValid()) return;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (!startDate || !endDate) {
+                alert('请选择开始时间和结束时间');
+                return;
+            }
+            
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            
+            if (start >= end) {
+                alert('开始时间必须早于结束时间');
+                return;
+            }
+            
+            generateChartData();
+            if (currentChartType === 'table') {
+                updateTableData();
+            } else {
+                updateTrendChart();
+            }
+        }
+        
+        function toggleCategory(element) {
+            if (!isPageValid()) return;
+            const header = element;
+            const expandIcon = header.querySelector('.expand-icon');
+            const devicesDiv = header.nextElementSibling;
+            
+            if (devicesDiv.style.display === 'none') {
+                devicesDiv.style.display = 'block';
+                expandIcon.classList.add('active');
+                header.classList.add('active');
+            } else {
+                devicesDiv.style.display = 'none';
+                expandIcon.classList.remove('active');
+                header.classList.remove('active');
+            }
+        }
+        
+        function updateTopStats(device) {
+            document.getElementById('statOee').textContent = (device ? device.oee : 79.2).toFixed(1) + '%';
+            document.getElementById('statAvailability').textContent = (device ? device.availability : 92.5).toFixed(1) + '%';
+            document.getElementById('statPerformance').textContent = (device ? device.performance : 88.3).toFixed(1) + '%';
+            document.getElementById('statQuality').textContent = (device ? device.quality : 96.8).toFixed(1) + '%';
+        }
+        
+        function updateMultiDeviceTopStats() {
+            let totalOee = 0, totalAvailability = 0, totalPerformance = 0, totalQuality = 0;
+            selectedDevices.forEach(id => {
+                const device = deviceData[id];
+                if (device) {
+                    totalOee += device.oee;
+                    totalAvailability += device.availability;
+                    totalPerformance += device.performance;
+                    totalQuality += device.quality;
+                }
+            });
+            const count = selectedDevices.length;
+            document.getElementById('statOee').textContent = (totalOee / count).toFixed(1) + '%';
+            document.getElementById('statAvailability').textContent = (totalAvailability / count).toFixed(1) + '%';
+            document.getElementById('statPerformance').textContent = (totalPerformance / count).toFixed(1) + '%';
+            document.getElementById('statQuality').textContent = (totalQuality / count).toFixed(1) + '%';
+        }
+        
+        function selectDevice(element, deviceId) {
+            if (!isPageValid()) return;
+            if (isMultiSelectMode && selectedDevices.length > 1) {
+                return;
+            }
+            
+            document.querySelectorAll('.device-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+            
+            currentDevice = deviceId;
+            selectedDevices = [deviceId];
+            
+            document.querySelectorAll('.device-checkbox').forEach(cb => {
+                cb.checked = (cb.closest('.device-item').dataset.deviceId === deviceId);
+            });
+            
+            updateCheckboxDisabledState();
+            
+            const device = deviceData[deviceId];
+            console.log('选择设备:', deviceId, device);
+            
+            updateTopStats(device);
+            updateDeviceInfoCard(device);
+            updateOeeDetail(device);
+            generateChartData();
+            updateOeeGauge(device ? device.oee : 79.2);
+            
+            if (currentChartType === 'table') {
+                updateTableData();
+            } else {
+                updateTrendChart();
+            }
+        }
+        
+        function toggleDeviceSelection(event, deviceId) {
+            if (!isPageValid()) return;
+            event.stopPropagation();
+            
+            const checkbox = event.target;
+            const deviceItem = checkbox.closest('.device-item');
+            
+            if (checkbox.checked) {
+                if (!selectedDevices.includes(deviceId)) {
+                    selectedDevices.push(deviceId);
+                }
+                deviceItem.classList.add('selected');
+            } else {
+                selectedDevices = selectedDevices.filter(id => id !== deviceId);
+                deviceItem.classList.remove('selected');
+            }
+            
+            updateCheckboxDisabledState();
+            
+            if (selectedDevices.length > 1) {
+                isMultiSelectMode = true;
+                updateMultiDeviceTopStats();
+                if (currentChartType === 'table') {
+                    showMultiDeviceTableView();
+                } else {
+                    updateMultiDeviceChart();
+                }
+            } else if (selectedDevices.length === 1) {
+                isMultiSelectMode = false;
+                currentDevice = selectedDevices[0];
+                if (currentChartType === 'table') {
+                    showTableView();
+                } else {
+                    selectDevice(deviceItem, currentDevice);
+                }
+            }
+            
+            console.log('选中设备:', selectedDevices);
+        }
+        
+        function updateCheckboxDisabledState() {
+            if (selectedDevices.length === 0) {
+                document.querySelectorAll('.device-checkbox').forEach(cb => {
+                    cb.disabled = false;
+                });
+                return;
+            }
+            
+            const selectedCategory = deviceData[selectedDevices[0]].category;
+            
+            document.querySelectorAll('.device-item').forEach(item => {
+                const deviceId = item.dataset.deviceId;
+                const checkbox = item.querySelector('.device-checkbox');
+                if (!checkbox) return;
+                
+                const device = deviceData[deviceId];
+                if (device.category !== selectedCategory && !selectedDevices.includes(deviceId)) {
+                    checkbox.disabled = true;
+                } else {
+                    checkbox.disabled = false;
+                }
+            });
+        }
+        
+        function updateDeviceInfoCard(device) {
+            const titleEl = document.getElementById('deviceTitle');
+            const metaEl = document.getElementById('deviceMeta');
+            
+            if (!titleEl || !metaEl) return;
+            
+            titleEl.innerHTML = `
+                <h2>${device.name}</h2>
+                <span class="device-status-badge ${device.status}" id="deviceStatus">● ${device.status === 'running' ? '正常运行' : device.status === 'warning' ? '警告' : '停机'}</span>
+            `;
+            
+            metaEl.innerHTML = `
+                <span>
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                    统计周期: 24小时
+                </span>
+                <span>
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
+                    计划运行时间: ${device.plannedTime.toFixed(1)}小时
+                </span>
+                <span>
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                    数据更新: 2025-02-14 08:00:00
+                </span>
+            `;
+        }
+        
+        function updateOeeDetail(device) {
+            document.getElementById('metricAvailability').textContent = device.availability.toFixed(1) + '%';
+            document.getElementById('metricAvailability').className = 'oee-metric-value ' + (device.availability >= 90 ? 'good' : device.availability >= 80 ? 'warning' : 'bad');
+            document.getElementById('metricPlannedTime').textContent = device.plannedTime.toFixed(1) + '小时';
+            document.getElementById('metricActualTime').textContent = device.actualTime.toFixed(1) + '小时';
+            document.getElementById('metricPerformance').textContent = device.performance.toFixed(1) + '%';
+            document.getElementById('metricPerformance').className = 'oee-metric-value ' + (device.performance >= 85 ? 'good' : device.performance >= 75 ? 'warning' : 'bad');
+            document.getElementById('metricStandardCycle').textContent = device.standardCycle.toFixed(1) + '分钟/件';
+            document.getElementById('metricQuality').textContent = device.quality.toFixed(1) + '%';
+            document.getElementById('metricQuality').className = 'oee-metric-value ' + (device.quality >= 95 ? 'good' : device.quality >= 90 ? 'warning' : 'bad');
+            document.getElementById('metricTotalProducts').textContent = device.totalProducts + '件';
+            document.getElementById('metricGoodProducts').textContent = device.goodProducts + '件';
+            document.getElementById('metricOee').textContent = device.oee.toFixed(1) + '%';
+            document.getElementById('metricOee').className = 'oee-metric-value ' + (device.oee >= 85 ? 'good' : device.oee >= 70 ? 'warning' : 'bad');
+            const gap = device.oee - 85;
+            document.getElementById('metricGap').textContent = (gap >= 0 ? '+' : '') + gap.toFixed(1) + '%';
+            document.getElementById('metricGap').className = 'oee-metric-value ' + (gap >= 0 ? 'good' : 'bad');
+        }
+        
+        function updateMultiDeviceChart() {
+            updateMultiDeviceInfoCard();
+            generateChartData();
+            updateTrendChart();
+        }
+        
+        function showMultiDeviceTableView() {
+            updateMultiDeviceInfoCard();
+            updateTableData();
+        }
+        
+        function showTableView() {
+            updateTableData();
+        }
+        
+        function updateMultiDeviceInfoCard() {
+            const titleEl = document.getElementById('deviceTitle');
+            const metaEl = document.getElementById('deviceMeta');
+            
+            if (!titleEl || !metaEl) return;
+            
+            const firstDevice = deviceData[selectedDevices[0]];
+            const deviceNames = selectedDevices.map(id => deviceData[id].name).join('、');
+            
+            titleEl.innerHTML = `
+                <h2>多设备OEE对比</h2>
+                <span class="device-status-badge" style="background: #e6f7ff; color: #1890ff;">● ${firstDevice.category}</span>
+            `;
+            
+            metaEl.innerHTML = `
+                <span>
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                    对比设备: ${selectedDevices.length}台
+                </span>
+                <span style="max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path></svg>
+                    ${deviceNames}
+                </span>
+            `;
+        }
+        
+        function exportData() {
+            if (!isPageValid()) return;
+            alert('数据导出功能');
+        }
+        
+        window.toggleCategory = toggleCategory;
+        window.selectDevice = selectDevice;
+        window.toggleDeviceSelection = toggleDeviceSelection;
+        window.switchChartType = switchChartType;
+        window.changeTimeRange = changeTimeRange;
+        window.applyCustomDateRange = applyCustomDateRange;
+        window.exportData = exportData;
+        window.initPage = initPage;
+        
+        initPage();
+        
+        // 注册页面清理函数
+        if (window.registerPageCleanup) {
+            window.registerPageCleanup(function() {
+                if (trendChart && typeof trendChart.dispose === 'function') {
+                    trendChart.dispose();
+                    console.log('✅ trendChart 已清理');
+                }
+                if (oeeGaugeChart && typeof oeeGaugeChart.dispose === 'function') {
+                    oeeGaugeChart.dispose();
+                    console.log('✅ oeeGaugeChart 已清理');
+                }
+            });
+        }
+        
+        console.log('OEE监控 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

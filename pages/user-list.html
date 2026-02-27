@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人员管理</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">基础信息</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">人员管理</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">维护人员档案、组织归属、岗位职责；支持用户与角色的多对多关联，人员的在职/离职/禁用状态管理。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>工号/姓名/部门</label>
+                    <input type="text" class="form-input" placeholder="工号、姓名、部门">
+                </div>
+                <div class="filter-item">
+                    <label>所属组织</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="org1">研发部</option>
+                        <option value="org2">工艺部</option>
+                        <option value="org3">生产部</option>
+                        <option value="org4">采购部</option>
+                        <option value="org5">质量部</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="在职">在职</option>
+                        <option value="离职">离职</option>
+                        <option value="禁用">禁用</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary" data-open-modal="user-add-modal">+ 新增</button>
+                <button class="btn btn-default" data-open-modal="user-import-modal">导入</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th>工号</th>
+                            <th>姓名</th>
+                            <th>部门</th>
+                            <th>岗位</th>
+                            <th>角色</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>U001</td>
+                            <td>张工</td>
+                            <td>研发部</td>
+                            <td>技术任务负责人</td>
+                            <td>研发负责人、BOM 专员</td>
+                            <td><span class="status-badge status-success">在职</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="user-view-modal">查看</button> <button class="btn btn-sm btn-default" data-open-modal="user-edit-modal">编辑</button></td>
+                        </tr>
+                        <tr>
+                            <td>U002</td>
+                            <td>李工</td>
+                            <td>工艺部</td>
+                            <td>工艺工程师</td>
+                            <td>工艺负责人</td>
+                            <td><span class="status-badge status-success">在职</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="user-view-modal">查看</button> <button class="btn btn-sm btn-default" data-open-modal="user-edit-modal">编辑</button></td>
+                        </tr>
+                        <tr>
+                            <td>U003</td>
+                            <td>王工</td>
+                            <td>生产部</td>
+                            <td>生产计划员</td>
+                            <td>生产负责人</td>
+                            <td><span class="status-badge status-success">在职</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="user-view-modal">查看</button> <button class="btn btn-sm btn-default" data-open-modal="user-edit-modal">编辑</button></td>
+                        </tr>
+                        <tr>
+                            <td>U004</td>
+                            <td>赵工</td>
+                            <td>采购部</td>
+                            <td>采购专员</td>
+                            <td>采购负责人</td>
+                            <td><span class="status-badge status-success">在职</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="user-view-modal">查看</button> <button class="btn btn-sm btn-default" data-open-modal="user-edit-modal">编辑</button></td>
+                        </tr>
+                        <tr>
+                            <td>U005</td>
+                            <td>刘工</td>
+                            <td>质量部</td>
+                            <td>质量工程师</td>
+                            <td>质量负责人</td>
+                            <td><span class="status-badge status-success">在职</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="user-view-modal">查看</button> <button class="btn btn-sm btn-default" data-open-modal="user-edit-modal">编辑</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 5 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+        <div id="user-view-modal" class="modal-overlay">
+            <div class="modal" style="max-width:520px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">人员详情</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <div class="form-info-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div class="form-info-item"><span class="form-info-label">工号</span><span class="form-info-value">U001</span></div>
+                        <div class="form-info-item"><span class="form-info-label">姓名</span><span class="form-info-value">张工</span></div>
+                        <div class="form-info-item"><span class="form-info-label">部门</span><span class="form-info-value">研发部</span></div>
+                        <div class="form-info-item"><span class="form-info-label">岗位</span><span class="form-info-value">技术任务负责人</span></div>
+                        <div class="form-info-item"><span class="form-info-label">角色</span><span class="form-info-value">研发负责人、BOM 专员</span></div>
+                        <div class="form-info-item"><span class="form-info-label">状态</span><span class="form-info-value"><span class="status-badge status-success">在职</span></span></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="user-view-modal">关闭</button></div>
+            </div>
+        </div>
+        <div id="user-add-modal" class="modal-overlay">
+            <div class="modal" style="max-width:560px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">新增人员</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <div class="form-item"><label class="form-label required">工号</label><input type="text" class="form-input" placeholder="如 U006"></div>
+                    <div class="form-item"><label class="form-label required">姓名</label><input type="text" class="form-input" placeholder="请输入"></div>
+                    <div class="form-item"><label class="form-label required">所属部门</label><select class="form-select"><option value="">请选择</option><option value="ORG-001">研发部</option><option value="ORG-002">工艺部</option><option value="ORG-003">生产部</option></select></div>
+                    <div class="form-item"><label class="form-label">岗位</label><input type="text" class="form-input" placeholder="请输入"></div>
+                    <div class="form-item"><label class="form-label">角色</label><select class="form-select" multiple style="height:80px;"><option value="ROLE-001">研发负责人</option><option value="ROLE-003">BOM 专员</option></select></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="user-add-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="user-add-modal" onclick="alert('✅ 人员已保存')">保存</button></div>
+            </div>
+        </div>
+        <div id="user-import-modal" class="modal-overlay">
+            <div class="modal" style="max-width:460px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">导入人员</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <p class="modal-desc">使用 Excel 模板填写工号、姓名、部门、岗位、角色等信息后上传。</p>
+                    <div class="form-item" style="margin-top:16px;"><label class="form-label">选择文件</label><input type="file" class="form-input" accept=".xlsx,.xls"></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="user-import-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="user-import-modal" onclick="alert('✅ 导入成功')">确认导入</button></div>
+            </div>
+        </div>
+        <div id="user-edit-modal" class="modal-overlay">
+            <div class="modal" style="max-width:560px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">编辑人员</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <div class="form-item"><label class="form-label required">工号</label><input type="text" class="form-input" value="U001" readonly></div>
+                    <div class="form-item"><label class="form-label required">姓名</label><input type="text" class="form-input" value="张工"></div>
+                    <div class="form-item"><label class="form-label required">所属部门</label><select class="form-select"><option value="ORG-001" selected>研发部</option><option value="ORG-002">工艺部</option></select></div>
+                    <div class="form-item"><label class="form-label">岗位</label><input type="text" class="form-input" value="技术任务负责人"></div>
+                    <div class="form-item"><label class="form-label">状态</label><select class="form-select"><option value="在职" selected>在职</option><option value="离职">离职</option><option value="禁用">禁用</option></select></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="user-edit-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="user-edit-modal" onclick="alert('✅ 已保存')">保存</button></div>
+            </div>
+        </div>
+        <script>
+            if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+            document.querySelectorAll('.action-left .btn-default').forEach(function(btn) {
+                if (btn.textContent.indexOf('导出') !== -1) {
+                    btn.addEventListener('click', function() {
+                        if (confirm('确定导出当前人员列表？')) alert('导出成功，文件已下载。');
+                    });
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>

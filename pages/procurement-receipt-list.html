@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>到货单 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">采购执行</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">到货单</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理采购到货单，包括到货登记、质量检验、入库确认等。到货单由采购订单到货后生成或手工创建，支持按到货单号、采购订单、供应商、状态筛选。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="到货单号、订单编号、供应商">
+                </div>
+                <div class="filter-item">
+                    <label>状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending_report">待报检</option>
+                        <option value="pending_inspection">待检验</option>
+                        <option value="inspecting">检验中</option>
+                        <option value="pending_stockin">待入库</option>
+                        <option value="stocking_in">入库中</option>
+                        <option value="received">已入库</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>到货日期</label>
+                    <input type="date" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary" id="btn-new-receipt">+ 新建到货单</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="130">到货单号</th>
+                            <th width="90">来源</th>
+                            <th width="120">关联采购订单</th>
+                            <th width="160">供应商</th>
+                            <th width="100">到货日期</th>
+                            <th width="90">状态</th>
+                            <th width="90">收货人</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 来源：下推；状态：检验中 → 不可编辑/删除 -->
+                        <tr data-receipt-id="1" data-source="push" data-status="inspecting">
+                            <td><input type="checkbox" name="arrival-id" value="1"></td>
+                            <td>DN-2025-001</td>
+                            <td>下推</td>
+                            <td>PO-2025-001</td>
+                            <td>深圳市电子科技有限公司</td>
+                            <td>2025-01-20</td>
+                            <td><span class="status-badge status-processing">检验中</span></td>
+                            <td>张三</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-receipt-detail.html" data-id="1">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-inspection-register" data-no="DN-2025-001">检验记录</button>
+                            </td>
+                        </tr>
+                        <!-- 来源：下推；状态：已入库 → 不可编辑/删除 -->
+                        <tr data-receipt-id="2" data-source="push" data-status="received">
+                            <td><input type="checkbox" name="arrival-id" value="2"></td>
+                            <td>DN-2025-002</td>
+                            <td>下推</td>
+                            <td>PO-2025-002</td>
+                            <td>上海精密机械制造有限公司</td>
+                            <td>2025-01-18</td>
+                            <td><span class="status-badge status-success">已入库</span></td>
+                            <td>李四</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-receipt-detail.html" data-id="2">查看</button>
+                            </td>
+                        </tr>
+                        <!-- 来源：下推；状态：待报检 → 可编辑、删除、报检 -->
+                        <tr data-receipt-id="3" data-source="push" data-status="pending_report">
+                            <td><input type="checkbox" name="arrival-id" value="3"></td>
+                            <td>DN-2025-003</td>
+                            <td>下推</td>
+                            <td>PO-2025-003</td>
+                            <td>北京贸易有限公司</td>
+                            <td>2025-01-22</td>
+                            <td><span class="status-badge status-warning">待报检</span></td>
+                            <td>-</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-receipt-detail.html" data-id="3">查看</button>
+                                <button type="button" class="btn btn-sm btn-default btn-receipt-edit" data-id="3" data-no="DN-2025-003">编辑</button>
+                                <button type="button" class="btn btn-sm btn-default btn-receipt-delete" data-id="3" data-no="DN-2025-003">删除</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-receipt-report" data-no="DN-2025-003">报检</button>
+                            </td>
+                        </tr>
+                        <!-- 来源：人工创建；状态：待检验 → 不可编辑/删除，可检验记录 -->
+                        <tr data-receipt-id="4" data-source="manual" data-status="pending_inspection">
+                            <td><input type="checkbox" name="arrival-id" value="4"></td>
+                            <td>DN-2025-004</td>
+                            <td>人工创建</td>
+                            <td>-</td>
+                            <td>深圳华强电子有限公司</td>
+                            <td>2025-01-23</td>
+                            <td><span class="status-badge status-warning">待检验</span></td>
+                            <td>王五</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-receipt-detail.html" data-id="4">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-inspection-register" data-no="DN-2025-004">检验记录</button>
+                            </td>
+                        </tr>
+                        <!-- 来源：下推；状态：待入库 → 可申请入库 -->
+                        <tr data-receipt-id="5" data-source="push" data-status="pending_stockin">
+                            <td><input type="checkbox" name="arrival-id" value="5"></td>
+                            <td>DN-2025-005</td>
+                            <td>下推</td>
+                            <td>PO-2025-002</td>
+                            <td>上海精密机械制造有限公司</td>
+                            <td>2025-01-25</td>
+                            <td><span class="status-badge status-warning">待入库</span></td>
+                            <td>赵六</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-receipt-detail.html" data-id="5">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-apply-stockin" data-id="5" data-no="DN-2025-005">申请入库</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 5 条记录</span>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 新建到货单弹窗 -->
+        <div id="new-receipt-modal" class="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center;">
+            <div class="modal" style="background:#fff;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);max-width:900px;width:92%;max-height:90vh;display:flex;flex-direction:column;">
+                <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #f0f0f0;">
+                    <div class="modal-title" style="font-size:16px;font-weight:600;">新建到货单</div>
+                    <div class="modal-close" id="new-receipt-modal-close" style="cursor:pointer;font-size:20px;color:#8c8c8c;">×</div>
+                </div>
+                <div class="modal-body" style="padding:20px;overflow-y:auto;flex:1;">
+                    <p style="margin-bottom:20px;padding:12px 16px;background:#f5f8fc;border-radius:6px;border-left:3px solid #1890ff;font-size:13px;color:#595959;line-height:1.6;">
+                        手工创建到货单。可关联采购订单带出供应商与物料，或不关联订单直接填写供应商与到货明细。
+                    </p>
+
+                    <!-- 基本信息 -->
+                    <div style="margin-bottom:24px;">
+                        <div class="section-title" style="font-size:14px;font-weight:600;color:rgba(0,0,0,0.85);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #e8e8e8;">基本信息</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px 20px;">
+                            <div class="form-item">
+                                <label class="form-label">关联采购订单</label>
+                                <select class="form-select" id="new-receipt-po">
+                                    <option value="">不关联（手工填写）</option>
+                                    <option value="PO-2025-001">PO-2025-001</option>
+                                    <option value="PO-2025-002">PO-2025-002</option>
+                                    <option value="PO-2025-003">PO-2025-003</option>
+                                </select>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">供应商 <span style="color:#ff4d4f;">*</span></label>
+                                <input type="text" class="form-input" id="new-receipt-supplier" placeholder="请输入或选择供应商" list="supplier-list">
+                                <datalist id="supplier-list">
+                                    <option value="深圳市电子科技有限公司">
+                                    <option value="上海精密机械制造有限公司">
+                                    <option value="北京贸易有限公司">
+                                </datalist>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">到货日期 <span style="color:#ff4d4f;">*</span></label>
+                                <input type="date" class="form-input" id="new-receipt-date" required>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">收货人 <span style="color:#ff4d4f;">*</span></label>
+                                <input type="text" class="form-input" id="new-receipt-receiver" placeholder="请输入收货人" required>
+                            </div>
+                            <div class="form-item" style="grid-column:1 / -1;">
+                                <label class="form-label">备注</label>
+                                <textarea class="form-input" id="new-receipt-remark" rows="2" placeholder="选填" style="resize:vertical;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 到货明细 -->
+                    <div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                            <div class="section-title" style="font-size:14px;font-weight:600;color:rgba(0,0,0,0.85);padding-bottom:8px;border-bottom:1px solid #e8e8e8;">到货明细 <span style="color:#ff4d4f;">*</span></div>
+                            <div id="new-receipt-add-line-wrap">
+                                <button type="button" class="btn btn-sm btn-default" id="new-receipt-add-line">+ 添加明细行</button>
+                            </div>
+                        </div>
+                        <div class="table-wrapper" style="border:1px solid #e8e8e8;border-radius:6px;max-height:320px;overflow-y:auto;">
+                            <table id="new-receipt-detail-table" style="width:100%;border-collapse:collapse;">
+                                <thead style="background:#fafafa;position:sticky;top:0;z-index:1;">
+                                    <tr>
+                                        <th class="new-receipt-th-check" style="width:50px;padding:10px 12px;text-align:center;display:none;"><input type="checkbox" id="new-receipt-header-check" class="new-receipt-header-check" title="全选/取消全选"></th>
+                                        <th style="width:50px;padding:10px 12px;text-align:center;">序号</th>
+                                        <th style="padding:10px 12px;text-align:left;font-size:13px;font-weight:600;">物料编码</th>
+                                        <th style="padding:10px 12px;text-align:left;font-size:13px;font-weight:600;">物料名称</th>
+                                        <th style="padding:10px 12px;text-align:left;font-size:13px;font-weight:600;">规格型号</th>
+                                        <th style="padding:10px 12px;text-align:right;font-size:13px;font-weight:600;">到货数量</th>
+                                        <th style="width:80px;padding:10px 12px;text-align:left;font-size:13px;font-weight:600;">单位</th>
+                                        <th class="new-receipt-th-op" style="width:80px;padding:10px 12px;text-align:center;">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="new-receipt-detail-tbody">
+                                    <tr class="new-receipt-detail-row new-receipt-detail-manual">
+                                        <td class="new-receipt-td-check" style="display:none;"></td>
+                                        <td style="padding:10px 12px;text-align:center;">1</td>
+                                        <td style="padding:10px 12px;"><input type="text" class="form-input" placeholder="物料编码" style="width:100%;"></td>
+                                        <td style="padding:10px 12px;"><input type="text" class="form-input" placeholder="物料名称" style="width:100%;"></td>
+                                        <td style="padding:10px 12px;"><input type="text" class="form-input" placeholder="规格型号" style="width:100%;"></td>
+                                        <td style="padding:10px 12px;"><input type="number" class="form-input" placeholder="数量" min="1" value="" style="width:100px;text-align:right;"></td>
+                                        <td style="padding:10px 12px;"><input type="text" class="form-input" placeholder="单位" style="width:60px;"></td>
+                                        <td class="new-receipt-td-op" style="padding:10px 12px;text-align:center;"><button type="button" class="btn btn-sm btn-default btn-remove-line">删除</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p style="margin-top:8px;font-size:12px;color:#8c8c8c;" id="new-receipt-detail-hint">选择关联采购订单后，将自动带出未到货物料明细，勾选需要写入到货单的明细行；不关联时可手工添加/删除明细。</p>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding:16px 20px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;gap:12px;">
+                    <button type="button" class="btn btn-default" id="new-receipt-cancel">取消</button>
+                    <button type="button" class="btn btn-primary" id="new-receipt-submit">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 检验记录弹窗：仅展示到货明细，检验由质检协同模块填写 -->
+        <div id="inspection-modal" class="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center;">
+            <div class="modal" style="background:#fff;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);max-width:800px;width:92%;max-height:90vh;display:flex;flex-direction:column;">
+                <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #f0f0f0;">
+                    <div class="modal-title" style="font-size:16px;font-weight:600;" id="inspection-modal-title">检验记录</div>
+                    <div class="modal-close" id="inspection-modal-close" style="cursor:pointer;font-size:20px;color:#8c8c8c;">×</div>
+                </div>
+                <div class="modal-body" style="padding:20px;overflow-y:auto;flex:1;">
+                    <p style="margin-bottom:16px;padding:12px 16px;background:#f5f8fc;border-radius:6px;border-left:3px solid #1890ff;font-size:13px;color:#595959;line-height:1.6;">
+                        以下为到货明细，基于明细的检验由质检协同应用模块填写，本页仅做展示。
+                    </p>
+                    <div class="section-title" style="font-size:14px;font-weight:600;color:rgba(0,0,0,0.85);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #e8e8e8;">到货明细</div>
+                    <div class="table-wrapper" style="border:1px solid #e8e8e8;border-radius:6px;max-height:360px;overflow-y:auto;">
+                        <table style="width:100%;border-collapse:collapse;">
+                            <thead style="background:#fafafa;position:sticky;top:0;z-index:1;">
+                                <tr>
+                                    <th style="width:50px;padding:10px 12px;text-align:center;">序号</th>
+                                    <th style="padding:10px 12px;text-align:left;font-size:13px;font-weight:600;">物料编码</th>
+                                    <th style="padding:10px 12px;text-align:left;font-size:13px;font-weight:600;">物料名称</th>
+                                    <th style="padding:10px 12px;text-align:left;font-size:13px;font-weight:600;">规格型号</th>
+                                    <th style="padding:10px 12px;text-align:right;font-size:13px;font-weight:600;">到货数量</th>
+                                    <th style="width:60px;padding:10px 12px;text-align:left;font-size:13px;font-weight:600;">单位</th>
+                                    <th style="padding:10px 12px;text-align:right;font-size:13px;font-weight:600;">合格数量</th>
+                                    <th style="padding:10px 12px;text-align:right;font-size:13px;font-weight:600;">不合格数量</th>
+                                    <th style="width:100px;padding:10px 12px;text-align:center;">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inspection-detail-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding:16px 20px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;">
+                    <button type="button" class="btn btn-default" id="inspection-modal-close-btn">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 检验项明细弹窗：仅展示，由质检协同模块填写 -->
+        <div id="inspection-items-modal" class="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1001;align-items:center;justify-content:center;">
+            <div class="modal" style="background:#fff;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);max-width:700px;width:92%;max-height:85vh;display:flex;flex-direction:column;">
+                <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #f0f0f0;">
+                    <div class="modal-title" style="font-size:16px;font-weight:600;" id="inspection-items-modal-title">检验项明细</div>
+                    <div class="modal-close" id="inspection-items-modal-close" style="cursor:pointer;font-size:20px;color:#8c8c8c;">×</div>
+                </div>
+                <div class="modal-body" style="padding:20px;overflow-y:auto;flex:1;">
+                    <p style="margin-bottom:16px;padding:12px 16px;background:#f5f8fc;border-radius:6px;border-left:3px solid #1890ff;font-size:13px;color:#595959;line-height:1.6;">
+                        检验项及结果由质检协同应用模块填写，本页仅做展示。
+                    </p>
+                    <div class="section-title" style="font-size:14px;font-weight:600;color:rgba(0,0,0,0.85);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #e8e8e8;">检验项明细</div>
+                    <div class="table-wrapper" style="border:1px solid #e8e8e8;border-radius:6px;max-height:320px;overflow-y:auto;">
+                        <table style="width:100%;border-collapse:collapse;">
+                            <thead style="background:#fafafa;position:sticky;top:0;z-index:1;">
+                                <tr>
+                                    <th style="width:50px;padding:10px 12px;text-align:center;">序号</th>
+                                    <th style="padding:10px 12px;text-align:left;font-size:13px;font-weight:600;">检验项</th>
+                                    <th style="padding:10px 12px;text-align:left;font-size:13px;font-weight:600;">检验标准</th>
+                                    <th style="padding:10px 12px;text-align:left;font-size:13px;font-weight:600;">检验结果</th>
+                                    <th style="padding:10px 12px;text-align:left;font-size:13px;font-weight:600;">备注</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inspection-items-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding:16px 20px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;">
+                    <button type="button" class="btn btn-default" id="inspection-items-modal-close-btn">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 编辑到货单弹窗 -->
+        <div id="edit-receipt-modal" class="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center;">
+            <div class="modal" style="background:#fff;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);max-width:900px;width:92%;max-height:90vh;display:flex;flex-direction:column;">
+                <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #f0f0f0;">
+                    <div class="modal-title" style="font-size:16px;font-weight:600;">编辑到货单</div>
+                    <div class="modal-close" id="edit-receipt-modal-close" style="cursor:pointer;font-size:20px;color:#8c8c8c;">×</div>
+                </div>
+                <div class="modal-body" style="padding:20px;overflow-y:auto;flex:1;">
+                    <input type="hidden" id="edit-receipt-id" value="">
+                    <p style="margin-bottom:20px;padding:12px 16px;background:#f5f8fc;border-radius:6px;border-left:3px solid #1890ff;font-size:13px;color:#595959;line-height:1.6;">
+                        仅待报检状态的到货单可编辑。修改后保存即可生效。
+                    </p>
+
+                    <div style="margin-bottom:24px;">
+                        <div class="section-title" style="font-size:14px;font-weight:600;color:rgba(0,0,0,0.85);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #e8e8e8;">基本信息</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px 20px;">
+                            <div class="form-item">
+                                <label class="form-label">到货单号</label>
+                                <div class="form-value" id="edit-receipt-no" style="padding:8px 0;color:#595959;">-</div>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">关联采购订单</label>
+                                <select class="form-select" id="edit-receipt-po">
+                                    <option value="">不关联（手工填写）</option>
+                                    <option value="PO-2025-001">PO-2025-001</option>
+                                    <option value="PO-2025-002">PO-2025-002</option>
+                                    <option value="PO-2025-003">PO-2025-003</option>
+                                </select>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">供应商 <span style="color:#ff4d4f;">*</span></label>
+                                <input type="text" class="form-input" id="edit-receipt-supplier" placeholder="请输入或选择供应商" list="supplier-list-edit">
+                                <datalist id="supplier-list-edit">
+                                    <option value="深圳市电子科技有限公司">
+                                    <option value="上海精密机械制造有限公司">
+                                    <option value="北京贸易有限公司">
+                                    <option value="深圳华强电子有限公司">
+                                </datalist>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">到货日期 <span style="color:#ff4d4f;">*</span></label>
+                                <input type="date" class="form-input" id="edit-receipt-date" required>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">收货人 <span style="color:#ff4d4f;">*</span></label>
+                                <input type="text" class="form-input" id="edit-receipt-receiver" placeholder="请输入收货人" required>
+                            </div>
+                            <div class="form-item" style="grid-column:1 / -1;">
+                                <label class="form-label">备注</label>
+                                <textarea class="form-input" id="edit-receipt-remark" rows="2" placeholder="选填" style="resize:vertical;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                            <div class="section-title" style="font-size:14px;font-weight:600;color:rgba(0,0,0,0.85);padding-bottom:8px;border-bottom:1px solid #e8e8e8;">到货明细 <span style="color:#ff4d4f;">*</span></div>
+                            <button type="button" class="btn btn-sm btn-default" id="edit-receipt-add-line">+ 添加明细行</button>
+                        </div>
+                        <div class="table-wrapper" style="border:1px solid #e8e8e8;border-radius:6px;max-height:320px;overflow-y:auto;">
+                            <table style="width:100%;border-collapse:collapse;">
+                                <thead style="background:#fafafa;position:sticky;top:0;z-index:1;">
+                                    <tr>
+                                        <th style="width:50px;padding:10px 12px;text-align:center;">序号</th>
+                                        <th style="padding:10px 12px;text-align:left;font-size:13px;font-weight:600;">物料编码</th>
+                                        <th style="padding:10px 12px;text-align:left;font-size:13px;font-weight:600;">物料名称</th>
+                                        <th style="padding:10px 12px;text-align:left;font-size:13px;font-weight:600;">规格型号</th>
+                                        <th style="padding:10px 12px;text-align:right;font-size:13px;font-weight:600;">到货数量</th>
+                                        <th style="width:80px;padding:10px 12px;text-align:left;font-size:13px;font-weight:600;">单位</th>
+                                        <th style="width:80px;padding:10px 12px;text-align:center;">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="edit-receipt-detail-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding:16px 20px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;gap:12px;">
+                    <button type="button" class="btn btn-default" id="edit-receipt-cancel">取消</button>
+                    <button type="button" class="btn btn-primary" id="edit-receipt-submit">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        console.log('到货单 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+            PageInteractions.toggleSelectAll('input[name="arrival-id"]');
+        }
+        // 确认入库：事件委托（支持动态插入的按钮），确认后状态改为已入库
+        document.addEventListener('click', function(e) {
+            var btn = e.target && e.target.closest('.btn-confirm-stockin');
+            if (!btn) return;
+            var id = btn.getAttribute('data-id') || '';
+            if (!confirm('确定对该到货单执行入库确认？')) return;
+            var row = btn.closest('tr');
+            if (row) {
+                row.setAttribute('data-status', 'received');
+                var statusTd = row.querySelector('td:nth-child(7)');
+                if (statusTd) statusTd.innerHTML = '<span class="status-badge status-success">已入库</span>';
+                var opTd = row.querySelector('td:last-child');
+                if (opTd) opTd.innerHTML = '<button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-receipt-detail.html" data-id="' + id + '">查看</button>';
+            }
+            alert('入库确认已提交。');
+        });
+
+        // 编辑到货单：打开编辑弹窗（见下方 edit-receipt-modal 逻辑）
+
+        // 报检：二次确认后状态改为待检验，并更新操作列
+        document.querySelectorAll('.btn-receipt-report').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var no = this.getAttribute('data-no') || '';
+                if (!confirm('确定对该到货单「' + no + '」执行报检？')) return;
+                var row = this.closest('tr');
+                if (row) {
+                    row.setAttribute('data-status', 'pending_inspection');
+                    var statusTd = row.querySelector('td:nth-child(7)');
+                    if (statusTd) statusTd.innerHTML = '<span class="status-badge status-warning">待检验</span>';
+                    var id = row.getAttribute('data-receipt-id') || '';
+                    var opTd = row.querySelector('td:last-child');
+                    if (opTd) {
+                        opTd.innerHTML =
+                            '<button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-receipt-detail.html" data-id="' + id + '">查看</button> ' +
+                            '<button type="button" class="btn btn-sm btn-primary btn-inspection-register" data-no="' + no + '">检验记录</button>';
+                    }
+                }
+                alert('报检已提交。');
+            });
+        });
+
+        // 申请入库：二次确认后状态改为入库中，并更新操作列
+        document.addEventListener('click', function(e) {
+            var btn = e.target && e.target.closest('.btn-apply-stockin');
+            if (!btn) return;
+            var no = btn.getAttribute('data-no') || '';
+            var id = btn.getAttribute('data-id') || '';
+            if (!confirm('确定对该到货单「' + no + '」执行申请入库？')) return;
+            var row = btn.closest('tr');
+            if (row) {
+                row.setAttribute('data-status', 'stocking_in');
+                var statusTd = row.querySelector('td:nth-child(7)');
+                if (statusTd) statusTd.innerHTML = '<span class="status-badge status-processing">入库中</span>';
+                var opTd = row.querySelector('td:last-child');
+                if (opTd) opTd.innerHTML = '<button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-receipt-detail.html" data-id="' + id + '">查看</button> <button type="button" class="btn btn-sm btn-default btn-confirm-stockin" data-id="' + id + '">确认入库</button>';
+            }
+            alert('申请入库已提交。');
+        });
+
+        // 删除到货单（仅待报检状态显示删除按钮）
+        document.querySelectorAll('.btn-receipt-delete').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var id = this.getAttribute('data-id');
+                var no = this.getAttribute('data-no');
+                if (!confirm('确定删除到货单「' + (no || '') + '」？删除后不可恢复。')) return;
+                var row = this.closest('tr');
+                if (row) {
+                    row.remove();
+                    var info = document.querySelector('.pagination-info');
+                    if (info) info.textContent = '共 ' + document.querySelectorAll('.list-table-nowrap tbody tr').length + ' 条记录';
+                }
+                alert('到货单已删除（原型模拟）。');
+            });
+        });
+
+        // 检验记录弹窗：到货明细（含合格/不合格数量、检验记录按钮）及检验项明细弹窗
+        (function() {
+            var modal = document.getElementById('inspection-modal');
+            var titleEl = document.getElementById('inspection-modal-title');
+            var tbody = document.getElementById('inspection-detail-tbody');
+            var btnClose = document.getElementById('inspection-modal-close');
+            var btnCloseBtn = document.getElementById('inspection-modal-close-btn');
+            var currentReceiptNo = '';
+            var RECEIPT_DETAILS = {
+                'DN-2025-001': [
+                    { materialCode: 'MAT-001', materialName: '电子元器件A', spec: '10KΩ ±5%', qty: 500, unit: '个', qualifiedQty: 480, unqualifiedQty: 20 },
+                    { materialCode: 'MAT-002', materialName: 'PCB板', spec: '100x80mm 4层', qty: 500, unit: '片', qualifiedQty: 500, unqualifiedQty: 0 },
+                    { materialCode: 'MAT-003', materialName: '电阻B', spec: '20KΩ', qty: 200, unit: '个', qualifiedQty: 200, unqualifiedQty: 0 }
+                ],
+                'DN-2025-003': [
+                    { materialCode: 'MAT-006', materialName: '包装箱', spec: '500x400x300mm', qty: 150, unit: '个', qualifiedQty: 150, unqualifiedQty: 0 },
+                    { materialCode: 'MAT-007', materialName: '缓冲材料', spec: 'EPE 5mm', qty: 500, unit: '米', qualifiedQty: 495, unqualifiedQty: 5 }
+                ],
+                'DN-2025-004': [
+                    { materialCode: 'MAT-008', materialName: '电容C', spec: '100uF', qty: 300, unit: '个', qualifiedQty: 298, unqualifiedQty: 2 },
+                    { materialCode: 'MAT-009', materialName: '连接器', spec: 'TYPE-C 10P', qty: 100, unit: '个', qualifiedQty: 100, unqualifiedQty: 0 }
+                ]
+            };
+            var INSPECTION_ITEMS = {
+                'DN-2025-001_MAT-001': [
+                    { itemName: '外观检查', standard: '无破损、无氧化', result: '合格', remark: '' },
+                    { itemName: '阻值测量', standard: '10KΩ±5%', result: '合格', remark: '' },
+                    { itemName: '绝缘电阻', standard: '≥100MΩ', result: '合格', remark: '' }
+                ],
+                'DN-2025-001_MAT-002': [
+                    { itemName: '外观检查', standard: '无划伤、无翘曲', result: '合格', remark: '' },
+                    { itemName: '尺寸检测', standard: '100±0.2mm×80±0.2mm', result: '合格', remark: '' }
+                ],
+                'DN-2025-001_MAT-003': [
+                    { itemName: '阻值测量', standard: '20KΩ±5%', result: '合格', remark: '' }
+                ],
+                'DN-2025-003_MAT-006': [
+                    { itemName: '外观检查', standard: '无破损、无变形', result: '合格', remark: '' },
+                    { itemName: '尺寸检测', standard: '500×400×300mm', result: '合格', remark: '' }
+                ],
+                'DN-2025-003_MAT-007': [
+                    { itemName: '厚度测量', standard: '5mm±0.2mm', result: '合格', remark: '' }
+                ],
+                'DN-2025-004_MAT-008': [
+                    { itemName: '容量检测', standard: '100uF±20%', result: '合格', remark: '' },
+                    { itemName: '耐压测试', standard: '≥16V', result: '合格', remark: '' }
+                ],
+                'DN-2025-004_MAT-009': [
+                    { itemName: '外观检查', standard: '引脚无弯曲', result: '合格', remark: '' }
+                ]
+            };
+            function renderDetails(no) {
+                if (!tbody) return;
+                currentReceiptNo = no || '';
+                var list = RECEIPT_DETAILS[no] || [];
+                tbody.innerHTML = '';
+                list.forEach(function(item, i) {
+                    var tr = document.createElement('tr');
+                    var qOk = item.qualifiedQty != null ? item.qualifiedQty : '-';
+                    var qNg = item.unqualifiedQty != null ? item.unqualifiedQty : '-';
+                    tr.innerHTML =
+                        '<td style="padding:10px 12px;text-align:center;">' + (i + 1) + '</td>' +
+                        '<td style="padding:10px 12px;">' + (item.materialCode || '') + '</td>' +
+                        '<td style="padding:10px 12px;">' + (item.materialName || '') + '</td>' +
+                        '<td style="padding:10px 12px;">' + (item.spec || '') + '</td>' +
+                        '<td style="padding:10px 12px;text-align:right;">' + (item.qty != null ? item.qty : '') + '</td>' +
+                        '<td style="padding:10px 12px;">' + (item.unit || '') + '</td>' +
+                        '<td style="padding:10px 12px;text-align:right;">' + qOk + '</td>' +
+                        '<td style="padding:10px 12px;text-align:right;">' + qNg + '</td>' +
+                        '<td style="padding:10px 12px;text-align:center;"><button type="button" class="btn btn-sm btn-default btn-inspection-detail" data-receipt-no="' + (no || '') + '" data-material-code="' + (item.materialCode || '') + '" data-material-name="' + (item.materialName || '') + '">检验记录</button></td>';
+                    tbody.appendChild(tr);
+                });
+            }
+            function openModal(no) {
+                if (titleEl) titleEl.textContent = '检验记录 - ' + (no || '');
+                renderDetails(no || '');
+                if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+            }
+            function closeModal() {
+                if (modal) { modal.style.display = 'none'; document.body.style.overflow = ''; }
+            }
+            if (btnClose) btnClose.addEventListener('click', closeModal);
+            if (btnCloseBtn) btnCloseBtn.addEventListener('click', closeModal);
+            if (modal) modal.addEventListener('click', function(e) { if (e.target === modal) closeModal(); });
+            document.addEventListener('click', function(e) {
+                var btn = e.target && e.target.closest('.btn-inspection-register');
+                if (btn) { openModal(btn.getAttribute('data-no')); }
+            });
+
+            tbody && tbody.addEventListener('click', function(e) {
+                var btn = e.target && e.target.closest('.btn-inspection-detail');
+                if (!btn) return;
+                var receiptNo = btn.getAttribute('data-receipt-no') || '';
+                var materialCode = btn.getAttribute('data-material-code') || '';
+                var materialName = btn.getAttribute('data-material-name') || '';
+                window.openInspectionItemsModal && window.openInspectionItemsModal(receiptNo, materialCode, materialName);
+            });
+
+            window.openInspectionItemsModal = function(receiptNo, materialCode, materialName) {
+                var itemsModal = document.getElementById('inspection-items-modal');
+                var itemsTitle = document.getElementById('inspection-items-modal-title');
+                var itemsTbody = document.getElementById('inspection-items-tbody');
+                var key = (receiptNo + '_' + materialCode).replace(/\s/g, '');
+                var list = INSPECTION_ITEMS[key] || INSPECTION_ITEMS[receiptNo + '_' + materialCode] || [];
+                if (itemsTitle) itemsTitle.textContent = '检验项明细 - ' + (materialCode || '') + ' ' + (materialName || '');
+                if (!itemsTbody) return;
+                itemsTbody.innerHTML = '';
+                list.forEach(function(item, i) {
+                    var tr = document.createElement('tr');
+                    tr.innerHTML =
+                        '<td style="padding:10px 12px;text-align:center;">' + (i + 1) + '</td>' +
+                        '<td style="padding:10px 12px;">' + (item.itemName || '') + '</td>' +
+                        '<td style="padding:10px 12px;">' + (item.standard || '') + '</td>' +
+                        '<td style="padding:10px 12px;">' + (item.result || '') + '</td>' +
+                        '<td style="padding:10px 12px;">' + (item.remark || '') + '</td>';
+                    itemsTbody.appendChild(tr);
+                });
+                if (itemsModal) { itemsModal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+            };
+        })();
+
+        // 检验项明细弹窗：关闭与事件
+        (function() {
+            var itemsModal = document.getElementById('inspection-items-modal');
+            var btnClose = document.getElementById('inspection-items-modal-close');
+            var btnCloseBtn = document.getElementById('inspection-items-modal-close-btn');
+            function closeItemsModal() {
+                if (itemsModal) { itemsModal.style.display = 'none'; document.body.style.overflow = ''; }
+            }
+            if (btnClose) btnClose.addEventListener('click', closeItemsModal);
+            if (btnCloseBtn) btnCloseBtn.addEventListener('click', closeItemsModal);
+            if (itemsModal) itemsModal.addEventListener('click', function(e) { if (e.target === itemsModal) closeItemsModal(); });
+        })();
+
+        // 新建到货单弹窗
+        (function() {
+            var modal = document.getElementById('new-receipt-modal');
+            var btnOpen = document.getElementById('btn-new-receipt');
+            var btnClose = document.getElementById('new-receipt-modal-close');
+            var btnCancel = document.getElementById('new-receipt-cancel');
+            var btnSubmit = document.getElementById('new-receipt-submit');
+            var btnAddLine = document.getElementById('new-receipt-add-line');
+            var tbody = document.getElementById('new-receipt-detail-tbody');
+            var poSelect = document.getElementById('new-receipt-po');
+            var supplierInput = document.getElementById('new-receipt-supplier');
+
+            // 模拟：采购订单 -> 供应商
+            var PO_SUPPLIER = {
+                'PO-2025-001': '深圳市电子科技有限公司',
+                'PO-2025-002': '上海精密机械制造有限公司',
+                'PO-2025-003': '北京贸易有限公司'
+            };
+
+            // 模拟：采购订单 -> 未到货物料明细（物料编码、名称、规格、订单数量、未到货数量、单位）
+            var PO_UNRECEIVED_DETAILS = {
+                'PO-2025-001': [
+                    { materialCode: 'MAT-001', materialName: '电子元器件A', spec: '10KΩ ±5%', orderQty: 1000, unreceivedQty: 500, unit: '个' },
+                    { materialCode: 'MAT-002', materialName: 'PCB板', spec: '100x80mm 4层', orderQty: 500, unreceivedQty: 500, unit: '片' },
+                    { materialCode: 'MAT-003', materialName: '电阻B', spec: '20KΩ', orderQty: 200, unreceivedQty: 200, unit: '个' }
+                ],
+                'PO-2025-002': [
+                    { materialCode: 'MAT-004', materialName: '精密轴承', spec: '6200-2RS', orderQty: 300, unreceivedQty: 300, unit: '个' },
+                    { materialCode: 'MAT-005', materialName: '电机外壳', spec: '铝合金 100mm', orderQty: 100, unreceivedQty: 100, unit: '件' }
+                ],
+                'PO-2025-003': [
+                    { materialCode: 'MAT-006', materialName: '包装箱', spec: '500x400x300mm', orderQty: 200, unreceivedQty: 150, unit: '个' },
+                    { materialCode: 'MAT-007', materialName: '缓冲材料', spec: 'EPE 5mm', orderQty: 500, unreceivedQty: 500, unit: '米' }
+                ]
+            };
+
+            var addLineWrap = document.getElementById('new-receipt-add-line-wrap');
+            var detailTable = document.getElementById('new-receipt-detail-table');
+            var headerCheck = document.getElementById('new-receipt-header-check');
+            var isByPo = false;
+
+            function syncHeaderCheckState() {
+                if (!headerCheck || !isByPo) return;
+                var checks = tbody ? tbody.querySelectorAll('.new-receipt-detail-check') : [];
+                var n = checks.length;
+                var checkedCount = 0;
+                for (var i = 0; i < n; i++) { if (checks[i].checked) checkedCount++; }
+                headerCheck.checked = n > 0 && checkedCount === n;
+                headerCheck.indeterminate = checkedCount > 0 && checkedCount < n;
+            }
+
+            function setDetailTableMode(byPo) {
+                isByPo = !!byPo;
+                if (detailTable) detailTable.setAttribute('data-new-receipt-by-po', isByPo ? '1' : '0');
+                var thCheck = detailTable ? detailTable.querySelectorAll('.new-receipt-th-check') : [];
+                var thOp = detailTable ? detailTable.querySelectorAll('.new-receipt-th-op') : [];
+                thCheck.forEach(function(el) { el.style.display = isByPo ? 'table-cell' : 'none'; });
+                thOp.forEach(function(el) { el.style.display = isByPo ? 'none' : 'table-cell'; });
+                if (addLineWrap) addLineWrap.style.display = isByPo ? 'none' : 'block';
+            }
+
+            function renderDetailRows(lines, byPo) {
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                var list = lines && lines.length ? lines : [{ materialCode: '', materialName: '', spec: '', orderQty: '', unreceivedQty: '', unit: '' }];
+                setDetailTableMode(!!byPo);
+                list.forEach(function(item, i) {
+                    var qty = item.unreceivedQty !== undefined && item.unreceivedQty !== '' ? item.unreceivedQty : (item.orderQty || '');
+                    var row = document.createElement('tr');
+                    row.className = 'new-receipt-detail-row' + (byPo ? ' new-receipt-detail-by-po' : ' new-receipt-detail-manual');
+                    if (byPo) {
+                        row.innerHTML =
+                            '<td class="new-receipt-td-check" style="padding:10px 12px;text-align:center;"><input type="checkbox" class="new-receipt-detail-check" value="1"></td>' +
+                            '<td style="padding:10px 12px;text-align:center;">' + (i + 1) + '</td>' +
+                            '<td style="padding:10px 12px;"><input type="text" class="form-input" readonly style="width:100%;background:#f5f5f5;" value="' + (item.materialCode || '') + '"></td>' +
+                            '<td style="padding:10px 12px;"><input type="text" class="form-input" readonly style="width:100%;background:#f5f5f5;" value="' + (item.materialName || '') + '"></td>' +
+                            '<td style="padding:10px 12px;"><input type="text" class="form-input" readonly style="width:100%;background:#f5f5f5;" value="' + (item.spec || '') + '"></td>' +
+                            '<td style="padding:10px 12px;"><input type="number" class="form-input new-receipt-qty" placeholder="数量" min="1" style="width:100px;text-align:right;" value="' + (qty !== '' ? qty : '') + '"></td>' +
+                            '<td style="padding:10px 12px;"><input type="text" class="form-input" readonly style="width:60px;background:#f5f5f5;" value="' + (item.unit || '') + '"></td>' +
+                            '<td class="new-receipt-td-op" style="display:none;padding:10px 12px;text-align:center;"></td>';
+                    } else {
+                        row.innerHTML =
+                            '<td class="new-receipt-td-check" style="display:none;"></td>' +
+                            '<td style="padding:10px 12px;text-align:center;">' + (i + 1) + '</td>' +
+                            '<td style="padding:10px 12px;"><input type="text" class="form-input" placeholder="物料编码" style="width:100%;" value="' + (item.materialCode || '') + '"></td>' +
+                            '<td style="padding:10px 12px;"><input type="text" class="form-input" placeholder="物料名称" style="width:100%;" value="' + (item.materialName || '') + '"></td>' +
+                            '<td style="padding:10px 12px;"><input type="text" class="form-input" placeholder="规格型号" style="width:100%;" value="' + (item.spec || '') + '"></td>' +
+                            '<td style="padding:10px 12px;"><input type="number" class="form-input" placeholder="数量" min="1" style="width:100px;text-align:right;" value="' + (qty !== '' ? qty : '') + '"></td>' +
+                            '<td style="padding:10px 12px;"><input type="text" class="form-input" placeholder="单位" style="width:60px;" value="' + (item.unit || '') + '"></td>' +
+                            '<td class="new-receipt-td-op" style="padding:10px 12px;text-align:center;"><button type="button" class="btn btn-sm btn-default btn-remove-line">删除</button></td>';
+                    }
+                    tbody.appendChild(row);
+                });
+                if (byPo) syncHeaderCheckState();
+            }
+
+            function onPoChange() {
+                var po = poSelect ? poSelect.value : '';
+                if (po && PO_SUPPLIER[po]) {
+                    if (supplierInput) supplierInput.value = PO_SUPPLIER[po];
+                    var details = PO_UNRECEIVED_DETAILS[po];
+                    renderDetailRows(details || [], true);
+                } else {
+                    if (supplierInput) supplierInput.value = '';
+                    renderDetailRows([{ materialCode: '', materialName: '', spec: '', orderQty: '', unreceivedQty: '', unit: '' }], false);
+                }
+            }
+
+            if (poSelect) {
+                poSelect.addEventListener('change', onPoChange);
+            }
+
+            function openModal() {
+                if (modal) {
+                    modal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                    var today = new Date().toISOString().slice(0, 10);
+                    var dateEl = document.getElementById('new-receipt-date');
+                    if (dateEl) dateEl.value = today;
+                    if (poSelect) poSelect.value = '';
+                    if (supplierInput) supplierInput.value = '';
+                    renderDetailRows([{ materialCode: '', materialName: '', spec: '', orderQty: '', unreceivedQty: '', unit: '' }], false);
+                }
+            }
+
+            function closeModal() {
+                if (modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = '';
+                }
+            }
+
+            btnOpen && btnOpen.addEventListener('click', openModal);
+            btnClose && btnClose.addEventListener('click', closeModal);
+            btnCancel && btnCancel.addEventListener('click', closeModal);
+            modal && modal.addEventListener('click', function(e) {
+                if (e.target === modal) closeModal();
+            });
+
+            function updateRowNumbers() {
+                var rows = tbody ? tbody.querySelectorAll('.new-receipt-detail-row') : [];
+                rows.forEach(function(row, i) {
+                    var cells = row.querySelectorAll('td');
+                    var seqCell = cells.length > 1 ? cells[1] : row.querySelector('td:first-child');
+                    if (seqCell) seqCell.textContent = i + 1;
+                });
+            }
+
+            btnAddLine && btnAddLine.addEventListener('click', function() {
+                if (!tbody) return;
+                var row = document.createElement('tr');
+                row.className = 'new-receipt-detail-row new-receipt-detail-manual';
+                var n = (tbody.querySelectorAll('.new-receipt-detail-row').length || 0) + 1;
+                row.innerHTML =
+                    '<td class="new-receipt-td-check" style="display:none;"></td>' +
+                    '<td style="padding:10px 12px;text-align:center;">' + n + '</td>' +
+                    '<td style="padding:10px 12px;"><input type="text" class="form-input" placeholder="物料编码" style="width:100%;"></td>' +
+                    '<td style="padding:10px 12px;"><input type="text" class="form-input" placeholder="物料名称" style="width:100%;"></td>' +
+                    '<td style="padding:10px 12px;"><input type="text" class="form-input" placeholder="规格型号" style="width:100%;"></td>' +
+                    '<td style="padding:10px 12px;"><input type="number" class="form-input" placeholder="数量" min="1" value="" style="width:100px;text-align:right;"></td>' +
+                    '<td style="padding:10px 12px;"><input type="text" class="form-input" placeholder="单位" style="width:60px;"></td>' +
+                    '<td class="new-receipt-td-op" style="padding:10px 12px;text-align:center;"><button type="button" class="btn btn-sm btn-default btn-remove-line">删除</button></td>';
+                tbody.appendChild(row);
+                updateRowNumbers();
+            });
+
+            var btnCheckAll = document.getElementById('new-receipt-check-all');
+            var btnUncheckAll = document.getElementById('new-receipt-uncheck-all');
+            headerCheck && headerCheck.addEventListener('change', function() {
+                if (!isByPo) return;
+                var checks = tbody ? tbody.querySelectorAll('.new-receipt-detail-check') : [];
+                var checked = this.checked;
+                checks.forEach(function(cb) { cb.checked = checked; });
+            });
+
+            tbody && tbody.addEventListener('change', function(e) {
+                if (e.target && e.target.classList.contains('new-receipt-detail-check')) syncHeaderCheckState();
+            });
+
+            tbody && tbody.addEventListener('click', function(e) {
+                if (e.target && e.target.classList.contains('btn-remove-line')) {
+                    var row = e.target.closest('.new-receipt-detail-row');
+                    if (row && tbody.querySelectorAll('.new-receipt-detail-row').length > 1) {
+                        row.remove();
+                        updateRowNumbers();
+                    }
+                }
+            });
+
+            btnSubmit && btnSubmit.addEventListener('click', function() {
+                var supplier = document.getElementById('new-receipt-supplier');
+                var date = document.getElementById('new-receipt-date');
+                var receiver = document.getElementById('new-receipt-receiver');
+                if (!supplier || !supplier.value.trim()) {
+                    alert('请填写供应商');
+                    supplier && supplier.focus();
+                    return;
+                }
+                if (!date || !date.value) {
+                    alert('请选择到货日期');
+                    date && date.focus();
+                    return;
+                }
+                if (!receiver || !receiver.value.trim()) {
+                    alert('请填写收货人');
+                    receiver && receiver.focus();
+                    return;
+                }
+                var rows = tbody ? tbody.querySelectorAll('.new-receipt-detail-row') : [];
+                var hasValid = false;
+                if (isByPo) {
+                    for (var i = 0; i < rows.length; i++) {
+                        var cb = rows[i].querySelector('.new-receipt-detail-check');
+                        var qtyInput = rows[i].querySelector('.new-receipt-qty');
+                        if (cb && cb.checked && qtyInput) {
+                            var qty = parseInt(qtyInput.value, 10) || 0;
+                            if (qty > 0) { hasValid = true; break; }
+                        }
+                    }
+                    if (!hasValid) {
+                        alert('请至少勾选一行明细并填写到货数量大于0');
+                        return;
+                    }
+                } else {
+                    for (var i = 0; i < rows.length; i++) {
+                        var inputs = rows[i].querySelectorAll('input');
+                        var code = inputs[0] ? inputs[0].value.trim() : '';
+                        var qty = inputs[3] ? parseInt(inputs[3].value, 10) : 0;
+                        if (code && qty > 0) { hasValid = true; break; }
+                    }
+                    if (!hasValid) {
+                        alert('请至少填写一行有效的到货明细（物料编码与到货数量大于0）');
+                        return;
+                    }
+                }
+                if (confirm('确定保存并创建到货单？')) {
+                    alert('到货单已创建（原型模拟）。');
+                    closeModal();
+                }
+            });
+        })();
+
+        // 编辑到货单弹窗
+        (function() {
+            var modal = document.getElementById('edit-receipt-modal');
+            var idInput = document.getElementById('edit-receipt-id');
+            var noEl = document.getElementById('edit-receipt-no');
+            var poSelect = document.getElementById('edit-receipt-po');
+            var supplierInput = document.getElementById('edit-receipt-supplier');
+            var dateInput = document.getElementById('edit-receipt-date');
+            var receiverInput = document.getElementById('edit-receipt-receiver');
+            var remarkInput = document.getElementById('edit-receipt-remark');
+            var tbody = document.getElementById('edit-receipt-detail-tbody');
+            var btnClose = document.getElementById('edit-receipt-modal-close');
+            var btnCancel = document.getElementById('edit-receipt-cancel');
+            var btnSubmit = document.getElementById('edit-receipt-submit');
+            var btnAddLine = document.getElementById('edit-receipt-add-line');
+
+            var PO_SUPPLIER = { 'PO-2025-001': '深圳市电子科技有限公司', 'PO-2025-002': '上海精密机械制造有限公司', 'PO-2025-003': '北京贸易有限公司' };
+            var PO_UNRECEIVED_DETAILS = {
+                'PO-2025-001': [ { materialCode: 'MAT-001', materialName: '电子元器件A', spec: '10KΩ ±5%', orderQty: 1000, unreceivedQty: 500, unit: '个' }, { materialCode: 'MAT-002', materialName: 'PCB板', spec: '100x80mm 4层', orderQty: 500, unreceivedQty: 500, unit: '片' }, { materialCode: 'MAT-003', materialName: '电阻B', spec: '20KΩ', orderQty: 200, unreceivedQty: 200, unit: '个' } ],
+                'PO-2025-002': [ { materialCode: 'MAT-004', materialName: '精密轴承', spec: '6200-2RS', orderQty: 300, unreceivedQty: 300, unit: '个' }, { materialCode: 'MAT-005', materialName: '电机外壳', spec: '铝合金 100mm', orderQty: 100, unreceivedQty: 100, unit: '件' } ],
+                'PO-2025-003': [ { materialCode: 'MAT-006', materialName: '包装箱', spec: '500x400x300mm', orderQty: 200, unreceivedQty: 150, unit: '个' }, { materialCode: 'MAT-007', materialName: '缓冲材料', spec: 'EPE 5mm', orderQty: 500, unreceivedQty: 500, unit: '米' } ]
+            };
+            var MANUAL_DETAILS = {
+                'DN-2025-004': [ { materialCode: 'MAT-008', materialName: '电容C', spec: '100uF', orderQty: 300, unreceivedQty: 300, unit: '个' }, { materialCode: 'MAT-009', materialName: '连接器', spec: 'TYPE-C 10P', orderQty: 100, unreceivedQty: 100, unit: '个' } ]
+            };
+
+            function renderEditDetailRows(lines) {
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                var list = lines && lines.length ? lines : [{ materialCode: '', materialName: '', spec: '', orderQty: '', unreceivedQty: '', unit: '' }];
+                list.forEach(function(item, i) {
+                    var qty = item.unreceivedQty !== undefined && item.unreceivedQty !== '' ? item.unreceivedQty : (item.orderQty || '');
+                    var row = document.createElement('tr');
+                    row.className = 'edit-receipt-detail-row';
+                    row.innerHTML =
+                        '<td style="padding:10px 12px;text-align:center;">' + (i + 1) + '</td>' +
+                        '<td style="padding:10px 12px;"><input type="text" class="form-input" placeholder="物料编码" style="width:100%;" value="' + (item.materialCode || '') + '"></td>' +
+                        '<td style="padding:10px 12px;"><input type="text" class="form-input" placeholder="物料名称" style="width:100%;" value="' + (item.materialName || '') + '"></td>' +
+                        '<td style="padding:10px 12px;"><input type="text" class="form-input" placeholder="规格型号" style="width:100%;" value="' + (item.spec || '') + '"></td>' +
+                        '<td style="padding:10px 12px;"><input type="number" class="form-input" placeholder="数量" min="1" style="width:100px;text-align:right;" value="' + (qty !== '' ? qty : '') + '"></td>' +
+                        '<td style="padding:10px 12px;"><input type="text" class="form-input" placeholder="单位" style="width:60px;" value="' + (item.unit || '') + '"></td>' +
+                        '<td style="padding:10px 12px;text-align:center;"><button type="button" class="btn btn-sm btn-default btn-edit-remove-line">删除</button></td>';
+                    tbody.appendChild(row);
+                });
+            }
+
+            function updateEditRowNumbers() {
+                var rows = tbody ? tbody.querySelectorAll('.edit-receipt-detail-row') : [];
+                rows.forEach(function(row, i) {
+                    var firstCell = row.querySelector('td:first-child');
+                    if (firstCell) firstCell.textContent = i + 1;
+                });
+            }
+
+            function openEditModal(listRow) {
+                var cells = listRow.querySelectorAll('td');
+                var no = (cells[1] && cells[1].textContent) ? cells[1].textContent.trim() : '';
+                var po = (cells[3] && cells[3].textContent) ? cells[3].textContent.trim() : '';
+                var supplier = (cells[4] && cells[4].textContent) ? cells[4].textContent.trim() : '';
+                var date = (cells[5] && cells[5].textContent) ? cells[5].textContent.trim() : '';
+                var receiver = (cells[7] && cells[7].textContent) ? cells[7].textContent.trim() : '';
+                var id = listRow.getAttribute('data-receipt-id') || '';
+
+                if (idInput) idInput.value = id;
+                if (noEl) noEl.textContent = no || '-';
+                if (poSelect) poSelect.value = (po && po !== '-') ? po : '';
+                if (supplierInput) supplierInput.value = supplier || '';
+                if (dateInput) dateInput.value = date || '';
+                if (receiverInput) receiverInput.value = (receiver && receiver !== '-') ? receiver : '';
+                if (remarkInput) remarkInput.value = '';
+
+                var details = [];
+                if (po && PO_UNRECEIVED_DETAILS[po]) details = PO_UNRECEIVED_DETAILS[po];
+                else if (no && MANUAL_DETAILS[no]) details = MANUAL_DETAILS[no];
+                renderEditDetailRows(details.length ? details : [{ materialCode: '', materialName: '', spec: '', unreceivedQty: '', unit: '' }]);
+
+                if (modal) {
+                    modal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+
+            function closeEditModal() {
+                if (modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = '';
+                }
+            }
+
+            poSelect && poSelect.addEventListener('change', function() {
+                var po = this.value;
+                if (po && PO_SUPPLIER[po]) {
+                    if (supplierInput) supplierInput.value = PO_SUPPLIER[po];
+                    var details = PO_UNRECEIVED_DETAILS[po];
+                    renderEditDetailRows(details || []);
+                } else {
+                    if (supplierInput) supplierInput.value = '';
+                    renderEditDetailRows([]);
+                }
+            });
+
+            btnClose && btnClose.addEventListener('click', closeEditModal);
+            btnCancel && btnCancel.addEventListener('click', closeEditModal);
+            modal && modal.addEventListener('click', function(e) { if (e.target === modal) closeEditModal(); });
+
+            tbody && tbody.addEventListener('click', function(e) {
+                if (e.target && e.target.classList.contains('btn-edit-remove-line')) {
+                    var row = e.target.closest('.edit-receipt-detail-row');
+                    if (row && tbody.querySelectorAll('.edit-receipt-detail-row').length > 1) {
+                        row.remove();
+                        updateEditRowNumbers();
+                    }
+                }
+            });
+
+            btnAddLine && btnAddLine.addEventListener('click', function() {
+                if (!tbody) return;
+                var row = document.createElement('tr');
+                row.className = 'edit-receipt-detail-row';
+                var n = (tbody.querySelectorAll('.edit-receipt-detail-row').length || 0) + 1;
+                row.innerHTML =
+                    '<td style="padding:10px 12px;text-align:center;">' + n + '</td>' +
+                    '<td style="padding:10px 12px;"><input type="text" class="form-input" placeholder="物料编码" style="width:100%;"></td>' +
+                    '<td style="padding:10px 12px;"><input type="text" class="form-input" placeholder="物料名称" style="width:100%;"></td>' +
+                    '<td style="padding:10px 12px;"><input type="text" class="form-input" placeholder="规格型号" style="width:100%;"></td>' +
+                    '<td style="padding:10px 12px;"><input type="number" class="form-input" placeholder="数量" min="1" style="width:100px;text-align:right;"></td>' +
+                    '<td style="padding:10px 12px;"><input type="text" class="form-input" placeholder="单位" style="width:60px;"></td>' +
+                    '<td style="padding:10px 12px;text-align:center;"><button type="button" class="btn btn-sm btn-default btn-edit-remove-line">删除</button></td>';
+                tbody.appendChild(row);
+                updateEditRowNumbers();
+            });
+
+            btnSubmit && btnSubmit.addEventListener('click', function() {
+                if (!supplierInput || !supplierInput.value.trim()) { alert('请填写供应商'); supplierInput.focus(); return; }
+                if (!dateInput || !dateInput.value) { alert('请选择到货日期'); dateInput.focus(); return; }
+                if (!receiverInput || !receiverInput.value.trim()) { alert('请填写收货人'); receiverInput.focus(); return; }
+                var rows = tbody ? tbody.querySelectorAll('.edit-receipt-detail-row') : [];
+                var hasValid = false;
+                for (var i = 0; i < rows.length; i++) {
+                    var inputs = rows[i].querySelectorAll('input');
+                    var code = inputs[0] ? inputs[0].value.trim() : '';
+                    var qty = inputs[3] ? parseInt(inputs[3].value, 10) : 0;
+                    if (code && qty > 0) { hasValid = true; break; }
+                }
+                if (!hasValid) { alert('请至少填写一行有效的到货明细（物料编码与到货数量大于0）'); return; }
+                if (confirm('确定保存对到货单的修改？')) {
+                    alert('到货单已保存（原型模拟）。');
+                    closeEditModal();
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.classList.contains('btn-receipt-edit')) {
+                    var row = e.target.closest('tr');
+                    if (row) openEditModal(row);
+                }
+            });
+        })();
+        </script>
+    </div>
+</body>
+</html>

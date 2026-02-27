@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECC层级监测 - 能源管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/energy-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">能源在线监测</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">ECC层级监测</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">监测ECC（企业、车间、产线）层级的能源消耗，包括层级能耗统计、能耗对比、能耗趋势等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>ECC层级</label>
+                    <select class="form-select">
+                        <option value="enterprise">企业级</option>
+                        <option value="workshop">车间级</option>
+                        <option value="production-line">产线级</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>时间范围</label>
+                    <input type="date" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">ECC层级能耗统计</h3>
+            </div>
+            <div class="card-body">
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-label">企业级能耗</div>
+                        <div class="stat-value">1,250,000 kWh</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">车间级能耗</div>
+                        <div class="stat-value">850,000 kWh</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">产线级能耗</div>
+                        <div class="stat-value">420,000 kWh</div>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; padding: 20px; background: #f5f5f5; border-radius: 4px; text-align: center; color: #999;">
+                    ECC层级能耗图表展示区域（可集成ECharts等图表库）
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('ECC层级监测 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

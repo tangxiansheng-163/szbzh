@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>优化建议 - 能源管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/energy-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">能效优化分析</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">优化建议</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">查看和管理能源优化建议，包括系统自动生成的优化建议和人工制定的优化方案。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="建议编号、建议内容">
+                </div>
+                <div class="filter-item">
+                    <label>建议类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="equipment">设备优化</option>
+                        <option value="process">工艺优化</option>
+                        <option value="management">管理优化</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>建议状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待处理</option>
+                        <option value="approved">已采纳</option>
+                        <option value="rejected">已拒绝</option>
+                        <option value="implemented">已实施</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary">+ 新建建议</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">建议编号</th>
+                            <th width="150">设备/区域</th>
+                            <th width="100">建议类型</th>
+                            <th width="200">建议内容</th>
+                            <th width="100">预期效果</th>
+                            <th width="100">建议状态</th>
+                            <th width="120">创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="suggestion-id" value="1"></td>
+                            <td>SUG-2025-001</td>
+                            <td>生产车间A</td>
+                            <td>设备优化</td>
+                            <td>优化设备运行参数，降低能耗</td>
+                            <td>节能5%</td>
+                            <td><span class="status-badge status-warning">待处理</span></td>
+                            <td>2025-01-20</td>
+                            <td>
+                                <button class="btn btn-sm btn-default">查看</button>
+                                <button class="btn btn-sm btn-primary">处理</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 1 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('优化建议 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

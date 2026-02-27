@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创建MBOM</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">BOM管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/mbom-list.html" class="breadcrumb-item">MBOM列表</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">创建MBOM</span>
+        </div>
+        <div class="page-header">
+            <p class="page-description">EBOM、MBOM、SBOM 本质均为 BOM；新建或下推后在对应阶段生成版本，在 BOM 树上做阶段专属编辑。本页用于创建 MBOM：选择来源后<strong>生成对应阶段版本（如 V1.0）</strong>，进入 <strong>BOM 树工艺编辑工作台</strong>，在树上对每个物料维护<strong>工序、加工方式、工艺流程、工装工具</strong>及损耗率、发料仓库、替代料等，可增补辅料、调整层级，保存草稿或提交评审。</p>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form id="mbom-form">
+                    <div class="section-title">选择来源</div>
+                    <p class="form-tip" style="margin: 0 0 12px; color: #666; font-size: 13px;">确认后将<strong>生成 MBOM 版本（如 V1.0）</strong>，进入 BOM 树工艺编辑工作台，对每物料维护工序、加工方式、工艺流程、工装工具等，可增补辅料。</p>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label required">MBOM来源</label>
+                                <select class="form-select" name="mbomSource" id="mbomSource" required>
+                                    <option value="fromEbom">从 EBOM 转化</option>
+                                    <option value="manual">手动创建</option>
+                                    <option value="copy">复制成熟产品 BOM</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="sourceEbomSection">
+                        <div class="form-item">
+                            <label class="form-label required">来源EBOM</label>
+                            <select class="form-select" name="sourceEbom" id="sourceEbom">
+                                <option value="">请选择已发布的 EBOM</option>
+                                <option value="EBOM-2025-001">EBOM-2025-001 - 智能控制器</option>
+                                <option value="EBOM-2025-002">EBOM-2025-002 - 传感器模块</option>
+                                <option value="EBOM-2025-003">EBOM-2025-003 - 执行器</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="manualCopyTip" style="display: none;">
+                        <p class="form-tip" style="color: #8c8c8c; font-size: 13px; margin: 0 0 8px;">无 EBOM 时使用。手动创建需经研发审核；复制成熟产品 BOM 需选择已有 MBOM 作为模板。</p>
+                    </div>
+                    <div id="copySourceSection" style="display: none;">
+                        <div class="form-item">
+                            <label class="form-label required">选择要复制的 MBOM</label>
+                            <select class="form-select" name="copySourceMbom" id="copySourceMbom">
+                                <option value="">请选择成熟产品 MBOM</option>
+                                <option value="MBOM-2025-001">MBOM-2025-001 - 智能控制器</option>
+                                <option value="MBOM-2025-002">MBOM-2025-002 - 传感器模块</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label required">产品编码</label>
+                                <input type="text" class="form-input" name="productCode" id="mbomProductCode" placeholder="从 EBOM/复制带出或手动输入" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label required">产品名称</label>
+                                <input type="text" class="form-input" name="productName" id="mbomProductName" placeholder="从 EBOM/复制带出或手动输入" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-primary" id="mbom-goto-workbench">进入工艺编辑</button>
+                        <button type="button" class="btn btn-default btn-cancel" data-url="pages/mbom-list.html">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <style>
+            .section-title { font-size: 14px; font-weight: 600; color: rgba(0,0,0,0.85); padding: 8px 0; border-bottom: 1px solid #e8e8e8; margin-bottom: 16px; }
+        </style>
+        <script>
+            (function () {
+                var src = document.getElementById('mbomSource');
+                var ebomSec = document.getElementById('sourceEbomSection');
+                var tip = document.getElementById('manualCopyTip');
+                var copySec = document.getElementById('copySourceSection');
+                var sourceEbom = document.getElementById('sourceEbom');
+                var copySourceMbom = document.getElementById('copySourceMbom');
+                var productCode = document.getElementById('mbomProductCode');
+                var productName = document.getElementById('mbomProductName');
+                function toggle() {
+                    var v = src && src.value;
+                    var fromEbom = (v === 'fromEbom');
+                    var isCopy = (v === 'copy');
+                    if (ebomSec) ebomSec.style.display = fromEbom ? 'block' : 'none';
+                    if (tip) tip.style.display = (v === 'manual' || v === 'copy') ? 'block' : 'none';
+                    if (copySec) copySec.style.display = isCopy ? 'block' : 'none';
+                    if (sourceEbom) sourceEbom.required = fromEbom;
+                    if (copySourceMbom) copySourceMbom.required = isCopy;
+                }
+                if (src) src.addEventListener('change', toggle);
+                toggle();
+
+                var productMap = {
+                    'EBOM-2025-001': { code: 'P001', name: '智能控制器' },
+                    'EBOM-2025-002': { code: 'P002', name: '传感器模块' },
+                    'EBOM-2025-003': { code: 'P003', name: '执行器' },
+                    'MBOM-2025-001': { code: 'P001', name: '智能控制器' },
+                    'MBOM-2025-002': { code: 'P002', name: '传感器模块' }
+                };
+                function maybePrefillProduct() {
+                    var v = src && src.value;
+                    var sel = (v === 'fromEbom' && sourceEbom) ? sourceEbom : ((v === 'copy' && copySourceMbom) ? copySourceMbom : null);
+                    if (!sel || !sel.value || !productCode || !productName) return;
+                    var m = productMap[sel.value];
+                    if (m) { productCode.value = m.code; productName.value = m.name; }
+                }
+                if (sourceEbom) sourceEbom.addEventListener('change', maybePrefillProduct);
+                if (copySourceMbom) copySourceMbom.addEventListener('change', maybePrefillProduct);
+
+                var gotoBtn = document.getElementById('mbom-goto-workbench');
+                if (gotoBtn) gotoBtn.addEventListener('click', function () {
+                    var v = src && src.value;
+                    if (v === 'fromEbom' && (!sourceEbom || !sourceEbom.value)) { alert('请选择来源 EBOM'); return; }
+                    if (v === 'copy' && (!copySourceMbom || !copySourceMbom.value)) { alert('请选择要复制的 MBOM'); return; }
+                    if (!productCode || !productCode.value.trim()) { alert('请输入产品编码'); return; }
+                    if (!productName || !productName.value.trim()) { alert('请输入产品名称'); return; }
+                    var q = 'from=' + encodeURIComponent(v);
+                    if (v === 'fromEbom' && sourceEbom && sourceEbom.value) q += '&ebomId=' + encodeURIComponent(sourceEbom.value);
+                    if (v === 'copy' && copySourceMbom && copySourceMbom.value) q += '&mbomId=' + encodeURIComponent(copySourceMbom.value);
+                    var url = 'pages/mbom-workbench.html?' + q;
+                    if (typeof PageLoader !== 'undefined') PageLoader.loadPage(url); else window.location.href = url;
+                });
+            })();
+        </script>
+    </div>
+</body>
+</html>

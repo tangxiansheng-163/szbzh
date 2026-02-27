@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>技术任务详情</title>
+</head>
+<body>
+    <div class="content-wrapper">
+    <style>
+        /* 头部摘要卡片 */
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 24px;
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .summary-title h1 {
+            margin: 0 0 8px 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .summary-code {
+            font-size: 14px;
+            opacity: 0.9;
+            font-family: 'Consolas', monospace;
+        }
+
+        .summary-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .summary-actions .btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .summary-actions .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .summary-actions .btn-primary {
+            background: white;
+            color: #667eea;
+            border-color: white;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .summary-value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* 主内容区 - 两栏布局 */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 16px;
+            align-items: start;
+        }
+
+        /* Tab选项卡 */
+        .tabs-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid #f0f0f0;
+            background: #fafafa;
+        }
+
+        .tab-item {
+            padding: 14px 24px;
+            font-size: 14px;
+            color: #595959;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-item:hover {
+            color: #1890ff;
+        }
+
+        .tab-item.active {
+            color: #1890ff;
+            border-bottom-color: #1890ff;
+            background: white;
+            font-weight: 500;
+        }
+
+        .tab-content {
+            padding: 20px;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* 表单信息布局 */
+        .form-info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px 24px;
+        }
+
+        .form-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-info-label {
+            font-size: 13px;
+            color: #8c8c8c;
+            font-weight: 500;
+        }
+
+        .form-info-value {
+            font-size: 14px;
+            color: #262626;
+        }
+
+        .section-divider {
+            margin: 24px 0;
+            border-top: 1px dashed #e8e8e8;
+        }
+
+        .subsection-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .subsection-title::before {
+            content: '';
+            width: 4px;
+            height: 16px;
+            background: #1890ff;
+            border-radius: 2px;
+        }
+
+        /* 描述文本 */
+        .description-box {
+            padding: 16px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #595959;
+            border-left: 4px solid #1890ff;
+        }
+
+        /* 右侧卡片 */
+        .side-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .side-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .side-card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .side-card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #262626;
+        }
+
+        .side-card-body {
+            padding: 16px 20px;
+        }
+
+        /* 进度卡片 */
+        .progress-overview {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .progress-main {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%);
+            border-radius: 8px;
+        }
+
+        .progress-circle {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 16px;
+            position: relative;
+        }
+
+        .progress-circle svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-circle-bg {
+            fill: none;
+            stroke: #e6f7ff;
+            stroke-width: 8;
+        }
+
+        .progress-circle-bar {
+            fill: none;
+            stroke: #1890ff;
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 251;
+            stroke-dashoffset: 100;
+            transition: stroke-dashoffset 0.5s;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: 700;
+            color: #1890ff;
+        }
+
+        .progress-label {
+            font-size: 13px;
+            color: #8c8c8c;
+        }
+
+        .progress-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .stat-mini {
+            text-align: center;
+            padding: 12px;
+            background: #fafafa;
+            border-radius: 6px;
+        }
+
+        .stat-mini-value {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-mini-value.success { color: #52c41a; }
+        .stat-mini-value.processing { color: #1890ff; }
+        .stat-mini-value.warning { color: #faad14; }
+
+        .stat-mini-label {
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+
+        /* 设计任务列表 */
+        .task-list-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-item-compact {
+            padding: 14px;
+            border: 1px solid #f0f0f0;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .task-item-compact:hover {
+            border-color: #1890ff;
+            box-shadow: 0 2px 8px rgba(24, 144, 255, 0.1);
+        }
+
+        .task-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .task-item-code {
+            font-size: 13px;
+            font-family: 'Consolas', monospace;
+            color: #1890ff;
+            font-weight: 500;
+        }
+
+        .task-item-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+
+        .task-item-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+
+        .task-item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #f0f0f0;
+        }
+
+        .task-item-assignee {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #595959;
+        }
+
+        .task-item-assignee-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #1890ff;
+            color: white;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-item-progress {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1890ff;
+        }
+
+        /* 时间线 */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e8e8e8;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 24px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #1890ff;
+        }
+
+        .timeline-item.completed::before {
+            background: #1890ff;
+        }
+
+        .timeline-date {
+            font-size: 12px;
+            color: #8c8c8c;
+            margin-bottom: 4px;
+        }
+
+        .timeline-content {
+            font-size: 14px;
+            color: #262626;
+        }
+
+        .timeline-status {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #f0f9ff;
+            color: #1890ff;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+        }
+
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #6a4190 100%);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        /* 响应式 */
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .summary-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+
+        <!-- 面包屑 -->
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">技术任务管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">技术任务详情</span>
+        </div>
+
+        <!-- 头部摘要卡片 -->
+        <div class="summary-card">
+            <div class="summary-header">
+                <div class="summary-title">
+                    <h1>智能控制器研发</h1>
+                    <div class="summary-code">TT-2025-001</div>
+                </div>
+                <div class="summary-actions">
+                    <button class="btn btn-back" data-url="pages/tech-task-list.html">返回</button>
+                    <button class="btn btn-primary" onclick="alert('编辑功能开发中')">编辑</button>
+                    <button class="btn" onclick="alert('更多操作')">•••</button>
+                </div>
+            </div>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-label">负责人</div>
+                    <div class="summary-value">张工</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">状态</div>
+                    <div class="summary-value">执行中</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">产品</div>
+                    <div class="summary-value">智能控制器</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">计划周期</div>
+                    <div class="summary-value">01-15 ~ 03-15</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">进度</div>
+                    <div class="summary-value">60%</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">设计任务</div>
+                    <div class="summary-value">3个</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 左侧Tab内容区 -->
+            <div class="tabs-container">
+                <div class="tabs-header">
+                    <div class="tab-item active" data-tab="basic" onclick="
+                        document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+                        this.classList.add('active');
+                        document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+                        document.getElementById('tab-basic').classList.add('active');
+                    ">基本信息</div>
+                    <div class="tab-item" data-tab="tasks" onclick="
+                        document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+                        this.classList.add('active');
+                        document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+                        document.getElementById('tab-tasks').classList.add('active');
+                    ">设计任务</div>
+                    <div class="tab-item" data-tab="timeline" onclick="
+                        document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+                        this.classList.add('active');
+                        document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+                        document.getElementById('tab-timeline').classList.add('active');
+                    ">进度跟踪</div>
+                    <div class="tab-item" data-tab="attachments" onclick="
+                        document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+                        this.classList.add('active');
+                        document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+                        document.getElementById('tab-attachments').classList.add('active');
+                    ">相关文档</div>
+                </div>
+
+                <!-- 基本信息 Tab -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-basic">
+                        <div class="subsection-title">任务信息</div>
+                        <div class="form-info-grid">
+                            <div class="form-info-item">
+                                <div class="form-info-label">任务编号</div>
+                                <div class="form-info-value">TT-2025-001</div>
+                            </div>
+                            <div class="form-info-item">
+                                <div class="form-info-label">任务名称</div>
+                                <div class="form-info-value">智能控制器研发</div>
+                            </div>
+                            <div class="form-info-item">
+                                <div class="form-info-label">负责人</div>
+                                <div class="form-info-value">张工</div>
+                            </div>
+                            <div class="form-info-item">
+                                <div class="form-info-label">任务状态</div>
+                                <div class="form-info-value"><span class="status-badge status-processing">执行中</span></div>
+                            </div>
+                            <div class="form-info-item">
+                                <div class="form-info-label">性质</div>
+                                <div class="form-info-value">正式</div>
+                            </div>
+                            <div class="form-info-item">
+                                <div class="form-info-label">创建人</div>
+                                <div class="form-info-value">系统管理员</div>
+                            </div>
+                            <div class="form-info-item">
+                                <div class="form-info-label">创建时间</div>
+                                <div class="form-info-value">2025-01-10 10:30</div>
+                            </div>
+                        </div>
+
+                        <div class="section-divider"></div>
+
+                        <div class="subsection-title">产品信息</div>
+                        <div class="form-info-grid">
+                            <div class="form-info-item">
+                                <div class="form-info-label">产品编码</div>
+                                <div class="form-info-value">PROD-001</div>
+                            </div>
+                            <div class="form-info-item">
+                                <div class="form-info-label">产品名称</div>
+                                <div class="form-info-value">智能控制器</div>
+                            </div>
+                            <div class="form-info-item">
+                                <div class="form-info-label">产品类型</div>
+                                <div class="form-info-value">电子产品</div>
+                            </div>
+                        </div>
+
+                        <div class="section-divider"></div>
+
+                        <div class="subsection-title">时间进度</div>
+                        <div class="form-info-grid">
+                            <div class="form-info-item">
+                                <div class="form-info-label">计划开始日期</div>
+                                <div class="form-info-value">2025-01-15</div>
+                            </div>
+                            <div class="form-info-item">
+                                <div class="form-info-label">计划完成日期</div>
+                                <div class="form-info-value">2025-03-15</div>
+                            </div>
+                            <div class="form-info-item">
+                                <div class="form-info-label">计划工期</div>
+                                <div class="form-info-value">60天</div>
+                            </div>
+                            <div class="form-info-item">
+                                <div class="form-info-label">实际开始日期</div>
+                                <div class="form-info-value">2025-01-18</div>
+                            </div>
+                            <div class="form-info-item">
+                                <div class="form-info-label">实际完成日期</div>
+                                <div class="form-info-value">-</div>
+                            </div>
+                            <div class="form-info-item">
+                                <div class="form-info-label">当前进度</div>
+                                <div class="form-info-value" style="color: #1890ff; font-weight: 600;">60%</div>
+                            </div>
+                        </div>
+
+                        <div class="section-divider"></div>
+
+                        <div class="subsection-title">任务描述</div>
+                        <div class="description-box">
+                            研发新一代智能控制器，包括硬件设计、软件开发和系统集成。需满足性能指标要求，通过可靠性测试。主要工作内容包括：
+                            <ul style="margin: 12px 0 0 20px; padding: 0;">
+                                <li>电气原理图设计与PCB layout</li>
+                                <li>机械结构设计与3D建模</li>
+                                <li>嵌入式固件开发</li>
+                                <li>系统联调与测试</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 设计任务 Tab -->
+                    <div class="tab-pane" id="tab-tasks">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <div style="font-size: 14px; color: #8c8c8c;">共3个设计任务</div>
+                            <button class="btn btn-primary btn-sm btn-add-design-task">+ 添加设计任务</button>
+                        </div>
+                        <div class="task-list-compact">
+                            <div class="task-item-compact">
+                                <div class="task-item-header">
+                                    <span class="task-item-code">DT-2025-001</span>
+                                    <span class="status-badge status-success">已通过</span>
+                                </div>
+                                <div class="task-item-name">电气原理图设计</div>
+                                <div class="task-item-meta">
+                                    <span>⚡ 电气设计</span>
+                                    <span>📋 正式任务</span>
+                                    <span>📅 2025-02-12 完成</span>
+                                </div>
+                                <div class="task-item-footer">
+                                    <div class="task-item-assignee">
+                                        <div class="task-item-assignee-avatar">张</div>
+                                        <span>张设计师</span>
+                                    </div>
+                                    <div class="task-item-progress">100%</div>
+                                </div>
+                            </div>
+                            <div class="task-item-compact">
+                                <div class="task-item-header">
+                                    <span class="task-item-code">DT-2025-002</span>
+                                    <span class="status-badge status-processing">执行中</span>
+                                </div>
+                                <div class="task-item-name">结构设计</div>
+                                <div class="task-item-meta">
+                                    <span>🏗️ 结构设计</span>
+                                    <span>📋 样品任务</span>
+                                    <span>📅 计划: 2025-02-28</span>
+                                </div>
+                                <div class="task-item-footer">
+                                    <div class="task-item-assignee">
+                                        <div class="task-item-assignee-avatar" style="background: #52c41a;">李</div>
+                                        <span>李设计师</span>
+                                    </div>
+                                    <div class="task-item-progress">60%</div>
+                                </div>
+                            </div>
+                            <div class="task-item-compact">
+                                <div class="task-item-header">
+                                    <span class="task-item-code">DT-2025-003</span>
+                                    <span class="status-badge status-warning">待审核</span>
+                                </div>
+                                <div class="task-item-name">嵌入式软件开发</div>
+                                <div class="task-item-meta">
+                                    <span>💻 软件设计</span>
+                                    <span>📋 样品任务</span>
+                                    <span>📅 计划: 2025-03-10</span>
+                                </div>
+                                <div class="task-item-footer">
+                                    <div class="task-item-assignee">
+                                        <div class="task-item-assignee-avatar" style="background: #faad14;">王</div>
+                                        <span>王设计师</span>
+                                    </div>
+                                    <div class="task-item-progress">80%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 进度跟踪 Tab -->
+                    <div class="tab-pane" id="tab-timeline">
+                        <div class="timeline">
+                            <div class="timeline-item completed">
+                                <div class="timeline-date">2025-01-10 10:30</div>
+                                <div class="timeline-content">技术任务创建成功</div>
+                                <span class="timeline-status">已完成</span>
+                            </div>
+                            <div class="timeline-item completed">
+                                <div class="timeline-date">2025-01-18 09:00</div>
+                                <div class="timeline-content">任务开始执行，负责人确认</div>
+                                <span class="timeline-status">已完成</span>
+                            </div>
+                            <div class="timeline-item completed">
+                                <div class="timeline-date">2025-01-25 14:30</div>
+                                <div class="timeline-content">拆解完成，创建3个设计任务</div>
+                                <span class="timeline-status">已完成</span>
+                            </div>
+                            <div class="timeline-item completed">
+                                <div class="timeline-date">2025-02-12 16:00</div>
+                                <div class="timeline-content">电气原理图设计通过审核</div>
+                                <span class="timeline-status">已完成</span>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-date">进行中</div>
+                                <div class="timeline-content">结构设计、软件开发执行中</div>
+                                <span class="timeline-status" style="background: #e6f7ff; color: #1890ff;">进行中</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 相关文档 Tab -->
+                    <div class="tab-pane" id="tab-attachments">
+                        <div class="empty-state">
+                            <div class="empty-icon">📎</div>
+                            <div class="empty-text">暂无相关文档</div>
+                            <div class="empty-description">点击上传按钮添加相关文档</div>
+                            <button class="btn btn-primary">上传文档</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧边栏 -->
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <!-- 进度概览 -->
+                <div class="side-card">
+                    <div class="side-card-header">
+                        <div class="side-card-title">进度概览</div>
+                    </div>
+                    <div class="side-card-body">
+                        <div class="progress-overview">
+                            <div class="progress-main">
+                                <div class="progress-circle">
+                                    <svg width="100" height="100">
+                                        <circle class="progress-circle-bg" cx="50" cy="50" r="40"></circle>
+                                        <circle class="progress-circle-bar" cx="50" cy="50" r="40" style="stroke-dashoffset: 100;"></circle>
+                                    </svg>
+                                    <div class="progress-text">60%</div>
+                                </div>
+                                <div class="progress-label">总体进度</div>
+                            </div>
+                            <div class="progress-stats">
+                                <div class="stat-mini">
+                                    <div class="stat-mini-value success">1</div>
+                                    <div class="stat-mini-label">已完成</div>
+                                </div>
+                                <div class="stat-mini">
+                                    <div class="stat-mini-value processing">1</div>
+                                    <div class="stat-mini-label">执行中</div>
+                                </div>
+                                <div class="stat-mini">
+                                    <div class="stat-mini-value warning">1</div>
+                                    <div class="stat-mini-label">待审核</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 快捷操作 -->
+                <div class="side-card">
+                    <div class="side-card-header">
+                        <div class="side-card-title">快捷操作</div>
+                    </div>
+                    <div class="side-card-body">
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <button class="btn btn-gradient btn-sm btn-add-design-task" style="width: 100%;">
+                                + 添加设计任务
+                            </button>
+                            <button class="btn btn-default btn-sm" style="width: 100%;" onclick="alert('创建变更单')">
+                                📝 创建变更单
+                            </button>
+                            <button class="btn btn-default btn-sm" style="width: 100%;" onclick="alert('生成报告')">
+                                📊 生成报告
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 关键指标 -->
+                <div class="side-card">
+                    <div class="side-card-header">
+                        <div class="side-card-title">关键指标</div>
+                    </div>
+                    <div class="side-card-body">
+                        <div class="form-info-grid" style="grid-template-columns: 1fr;">
+                            <div class="form-info-item">
+                                <div class="form-info-label">剩余天数</div>
+                                <div class="form-info-value" style="font-size: 18px; font-weight: 600; color: #faad14;">26天</div>
+                            </div>
+                            <div class="form-info-item">
+                                <div class="form-info-label">延期风险</div>
+                                <div class="form-info-value"><span class="status-badge status-success">低</span></div>
+                            </div>
+                            <div class="form-info-item">
+                                <div class="form-info-label">设计任务完成率</div>
+                                <div class="form-info-value">33% (1/3)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局Tab切换函数
+        function switchTab(event, tabId) {
+            event.preventDefault();
+            console.log('切换tab:', tabId);
+
+            // 移除所有tab的active状态
+            var tabs = document.querySelectorAll('.tab-item');
+            tabs.forEach(function(tab) {
+                tab.classList.remove('active');
+            });
+
+            // 添加当前tab的active状态
+            event.target.classList.add('active');
+
+            // 隐藏所有tab内容
+            var panes = document.querySelectorAll('.tab-pane');
+            panes.forEach(function(pane) {
+                pane.classList.remove('active');
+            });
+
+            // 显示对应的tab内容
+            var targetPane = document.getElementById('tab-' + tabId);
+            if (targetPane) {
+                targetPane.classList.add('active');
+                console.log('成功切换到:', tabId);
+            }
+        }
+
+        // 其他按钮事件
+        document.addEventListener('click', function(e) {
+            // 添加设计任务按钮
+            if (e.target.closest('.btn-add-design-task')) {
+                e.preventDefault();
+                var url = 'pages/design-task-create.html?techTaskId=TT-2025-001';
+                if (typeof PageLoader !== 'undefined') {
+                    PageLoader.loadPage(url);
+                }
+            }
+
+            // 返回按钮
+            if (e.target.closest('.btn-back')) {
+                e.preventDefault();
+                var btn = e.target.closest('.btn-back');
+                if (typeof PageLoader !== 'undefined') {
+                    PageLoader.loadPage(btn.dataset.url);
+                }
+            }
+        });
+
+        console.log('技术任务详情页已加载');
+    </script>
+</body>
+</html>

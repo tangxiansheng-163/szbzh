@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>变更会审单列表</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <!-- 面包屑 -->
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">变更管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">变更会审单</span>
+        </div>
+
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <p class="page-description">BOM 变更由此发起。新建会审单时确定产品、涉及 BOM 类型（EBOM/MBOM/SBOM）及版本号、新版本生效日期与执行范围。BOM 变更不仅会涉及其他类型 BOM 联动变更，还可能涉及领料单、采购订单、投料单、出入库单、销售订单等业务单据的变更。设计子表中每增加一个影响部门需对应一个审核人，影响部门数量即所需审批人数。会审单提交后进入评审流程，<strong>仅当会审单评审全部通过后</strong>，系统才会根据主变更类型、涉及的 BOM 类型及勾选的业务单据类型分别创建对应数量的变更单，各变更单下发至对应部门负责人，由其执行实际变更，完成后对应 BOM 列表及业务单据自动更新。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>会审单号/产品/变更编码</label>
+                    <input type="text" class="form-input" placeholder="会审单号、涉及产品、变更编码">
+                </div>
+                <div class="filter-item">
+                    <label>变更类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="customer">客户变更</option>
+                        <option value="technical">技术变更</option>
+                        <option value="process">工艺变更</option>
+                        <option value="supplier">供应商变更</option>
+                        <option value="design">设计变更</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>会审状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待评审</option>
+                        <option value="reviewing">评审中</option>
+                        <option value="approved">已通过</option>
+                        <option value="rejected">已驳回</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button type="button" class="btn btn-primary" id="btn-open-change-review-modal">+ 新建会审单</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th>会审单号</th>
+                            <th>变更编码</th>
+                            <th>变更类型/类别</th>
+                            <th>变更主题</th>
+                            <th>计划会审时间</th>
+                            <th>计划生效日期</th>
+                            <th>发起部门</th>
+                            <th>发起人</th>
+                            <th>会审状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>BG-HS-2025-001</td>
+                            <td>BG-2025-001</td>
+                            <td>技术变更 / BOM变更</td>
+                            <td>PROD-001 设计缺陷修正</td>
+                            <td>2025-01-28 14:00</td>
+                            <td>2025-02-15</td>
+                            <td>研发部</td>
+                            <td>张工</td>
+                            <td><span class="status-badge status-reviewing">评审中</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/change-review-detail.html" data-id="1">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>BG-HS-2025-002</td>
+                            <td>BG-2025-002</td>
+                            <td>工艺变更 / BOM变更</td>
+                            <td>PROD-002 工艺优化</td>
+                            <td>2025-01-30 10:00</td>
+                            <td>2025-02-20</td>
+                            <td>工艺部</td>
+                            <td>李工</td>
+                            <td><span class="status-badge status-draft">待评审</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/change-review-detail.html" data-id="2">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 2 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+        <!-- 创建变更会审单弹窗 -->
+        <div id="change-review-create-modal" class="modal-overlay">
+            <div class="modal modal-xl cr-modal" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">新建会审单</span>
+                    <button type="button" class="modal-close" id="change-review-modal-close">×</button>
+                </div>
+                <div class="modal-body cr-modal-body">
+                    <form id="change-review-form">
+                        <div class="cr-form-grid">
+                            <div class="cr-form-item">
+                                <label class="cr-label">变更编码</label>
+                                <input type="text" class="form-input" value="系统自动生成" readonly>
+                            </div>
+                            <div class="cr-form-item">
+                                <label class="cr-label required">优先级</label>
+                                <select class="form-select" id="review-priority" required>
+                                    <option value="">请选择优先级</option>
+                                    <option value="high">高</option>
+                                    <option value="medium">中</option>
+                                    <option value="low">低</option>
+                                </select>
+                            </div>
+                            <div class="cr-form-item">
+                                <label class="cr-label required">销售订单编码</label>
+                                <select class="form-select" id="review-order-code" required>
+                                    <option value="">请选择销售订单编码</option>
+                                    <option value="SO-2025-001">SO-2025-001</option>
+                                    <option value="SO-2025-002">SO-2025-002</option>
+                                    <option value="SO-2025-003">SO-2025-003</option>
+                                </select>
+                            </div>
+                            <div class="cr-form-item">
+                                <label class="cr-label">生产计划编码</label>
+                                <select class="form-select" id="review-plan-code">
+                                    <option value="">请选择生产计划编码</option>
+                                    <option value="PP-2025-001">PP-2025-001</option>
+                                    <option value="PP-2025-002">PP-2025-002</option>
+                                </select>
+                            </div>
+                            <div class="cr-form-item">
+                                <label class="cr-label required">变更类型</label>
+                                <select class="form-select" id="review-change-type" required>
+                                    <option value="">请选择变更类型</option>
+                                    <option value="customer">客户变更</option>
+                                    <option value="technical">技术变更</option>
+                                    <option value="process">工艺变更</option>
+                                    <option value="supplier">供应商变更</option>
+                                    <option value="design">设计变更</option>
+                                    <option value="other">其他</option>
+                                </select>
+                            </div>
+                            <div class="cr-form-item">
+                                <label class="cr-label required">计划生效日期</label>
+                                <input type="date" class="form-input" id="review-eff-date" required>
+                            </div>
+                            <div class="cr-form-item">
+                                <label class="cr-label required">变更类别</label>
+                                <select class="form-select" id="review-change-category" required>
+                                    <option value="">请选择变更类别</option>
+                                    <option value="bom">BOM 变更</option>
+                                    <option value="material">物料变更</option>
+                                    <option value="process">工艺变更</option>
+                                    <option value="order">订单变更</option>
+                                    <option value="other">其他</option>
+                                </select>
+                            </div>
+                            <div class="cr-form-item">
+                                <label class="cr-label required">变更性质</label>
+                                <select class="form-select" id="review-change-nature" required>
+                                    <option value="">请选择变更性质</option>
+                                    <option value="major">重大</option>
+                                    <option value="normal">一般</option>
+                                    <option value="minor">轻微</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="cr-bom-detail" id="cr-bom-detail" style="display:none;">
+                            <div class="cr-subtable-title">BOM 变更明细</div>
+                            <div class="cr-form-row cr-form-row-2">
+                                <div class="cr-form-col">
+                                    <label class="cr-label required">主变更 BOM 类型</label>
+                                    <select class="form-select" id="review-bom-type">
+                                        <option value="">请选择</option>
+                                        <option value="EBOM">EBOM</option>
+                                        <option value="MBOM">MBOM</option>
+                                        <option value="SBOM">SBOM</option>
+                                    </select>
+                                </div>
+                                <div class="cr-form-col">
+                                    <label class="cr-label required">主变更版本号</label>
+                                    <select class="form-select" id="review-bom-version">
+                                        <option value="">请选择版本</option>
+                                        <option value="V1.0">V1.0</option>
+                                        <option value="V1.1">V1.1</option>
+                                        <option value="V2.0">V2.0</option>
+                                        <option value="V2.1">V2.1</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="cr-form-row">
+                                <label class="cr-label required">是否涉及其他类别 BOM 联动变更</label>
+                                <label class="filter-checkbox" style="margin-right:16px;"><input type="radio" name="bomCascade" value="no" checked> 否</label>
+                                <label class="filter-checkbox"><input type="radio" name="bomCascade" value="yes"> 是</label>
+                            </div>
+                            <div class="cr-bom-cascade-area" id="cr-bom-cascade-area" style="display:none;">
+                                <p class="cr-tip">同一产品下 EBOM、MBOM、SBOM 版本号存在对应关系。选择主变更版本后，联动 BOM 的对应版本号将根据产品自动带出。</p>
+                                <div class="table-wrapper" style="margin-bottom:8px;">
+                                    <table class="output-table" id="bom-cascade-table">
+                                        <thead><tr><th width="50">序号</th><th width="140">BOM 类型</th><th width="180">对应版本号（联动带出）</th><th width="60"></th></tr></thead>
+                                        <tbody id="bom-cascade-tbody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="cr-form-row" style="margin-top:12px;">
+                                <label class="cr-label">是否涉及领料单、采购订单、投料单等业务单据变更</label>
+                                <p class="cr-tip" style="margin-bottom:6px;">BOM 变更可能引发领料单、采购订单、投料单等业务单据联动变更，勾选后将一并创建对应变更单。</p>
+                                <div class="cr-checkbox-group">
+                                    <label class="filter-checkbox"><input type="checkbox" name="bomRelatedChange" value="requisition"> 领料单</label>
+                                    <label class="filter-checkbox"><input type="checkbox" name="bomRelatedChange" value="purchase"> 采购订单</label>
+                                    <label class="filter-checkbox"><input type="checkbox" name="bomRelatedChange" value="feeding"> 投料单</label>
+                                    <label class="filter-checkbox"><input type="checkbox" name="bomRelatedChange" value="inout"> 出入库单</label>
+                                    <label class="filter-checkbox"><input type="checkbox" name="bomRelatedChange" value="sales"> 销售订单</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cr-form-row">
+                            <label class="cr-label">变更前内容</label>
+                            <textarea class="form-textarea cr-textarea" id="review-content-before" maxlength="255" placeholder="请输入变更前内容"></textarea>
+                            <span class="cr-char-count"><span id="count-before">0</span>/255</span>
+                        </div>
+                        <div class="cr-form-row">
+                            <label class="cr-label">变更后内容</label>
+                            <textarea class="form-textarea cr-textarea" id="review-content-after" maxlength="255" placeholder="请输入变更后内容"></textarea>
+                            <span class="cr-char-count"><span id="count-after">0</span>/255</span>
+                        </div>
+                        <div class="cr-form-row">
+                            <label class="cr-label required">变更原因</label>
+                            <textarea class="form-textarea cr-textarea" id="review-reason" maxlength="255" placeholder="请输入变更原因" required></textarea>
+                            <span class="cr-char-count"><span id="count-reason">0</span>/255</span>
+                        </div>
+                        <div class="cr-form-row">
+                            <label class="cr-label">备注</label>
+                            <textarea class="form-textarea cr-textarea" id="review-remark" maxlength="255" placeholder="请输入备注"></textarea>
+                            <span class="cr-char-count"><span id="count-remark">0</span>/255</span>
+                        </div>
+                        <div class="cr-subtable">
+                            <div class="cr-subtable-title">设计子表 <span class="cr-tip-inline" style="font-weight:normal;color:#666;">（影响部门数量=审批人数，会审单评审全部通过后才按主变更类型、涉及 BOM 类型及勾选的业务单据类型分别创建变更单，下发至各对应部门负责人执行）</span></div>
+                            <div class="table-wrapper">
+                                <table class="output-table" id="impact-table">
+                                    <thead>
+                                        <tr>
+                                            <th width="50">序号</th>
+                                            <th width="140">*影响部门</th>
+                                            <th width="140">*审核人</th>
+                                            <th width="100">影响费用</th>
+                                            <th>影响内容</th>
+                                            <th width="120">备注</th>
+                                            <th width="50"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="impact-tbody">
+                                        <tr class="impact-row">
+                                            <td class="impact-seq">1</td>
+                                            <td><select class="form-select form-select-sm" name="impactDept"><option value="">请选择影响部门</option><option value="研发">研发</option><option value="工艺">工艺</option><option value="生产">生产</option><option value="采购">采购</option><option value="质量">质量</option><option value="销售">销售</option></select></td>
+                                            <td><select class="form-select form-select-sm" name="reviewer"><option value="">请选择审核人</option><option value="张三">张三</option><option value="李四">李四</option><option value="王工">王工</option><option value="赵工">赵工</option></select></td>
+                                            <td><div class="cr-num-input"><button type="button" class="cr-num-btn">-</button><input type="number" class="form-input form-input-sm" name="impactCost" placeholder="请输入" value="0"><button type="button" class="cr-num-btn">+</button></div></td>
+                                            <td><input type="text" class="form-input form-input-sm" name="impactContent" maxlength="255" placeholder="请输入影响内容"></td>
+                                            <td><input type="text" class="form-input form-input-sm" name="impactRemark" placeholder="请输入备注"></td>
+                                            <td><button type="button" class="btn btn-sm btn-link btn-remove-impact">删除</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button type="button" class="btn btn-link cr-add-btn" id="btn-add-impact">+ 添加</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" id="change-review-modal-cancel">取消</button>
+                    <button type="button" class="btn btn-primary" id="change-review-modal-submit">提交会审</button>
+                </div>
+            </div>
+        </div>
+        <style>
+            .cr-modal { max-width: 880px; }
+            .cr-modal-body { max-height: 70vh; overflow-y: auto; padding: 20px 24px; }
+            .cr-form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 20px; margin-bottom: 20px; }
+            .cr-form-item { min-width: 0; }
+            .cr-form-row { margin-bottom: 16px; position: relative; }
+            .cr-label { display: block; font-size: 13px; color: rgba(0,0,0,0.65); margin-bottom: 6px; }
+            .cr-label.required::before { content: '*'; color: #ff4d4f; margin-right: 4px; }
+            .cr-textarea { min-height: 70px; resize: vertical; }
+            .cr-char-count { position: absolute; right: 8px; bottom: 6px; font-size: 12px; color: #999; }
+            .cr-subtable { margin-top: 20px; }
+            .cr-subtable-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+            .cr-bom-detail { margin-bottom: 20px; padding: 16px; background: #fafafa; border-radius: 8px; }
+            .cr-tip { font-size: 12px; color: #999; margin: 0 0 12px; }
+            .cr-checkbox-group { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 4px; }
+            .cr-num-input { display: flex; align-items: center; }
+            .cr-num-input input { width: 60px; text-align: center; }
+            .cr-num-btn { width: 24px; height: 24px; padding: 0; border: 1px solid #d9d9d9; background: #fff; cursor: pointer; font-size: 14px; line-height: 1; }
+            .cr-num-btn:hover { border-color: #1890ff; color: #1890ff; }
+            .cr-add-btn { padding: 0; color: #1890ff; margin-top: 8px; }
+            .btn-link { background: none; border: none; color: #1890ff; cursor: pointer; }
+            .form-select-sm, .form-input-sm { padding: 4px 8px; font-size: 13px; height: 28px; }
+        </style>
+        <script>
+            (function () {
+                console.log('变更会审单列表 页面已加载');
+                if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+
+                var modal = document.getElementById('change-review-create-modal');
+                var openBtn = document.getElementById('btn-open-change-review-modal');
+                var closeBtn = document.getElementById('change-review-modal-close');
+                var cancelBtn = document.getElementById('change-review-modal-cancel');
+                var submitBtn = document.getElementById('change-review-modal-submit');
+                var tbody = document.getElementById('impact-tbody');
+                var addImpactBtn = document.getElementById('btn-add-impact');
+                var categoryEl = document.getElementById('review-change-category');
+                var bomDetailEl = document.getElementById('cr-bom-detail');
+                var bomCascadeArea = document.getElementById('cr-bom-cascade-area');
+                var bomCascadeTbody = document.getElementById('bom-cascade-tbody');
+                var mainBomTypeEl = document.getElementById('review-bom-type');
+
+                var BOM_TYPES = ['EBOM', 'MBOM', 'SBOM'];
+                var VERSION_OPTS = ['V1.0', 'V1.1', 'V2.0', 'V2.1'];
+                var impactRowTpl = '<tr class="impact-row"><td class="impact-seq"></td><td><select class="form-select form-select-sm" name="impactDept"><option value="">请选择影响部门</option><option value="研发">研发</option><option value="工艺">工艺</option><option value="生产">生产</option><option value="采购">采购</option><option value="质量">质量</option><option value="销售">销售</option></select></td><td><select class="form-select form-select-sm" name="reviewer"><option value="">请选择审核人</option><option value="张三">张三</option><option value="李四">李四</option><option value="王工">王工</option><option value="赵工">赵工</option></select></td><td><div class="cr-num-input"><button type="button" class="cr-num-btn">-</button><input type="number" class="form-input form-input-sm" name="impactCost" placeholder="请输入" value="0"><button type="button" class="cr-num-btn">+</button></div></td><td><input type="text" class="form-input form-input-sm" name="impactContent" maxlength="255" placeholder="请输入影响内容"></td><td><input type="text" class="form-input form-input-sm" name="impactRemark" placeholder="请输入备注"></td><td><button type="button" class="btn btn-sm btn-link btn-remove-impact">删除</button></td></tr>';
+
+                function getCascadeTypes(mainType) {
+                    return BOM_TYPES.filter(function (t) { return t !== mainType; });
+                }
+                var VERSION_MAP = {
+                    'SO-2025-001': {
+                        'EBOM': { 'V1.0': { 'MBOM': 'V2.0', 'SBOM': 'V1.1' }, 'V1.1': { 'MBOM': 'V2.1', 'SBOM': 'V1.2' }, 'V2.0': { 'MBOM': 'V3.0', 'SBOM': 'V2.1' } },
+                        'MBOM': { 'V2.0': { 'EBOM': 'V1.0', 'SBOM': 'V1.1' }, 'V2.1': { 'EBOM': 'V1.1', 'SBOM': 'V1.2' }, 'V3.0': { 'EBOM': 'V2.0', 'SBOM': 'V2.1' } },
+                        'SBOM': { 'V1.1': { 'EBOM': 'V1.0', 'MBOM': 'V2.0' }, 'V1.2': { 'EBOM': 'V1.1', 'MBOM': 'V2.1' }, 'V2.1': { 'EBOM': 'V2.0', 'MBOM': 'V3.0' } }
+                    },
+                    'SO-2025-002': {
+                        'EBOM': { 'V1.0': { 'MBOM': 'V1.5', 'SBOM': 'V1.0' }, 'V1.1': { 'MBOM': 'V1.6', 'SBOM': 'V1.1' } },
+                        'MBOM': { 'V1.5': { 'EBOM': 'V1.0', 'SBOM': 'V1.0' }, 'V1.6': { 'EBOM': 'V1.1', 'SBOM': 'V1.1' } },
+                        'SBOM': { 'V1.0': { 'EBOM': 'V1.0', 'MBOM': 'V1.5' }, 'V1.1': { 'EBOM': 'V1.1', 'MBOM': 'V1.6' } }
+                    },
+                    'SO-2025-003': {
+                        'EBOM': { 'V1.0': { 'MBOM': 'V2.0', 'SBOM': 'V1.1' }, 'V2.0': { 'MBOM': 'V3.0', 'SBOM': 'V2.0' } },
+                        'MBOM': { 'V2.0': { 'EBOM': 'V1.0', 'SBOM': 'V1.1' }, 'V3.0': { 'EBOM': 'V2.0', 'SBOM': 'V2.0' } },
+                        'SBOM': { 'V1.1': { 'EBOM': 'V1.0', 'MBOM': 'V2.0' }, 'V2.0': { 'EBOM': 'V2.0', 'MBOM': 'V3.0' } }
+                    }
+                };
+                function getCorrespondVersion(mainType, mainVer, cascadeType, orderId) {
+                    if (!mainVer || !cascadeType) return '';
+                    var order = orderId || 'SO-2025-001';
+                    var map = VERSION_MAP[order];
+                    if (!map || !map[mainType] || !map[mainType][mainVer]) return '';
+                    return map[mainType][mainVer][cascadeType] || '';
+                }
+                function toggleBomDetail() {
+                    var isBom = categoryEl && categoryEl.value === 'bom';
+                    if (bomDetailEl) bomDetailEl.style.display = isBom ? 'block' : 'none';
+                }
+                function toggleBomCascade() {
+                    var yes = document.querySelector('input[name="bomCascade"]:checked');
+                    var show = yes && yes.value === 'yes';
+                    if (bomCascadeArea) bomCascadeArea.style.display = show ? 'block' : 'none';
+                    if (show) renderBomCascade();
+                }
+                function renderBomCascade() {
+                    if (!bomCascadeTbody) return;
+                    var mainType = mainBomTypeEl && mainBomTypeEl.value;
+                    var mainVer = document.getElementById('review-bom-version') && document.getElementById('review-bom-version').value;
+                    var orderId = document.getElementById('review-order-code') && document.getElementById('review-order-code').value;
+                    var cascadeTypes = mainType ? getCascadeTypes(mainType) : [];
+                    if (!mainVer) { bomCascadeTbody.innerHTML = '<tr><td colspan="4" style="padding:12px;color:#999;font-size:13px;">请先选择主变更版本号，系统将根据产品自动带出联动 BOM 及对应版本</td></tr>'; return; }
+                    if (!cascadeTypes.length) { bomCascadeTbody.innerHTML = '<tr><td colspan="4" style="padding:12px;color:#999;font-size:13px;">请先选择主变更 BOM 类型</td></tr>'; return; }
+                    var html = cascadeTypes.map(function (t, i) {
+                        var corrVer = getCorrespondVersion(mainType, mainVer, t, orderId);
+                        return '<tr class="bom-cascade-row" data-bom="' + t + '"><td class="cascade-seq">' + (i + 1) + '</td><td>' + t + '</td><td><span class="cascade-version">' + (corrVer || '—') + '</span><input type="hidden" name="cascadeBomVer" value="' + (corrVer || '') + '"></td><td><button type="button" class="btn btn-sm btn-link btn-remove-cascade">删除</button></td></tr>';
+                    }).join('');
+                    bomCascadeTbody.innerHTML = html;
+                    bomCascadeTbody.querySelectorAll('.btn-remove-cascade').forEach(function (btn) {
+                        btn.onclick = function () {
+                            var row = btn.closest('tr');
+                            if (bomCascadeTbody.querySelectorAll('.bom-cascade-row').length <= 1) { alert('至少保留一行联动 BOM'); return; }
+                            row.remove();
+                            refreshCascadeSeq();
+                        };
+                    });
+                }
+                function refreshCascadeSeq() {
+                    if (!bomCascadeTbody) return;
+                    bomCascadeTbody.querySelectorAll('.bom-cascade-row').forEach(function (tr, i) {
+                        var td = tr.querySelector('.cascade-seq');
+                        if (td) td.textContent = i + 1;
+                    });
+                }
+
+                if (categoryEl) categoryEl.addEventListener('change', toggleBomDetail);
+                document.querySelectorAll('input[name="bomCascade"]').forEach(function (r) {
+                    r.addEventListener('change', toggleBomCascade);
+                });
+                function refreshCascadeIfNeeded() {
+                    if (document.querySelector('input[name="bomCascade"]:checked') && document.querySelector('input[name="bomCascade"]:checked').value === 'yes') renderBomCascade();
+                }
+                if (mainBomTypeEl) mainBomTypeEl.addEventListener('change', refreshCascadeIfNeeded);
+                document.getElementById('review-bom-version') && document.getElementById('review-bom-version').addEventListener('change', refreshCascadeIfNeeded);
+                document.getElementById('review-order-code') && document.getElementById('review-order-code').addEventListener('change', refreshCascadeIfNeeded);
+
+                function updateCharCount(id, countElId) {
+                    var el = document.getElementById(id);
+                    var countEl = document.getElementById(countElId);
+                    if (el && countEl) { countEl.textContent = (el.value || '').length; }
+                }
+
+                [['review-content-before','count-before'],['review-content-after','count-after'],['review-reason','count-reason'],['review-remark','count-remark']].forEach(function (pair) {
+                    var el = document.getElementById(pair[0]);
+                    if (el) el.addEventListener('input', function () { updateCharCount(pair[0], pair[1]); });
+                });
+
+                function refreshImpactSeq() {
+                    if (!tbody) return;
+                    tbody.querySelectorAll('.impact-row').forEach(function (tr, i) {
+                        var td = tr.querySelector('.impact-seq');
+                        if (td) td.textContent = i + 1;
+                    });
+                }
+
+                function bindImpactRow(row) {
+                    var costInput = row.querySelector('input[name="impactCost"]');
+                    row.querySelectorAll('.cr-num-btn').forEach(function (btn) {
+                        if (btn.textContent === '-') btn.onclick = function () { var v = parseInt(costInput.value, 10) || 0; costInput.value = Math.max(0, v - 1); };
+                        else btn.onclick = function () { var v = parseInt(costInput.value, 10) || 0; costInput.value = v + 1; };
+                    });
+                    var rmBtn = row.querySelector('.btn-remove-impact');
+                    if (rmBtn) rmBtn.onclick = function () {
+                        if (tbody.querySelectorAll('.impact-row').length <= 1) { alert('至少保留一行'); return; }
+                        row.remove();
+                        refreshImpactSeq();
+                    };
+                }
+
+                if (addImpactBtn && tbody) addImpactBtn.addEventListener('click', function () {
+                    tbody.insertAdjacentHTML('beforeend', impactRowTpl);
+                    var row = tbody.lastElementChild;
+                    bindImpactRow(row);
+                    refreshImpactSeq();
+                });
+
+                tbody && tbody.querySelectorAll('.impact-row').forEach(bindImpactRow);
+
+                function openModal() {
+                    if (modal) { modal.classList.add('active'); document.body.style.overflow = 'hidden'; }
+                }
+                function closeModal() {
+                    if (modal) { modal.classList.remove('active'); document.body.style.overflow = ''; }
+                }
+                if (openBtn) openBtn.addEventListener('click', openModal);
+                if (closeBtn) closeBtn.addEventListener('click', closeModal);
+                if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+                if (modal) modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+
+                if (submitBtn) submitBtn.addEventListener('click', function () {
+                    var priority = document.getElementById('review-priority');
+                    var orderCode = document.getElementById('review-order-code');
+                    var changeType = document.getElementById('review-change-type');
+                    var effDate = document.getElementById('review-eff-date');
+                    var category = document.getElementById('review-change-category');
+                    var nature = document.getElementById('review-change-nature');
+                    var reason = document.getElementById('review-reason');
+                    if (!priority || !priority.value) { alert('请选择优先级'); return; }
+                    if (!orderCode || !orderCode.value) { alert('请选择销售订单编码'); return; }
+                    if (!changeType || !changeType.value) { alert('请选择变更类型'); return; }
+                    if (!effDate || !effDate.value) { alert('请选择计划生效日期'); return; }
+                    if (!category || !category.value) { alert('请选择变更类别'); return; }
+                    if (!nature || !nature.value) { alert('请选择变更性质'); return; }
+                    if (!reason || !reason.value.trim()) { alert('请填写变更原因'); return; }
+                    if (category.value === 'bom') {
+                        var mainType = document.getElementById('review-bom-type');
+                        var mainVer = document.getElementById('review-bom-version');
+                        if (!mainType || !mainType.value) { alert('请选择主变更 BOM 类型'); return; }
+                        if (!mainVer || !mainVer.value) { alert('请选择主变更版本号'); return; }
+                        var cascadeYes = document.querySelector('input[name="bomCascade"]:checked');
+                        if (cascadeYes && cascadeYes.value === 'yes') {
+                            var mainType = document.getElementById('review-bom-type').value;
+                            var cascadeTypes = mainType ? getCascadeTypes(mainType) : [];
+                            if (cascadeTypes.length && (!bomCascadeTbody || !bomCascadeTbody.querySelectorAll('.bom-cascade-row').length)) {
+                                alert('请先选择主变更 BOM 类型和版本号，系统将自动带出联动 BOM 及对应版本');
+                                return;
+                            }
+                        }
+                    }
+                    var rows = tbody ? tbody.querySelectorAll('.impact-row') : [];
+                    var ok = true;
+                    rows.forEach(function (r) {
+                        var dept = r.querySelector('select[name="impactDept"]');
+                        var rev = r.querySelector('select[name="reviewer"]');
+                        if ((!dept || !dept.value) || (!rev || !rev.value)) ok = false;
+                    });
+                    if (!ok) { alert('设计子表中请为每行选择影响部门和审核人'); return; }
+                    var deptCount = rows.length;
+                    var applyCount = 0;
+                    var applyTypes = [];
+                    if (category.value === 'bom') {
+                        var mainTypeEl = document.getElementById('review-bom-type');
+                        var mainType = mainTypeEl ? mainTypeEl.value : '';
+                        if (mainType) {
+                            applyTypes.push(mainType);
+                            var cascadeYes = document.querySelector('input[name="bomCascade"]:checked');
+                            if (cascadeYes && cascadeYes.value === 'yes' && bomCascadeTbody) {
+                                bomCascadeTbody.querySelectorAll('.bom-cascade-row').forEach(function (tr) {
+                                    var t = tr.getAttribute('data-bom');
+                                    if (t) applyTypes.push(t);
+                                });
+                            }
+                            var relatedLabels = { requisition: '领料单', purchase: '采购订单', feeding: '投料单', inout: '出入库单', sales: '销售订单' };
+                            document.querySelectorAll('input[name="bomRelatedChange"]:checked').forEach(function (cb) {
+                                var lbl = relatedLabels[cb.value];
+                                if (lbl) applyTypes.push(lbl);
+                            });
+                        }
+                        applyCount = applyTypes.length;
+                    } else {
+                        applyCount = 1;
+                        applyTypes = ['变更申请'];
+                    }
+                    var DEPT_MAP = { EBOM: '研发', MBOM: '工艺', SBOM: '生产', '领料单': '生产', '采购订单': '采购', '投料单': '生产', '出入库单': '仓库', '销售订单': '销售' };
+                    var msg = '会审单已提交（原型演示），进入评审流程。需 ' + deptCount + ' 个部门审核人审批，会审单评审全部通过后才会分别创建 ' + applyCount + ' 个变更单';
+                    if (category.value === 'bom' && applyTypes.length) {
+                        msg += '：';
+                        msg += applyTypes.map(function (t) {
+                            var d = DEPT_MAP[t];
+                            return d ? t + '变更单→' + d + '负责人' : t + '变更单';
+                        }).join('、');
+                        msg += '，由各负责人执行实际变更。';
+                    } else {
+                        msg += '。';
+                    }
+                    alert(msg);
+                    closeModal();
+                });
+                document.querySelectorAll('.action-left .btn-default').forEach(function(btn) {
+                    if (btn.textContent.indexOf('导出') !== -1) btn.addEventListener('click', function() { if (confirm('确定导出当前列表？')) alert('导出成功，文件已下载。'); });
+                });
+            })();
+        </script>
+    </div>
+</body>
+</html>

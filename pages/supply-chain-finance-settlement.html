@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>财务结算 - 供应链协同</title>
+</head>
+<body>
+<div class="content-wrapper">
+    <div class="breadcrumb">
+        <a href="pages/supply-chain-dashboard.html" class="breadcrumb-item">工作台</a>
+        <span class="breadcrumb-separator">/</span>
+        <span class="breadcrumb-item active">财务结算</span>
+    </div>
+
+    <div class="page-header">
+        <div class="page-title">
+            <h2>财务结算</h2>
+            <p class="page-description">
+                以「结算单」管理应收：合同/订单 → 收货与退换货/让步 → 对账 → 开票 → 收款。
+            </p>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 16px;">
+        <div class="card-body" style="display:flex;gap:16px;">
+            <div style="flex:1;border-right:1px solid #f0f0f0;padding-right:16px;">
+                <div style="font-size:12px;color:#8c8c8c;margin-bottom:4px;">本期应收</div>
+                <div id="kpi-receivable" style="font-size:22px;font-weight:600;color:#262626;">¥0.00</div>
+            </div>
+            <div style="flex:1;border-right:1px solid #f0f0f0;padding:0 16px;">
+                <div style="font-size:12px;color:#8c8c8c;margin-bottom:4px;">已收款</div>
+                <div id="kpi-received" style="font-size:22px;font-weight:600;color:#52c41a;">¥0.00</div>
+            </div>
+            <div style="flex:1;border-right:1px solid #f0f0f0;padding:0 16px;">
+                <div style="font-size:12px;color:#8c8c8c;margin-bottom:4px;">待收款</div>
+                <div id="kpi-unreceived" style="font-size:22px;font-weight:600;color:#fa8c16;">¥0.00</div>
+            </div>
+            <div style="flex:1;padding-left:16px;">
+                <div style="font-size:12px;color:#8c8c8c;margin-bottom:4px;">待开票结算单</div>
+                <div id="kpi-to-invoice" style="font-size:22px;font-weight:600;color:#ff4d4f;">0 笔</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 16px;">
+        <div class="card-body" style="font-size:13px;color:#595959;background:#fff7e6;border-radius:4px;">
+            说明：此页只关心「这几张结算单怎么对账、怎么开票、收了多少钱」，其它明细在各自台账中查看。
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;align-items:flex-start;">
+        <div>
+            <div class="card" style="margin-bottom:12px;">
+                <div class="card-body">
+                    <div class="filter-row">
+                        <div class="filter-item">
+                            <label>甲方客户</label>
+                            <input id="filter-customer" type="text" class="form-input" placeholder="客户名称">
+                        </div>
+                        <div class="filter-item">
+                            <label>结算状态</label>
+                            <select id="filter-state" class="form-select">
+                                <option value="">全部</option>
+                                <option value="待对账">待对账</option>
+                                <option value="对账中">对账中</option>
+                                <option value="待开票">待开票</option>
+                                <option value="待审核发票">待审核发票</option>
+                                <option value="待付款">待收款</option>
+                                <option value="已结算">已结算</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label>结算周期</label>
+                            <input id="filter-period" type="month" class="form-input">
+                        </div>
+                        <div class="filter-item" style="flex-direction:row;align-items:center;">
+                            <button id="btn-filter" class="btn btn-primary">查询</button>
+                            <button id="btn-reset" class="btn btn-default">重置</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title" style="margin:0;font-size:14px;">结算单列表</h3>
+                </div>
+                <div class="card-body" style="padding-top:0;">
+                    <div class="table-wrapper">
+                        <table class="list-table-nowrap">
+                            <thead>
+                            <tr>
+                                <th width="130">结算单号</th>
+                                <th width="160">甲方客户</th>
+                                <th width="90">周期</th>
+                                <th width="110">应收日期</th>
+                                <th width="130">结算金额</th>
+                                <th width="110">当前状态</th>
+                                <th width="90">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody id="settlement-tbody">
+                            <tr><td colspan="7" style="text-align:center;color:#8c8c8c;padding:16px;">加载中...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title" style="margin:0;font-size:14px;">当前结算</h3>
+                </div>
+                <div class="card-body" id="detail-empty" style="font-size:13px;color:#8c8c8c;padding:20px;text-align:center;">
+                    请在左侧选择一条结算单
+                </div>
+                <div class="card-body" id="detail-main" style="display:none;">
+                    <div style="display:grid;grid-template-columns:1.2fr 1.2fr;gap:12px;margin-bottom:12px;">
+                        <div>
+                            <div style="font-size:12px;color:#8c8c8c;">结算单号</div>
+                            <div id="d-id" style="font-size:13px;font-weight:600;color:#262626;">-</div>
+                        </div>
+                        <div>
+                            <div style="font-size:12px;color:#8c8c8c;">甲方客户</div>
+                            <div id="d-customer" style="font-size:13px;font-weight:600;color:#262626;">-</div>
+                        </div>
+                        <div>
+                            <div style="font-size:12px;color:#8c8c8c;">结算金额</div>
+                            <div id="d-amount" style="font-size:13px;font-weight:600;color:#262626;">-</div>
+                        </div>
+                        <div>
+                            <div style="font-size:12px;color:#8c8c8c;">应收日期 / 账期</div>
+                            <div id="d-due" style="font-size:13px;font-weight:600;color:#262626;">-</div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;justify-content:space-between;margin:8px 0 14px;">
+                        <div style="flex:1;">
+                            <div style="font-size:12px;color:#8c8c8c;">① 对账</div>
+                            <div id="step-recon" style="font-size:13px;font-weight:600;color:#595959;">-</div>
+                        </div>
+                        <div style="flex:1;border-left:1px solid #f0f0f0;padding-left:12px;">
+                            <div style="font-size:12px;color:#8c8c8c;">② 开票</div>
+                            <div id="step-invoice" style="font-size:13px;font-weight:600;color:#595959;">-</div>
+                        </div>
+                        <div style="flex:1;border-left:1px solid #f0f0f0;padding-left:12px;">
+                            <div style="font-size:12px;color:#8c8c8c;">③ 收款</div>
+                            <div id="step-receipt" style="font-size:13px;font-weight:600;color:#595959;">-</div>
+                        </div>
+                    </div>
+
+                    <div id="actions" style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;"></div>
+
+                    <!-- 发票列表 -->
+                    <div id="invoice-list-section" style="margin: 12px 0; padding: 12px; background: #fafafa; border-radius: 8px; border: 1px solid #f0f0f0;">
+                        <div style="font-size: 13px; font-weight: 600; color: #262626; margin-bottom: 10px;">📄 我的发票</div>
+                        <div id="invoice-list-container">
+                            <div style="font-size: 12px; color: #8c8c8c; text-align: center; padding: 12px;">暂无发票</div>
+                        </div>
+                    </div>
+
+                    <div style="font-size:12px;color:#8c8c8c;border-top:1px solid #f0f0f0;padding-top:10px;">
+                        <div>合同：<a id="d-contract" href="pages/supply-chain-contract-list.html" class="link">点击查看合同列表</a></div>
+                        <div style="margin-top:4px;">
+                            订单、退货、让步、发票、收款的明细请在对应台账中查看，
+                            当前只展示流程与动作，不在此页平铺所有表格。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('财务结算（供应链协同）页面已加载');
+        if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+
+        function money(n) {
+            var num = parseFloat(n || 0) || 0;
+            return '¥' + num.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        function getQueryId() {
+            try { return new URLSearchParams(window.location.search).get('id') || ''; } catch (e) { return ''; }
+        }
+        function getStore() {
+            if (!window.FinanceCollabStore) return null;
+            return window.FinanceCollabStore.getStore();
+        }
+
+        function renderKpis(store) {
+            var sts = store.settlements || [];
+            var total = 0, received = 0, toInvoice = 0;
+            sts.forEach(function (s) {
+                var amt = (s.amount && s.amount.settlementAmount) ? s.amount.settlementAmount : 0;
+                total += amt;
+                var rec = 0;
+                (s.payments || []).forEach(function (p) { if (p.status === 'paid') rec += (p.amount || 0); });
+                received += rec;
+                var recon = (s.reconciliation && s.reconciliation.status) ? s.reconciliation.status : 'not_started';
+                if (recon === 'b_confirmed' && !(s.invoices || []).length) toInvoice++;
+            });
+            document.getElementById('kpi-receivable').textContent = money(total);
+            document.getElementById('kpi-received').textContent = money(received);
+            document.getElementById('kpi-unreceived').textContent = money(Math.max(0, total - received));
+            document.getElementById('kpi-to-invoice').textContent = toInvoice + ' 笔';
+        }
+
+        function renderList(store) {
+            var tbody = document.getElementById('settlement-tbody');
+            var kw = (document.getElementById('filter-customer').value || '').trim();
+            var st = document.getElementById('filter-state').value || '';
+            var period = document.getElementById('filter-period').value || '';
+            var active = window.FinanceCollabStore.getActiveSettlementId() || getQueryId();
+
+            var rows = (store.settlements || []).filter(function (s) {
+                if (kw) {
+                    var ok = (s.partyA && (s.partyA.org || '').indexOf(kw) !== -1);
+                    if (!ok) return false;
+                }
+                if (st && s.state !== st) return false;
+                if (period && (s.period || '') !== period) return false;
+                return true;
+            });
+
+            if (!rows.length) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#8c8c8c;padding:16px;">暂无数据</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            rows.forEach(function (s) {
+                var tr = document.createElement('tr');
+                if (s.id === active) tr.className = 'active';
+                tr.innerHTML =
+                    '<td><a href="javascript:void(0)">' + s.id + '</a></td>' +
+                    '<td>' + (s.partyA && s.partyA.org || '-') + '</td>' +
+                    '<td>' + (s.period || '-') + '</td>' +
+                    '<td>' + (s.dueDate || '-') + '</td>' +
+                    '<td>' + money((s.amount && s.amount.settlementAmount) || 0) + '</td>' +
+                    '<td>' + (s.state || '-') + '</td>' +
+                    '<td><button class="btn btn-sm btn-default" data-id="' + s.id + '">查看</button></td>';
+                tr.addEventListener('click', function () {
+                    window.FinanceCollabStore.setActiveSettlement(s.id);
+                    renderAll();
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderDetail(store) {
+            var empty = document.getElementById('detail-empty');
+            var main = document.getElementById('detail-main');
+            var id = window.FinanceCollabStore.getActiveSettlementId() || getQueryId();
+            var s = (store.settlements || []).find(function (x) { return x.id === id; }) || null;
+
+            if (!s) {
+                empty.style.display = 'block';
+                main.style.display = 'none';
+                return;
+            }
+            empty.style.display = 'none';
+            main.style.display = 'block';
+
+            var amt = (s.amount && s.amount.settlementAmount) || 0;
+            document.getElementById('d-id').textContent = s.id;
+            document.getElementById('d-customer').textContent = (s.partyA && s.partyA.org) || '-';
+            document.getElementById('d-amount').textContent = money(amt);
+            document.getElementById('d-due').textContent = (s.dueDate || '-') + ' / ' + (s.paymentTerm || '-');
+
+            var recon = (s.reconciliation && s.reconciliation.status) || 'not_started';
+            var invs = s.invoices || [];
+            var paid = 0;
+            (s.payments || []).forEach(function (p) { if (p.status === 'paid') paid += (p.amount || 0); });
+
+            document.getElementById('step-recon').textContent =
+                recon === 'b_confirmed' ? '我已确认' :
+                recon === 'sent' ? '待我确认' :
+                recon === 'disputed' ? '我已提异议' : '未发起';
+
+            var hasSent = invs.some(function (x) { return x.status === 'sent' || x.status === 'a_approved'; });
+            var hasIssued = invs.some(function (x) { return x.status === 'issued'; });
+            document.getElementById('step-invoice').textContent =
+                invs.length === 0 ? '未开票' :
+                hasSent ? ('已发送 ' + invs.length + ' 张') :
+                hasIssued ? ('已开具 ' + invs.length + ' 张') : ('已开具 ' + invs.length + ' 张');
+            document.getElementById('step-receipt').textContent =
+                paid >= amt && amt > 0 ? '已收款' :
+                paid > 0 ? '部分收款 ' + money(paid) : '未收款';
+
+            // 渲染发票列表
+            renderInvoiceList(s);
+
+            document.getElementById('d-contract').textContent =
+                (s.contract && s.contract.id) ? s.contract.id : '点击查看合同列表';
+
+            var act = document.getElementById('actions');
+            var btns = [];
+
+            if (recon === 'sent') {
+                btns.push('<button class="btn btn-primary" id="btn-confirm-recon">确认对账</button>');
+                btns.push('<button class="btn btn-default" id="btn-dispute-recon">提出异议</button>');
+            } else if (recon === 'b_confirmed' && invs.length === 0) {
+                btns.push('<button class="btn btn-primary" id="btn-issue-invoice">开具发票</button>');
+            } else if (hasIssued && !hasSent) {
+                btns.push('<button class="btn btn-primary" id="btn-send-invoice">发送发票至甲方</button>');
+            }
+
+            act.innerHTML = btns.join(' ');
+
+            var btn;
+            btn = document.getElementById('btn-confirm-recon');
+            if (btn) btn.onclick = function () {
+                if (!confirm('确认当前结算金额无误并完成对账？')) return;
+                window.FinanceCollabStore.actionB_confirmReconciliation(s.id);
+                renderAll();
+            };
+            btn = document.getElementById('btn-dispute-recon');
+            if (btn) btn.onclick = function () {
+                var reason = prompt('请输入异议原因：', '金额/单据存在差异');
+                if (reason === null) return;
+                window.FinanceCollabStore.actionB_raiseDispute(s.id, reason);
+                renderAll();
+            };
+            btn = document.getElementById('btn-issue-invoice');
+            if (btn) btn.onclick = function () {
+                showInvoiceUploadModal(s.id, amt);
+            };
+            btn = document.getElementById('btn-send-invoice');
+            if (btn) btn.onclick = function () {
+                var issued = invs.find(function (x) { return x.status === 'issued'; }) || invs[0];
+                if (!issued) return;
+                if (!confirm('将发票 ' + issued.id + ' 发送至甲方？')) return;
+                window.FinanceCollabStore.actionB_sendInvoice(s.id, issued.id);
+                renderAll();
+            };
+        }
+
+        function renderAll() {
+            var store = getStore();
+            if (!store) return;
+            renderKpis(store);
+            renderList(store);
+            renderDetail(store);
+        }
+
+        // 渲染发票列表
+        function renderInvoiceList(s) {
+            var container = document.getElementById('invoice-list-container');
+            var invoices = s.invoices || [];
+            
+            if (!invoices.length) {
+                container.innerHTML = '<div style="font-size: 12px; color: #8c8c8c; text-align: center; padding: 12px;">暂无发票</div>';
+                return;
+            }
+            
+            var html = '<table style="width: 100%; border-collapse: collapse; font-size: 12px;">' +
+                '<thead>' +
+                '<tr style="background: #f0f0f0;">' +
+                '<th style="padding: 8px; text-align: left; font-weight: 600; color: #595959;">发票号</th>' +
+                '<th style="padding: 8px; text-align: left; font-weight: 600; color: #595959;">状态</th>' +
+                '<th style="padding: 8px; text-align: right; font-weight: 600; color: #595959;">金额</th>' +
+                '<th style="padding: 8px; text-align: center; font-weight: 600; color: #595959;">操作</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>';
+            
+            invoices.forEach(function(inv) {
+                var statusText = inv.status === 'issued' ? '已开具' : 
+                                inv.status === 'sent' ? '已发送' : 
+                                inv.status === 'a_approved' ? '甲方已审核' : inv.status;
+                var statusColor = inv.status === 'issued' ? '#faad14' : 
+                                 inv.status === 'sent' ? '#1890ff' : 
+                                 inv.status === 'a_approved' ? '#52c41a' : '#595959';
+                
+                html += '<tr style="border-bottom: 1px solid #f0f0f0;">' +
+                    '<td style="padding: 8px; color: #262626;">' + inv.id + '</td>' +
+                    '<td style="padding: 8px;"><span style="color: ' + statusColor + '; font-weight: 500;">' + statusText + '</span></td>' +
+                    '<td style="padding: 8px; text-align: right; color: #262626; font-weight: 600;">' + money(inv.total || 0) + '</td>' +
+                    '<td style="padding: 8px; text-align: center;">';
+                
+                // 如果有文件，显示查看按钮
+                if (inv.file && inv.file.data) {
+                    html += '<button class="btn btn-sm btn-default" onclick="viewInvoiceFile(\'' + s.id + '\', \'' + inv.id + '\')">查看文件</button>';
+                } else {
+                    html += '<span style="color: #8c8c8c;">无文件</span>';
+                }
+                
+                html += '</td></tr>';
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // 查看发票文件
+        function viewInvoiceFile(settlementId, invoiceId) {
+            var store = getStore();
+            var s = store.settlements.find(function(x) { return x.id === settlementId; });
+            if (!s) return;
+            
+            var inv = s.invoices.find(function(x) { return x.id === invoiceId; });
+            if (!inv || !inv.file || !inv.file.data) {
+                alert('发票文件不存在');
+                return;
+            }
+            
+            // 在新窗口打开文件预览
+            var win = window.open();
+            win.document.write('<html><head><title>发票预览 - ' + inv.id + '</title></head><body style="margin:0;padding:20px;text-align:center;background:#f0f0f0;">');
+            win.document.write('<h3 style="color:#262626;">发票预览：' + inv.id + '</h3>');
+            if (inv.file.type && inv.file.type.startsWith('image/')) {
+                win.document.write('<img src="' + inv.file.data + '" style="max-width:100%;box-shadow:0 4px 12px rgba(0,0,0,0.15);">');
+            } else {
+                win.document.write('<iframe src="' + inv.file.data + '" style="width:100%;height:80vh;border:none;"></iframe>');
+            }
+            win.document.write('<div style="margin-top:20px;"><button onclick="window.close()" style="padding:8px 20px;background:#1890ff;color:#fff;border:none;border-radius:4px;cursor:pointer;">关闭</button></div>');
+            win.document.write('</body></html>');
+        }
+
+        window.viewInvoiceFile = viewInvoiceFile;
+
+        // 显示发票上传弹窗
+        function showInvoiceUploadModal(settlementId, total) {
+            var modal = document.createElement('div');
+            modal.id = 'invoice-upload-modal';
+            modal.className = 'modal-overlay active';
+            modal.innerHTML = 
+                '<div class="modal-container" style="max-width: 500px;">' +
+                '<div class="modal-header">' +
+                '<h3 class="modal-title">📄 开具发票并上传</h3>' +
+                '<button type="button" class="modal-close" onclick="closeInvoiceModal()">×</button>' +
+                '</div>' +
+                '<div class="modal-body">' +
+                '<div style="margin-bottom: 16px;">' +
+                '<label style="display: block; font-size: 13px; color: #595959; margin-bottom: 6px;">发票号码 *</label>' +
+                '<input type="text" id="inv-no-input" placeholder="INV-2025-XXX" style="width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px;">' +
+                '</div>' +
+                '<div style="margin-bottom: 16px;">' +
+                '<label style="display: block; font-size: 13px; color: #595959; margin-bottom: 6px;">价税合计金额 *</label>' +
+                '<input type="number" id="inv-total-input" value="' + total.toFixed(2) + '" style="width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px;">' +
+                '</div>' +
+                '<div style="margin-bottom: 16px;">' +
+                '<label style="display: block; font-size: 13px; color: #595959; margin-bottom: 6px;">税率</label>' +
+                '<select id="inv-tax-rate" style="width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px;">' +
+                '<option value="13">13%</option>' +
+                '<option value="9">9%</option>' +
+                '<option value="6">6%</option>' +
+                '<option value="3">3%</option>' +
+                '<option value="0">0%</option>' +
+                '</select>' +
+                '</div>' +
+                '<div style="margin-bottom: 16px;">' +
+                '<label style="display: block; font-size: 13px; color: #595959; margin-bottom: 6px;">上传发票文件 *</label>' +
+                '<div id="upload-area" style="border: 2px dashed #d9d9d9; border-radius: 8px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.3s;" ondragover="event.preventDefault(); this.style.borderColor=\'#1890ff\'; this.style.background=\'#e6f7ff\';" ondragleave="this.style.borderColor=\'#d9d9d9\'; this.style.background=\'transparent\';" ondrop="handleFileDrop(event)">' +
+                '<div style="font-size: 32px; margin-bottom: 8px;">📁</div>' +
+                '<div style="font-size: 13px; color: #595959; margin-bottom: 4px;">点击或拖拽文件到此处上传</div>' +
+                '<div style="font-size: 12px; color: #8c8c8c;">支持 PDF、JPG、PNG 格式，最大 10MB</div>' +
+                '<input type="file" id="inv-file-input" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" onchange="handleFileSelect(this)">' +
+                '</div>' +
+                '<div id="file-preview" style="display: none; margin-top: 12px; padding: 12px; background: #f6ffed; border: 1px solid #b7eb8f; border-radius: 4px;">' +
+                '<div style="display: flex; align-items: center; gap: 8px;">' +
+                '<span style="font-size: 20px;">📄</span>' +
+                '<div style="flex: 1;">' +
+                '<div id="file-name" style="font-size: 13px; color: #262626; font-weight: 500;"></div>' +
+                '<div id="file-size" style="font-size: 12px; color: #8c8c8c;"></div>' +
+                '</div>' +
+                '<button onclick="clearFile()" style="background: none; border: none; color: #ff4d4f; cursor: pointer; font-size: 12px;">删除</button>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="background: #fff7e6; border: 1px solid #ffd591; border-radius: 4px; padding: 12px; font-size: 12px; color: #262626;">' +
+                '<strong>💡 提示：</strong>上传的发票将同步至甲方（采购协同系统），供财务审核和下载使用。' +
+                '</div>' +
+                '</div>' +
+                '<div class="modal-footer">' +
+                '<button type="button" class="btn btn-default" onclick="closeInvoiceModal()">取消</button>' +
+                '<button type="button" class="btn btn-primary" onclick="submitInvoice(\'' + settlementId + '\')">确认开具并上传</button>' +
+                '</div>' +
+                '</div>';
+            
+            document.body.appendChild(modal);
+            document.body.style.overflow = 'hidden';
+            
+            // 绑定点击上传区域事件
+            document.getElementById('upload-area').onclick = function(e) {
+                if (e.target.id !== 'inv-file-input') {
+                    document.getElementById('inv-file-input').click();
+                }
+            };
+        }
+
+        // 关闭弹窗
+        function closeInvoiceModal() {
+            var modal = document.getElementById('invoice-upload-modal');
+            if (modal) {
+                modal.remove();
+                document.body.style.overflow = '';
+            }
+        }
+
+        // 全局变量存储选中的文件
+        window.invoiceSelectedFile = null;
+
+        // 处理文件选择
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                window.invoiceSelectedFile = input.files[0];
+                showFilePreview(window.invoiceSelectedFile);
+            }
+        }
+
+        // 处理文件拖拽
+        function handleFileDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.currentTarget.style.borderColor = '#d9d9d9';
+            e.currentTarget.style.background = 'transparent';
+            
+            var files = e.dataTransfer.files;
+            if (files && files[0]) {
+                window.invoiceSelectedFile = files[0];
+                showFilePreview(window.invoiceSelectedFile);
+            }
+        }
+
+        // 显示文件预览
+        function showFilePreview(file) {
+            document.getElementById('file-name').textContent = file.name;
+            document.getElementById('file-size').textContent = formatFileSize(file.size);
+            document.getElementById('file-preview').style.display = 'block';
+            document.getElementById('upload-area').style.display = 'none';
+        }
+
+        // 清除文件
+        function clearFile() {
+            window.invoiceSelectedFile = null;
+            document.getElementById('file-preview').style.display = 'none';
+            document.getElementById('upload-area').style.display = 'block';
+            document.getElementById('inv-file-input').value = '';
+        }
+
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            var k = 1024;
+            var sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            var i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // 提交发票
+        function submitInvoice(settlementId) {
+            var invNo = document.getElementById('inv-no-input').value.trim();
+            var totalStr = document.getElementById('inv-total-input').value.trim();
+            var taxRate = document.getElementById('inv-tax-rate').value;
+            
+            if (!invNo) {
+                alert('请输入发票号码');
+                return;
+            }
+            if (!totalStr || parseFloat(totalStr) <= 0) {
+                alert('请输入有效的金额');
+                return;
+            }
+            if (!window.invoiceSelectedFile) {
+                alert('请上传发票文件');
+                return;
+            }
+            
+            // 读取文件为 base64
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var fileData = e.target.result;
+                
+                // 保存发票信息到 store
+                window.FinanceCollabStore.actionB_issueInvoiceWithFile(settlementId, invNo, totalStr, taxRate, {
+                    name: window.invoiceSelectedFile.name,
+                    size: window.invoiceSelectedFile.size,
+                    type: window.invoiceSelectedFile.type,
+                    data: fileData
+                });
+                
+                alert('发票开具成功并已上传！将同步至甲方系统。');
+                closeInvoiceModal();
+                renderAll();
+            };
+            reader.readAsDataURL(window.invoiceSelectedFile);
+        }
+
+        // 将函数挂载到 window
+        window.closeInvoiceModal = closeInvoiceModal;
+        window.handleFileSelect = handleFileSelect;
+        window.handleFileDrop = handleFileDrop;
+        window.clearFile = clearFile;
+        window.submitInvoice = submitInvoice;
+
+        function ensureAssetLoaded(cb) {
+            if (window.FinanceCollabStore) { cb(); return; }
+            var s = document.createElement('script');
+            s.src = 'assets/finance-collab-store.js';
+            s.onload = cb;
+            s.onerror = function () { alert('加载 assets/finance-collab-store.js 失败'); };
+            document.head.appendChild(s);
+        }
+
+        ensureAssetLoaded(function () {
+            document.getElementById('btn-filter').onclick = renderAll;
+            document.getElementById('btn-reset').onclick = function () {
+                document.getElementById('filter-customer').value = '';
+                document.getElementById('filter-state').value = '';
+                document.getElementById('filter-period').value = '';
+                renderAll();
+            };
+            var qid = getQueryId();
+            if (qid) window.FinanceCollabStore.setActiveSettlement(qid);
+            renderAll();
+        });
+    </script>
+</div>
+</body>
+</html>

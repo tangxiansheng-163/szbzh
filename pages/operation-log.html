@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>操作日志</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">系统配置</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">操作日志</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">查询系统操作日志、数据变更日志、登录日志；支持按操作人、操作类型、操作对象、时间范围筛选，用于安全审计与问题追溯。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>操作人</label>
+                    <input type="text" class="form-input" placeholder="操作人">
+                </div>
+                <div class="filter-item">
+                    <label>操作类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="login">登录</option>
+                        <option value="create">新建</option>
+                        <option value="update">修改</option>
+                        <option value="delete">删除</option>
+                        <option value="approve">审批</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>操作对象</label>
+                    <input type="text" class="form-input" placeholder="BOM、会审单、变更单等">
+                </div>
+                <div class="filter-item">
+                    <label>时间范围</label>
+                    <input type="date" class="form-input"> 至 <input type="date" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th>操作时间</th>
+                            <th>操作人</th>
+                            <th>操作类型</th>
+                            <th>操作对象</th>
+                            <th>操作内容</th>
+                            <th>IP 地址</th>
+                            <th>结果</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2025-01-28 14:25:32</td>
+                            <td>张工</td>
+                            <td>修改</td>
+                            <td>会审单 BG-HS-2025-001</td>
+                            <td>更新变更原因</td>
+                            <td>192.168.1.100</td>
+                            <td><span class="status-badge status-success">成功</span></td>
+                        </tr>
+                        <tr>
+                            <td>2025-01-28 14:00:15</td>
+                            <td>李工</td>
+                            <td>审批</td>
+                            <td>会审单 BG-HS-2025-001</td>
+                            <td>研发部审批通过</td>
+                            <td>192.168.1.101</td>
+                            <td><span class="status-badge status-success">成功</span></td>
+                        </tr>
+                        <tr>
+                            <td>2025-01-28 10:30:08</td>
+                            <td>张工</td>
+                            <td>新建</td>
+                            <td>会审单</td>
+                            <td>创建会审单 BG-HS-2025-001</td>
+                            <td>192.168.1.100</td>
+                            <td><span class="status-badge status-success">成功</span></td>
+                        </tr>
+                        <tr>
+                            <td>2025-01-28 09:15:22</td>
+                            <td>王工</td>
+                            <td>登录</td>
+                            <td>—</td>
+                            <td>用户登录系统</td>
+                            <td>192.168.1.102</td>
+                            <td><span class="status-badge status-success">成功</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 4 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+            document.querySelectorAll('.action-left .btn-default').forEach(function(btn) {
+                if (btn.textContent.indexOf('导出') !== -1) btn.addEventListener('click', function() { if (confirm('确定导出当前操作日志？')) alert('导出成功，文件已下载。'); });
+            });
+        </script>
+    </div>
+</body>
+</html>

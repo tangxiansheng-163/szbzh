@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>变更申请单列表</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <!-- 面包屑 -->
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">变更管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">变更申请单</span>
+        </div>
+
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <p class="page-description">会审单评审通过后，系统自动创建变更申请单（EBOM/MBOM/SBOM/领料单/采购订单等），下发至对应部门负责人执行；亦可在此发起独立变更申请。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>申请单号/产品/会审单号</label>
+                    <input type="text" class="form-input" placeholder="申请单号、涉及产品、来源会审单号">
+                </div>
+                <div class="filter-item">
+                    <label>变更单类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="EBOM">EBOM 变更</option>
+                        <option value="MBOM">MBOM 变更</option>
+                        <option value="SBOM">SBOM 变更</option>
+                        <option value="requisition">领料单</option>
+                        <option value="purchase">采购订单</option>
+                        <option value="feeding">投料单</option>
+                        <option value="inout">出入库单</option>
+                        <option value="sales">销售订单</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>执行状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待执行</option>
+                        <option value="executing">执行中</option>
+                        <option value="completed">已完成</option>
+                        <option value="rejected">已驳回</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <a href="pages/change-request-create.html" class="btn btn-primary">+ 新建变更申请</a>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th>申请单号</th>
+                            <th>来源会审单</th>
+                            <th>变更单类型</th>
+                            <th>涉及产品</th>
+                            <th>BOM版本</th>
+                            <th>变更原因</th>
+                            <th>计划执行日期</th>
+                            <th>负责人</th>
+                            <th>执行状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>BG-SQ-2025-001</td>
+                            <td><a href="pages/change-review-detail.html?id=1">BG-HS-2025-001</a></td>
+                            <td>EBOM 变更</td>
+                            <td>PROD-001 智能控制器</td>
+                            <td>V1.0→V1.1</td>
+                            <td>设计缺陷修正</td>
+                            <td>2025-02-15</td>
+                            <td>张工</td>
+                            <td><span class="status-badge status-processing">执行中</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/change-request-detail.html" data-id="1">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>BG-SQ-2025-002</td>
+                            <td><a href="pages/change-review-detail.html?id=1">BG-HS-2025-001</a></td>
+                            <td>MBOM 变更</td>
+                            <td>PROD-001 智能控制器</td>
+                            <td>V2.0→V2.1</td>
+                            <td>设计缺陷修正</td>
+                            <td>2025-02-15</td>
+                            <td>李工</td>
+                            <td><span class="status-badge status-pending">待执行</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/change-request-detail.html" data-id="2">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>BG-SQ-2025-003</td>
+                            <td><a href="pages/change-review-detail.html?id=1">BG-HS-2025-001</a></td>
+                            <td>领料单</td>
+                            <td>PROD-001 智能控制器</td>
+                            <td>—</td>
+                            <td>设计缺陷修正</td>
+                            <td>2025-02-15</td>
+                            <td>王工</td>
+                            <td><span class="status-badge status-pending">待执行</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/change-request-detail.html" data-id="3">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>BG-SQ-2024-018</td>
+                            <td>—</td>
+                            <td>SBOM 变更</td>
+                            <td>PROD-005 控制器外壳</td>
+                            <td>V1.0→V1.1</td>
+                            <td>配件停产替换</td>
+                            <td>2025-01-25</td>
+                            <td>赵工</td>
+                            <td><span class="status-badge status-success">已完成</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/change-request-detail.html" data-id="4">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 4 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+            var exportBtn = document.querySelector('.action-left .btn-default');
+            if (exportBtn && exportBtn.textContent.indexOf('导出') !== -1) {
+                exportBtn.addEventListener('click', function() {
+                    if (confirm('确定导出当前列表？')) alert('导出成功，文件已下载。');
+                });
+            }
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工作流配置 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">系统配置</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">工作流配置</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">配置采购业务流程的工作流，包括审批流程、流转规则、审批节点等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="工作流名称、业务类型">
+                </div>
+                <div class="filter-item">
+                    <label>业务类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="plan-approval">计划审批</option>
+                        <option value="order-approval">订单审批</option>
+                        <option value="contract-approval">合同审批</option>
+                        <option value="payment-approval">付款审批</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button type="button" class="btn btn-primary" data-open-modal="workflow-add-modal">+ 新建工作流</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">工作流编号</th>
+                            <th width="150">工作流名称</th>
+                            <th width="100">业务类型</th>
+                            <th width="100">审批节点数</th>
+                            <th width="100">状态</th>
+                            <th width="120">创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="workflow-id" value="1"></td>
+                            <td>WF-001</td>
+                            <td>采购计划审批流程</td>
+                            <td>计划审批</td>
+                            <td>3</td>
+                            <td><span class="status-badge status-success">已启用</span></td>
+                            <td>2025-01-10</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="workflow-view-modal" data-row-index="0">查看</button>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="workflow-edit-modal" data-row-index="0">编辑</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="workflow-id" value="2"></td>
+                            <td>WF-002</td>
+                            <td>采购订单审批流程</td>
+                            <td>订单审批</td>
+                            <td>2</td>
+                            <td><span class="status-badge status-success">已启用</span></td>
+                            <td>2025-01-10</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="workflow-view-modal" data-row-index="1">查看</button>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="workflow-edit-modal" data-row-index="1">编辑</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 2 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 工作流查看弹窗 -->
+        <div id="workflow-view-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:560px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">工作流详情</span><button type="button" class="modal-close" data-close-modal="workflow-view-modal">×</button></div>
+                <div class="modal-body">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:13px;">
+                        <div><span style="color:#666;">工作流编号：</span><span id="view-workflow-code">-</span></div>
+                        <div><span style="color:#666;">工作流名称：</span><span id="view-workflow-name">-</span></div>
+                        <div><span style="color:#666;">业务类型：</span><span id="view-workflow-type">-</span></div>
+                        <div><span style="color:#666;">审批节点数：</span><span id="view-workflow-nodes">-</span></div>
+                        <div><span style="color:#666;">状态：</span><span id="view-workflow-status">-</span></div>
+                        <div><span style="color:#666;">创建时间：</span><span id="view-workflow-time">-</span></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="workflow-view-modal">关闭</button></div>
+            </div>
+        </div>
+
+        <!-- 工作流编辑弹窗 -->
+        <div id="workflow-edit-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:640px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">编辑工作流</span><button type="button" class="modal-close" data-close-modal="workflow-edit-modal">×</button></div>
+                <div class="modal-body">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label">工作流编号</label><input type="text" id="edit-workflow-code" class="form-input" readonly></div>
+                        <div class="form-item"><label class="form-label required">工作流名称</label><input type="text" id="edit-workflow-name" class="form-input" placeholder="如：采购计划审批流程"></div>
+                        <div class="form-item"><label class="form-label required">业务类型</label><select id="edit-workflow-type" class="form-select"><option value="">请选择</option><option value="plan-approval">计划审批</option><option value="order-approval">订单审批</option><option value="contract-approval">合同审批</option><option value="payment-approval">付款审批</option></select></div>
+                        <div class="form-item"><label class="form-label">备注</label><input type="text" id="edit-workflow-remark" class="form-input" placeholder="选填"></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="workflow-edit-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="workflow-edit-modal" onclick="alert('✅ 工作流已保存')">保存</button></div>
+            </div>
+        </div>
+
+        <div id="workflow-add-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:640px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">新建工作流</span><button type="button" class="modal-close" data-close-modal="workflow-add-modal">×</button></div>
+                <div class="modal-body">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label required">工作流名称</label><input type="text" class="form-input" placeholder="如：采购计划审批流程"></div>
+                        <div class="form-item"><label class="form-label required">业务类型</label><select class="form-select"><option value="">请选择</option><option value="plan-approval">计划审批</option><option value="order-approval">订单审批</option><option value="contract-approval">合同审批</option><option value="payment-approval">付款审批</option></select></div>
+                        <div class="form-item" style="grid-column:1/-1;"><label class="form-label">备注</label><input type="text" class="form-input" placeholder="选填"></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="workflow-add-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="workflow-add-modal" onclick="alert('✅ 工作流已保存')">保存</button></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('工作流配置 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+        (function() {
+            document.addEventListener('click', function(e) {
+                var viewBtn = e.target && e.target.closest ? e.target.closest('[data-open-modal="workflow-view-modal"]') : null;
+                if (viewBtn) {
+                    var row = viewBtn.closest('tr');
+                    var cells = row ? row.querySelectorAll('td') : [];
+                    if (cells.length >= 8) {
+                        document.getElementById('view-workflow-code').textContent = (cells[1] && cells[1].textContent) || '-';
+                        document.getElementById('view-workflow-name').textContent = (cells[2] && cells[2].textContent) || '-';
+                        document.getElementById('view-workflow-type').textContent = (cells[3] && cells[3].textContent) || '-';
+                        document.getElementById('view-workflow-nodes').textContent = (cells[4] && cells[4].textContent) || '-';
+                        document.getElementById('view-workflow-status').textContent = (cells[5] && cells[5].textContent) || '-';
+                        document.getElementById('view-workflow-time').textContent = (cells[6] && cells[6].textContent) || '-';
+                    }
+                    return;
+                }
+                var editBtn = e.target && e.target.closest ? e.target.closest('[data-open-modal="workflow-edit-modal"]') : null;
+                if (editBtn) {
+                    var row = editBtn.closest('tr');
+                    var cells = row ? row.querySelectorAll('td') : [];
+                    if (cells.length >= 8) {
+                        var codeEl = document.getElementById('edit-workflow-code'); if (codeEl) codeEl.value = (cells[1] && cells[1].textContent) || '';
+                        var nameEl = document.getElementById('edit-workflow-name'); if (nameEl) nameEl.value = (cells[2] && cells[2].textContent) || '';
+                        var typeText = (cells[3] && cells[3].textContent.trim()) || '';
+                        var typeEl = document.getElementById('edit-workflow-type'); if (typeEl) typeEl.value = typeText === '计划审批' ? 'plan-approval' : (typeText === '订单审批' ? 'order-approval' : (typeText === '合同审批' ? 'contract-approval' : 'payment-approval'));
+                    }
+                    return;
+                }
+            }, true);
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分配设计任务</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">任务管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/tech-task-list.html" class="breadcrumb-item">技术任务</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">分配设计任务</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">拆解技术任务为设计任务并分配；设计类型：电气/结构/软件/其他</p>
+        </div>
+
+        <div class="card" style="margin-bottom: 16px;">
+            <div class="card-body" style="padding: 12px 16px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #1890ff; font-size: 16px;">ℹ️</span>
+                    <span style="font-size: 13px; color: #595959;">
+                        <strong>来源：</strong>技术任务 <code>TT-2025-001</code> 新产品研发。拆解后系统自动生成设计任务编号，设计人员接收后开始执行。
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form id="assign-form">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label">技术任务编号</label>
+                                <input type="text" class="form-input" value="TT-2025-001" readonly>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label">任务编号</label>
+                                <input type="text" class="form-input" placeholder="拆解保存后系统生成" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label required">任务名称</label>
+                                <input type="text" class="form-input" name="taskName" placeholder="请输入设计任务名称" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label required">设计类型</label>
+                                <select class="form-select" name="designType" required>
+                                    <option value="">请选择</option>
+                                    <option value="electrical">电气设计</option>
+                                    <option value="structural">结构设计</option>
+                                    <option value="software">软件设计</option>
+                                    <option value="other">其他</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label required">设计人员</label>
+                                <select class="form-select" name="designer" required>
+                                    <option value="">请选择</option>
+                                    <option value="zhang">张设计师</option>
+                                    <option value="li">李设计师</option>
+                                    <option value="wang">王设计师</option>
+                                    <option value="zhao">赵设计师</option>
+                                    <option value="sun">孙设计师</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label required">计划完成日期</label>
+                                <input type="date" class="form-input" name="planDate" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">设计说明</label>
+                        <textarea class="form-textarea" name="designDesc" placeholder="任务要求、技术指标等" rows="3"></textarea>
+                    </div>
+                    <div class="form-item" style="margin-top: 24px; display: flex; gap: 12px;">
+                        <button type="button" class="btn btn-primary">保存并继续添加</button>
+                        <button type="button" class="btn btn-primary">保存并完成拆解</button>
+                        <button type="button" class="btn btn-default btn-back" data-url="pages/tech-task-detail.html?id=1">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('分配设计任务 页面已加载');
+        if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+    </script>
+</body>
+</html>

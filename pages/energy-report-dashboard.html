@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报表中心 - 能源管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/energy-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">报表管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">报表中心</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">能源报表中心，提供各类能源统计分析报表，包括能耗报表、能效报表、成本报表等。</p>
+        </div>
+
+        <div class="dashboard-stats">
+            <a href="#" class="stat-card">
+                <div class="stat-icon blue">📊</div>
+                <div class="stat-content">
+                    <div class="stat-label">能耗报表</div>
+                    <div class="stat-value">10种</div>
+                </div>
+            </a>
+            <a href="#" class="stat-card">
+                <div class="stat-icon green">💡</div>
+                <div class="stat-content">
+                    <div class="stat-label">能效报表</div>
+                    <div class="stat-value">8种</div>
+                </div>
+            </a>
+            <a href="#" class="stat-card">
+                <div class="stat-icon purple">💰</div>
+                <div class="stat-content">
+                    <div class="stat-label">成本报表</div>
+                    <div class="stat-value">6种</div>
+                </div>
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">常用报表</h3>
+            </div>
+            <div class="card-body">
+                <div class="report-list">
+                    <a href="#" class="report-item">
+                        <div class="report-icon">📊</div>
+                        <div class="report-content">
+                            <div class="report-title">能耗统计报表</div>
+                            <div class="report-desc">按时间、区域、设备等维度统计能耗数据</div>
+                        </div>
+                        <span class="report-arrow">→</span>
+                    </a>
+                    <a href="#" class="report-item">
+                        <div class="report-icon">💡</div>
+                        <div class="report-content">
+                            <div class="report-title">能效分析报表</div>
+                            <div class="report-desc">能效指标、能效对标、能效趋势分析</div>
+                        </div>
+                        <span class="report-arrow">→</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('报表中心 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

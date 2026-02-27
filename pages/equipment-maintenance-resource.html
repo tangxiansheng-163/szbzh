@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资源调度 - 设备管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/equipment-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">维护管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">资源调度</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">调度维护资源，包括人员调度、工具调度、备件调度等，优化资源利用效率。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="任务编号、资源类型">
+                </div>
+                <div class="filter-item">
+                    <label>资源类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="personnel">人员</option>
+                        <option value="tool">工具</option>
+                        <option value="spare-part">备件</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>调度状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待调度</option>
+                        <option value="scheduled">已调度</option>
+                        <option value="in-use">使用中</option>
+                        <option value="returned">已归还</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary">+ 新建调度</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">调度单号</th>
+                            <th width="150">维护任务</th>
+                            <th width="100">资源类型</th>
+                            <th width="150">资源名称</th>
+                            <th width="100">调度状态</th>
+                            <th width="120">调度时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="resource-id" value="1"></td>
+                            <td>RES-2025-001</td>
+                            <td>MAIN-2025-001</td>
+                            <td>人员</td>
+                            <td>维护员A</td>
+                            <td><span class="status-badge status-processing">使用中</span></td>
+                            <td>2025-01-22 09:00</td>
+                            <td>
+                                <button class="btn btn-sm btn-default">查看</button>
+                                <button class="btn btn-sm btn-primary">归还</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 1 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('资源调度 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

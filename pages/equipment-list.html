@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备列表 - 设备管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/equipment-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">设备台账管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">设备列表</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理设备台账信息，包括设备编码、名称、型号、类型、状态、位置等；支持设备全生命周期管理和多维度查询。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="设备编码、设备名称、资产编号">
+                </div>
+                <div class="filter-item">
+                    <label>用途分类</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="production">生产类</option>
+                        <option value="energy">能源类</option>
+                        <option value="safety">安环类</option>
+                        <option value="auxiliary">辅助类</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>所属部门</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="production">生产部</option>
+                        <option value="power">动力车间</option>
+                        <option value="processing">加工车间</option>
+                        <option value="safety">安全部</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>设备状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="warehouse">入库</option>
+                        <option value="debugging">安装调试</option>
+                        <option value="running">正常运行</option>
+                        <option value="stopped">停用</option>
+                        <option value="scrapped">报废</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>关键等级</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="A">A类（关键）</option>
+                        <option value="B">B类（重要）</option>
+                        <option value="C">C类（一般）</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary" data-open-modal="equipment-add-modal">+ 新增设备</button>
+                <button type="button" class="btn btn-default btn-equipment-batch-import">批量导入</button>
+                <button type="button" class="btn btn-default btn-equipment-export">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="110">设备编码</th>
+                            <th width="150">设备名称</th>
+                            <th width="100">设备型号</th>
+                            <th width="90">用途分类</th>
+                            <th width="70">关键等级</th>
+                            <th width="100">所属部门</th>
+                            <th width="120">安装位置</th>
+                            <th width="80">设备状态</th>
+                            <th width="80">健康度</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="equipment-id" value="1"></td>
+                            <td>EQ-001</td>
+                            <td>空压机A</td>
+                            <td>AC-2000</td>
+                            <td>能源类</td>
+                            <td><span class="status-badge status-success">A类</span></td>
+                            <td>动力车间</td>
+                            <td>车间A-产线1</td>
+                            <td><span class="status-badge status-published">正常运行</span></td>
+                            <td><span class="status-badge status-success">优秀</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/equipment-detail.html" data-id="1">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/equipment-edit.html" data-id="1">编辑</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="equipment-id" value="2"></td>
+                            <td>EQ-002</td>
+                            <td>数控机床</td>
+                            <td>CNC-5000</td>
+                            <td>生产类</td>
+                            <td><span class="status-badge status-success">A类</span></td>
+                            <td>加工车间</td>
+                            <td>车间B-产线2</td>
+                            <td><span class="status-badge status-published">正常运行</span></td>
+                            <td><span class="status-badge status-success">良好</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/equipment-detail.html" data-id="2">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/equipment-edit.html" data-id="2">编辑</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="equipment-id" value="3"></td>
+                            <td>EQ-003</td>
+                            <td>冷却塔</td>
+                            <td>CT-100</td>
+                            <td>能源类</td>
+                            <td><span class="status-badge status-warning">B类</span></td>
+                            <td>动力车间</td>
+                            <td>车间B-产线1</td>
+                            <td><span class="status-badge status-warning">停用</span></td>
+                            <td><span class="status-badge status-warning">预警</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/equipment-detail.html" data-id="3">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/equipment-edit.html" data-id="3">编辑</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 3 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="equipment-add-modal" class="modal-overlay">
+            <div class="modal" style="max-width:700px;max-height:85vh;overflow-y:auto;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">新增设备（采购阶段）</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <div class="alert alert-info" style="background:#e6f7ff;border:1px solid #91d5ff;border-radius:4px;padding:12px 16px;margin-bottom:20px;color:#096dd9;font-size:13px;">
+                        <strong>提示：</strong>此阶段仅需录入采购基础信息，其他信息将在设备入库、安装、运行等阶段逐步补充完善。
+                    </div>
+
+                    <!-- 基础信息 -->
+                    <div class="section-title" style="margin-bottom:12px;font-weight:600;color:#333;border-left:3px solid #1890ff;padding-left:8px;">基础信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;margin-bottom:20px;">
+                        <div class="form-item"><label class="form-label required">设备编码</label><input type="text" class="form-input" placeholder="请输入设备编码，如：EQ-001" id="equipment-code" name="equipment-code"></div>
+                        <div class="form-item"><label class="form-label required">设备名称</label><input type="text" class="form-input" placeholder="请输入设备标准名称" id="equipment-name" name="equipment-name"></div>
+                        <div class="form-item"><label class="form-label required">设备型号</label><input type="text" class="form-input" placeholder="请输入设备型号规格" id="equipment-model" name="equipment-model"></div>
+                        <div class="form-item"><label class="form-label required">用途分类</label><select class="form-select" id="usage-category" name="usage-category" onchange="updateSubCategory(this.value)"><option value="">请选择</option><option value="safety">安环类</option><option value="production">生产类</option><option value="energy">能源类</option><option value="auxiliary">辅助类</option></select></div>
+                        <div class="form-item"><label class="form-label required">设备子类</label><select class="form-select" id="equipment-subcategory" name="equipment-subcategory"><option value="">请先选择用途分类</option></select></div>
+                        <div class="form-item"><label class="form-label required">关键等级</label><select class="form-select" id="critical-level" name="critical-level"><option value="">请选择</option><option value="A">A类（关键）</option><option value="B">B类（重要）</option><option value="C">C类（一般）</option></select></div>
+                        <div class="form-item" style="grid-column:1/-1;"><label class="form-label required">生产厂家</label><input type="text" class="form-input" placeholder="请输入设备制造商" id="manufacturer" name="manufacturer"></div>
+                    </div>
+
+                    <!-- 采购信息 -->
+                    <div class="section-title" style="margin-bottom:12px;font-weight:600;color:#333;border-left:3px solid #52c41a;padding-left:8px;">采购信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;margin-bottom:20px;">
+                        <div class="form-item"><label class="form-label required">购置日期</label><input type="date" class="form-input" id="purchase-date" name="purchase-date"></div>
+                        <div class="form-item"><label class="form-label">购置金额(元)</label><input type="number" class="form-input" placeholder="请输入购置金额" min="0" step="0.01" id="purchase-amount" name="purchase-amount"></div>
+                        <div class="form-item"><label class="form-label">预计到货日期</label><input type="date" class="form-input" id="expected-arrival" name="expected-arrival"></div>
+                        <div class="form-item"><label class="form-label">采购合同号</label><input type="text" class="form-input" placeholder="请输入采购合同编号" id="contract-number" name="contract-number"></div>
+                    </div>
+
+                    <!-- 备注 -->
+                    <div class="section-title" style="margin-bottom:12px;font-weight:600;color:#333;border-left:3px solid #faad14;padding-left:8px;">备注</div>
+                    <div style="margin-bottom:20px;">
+                        <div class="form-item"><textarea class="form-textarea" rows="2" placeholder="请输入采购备注信息（如特殊要求、技术规格说明等）" id="purchase-remark" name="purchase-remark"></textarea></div>
+                    </div>
+
+                    <!-- 后续阶段提示 -->
+                    <div style="background:#f6ffed;border:1px solid #b7eb8f;border-radius:4px;padding:12px 16px;margin-top:16px;">
+                        <div style="font-weight:600;color:#389e0d;margin-bottom:8px;font-size:13px;">后续待补充信息：</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:12px;color:#595959;">
+                            <div>• <strong>入库阶段：</strong>资产编号、存放位置</div>
+                            <div>• <strong>安装阶段：</strong>安装位置、技术参数</div>
+                            <div>• <strong>运行阶段：</strong>运行参数、维护计划</div>
+                            <div>• <strong>财务阶段：</strong>成本中心、折旧信息</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="equipment-add-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="equipment-add-modal" onclick="var code = document.getElementById('equipment-code').value || 'EQ-004'; alert('✅ 设备采购信息已保存，设备编码：' + code)">保存</button></div>
+            </div>
+        </div>
+        <script>
+            console.log('设备列表 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+            PageInteractions.toggleSelectAll('input[name="equipment-id"]');
+        }
+        
+        // 设备子类选项
+        var subCategories = {
+            'safety': [
+                {value: 'video', text: '视频监控'},
+                {value: 'fire', text: '火灾报警'},
+                {value: 'gas', text: '气体检测'},
+                {value: 'leak', text: '液体泄漏'},
+                {value: 'env', text: '环境监测'},
+                {value: 'other', text: '其他安防'}
+            ],
+            'production': [
+                {value: 'machining', text: '加工设备'},
+                {value: 'forming', text: '成型设备'},
+                {value: 'welding', text: '焊接设备'},
+                {value: 'assembly', text: '装配设备'},
+                {value: 'testing', text: '检测设备'},
+                {value: 'logistics', text: '物流设备'}
+            ],
+            'energy': [
+                {value: 'power', text: '供电设备'},
+                {value: 'heating', text: '供热设备'},
+                {value: 'gas', text: '供气设备'},
+                {value: 'water', text: '供水设备'}
+            ],
+            'auxiliary': [
+                {value: 'hvac', text: '通风空调'},
+                {value: 'lighting', text: '照明设备'},
+                {value: 'elevator', text: '电梯起重'},
+                {value: 'lab', text: '实验设备'},
+                {value: 'office', text: '办公设备'}
+            ]
+        };
+        
+        function updateSubCategory(category) {
+            var subSelect = document.getElementById('equipment-subcategory');
+            if (!subSelect) return;
+            subSelect.innerHTML = '<option value="">请选择</option>';
+            if (category && subCategories[category]) {
+                subCategories[category].forEach(function(item) {
+                    var opt = document.createElement('option');
+                    opt.value = item.value;
+                    opt.textContent = item.text;
+                    subSelect.appendChild(opt);
+                });
+            }
+            // 显示/隐藏专用字段区域
+            document.getElementById('safety-section').style.display = category === 'safety' ? 'block' : 'none';
+            document.getElementById('safety-fields').style.display = category === 'safety' ? 'grid' : 'none';
+            document.getElementById('production-section').style.display = category === 'production' ? 'block' : 'none';
+            document.getElementById('production-fields').style.display = category === 'production' ? 'grid' : 'none';
+            document.getElementById('energy-section').style.display = category === 'energy' ? 'block' : 'none';
+            document.getElementById('energy-fields').style.display = category === 'energy' ? 'grid' : 'none';
+        }
+        
+        function toggleInspectionFields(value) {
+            var cycle = document.getElementById('inspection-cycle');
+            var last = document.getElementById('last-inspection');
+            var next = document.getElementById('next-inspection');
+            if (value === 'yes') {
+                cycle.disabled = false;
+                last.disabled = false;
+                next.disabled = false;
+            } else {
+                cycle.disabled = true;
+                last.disabled = true;
+                next.disabled = true;
+            }
+        }
+        
+        function toggleCalibrationFields(value) {
+            var cycle = document.getElementById('calibration-cycle');
+            var last = document.getElementById('last-calibration');
+            var next = document.getElementById('next-calibration');
+            if (value === 'yes') {
+                cycle.disabled = false;
+                last.disabled = false;
+                next.disabled = false;
+            } else {
+                cycle.disabled = true;
+                last.disabled = true;
+                next.disabled = true;
+            }
+        }
+            var batchImportBtn = document.querySelector('.btn-equipment-batch-import');
+            if (batchImportBtn) batchImportBtn.addEventListener('click', function() {
+                if (confirm('请使用 Excel 模板填写设备信息后上传，确定打开导入？')) alert('请选择文件上传。');
+            });
+            var exportBtn = document.querySelector('.btn-equipment-export');
+            if (exportBtn) exportBtn.addEventListener('click', function() {
+                if (confirm('确定导出当前列表？')) alert('导出成功，文件已下载。');
+            });
+        </script>
+    </div>
+</body>
+</html>

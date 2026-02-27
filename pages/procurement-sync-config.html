@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>同步配置 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">系统集成</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">同步配置</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">配置与ERP、WMS等系统的数据同步，包括同步规则、同步频率、同步字段映射等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>系统类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="erp">ERP系统</option>
+                        <option value="wms">WMS系统</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary">+ 新建配置</button>
+                <button class="btn btn-default">测试连接</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="150">系统名称</th>
+                            <th width="100">系统类型</th>
+                            <th width="100">同步频率</th>
+                            <th width="100">同步状态</th>
+                            <th width="120">最后同步时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="config-id" value="1"></td>
+                            <td>ERP系统</td>
+                            <td>ERP系统</td>
+                            <td>每小时</td>
+                            <td><span class="status-badge status-success">正常</span></td>
+                            <td>2025-01-22 10:00</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-sync-config-detail.html" data-id="1">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/procurement-sync-config-edit.html" data-id="1">编辑</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-sync-now" data-id="1">同步</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 1 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            console.log('同步配置 页面已加载');
+            if (typeof PageInteractions !== 'undefined') {
+                PageInteractions.initButtons();
+            }
+            document.querySelectorAll('.btn-sync-now').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    if (confirm('确定立即执行该配置的数据同步？')) alert('同步任务已提交。');
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>

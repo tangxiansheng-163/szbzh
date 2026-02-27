@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>执行工作台</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">任务管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">执行工作台</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">我的可执行任务列表。点击「设计工作台」进入树形 BOM 设计；同技术任务共享一款产品 BOM，谁添加的物料仅谁可编辑、调层级或删除。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item filter-item--wide">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="任务编号、任务名称">
+                </div>
+                <div class="filter-item">
+                    <label>状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待执行</option>
+                        <option value="running">执行中</option>
+                        <option value="rejected">已驳回</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>设计类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="electrical">电气设计</option>
+                        <option value="structural">结构设计</option>
+                        <option value="software">软件设计</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                <div class="filter-actions">
+                    <button type="button" class="btn btn-primary">查询</button>
+                    <button type="button" class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="120">任务编号</th>
+                            <th width="180">任务名称</th>
+                            <th width="110">技术任务</th>
+                            <th width="90">设计类型</th>
+                            <th width="90">状态</th>
+                            <th width="100">计划完成</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>DT-2025-001</td>
+                            <td>智能控制器电气设计</td>
+                            <td>TT-2025-001</td>
+                            <td>电气设计</td>
+                            <td><span class="status-badge status-processing">执行中</span></td>
+                            <td>2025-02-28</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/design-task-detail.html" data-id="1">查看</button>
+                                <a href="pages/design-workbench.html?id=1" class="btn btn-sm btn-primary">设计工作台</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>DT-2025-004</td>
+                            <td>控制面板热设计</td>
+                            <td>TT-2025-002</td>
+                            <td>其他</td>
+                            <td><span class="status-badge status-draft">待执行</span></td>
+                            <td>2025-03-25</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/design-task-detail.html" data-id="4">查看</button>
+                                <a href="pages/design-workbench.html?id=4" class="btn btn-sm btn-primary">设计工作台</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>DT-2025-006</td>
+                            <td>外壳结构设计</td>
+                            <td>TT-2025-001</td>
+                            <td>结构设计</td>
+                            <td><span class="status-badge status-rejected">已驳回</span></td>
+                            <td>2025-03-05</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/design-task-detail.html" data-id="6">查看</button>
+                                <a href="pages/design-workbench.html?id=6" class="btn btn-sm btn-primary">设计工作台</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 3 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('执行工作台 页面已加载');
+        if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+    </script>
+</body>
+</html>

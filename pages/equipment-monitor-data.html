@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>运行数据 - 设备管理协同系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f0f2f5; }
+        .content-wrapper { padding: 20px; }
+        
+        /* 面包屑 */
+        .breadcrumb { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; font-size: 14px; }
+        .breadcrumb-item { color: #595959; text-decoration: none; }
+        .breadcrumb-item.active { color: #262626; font-weight: 500; }
+        .breadcrumb-separator { color: #bfbfbf; }
+        
+        /* 页面标题 */
+        .page-header { margin-bottom: 20px; }
+        .page-title { font-size: 20px; font-weight: 600; color: #262626; margin-bottom: 8px; }
+        .page-description { font-size: 14px; color: #8c8c8c; }
+        
+        /* 按钮 */
+        .btn { 
+            padding: 8px 20px; 
+            border-radius: 6px; 
+            font-size: 14px; 
+            cursor: pointer; 
+            border: none; 
+            transition: all 0.3s; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+        }
+        .btn-primary { background: #1890ff; color: #fff; }
+        .btn-primary:hover { background: #40a9ff; }
+        .btn-default { background: #fff; color: #595959; border: 1px solid #d9d9d9; }
+        .btn-default:hover { border-color: #1890ff; color: #1890ff; }
+        
+        /* 主内容区：左侧设备树 + 右侧图表 */
+        .main-container { display: flex; gap: 16px; }
+        
+        /* 左侧设备树 */
+        .left-panel { 
+            width: 260px; 
+            background: #fff; 
+            border-radius: 8px; 
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1); 
+            display: flex; 
+            flex-direction: column;
+        }
+        .panel-header { 
+            padding: 16px; 
+            border-bottom: 1px solid #f0f0f0; 
+            font-size: 15px; 
+            font-weight: 600; 
+            color: #262626;
+        }
+        .search-box { padding: 12px; border-bottom: 1px solid #f0f0f0; }
+        .search-box input { 
+            width: 100%; 
+            padding: 8px 12px; 
+            border: 1px solid #d9d9d9; 
+            border-radius: 6px; 
+            font-size: 13px;
+        }
+        .search-box input:focus { 
+            outline: none; 
+            border-color: #1890ff; 
+            box-shadow: 0 0 0 3px rgba(24,144,255,0.1); 
+        }
+        
+        /* 时间筛选 */
+        .time-filter { padding: 12px; border-bottom: 1px solid #f0f0f0; }
+        .time-filter label { font-size: 12px; color: #8c8c8c; margin-bottom: 6px; display: block; }
+        .time-filter select { 
+            width: 100%; 
+            padding: 6px 10px; 
+            border: 1px solid #d9d9d9; 
+            border-radius: 4px; 
+            font-size: 13px;
+        }
+        
+        /* 设备分类树 */
+        .device-tree { flex: 1; overflow-y: auto; padding: 8px 0; }
+        .category-item { margin-bottom: 4px; }
+        .category-header { 
+            padding: 10px 12px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        .category-header:hover { background: #f5f5f5; }
+        .category-header.active { background: #e6f7ff; }
+        .category-header.active .category-name { color: #1890ff; }
+        .expand-icon { width: 10px; height: 10px; transition: transform 0.2s; color: #8c8c8c; }
+        .expand-icon.expanded { transform: rotate(90deg); }
+        .category-header.active .expand-icon { color: #1890ff; }
+        .category-name { font-weight: 500; flex: 1; font-size: 13px; color: #262626; }
+        .category-count { 
+            background: #f0f0f0; 
+            color: #595959; 
+            padding: 1px 6px; 
+            border-radius: 8px; 
+            font-size: 10px; 
+        }
+        .category-header.active .category-count { background: #1890ff; color: white; }
+        
+        .category-devices { display: none; }
+        .category-devices.expanded { display: block; }
+        
+        .device-item { 
+            padding: 10px 12px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+            transition: background 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .device-item:hover { background: #f5f5f5; }
+        .device-item.active { 
+            background: #e6f7ff; 
+            border-left-color: #1890ff;
+        }
+        .device-item.selected {
+            background: #f6ffed;
+            border-left-color: #52c41a;
+        }
+        .device-checkbox {
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            accent-color: #1890ff;
+        }
+        .device-checkbox:disabled {
+            cursor: not-allowed;
+            opacity: 0.4;
+        }
+        .device-icon { width: 16px; height: 16px; color: #8c8c8c; }
+        .device-item.active .device-icon { color: #1890ff; }
+        .device-info { flex: 1; }
+        .device-code { font-size: 12px; font-weight: 500; color: #262626; }
+        .device-name { font-size: 11px; color: #8c8c8c; margin-top: 2px; }
+        .device-item.active .device-code { color: #1890ff; }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; }
+        .status-dot.running { background: #52c41a; }
+        .status-dot.warning { background: #faad14; }
+        .status-dot.danger { background: #ff4d4f; }
+        
+        /* 右侧内容区 */
+        .right-panel { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 16px;
+            min-width: 0;
+        }
+        
+        /* 设备信息卡片 */
+        .device-info-card { 
+            background: #fff; 
+            border-radius: 8px; 
+            padding: 16px 20px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .device-info-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 12px;
+        }
+        .device-title { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px;
+        }
+        .device-title h2 { font-size: 18px; font-weight: 600; color: #262626; }
+        .device-status-badge { 
+            padding: 4px 12px; 
+            border-radius: 4px; 
+            font-size: 12px; 
+            font-weight: 500;
+        }
+        .device-status-badge.running { background: #f6ffed; color: #52c41a; }
+        .device-status-badge.warning { background: #fff7e6; color: #fa8c16; }
+        .device-status-badge.danger { background: #fff2f0; color: #ff4d4f; }
+        .device-meta { 
+            display: flex; 
+            gap: 24px; 
+            font-size: 13px; 
+            color: #8c8c8c;
+        }
+        .device-meta span { display: flex; align-items: center; gap: 6px; }
+        
+        /* 参数选择标签 */
+        .param-tabs { 
+            display: flex; 
+            gap: 8px; 
+            padding: 0 0 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 16px;
+        }
+        .param-tab { 
+            padding: 8px 16px; 
+            border: 1px solid #d9d9d9; 
+            background: #fff; 
+            border-radius: 6px; 
+            font-size: 13px; 
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .param-tab:hover { border-color: #1890ff; color: #1890ff; }
+        .param-tab.active { 
+            background: #1890ff; 
+            color: #fff; 
+            border-color: #1890ff;
+        }
+        .param-tab .param-value { 
+            font-weight: 600; 
+            font-size: 12px;
+        }
+        .param-tab.active .param-value { color: #fff; }
+        
+        /* 图表区域 */
+        .chart-section { 
+            background: #fff; 
+            border-radius: 8px; 
+            padding: 20px; 
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            flex: 1;
+        }
+        .chart-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 16px;
+        }
+        .chart-title { font-size: 16px; font-weight: 600; color: #262626; }
+        .chart-actions { display: flex; gap: 8px; align-items: center; }
+        .chart-btn { 
+            padding: 6px 12px; 
+            border: 1px solid #d9d9d9; 
+            background: #fff; 
+            border-radius: 4px; 
+            font-size: 13px; 
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .chart-btn:hover { border-color: #1890ff; color: #1890ff; }
+        .chart-btn.active { background: #1890ff; color: #fff; border-color: #1890ff; }
+        
+        /* 时间范围选择器 */
+        .time-range-select {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 13px;
+            background: #fff;
+            cursor: pointer;
+            outline: none;
+        }
+        .time-range-select:hover { border-color: #1890ff; }
+        .time-range-select:focus { border-color: #1890ff; box-shadow: 0 0 0 2px rgba(24,144,255,0.2); }
+        
+        /* 自定义日期内联显示 */
+        .custom-date-display {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #fff;
+            padding: 2px 6px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+        }
+        .date-input-inline {
+            width: 145px;
+            padding: 3px 6px;
+            border: 1px solid #e8e8e8;
+            border-radius: 3px;
+            font-size: 12px;
+            font-family: inherit;
+            outline: none;
+        }
+        .date-input-inline:focus { border-color: #1890ff; }
+        .date-separator {
+            color: #8c8c8c;
+            font-size: 12px;
+            padding: 0 2px;
+        }
+        .btn-apply {
+            width: 22px;
+            height: 22px;
+            padding: 0;
+            margin-left: 4px;
+            border: none;
+            background: #1890ff;
+            color: #fff;
+            border-radius: 3px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-apply:hover { background: #40a9ff; }
+        
+        /* 图表类型切换器 */
+        .chart-type-switcher { display: flex; gap: 0; border: 1px solid #d9d9d9; border-radius: 6px; overflow: hidden; }
+        .type-btn { 
+            padding: 6px 14px; 
+            border: none; 
+            background: #fff; 
+            font-size: 13px; 
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border-right: 1px solid #d9d9d9;
+        }
+        .type-btn:last-child { border-right: none; }
+        .type-btn:hover { background: #f5f5f5; }
+        .type-btn.active { background: #1890ff; color: #fff; }
+        
+        /* 数据表格视图 */
+        .data-table-view { 
+            max-height: 380px; 
+            overflow-y: auto;
+            border: 1px solid #f0f0f0;
+            border-radius: 6px;
+        }
+        .data-table-view table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .data-table-view th, .data-table-view td { 
+            padding: 10px 12px; 
+            text-align: center; 
+            border-bottom: 1px solid #f0f0f0; 
+        }
+        .data-table-view th { 
+            background: #fafafa; 
+            font-weight: 600; 
+            color: #262626; 
+            font-size: 12px;
+            position: sticky;
+            top: 0;
+        }
+        .data-table-view tr:hover { background: #f5f5f5; }
+        .data-table-view td:nth-child(3) { color: #1890ff; font-weight: 600; }
+        .deviation-positive { color: #ff4d4f; }
+        .deviation-negative { color: #52c41a; }
+        /* 多设备表格状态样式 */
+        .data-table-view td.normal { color: #52c41a; }
+        .data-table-view td.warning { color: #fa8c16; }
+        .data-table-view td.danger { color: #ff4d4f; font-weight: 600; }
+        
+        /* 图例和切换按钮容器 */
+        .legend-with-switcher {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            min-height: 44px;
+        }
+        
+        /* 占位元素，保持图标始终在右侧 */
+        .legend-placeholder {
+            flex: 1;
+        }
+        
+        /* 阈值图例 */
+        .threshold-legend { 
+            display: flex; 
+            gap: 24px; 
+            flex-wrap: wrap;
+        }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #595959; }
+        .legend-line { width: 24px; height: 3px; border-radius: 2px; }
+        .legend-line.current { background: #1890ff; }
+        .legend-line.max { background: #ff4d4f; }
+        .legend-line.min { background: #52c41a; }
+        .legend-line.avg { background: #faad14; }
+        .legend-area { width: 24px; height: 12px; border-radius: 2px; }
+        .legend-area.normal { background: rgba(82, 196, 26, 0.2); border: 1px solid #52c41a; }
+        
+        .chart-container { 
+            height: 380px; 
+            width: 100%;
+            min-width: 600px;
+        }
+        
+        /* 数据表格 */
+        .table-section { 
+            background: #fff; 
+            border-radius: 8px; 
+            padding: 20px; 
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .table-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 16px;
+        }
+        .table-title { font-size: 15px; font-weight: 600; color: #262626; }
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+        th { background: #fafafa; font-weight: 600; color: #262626; font-size: 12px; }
+        tr:hover { background: #f5f5f5; }
+        .status-badge { 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            font-size: 11px; 
+            font-weight: 500; 
+        }
+        .status-badge.normal { background: #f6ffed; color: #52c41a; }
+        .status-badge.warning { background: #fff7e6; color: #fa8c16; }
+        .status-badge.danger { background: #fff2f0; color: #ff4d4f; }
+        .trend-indicator { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; }
+        .trend-up { color: #ff4d4f; }
+        .trend-down { color: #52c41a; }
+        
+        /* 分页 */
+        .pagination { 
+            display: flex; 
+            justify-content: flex-end; 
+            align-items: center; 
+            gap: 8px; 
+            margin-top: 16px; 
+            padding-top: 16px;
+            border-top: 1px solid #f0f0f0;
+        }
+        .page-btn { 
+            padding: 6px 12px; 
+            border: 1px solid #d9d9d9; 
+            background: #fff; 
+            border-radius: 4px; 
+            font-size: 13px; 
+            cursor: pointer;
+        }
+        .page-btn:hover { border-color: #1890ff; color: #1890ff; }
+        .page-btn.active { background: #1890ff; color: #fff; border-color: #1890ff; }
+        .page-info { font-size: 13px; color: #595959; }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <!-- 面包屑 -->
+        <div class="breadcrumb">
+            <a href="pages/equipment-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">运行监控</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">运行数据</span>
+        </div>
+
+        <!-- 页面标题 -->
+        <div class="page-header">
+            <h1 class="page-title">设备运行数据分析</h1>
+            <p class="page-description">选择设备查看运行参数的历史趋势，对比上限值、下限值与实时值。</p>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-container">
+            <!-- 左侧设备树 -->
+            <div class="left-panel">
+                <div class="panel-header">设备列表</div>
+                
+                <!-- 搜索框 -->
+                <div class="search-box">
+                    <input type="text" placeholder="搜索设备编码或名称" id="deviceSearch">
+                </div>
+                
+                <!-- 设备分类树 -->
+                <div class="device-tree">
+                    <!-- 生产设备 -->
+                    <div class="category-item">
+                        <div class="category-header active" onclick="toggleCategory(this)">
+                            <svg class="expand-icon expanded" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="category-name">生产设备</span>
+                            <span class="category-count">86</span>
+                        </div>
+                        <div class="category-devices expanded">
+                            <div class="device-item active" data-device-id="EQ-001" onclick="selectDevice(this, 'EQ-001')">
+                                <input type="checkbox" class="device-checkbox" onclick="toggleDeviceSelection(event, 'EQ-001')">
+                                <svg class="device-icon" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div class="device-info">
+                                    <div class="device-code">EQ-001</div>
+                                    <div class="device-name">数控车床-001</div>
+                                </div>
+                                <span class="status-dot running"></span>
+                            </div>
+                            <div class="device-item" data-device-id="EQ-002" onclick="selectDevice(this, 'EQ-002')">
+                                <input type="checkbox" class="device-checkbox" onclick="toggleDeviceSelection(event, 'EQ-002')">
+                                <svg class="device-icon" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div class="device-info">
+                                    <div class="device-code">EQ-002</div>
+                                    <div class="device-name">加工中心-003</div>
+                                </div>
+                                <span class="status-dot running"></span>
+                            </div>
+                            <div class="device-item" data-device-id="EQ-003" onclick="selectDevice(this, 'EQ-003')">
+                                <input type="checkbox" class="device-checkbox" onclick="toggleDeviceSelection(event, 'EQ-003')">
+                                <svg class="device-icon" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div class="device-info">
+                                    <div class="device-code">EQ-003</div>
+                                    <div class="device-name">铣床-005</div>
+                                </div>
+                                <span class="status-dot warning"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 能源设备 -->
+                    <div class="category-item">
+                        <div class="category-header" onclick="toggleCategory(this)">
+                            <svg class="expand-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="category-name">能源设备</span>
+                            <span class="category-count">32</span>
+                        </div>
+                        <div class="category-devices">
+                            <div class="device-item" data-device-id="EN-001" onclick="selectDevice(this, 'EN-001')">
+                                <input type="checkbox" class="device-checkbox" onclick="toggleDeviceSelection(event, 'EN-001')">
+                                <svg class="device-icon" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div class="device-info">
+                                    <div class="device-code">EN-001</div>
+                                    <div class="device-name">空压机-001</div>
+                                </div>
+                                <span class="status-dot running"></span>
+                            </div>
+                            <div class="device-item" data-device-id="EN-002" onclick="selectDevice(this, 'EN-002')">
+                                <input type="checkbox" class="device-checkbox" onclick="toggleDeviceSelection(event, 'EN-002')">
+                                <svg class="device-icon" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div class="device-info">
+                                    <div class="device-code">EN-002</div>
+                                    <div class="device-name">循环水泵-002</div>
+                                </div>
+                                <span class="status-dot running"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 安环设备 -->
+                    <div class="category-item">
+                        <div class="category-header" onclick="toggleCategory(this)">
+                            <svg class="expand-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="category-name">安环设备</span>
+                            <span class="category-count">24</span>
+                        </div>
+                        <div class="category-devices">
+                            <div class="device-item" data-device-id="SF-001" onclick="selectDevice(this, 'SF-001')">
+                                <input type="checkbox" class="device-checkbox" onclick="toggleDeviceSelection(event, 'SF-001')">
+                                <svg class="device-icon" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div class="device-info">
+                                    <div class="device-code">SF-001</div>
+                                    <div class="device-name">烟雾探测器-001</div>
+                                </div>
+                                <span class="status-dot running"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 辅助设备 -->
+                    <div class="category-item">
+                        <div class="category-header" onclick="toggleCategory(this)">
+                            <svg class="expand-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="category-name">辅助设备</span>
+                            <span class="category-count">14</span>
+                        </div>
+                        <div class="category-devices">
+                            <div class="device-item" data-device-id="AU-001" onclick="selectDevice(this, 'AU-001')">
+                                <input type="checkbox" class="device-checkbox" onclick="toggleDeviceSelection(event, 'AU-001')">
+                                <svg class="device-icon" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div class="device-info">
+                                    <div class="device-code">AU-001</div>
+                                    <div class="device-name">行车-001</div>
+                                </div>
+                                <span class="status-dot running"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧内容区 -->
+            <div class="right-panel">
+                <!-- 设备信息卡片 -->
+                <div class="device-info-card" id="deviceInfoCard">
+                    <div class="device-info-header">
+                        <div class="device-title" id="deviceTitle">
+                            <h2>数控车床-001</h2>
+                            <span class="device-status-badge running" id="deviceStatus">● 正常运行</span>
+                        </div>
+                        <button class="btn btn-default" onclick="exportData()">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                            导出数据
+                        </button>
+                    </div>
+                    <div class="device-meta" id="deviceMeta">
+                        <span>
+                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                            运行时长: 1,248小时
+                        </span>
+                        <span>
+                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
+                            今日能耗: 245.8 kW·h
+                        </span>
+                        <span>
+                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                            上次维护: 2025-02-01
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- 参数选择标签 -->
+                <div class="chart-section">
+                    <div class="param-tabs">
+                        <div class="param-tab active" onclick="selectParam(this, 'temperature')">
+                            <span>主轴温度</span>
+                            <span class="param-value" style="color: #1890ff;">65.2°C</span>
+                        </div>
+                        <div class="param-tab" onclick="selectParam(this, 'pressure')">
+                            <span>主轴压力</span>
+                            <span class="param-value" style="color: #52c41a;">0.45MPa</span>
+                        </div>
+                        <div class="param-tab" onclick="selectParam(this, 'speed')">
+                            <span>主轴转速</span>
+                            <span class="param-value" style="color: #faad14;">2850rpm</span>
+                        </div>
+                        <div class="param-tab" onclick="selectParam(this, 'current')">
+                            <span>电机电流</span>
+                            <span class="param-value" style="color: #1890ff;">12.5A</span>
+                        </div>
+                        <div class="param-tab" onclick="selectParam(this, 'vibration')">
+                            <span>振动</span>
+                            <span class="param-value" style="color: #52c41a;">2.5mm/s</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 图表头部 -->
+                    <div class="chart-header">
+                        <h3 class="chart-title">主轴温度趋势分析</h3>
+                        <div class="chart-actions">
+                            <!-- 时间范围选择 -->
+                            <select id="timeRange" class="time-range-select" onchange="changeTimeRange(this.value)">
+                                <option value="1h">最近1小时</option>
+                                <option value="6h">最近6小时</option>
+                                <option value="24h" selected>最近24小时</option>
+                                <option value="7d">最近7天</option>
+                                <option value="30d">最近30天</option>
+                                <option value="custom">自定义范围</option>
+                            </select>
+                            <!-- 自定义日期范围（内联显示） -->
+                            <span id="customDateDisplay" class="custom-date-display" style="display: none;">
+                                <input type="datetime-local" id="startDate" class="date-input-inline">
+                                <span class="date-separator">~</span>
+                                <input type="datetime-local" id="endDate" class="date-input-inline">
+                                <button class="btn-apply" onclick="applyCustomDateRange()">✓</button>
+                            </span>
+                            <button class="chart-btn" onclick="exportChart()">导出图表</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 阈值图例和图表类型切换 -->
+                    <div class="legend-with-switcher" id="legendWithSwitcher">
+                        <div class="threshold-legend" id="chartLegend">
+                            <div class="legend-item">
+                                <div class="legend-line current"></div>
+                                <span>实时值</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-line max"></div>
+                                <span>上限阈值 (80°C)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-line min"></div>
+                                <span>下限阈值 (20°C)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-area normal"></div>
+                                <span>正常区间</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-line avg"></div>
+                                <span>平均值</span>
+                            </div>
+                        </div>
+                        <!-- 占位元素，保持图标始终在右侧 -->
+                        <div class="legend-placeholder"></div>
+                        <!-- 图表类型切换 -->
+                        <div class="chart-type-switcher" id="chartTypeSwitcher">
+                            <button class="type-btn active" data-type="line" onclick="switchChartType('line')" title="折线图">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 17 9 11 15 15 21 7"></polyline>
+                                </svg>
+                            </button>
+                            <button class="type-btn" data-type="bar" onclick="switchChartType('bar')" title="柱状图">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="12" width="4" height="9"></rect>
+                                    <rect x="10" y="5" width="4" height="16"></rect>
+                                    <rect x="17" y="2" width="4" height="19"></rect>
+                                </svg>
+                            </button>
+                            <button class="type-btn" data-type="table" onclick="switchChartType('table')" title="数据表">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                                    <line x1="3" y1="15" x2="21" y2="15"></line>
+                                    <line x1="9" y1="3" x2="9" y2="21"></line>
+                                    <line x1="15" y1="3" x2="15" y2="21"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 图表容器 -->
+                    <div id="trendChart" class="chart-container"></div>
+                    
+                    <!-- 数据表格视图（默认隐藏） -->
+                    <div id="dataTableView" class="data-table-view" style="display: none;">
+                        <div class="table-wrapper">
+                            <table id="chartDataTable">
+                                <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>时间</th>
+                                        <th>实时值</th>
+                                        <th>上限值</th>
+                                        <th>下限值</th>
+                                        <th>状态</th>
+                                        <th>偏差</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="chartTableBody">
+                                    <!-- 动态生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+
+                
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 检查页面是否仍然有效
+        function isPageValid() {
+            return document.getElementById('deviceTitle') !== null;
+        }
+        
+        // 初始化图表
+        let trendChart = null;
+        let currentParam = 'temperature';
+        let currentChartType = 'line';
+        let currentTimeRange = '24h';
+        let currentDevice = 'EQ-001';
+        let selectedDevices = ['EQ-001']; // 多选设备列表
+        let isMultiSelectMode = false; // 是否多选模式
+        let chartData = { hours: [], values: [], maxValues: [], minValues: [] };
+        
+        const paramConfig = {
+            'temperature': { name: '主轴温度', unit: '°C', max: 80, min: 20 },
+            'pressure': { name: '主轴压力', unit: 'MPa', max: 0.8, min: 0.1 },
+            'speed': { name: '主轴转速', unit: 'rpm', max: 3000, min: 500 },
+            'current': { name: '电机电流', unit: 'A', max: 20, min: 2 },
+            'vibration': { name: '振动', unit: 'mm/s', max: 5, min: 0.5 }
+        };
+        
+        // 设备数据配置 - 不同设备类型有不同的参数
+        const deviceData = {
+            // 生产设备 - 机床类
+            'EQ-001': { 
+                name: '数控机床-A01', 
+                category: '生产设备', 
+                params: {
+                    'temperature': { name: '主轴温度', unit: '°C', max: 80, min: 20, base: 65 },
+                    'pressure': { name: '主轴压力', unit: 'MPa', max: 0.8, min: 0.1, base: 0.45 },
+                    'speed': { name: '主轴转速', unit: 'rpm', max: 3000, min: 500, base: 2850 },
+                    'current': { name: '电机电流', unit: 'A', max: 20, min: 2, base: 12.5 },
+                    'vibration': { name: '振动', unit: 'mm/s', max: 5, min: 0.5, base: 2.5 }
+                }
+            },
+            'EQ-002': { 
+                name: '数控机床-A02', 
+                category: '生产设备', 
+                params: {
+                    'temperature': { name: '主轴温度', unit: '°C', max: 80, min: 20, base: 68 },
+                    'pressure': { name: '主轴压力', unit: 'MPa', max: 0.8, min: 0.1, base: 0.48 },
+                    'speed': { name: '主轴转速', unit: 'rpm', max: 3000, min: 500, base: 2900 },
+                    'current': { name: '电机电流', unit: 'A', max: 20, min: 2, base: 13.2 },
+                    'vibration': { name: '振动', unit: 'mm/s', max: 5, min: 0.5, base: 2.8 }
+                }
+            },
+            'EQ-003': { 
+                name: '加工中心-B01', 
+                category: '生产设备', 
+                params: {
+                    'temperature': { name: '主轴温度', unit: '°C', max: 85, min: 20, base: 72 },
+                    'pressure': { name: '冷却压力', unit: 'MPa', max: 1.0, min: 0.2, base: 0.52 },
+                    'speed': { name: '主轴转速', unit: 'rpm', max: 3500, min: 500, base: 2950 },
+                    'current': { name: '电机电流', unit: 'A', max: 25, min: 2, base: 14.1 },
+                    'vibration': { name: '振动', unit: 'mm/s', max: 5, min: 0.5, base: 3.1 }
+                }
+            },
+            // 动力设备 - 空压机
+            'EN-001': { 
+                name: '空压机-01', 
+                category: '动力设备', 
+                params: {
+                    'temperature': { name: '排气温度', unit: '°C', max: 100, min: 30, base: 75 },
+                    'pressure': { name: '排气压力', unit: 'MPa', max: 1.2, min: 0.4, base: 0.85 },
+                    'speed': { name: '电机转速', unit: 'rpm', max: 3000, min: 800, base: 2400 },
+                    'current': { name: '电机电流', unit: 'A', max: 30, min: 5, base: 18.5 },
+                    'vibration': { name: '振动', unit: 'mm/s', max: 8, min: 1, base: 4.2 }
+                }
+            },
+            'EN-002': { 
+                name: '循环水泵-002', 
+                category: '动力设备', 
+                params: {
+                    'flow': { name: '流量', unit: 'm³/h', max: 500, min: 50, base: 320 },
+                    'pressure': { name: '出口压力', unit: 'MPa', max: 0.8, min: 0.2, base: 0.45 },
+                    'speed': { name: '泵转速', unit: 'rpm', max: 2900, min: 800, base: 1750 },
+                    'current': { name: '电机电流', unit: 'A', max: 45, min: 8, base: 28.5 },
+                    'temperature': { name: '轴承温度', unit: '°C', max: 75, min: 20, base: 42 }
+                }
+            },
+            // 安全设备 - 烟雾探测器
+            'SF-001': { 
+                name: '烟雾探测器-S01', 
+                category: '安全设备', 
+                params: {
+                    'smoke': { name: '烟雾浓度', unit: '%/m', max: 25, min: 0, base: 0.05 },
+                    'battery': { name: '电池电量', unit: '%', max: 100, min: 20, base: 85 },
+                    'temperature': { name: '环境温度', unit: '°C', max: 50, min: -10, base: 25 },
+                    'signal': { name: '信号强度', unit: 'dBm', max: -30, min: -90, base: -55 },
+                    'status': { name: '运行状态', unit: '', max: 1, min: 0, base: 1 }
+                }
+            },
+            // 自动化设备 - 机械臂
+            'AU-001': { 
+                name: '机械臂-R01', 
+                category: '自动化设备', 
+                params: {
+                    'position': { name: '位置精度', unit: 'mm', max: 0.5, min: 0, base: 0.02 },
+                    'speed': { name: '运行速度', unit: 'mm/s', max: 2000, min: 0, base: 850 },
+                    'current': { name: '驱动电流', unit: 'A', max: 15, min: 0, base: 6.5 },
+                    'temperature': { name: '关节温度', unit: '°C', max: 60, min: 10, base: 38 },
+                    'load': { name: '负载率', unit: '%', max: 100, min: 0, base: 45 }
+                }
+            }
+        };
+        
+        function initChart() {
+            console.log('initChart 被调用');
+            const chartDom = document.getElementById('trendChart');
+            console.log('chartDom:', chartDom);
+            
+            if (!chartDom) {
+                console.error('找不到图表容器 #trendChart');
+                return;
+            }
+            
+            if (typeof echarts === 'undefined') {
+                console.error('ECharts 库未加载');
+                return;
+            }
+            
+            // 确保图表容器可见
+            chartDom.style.display = 'block';
+            
+            try {
+                trendChart = echarts.init(chartDom);
+                console.log('ECharts 初始化成功');
+                updateChart('temperature');
+                // 延迟调用 resize 确保图表正确渲染
+                setTimeout(function() {
+                    if (trendChart) {
+                        trendChart.resize();
+                        console.log('图表 resize 完成');
+                    }
+                }, 100);
+            } catch (e) {
+                console.error('ECharts 初始化失败:', e);
+            }
+        }
+        
+        function generateData(paramType, timeRange = currentTimeRange) {
+            const device = deviceData[currentDevice];
+            // 获取设备的参数配置
+            const config = device.params[paramType] || { name: paramType, unit: '', max: 100, min: 0, base: 50 };
+            const hours = [];
+            const currentValues = [];
+            const maxValues = [];
+            const minValues = [];
+            
+            let totalPoints, intervalMinutes, timeFormat;
+            
+            // 根据时间范围设置数据点数量和间隔
+            switch(timeRange) {
+                case '1h':
+                    totalPoints = 12;  // 1小时，每5分钟一个点
+                    intervalMinutes = 5;
+                    timeFormat = 'HH:mm';
+                    break;
+                case '6h':
+                    totalPoints = 24;  // 6小时，每15分钟一个点
+                    intervalMinutes = 15;
+                    timeFormat = 'HH:mm';
+                    break;
+                case '7d':
+                    totalPoints = 28;  // 7天，每6小时一个点
+                    intervalMinutes = 360;
+                    timeFormat = 'MM-DD HH:mm';
+                    break;
+                case '24h':
+                default:
+                    totalPoints = 96;  // 24小时，每15分钟一个点
+                    intervalMinutes = 15;
+                    timeFormat = 'HH:mm';
+                    break;
+            }
+            
+            const now = new Date();
+            
+            // 获取设备的基础值
+            const baseValue = config.base;
+            
+            for (let i = totalPoints - 1; i >= 0; i--) {
+                const timePoint = new Date(now.getTime() - i * intervalMinutes * 60000);
+                let timeStr;
+                
+                if (timeRange === '7d') {
+                    const month = (timePoint.getMonth() + 1).toString().padStart(2, '0');
+                    const day = timePoint.getDate().toString().padStart(2, '0');
+                    const hour = timePoint.getHours().toString().padStart(2, '0');
+                    const minute = timePoint.getMinutes().toString().padStart(2, '0');
+                    timeStr = `${month}-${day} ${hour}:${minute}`;
+                } else {
+                    const hour = timePoint.getHours().toString().padStart(2, '0');
+                    const minute = timePoint.getMinutes().toString().padStart(2, '0');
+                    timeStr = `${hour}:${minute}`;
+                }
+                
+                hours.push(timeStr);
+                
+                // 生成模拟数据，基于设备基础值添加时间趋势和随机波动
+                const timeIndex = totalPoints - 1 - i;
+                let value;
+                
+                // 添加周期性趋势
+                const trend = Math.sin(timeIndex / totalPoints * Math.PI * 2) * (baseValue * 0.05);
+                // 添加随机波动
+                const randomVariation = (Math.random() - 0.5) * (baseValue * 0.08);
+                
+                value = baseValue + trend + randomVariation;
+                
+                // 格式化数值
+                if (paramType === 'pressure' || paramType === 'smoke' || paramType === 'position') {
+                    value = value.toFixed(2);
+                } else if (['temperature', 'current', 'vibration', 'flow', 'load'].includes(paramType)) {
+                    value = value.toFixed(1);
+                } else {
+                    value = Math.floor(value);
+                }
+                
+                currentValues.push(parseFloat(value));
+                maxValues.push(config.max);
+                minValues.push(config.min);
+            }
+            
+            chartData = { hours, values: currentValues, maxValues, minValues };
+            return { hours, currentValues, maxValues, minValues, config };
+        }
+        
+        function updateChart(paramType, chartType = currentChartType) {
+            console.log('updateChart 被调用:', paramType, chartType, '时间范围:', currentTimeRange);
+            const { hours, currentValues, maxValues, minValues, config } = generateData(paramType, currentTimeRange);
+            console.log('数据生成完成:', hours.length, '个数据点');
+            
+            if (chartType === 'table') {
+                showTableView();
+                return;
+            }
+            
+            showChartView();
+            
+            if (!trendChart) {
+                console.error('trendChart 未初始化');
+                return;
+            }
+            
+            const isBar = chartType === 'bar';
+            const seriesType = isBar ? 'bar' : 'line';
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderColor: '#e8e8e8',
+                    borderWidth: 1,
+                    textStyle: { color: '#262626' },
+                    formatter: function(params) {
+                        let result = `<div style="font-weight:600;margin-bottom:5px;">${params[0].axisValue}</div>`;
+                        params.forEach(item => {
+                            if (item.seriesName !== '正常区间') {
+                                const color = item.color;
+                                result += `<div style="display:flex;align-items:center;gap:8px;margin:3px 0;">
+                                    <span style="display:inline-block;width:10px;height:10px;background:${color};border-radius:50%;"></span>
+                                    <span>${item.seriesName}: <strong>${item.value}${config.unit}</strong></span>
+                                </div>`;
+                            }
+                        });
+                        return result;
+                    }
+                },
+                // 使用 HTML 自定义图例，不显示 ECharts 内置图例
+                legend: { show: false },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '12%',
+                    top: '12%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: isBar,
+                    data: hours,
+                    axisLine: { lineStyle: { color: '#d9d9d9' } },
+                    axisLabel: { color: '#8c8c8c', interval: 7 },
+                    axisTick: { show: false }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: `${config.name} (${config.unit})`,
+                    nameTextStyle: { color: '#8c8c8c' },
+                    axisLine: { show: false },
+                    axisTick: { show: false },
+                    axisLabel: { color: '#8c8c8c' },
+                    splitLine: { lineStyle: { color: '#f0f0f0' } }
+                },
+                series: [
+                    {
+                        name: '正常区间',
+                        type: 'line',
+                        data: maxValues.map((max, idx) => [hours[idx], minValues[idx], max]),
+                        lineStyle: { opacity: 0 },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'rgba(82, 196, 26, 0.1)' },
+                                { offset: 1, color: 'rgba(82, 196, 26, 0.05)' }
+                            ])
+                        },
+                        symbol: 'none',
+                        tooltip: { show: false }
+                    },
+                    {
+                        name: '上限值',
+                        type: 'line',
+                        data: maxValues,
+                        lineStyle: { color: '#ff4d4f', type: 'dashed', width: 2 },
+                        symbol: 'none'
+                    },
+                    {
+                        name: '下限值',
+                        type: 'line',
+                        data: minValues,
+                        lineStyle: { color: '#52c41a', type: 'dashed', width: 2 },
+                        symbol: 'none'
+                    },
+                    {
+                        name: '实时值',
+                        type: seriesType,
+                        data: currentValues,
+                        smooth: !isBar,
+                        symbol: isBar ? 'none' : 'circle',
+                        symbolSize: isBar ? 0 : 5,
+                        lineStyle: { color: '#1890ff', width: 3 },
+                        itemStyle: { color: '#1890ff', borderWidth: 2, borderColor: '#fff' },
+                        barWidth: '60%',
+                        areaStyle: isBar ? null : {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'rgba(24, 144, 255, 0.3)' },
+                                { offset: 1, color: 'rgba(24, 144, 255, 0.05)' }
+                            ])
+                        },
+                        markPoint: isBar ? null : {
+                            data: [
+                                { type: 'max', name: '最大值', itemStyle: { color: '#ff4d4f' } },
+                                { type: 'min', name: '最小值', itemStyle: { color: '#52c41a' } }
+                            ]
+                        },
+                        markLine: isBar ? null : {
+                            data: [
+                                { type: 'average', name: '平均值', lineStyle: { color: '#faad14', type: 'solid', width: 2 } }
+                            ],
+                            label: {
+                                formatter: '平均值: {c}' + config.unit,
+                                color: '#faad14'
+                            }
+                        }
+                    }
+                ],
+                dataZoom: [
+                    { type: 'inside', start: 70, end: 100 },
+                    { start: 70, end: 100, height: 20, bottom: 0, handleStyle: { color: '#1890ff' } }
+                ]
+            };
+            
+            trendChart.setOption(option, true);
+        }
+        
+        // 切换图表类型
+        function switchChartType(type) {
+            if (!isPageValid()) return;
+            currentChartType = type;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.type-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.type-btn[data-type="${type}"]`).classList.add('active');
+            
+            // 多设备模式下
+            if (isMultiSelectMode && selectedDevices.length > 1) {
+                if (type === 'table') {
+                    showMultiDeviceTableView();
+                } else {
+                    // 先显示图表视图
+                    showChartView();
+                    // 重新生成多设备对比图表
+                    const firstDevice = deviceData[selectedDevices[0]];
+                    const param = firstDevice.params[currentParam];
+                    
+                    const datasets = selectedDevices.map((deviceId, index) => {
+                        const device = deviceData[deviceId];
+                        const colors = ['#1890ff', '#52c41a', '#faad14', '#ff4d4f', '#722ed1'];
+                        const color = colors[index % colors.length];
+                        const data = generateDeviceData(deviceId, currentParam);
+                        
+                        return {
+                            name: device.name,
+                            color: color,
+                            data: data
+                        };
+                    });
+                    
+                    renderMultiDeviceChart(datasets, param);
+                }
+                return;
+            }
+            
+            // 单设备模式
+            if (type === 'table') {
+                showTableView();
+            } else {
+                showChartView();
+                updateChart(currentParam, type);
+            }
+        }
+        
+        // 显示图表视图
+        function showChartView() {
+            document.getElementById('trendChart').style.display = 'block';
+            document.getElementById('dataTableView').style.display = 'none';
+            // 显示图例，保持切换按钮
+            const legend = document.getElementById('chartLegend');
+            if (legend) {
+                legend.style.display = 'flex';
+                legend.style.visibility = 'visible';
+            }
+            if (trendChart) trendChart.resize();
+        }
+        
+        // 显示表格视图
+        function showTableView() {
+            document.getElementById('trendChart').style.display = 'none';
+            document.getElementById('dataTableView').style.display = 'block';
+            // 只隐藏图例内容，保持切换按钮可见
+            const legend = document.getElementById('chartLegend');
+            if (legend) legend.style.visibility = 'hidden';
+            
+            // 恢复单设备表头
+            const thead = document.querySelector('#dataTableView thead tr');
+            if (thead) {
+                thead.innerHTML = `
+                    <th>序号</th>
+                    <th>时间</th>
+                    <th>实时值</th>
+                    <th>上限值</th>
+                    <th>下限值</th>
+                    <th>状态</th>
+                    <th>偏差</th>
+                `;
+            }
+            
+            // 生成表格数据
+            const tbody = document.getElementById('chartTableBody');
+            const device = deviceData[currentDevice];
+            const config = device.params[currentParam];
+            tbody.innerHTML = '';
+            
+            chartData.hours.forEach((time, index) => {
+                const value = chartData.values[index];
+                const max = chartData.maxValues[index];
+                const min = chartData.minValues[index];
+                const avg = (max + min) / 2;
+                const deviation = ((value - avg) / (max - min) * 100).toFixed(1);
+                
+                let status = '正常';
+                let statusClass = 'normal';
+                if (value > max) {
+                    status = '超限';
+                    statusClass = 'danger';
+                } else if (value < min) {
+                    status = '低限';
+                    statusClass = 'warning';
+                }
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${time}</td>
+                    <td>${value}${config.unit}</td>
+                    <td>${max}${config.unit}</td>
+                    <td>${min}${config.unit}</td>
+                    <td><span class="status-badge ${statusClass}">${status}</span></td>
+                    <td class="${deviation > 0 ? 'deviation-positive' : 'deviation-negative'}">${deviation > 0 ? '+' : ''}${deviation}%</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 显示多设备表格视图
+        function showMultiDeviceTableView() {
+            document.getElementById('trendChart').style.display = 'none';
+            document.getElementById('dataTableView').style.display = 'block';
+            const legend = document.getElementById('chartLegend');
+            if (legend) legend.style.visibility = 'hidden';
+            
+            const tbody = document.getElementById('chartTableBody');
+            const firstDevice = deviceData[selectedDevices[0]];
+            const param = firstDevice.params[currentParam];
+            
+            // 生成多设备表格数据
+            const hours = chartData.hours;
+            const deviceDataMap = {};
+            
+            // 为每个选中的设备生成数据
+            selectedDevices.forEach(deviceId => {
+                deviceDataMap[deviceId] = generateDeviceData(deviceId, currentParam);
+            });
+            
+            tbody.innerHTML = '';
+            
+            hours.forEach((time, index) => {
+                const row = document.createElement('tr');
+                
+                // 序号和时间
+                let html = `
+                    <td>${index + 1}</td>
+                    <td>${time}</td>
+                `;
+                
+                // 每个设备的数据（带状态标识）
+                selectedDevices.forEach(deviceId => {
+                    const device = deviceData[deviceId];
+                    const value = deviceDataMap[deviceId][index];
+                    const max = param.max;
+                    const min = param.min;
+                    
+                    let statusClass = 'normal';
+                    if (value > max) {
+                        statusClass = 'danger';
+                    } else if (value < min) {
+                        statusClass = 'warning';
+                    }
+                    
+                    html += `<td class="${statusClass}">${value}${param.unit}</td>`;
+                });
+                
+                // 阈值列
+                html += `
+                    <td>${param.max}${param.unit}</td>
+                    <td>${param.min}${param.unit}</td>
+                `;
+                
+                row.innerHTML = html;
+                tbody.appendChild(row);
+            });
+            
+            // 更新表头
+            updateMultiDeviceTableHeader();
+            
+            // 更新设备信息卡片为多设备对比模式
+            updateMultiDeviceInfoCard();
+        }
+        
+        // 更新多设备表格表头
+        function updateMultiDeviceTableHeader() {
+            const thead = document.querySelector('#dataTableView thead tr');
+            if (!thead) return;
+            
+            const firstDevice = deviceData[selectedDevices[0]];
+            const param = firstDevice.params[currentParam];
+            
+            let html = '<th>序号</th><th>时间</th>';
+            
+            // 每个设备的列
+            selectedDevices.forEach(deviceId => {
+                const device = deviceData[deviceId];
+                html += `<th>${device.name}</th>`;
+            });
+            
+            // 阈值列
+            html += `<th>上限值(${param.unit})</th><th>下限值(${param.unit})</th>`;
+            
+            thead.innerHTML = html;
+        }
+        
+        // 展开/收起分类
+        function toggleCategory(header) {
+            if (!isPageValid()) return;
+            const icon = header.querySelector('.expand-icon');
+            const devices = header.nextElementSibling;
+            const isExpanded = icon.classList.contains('expanded');
+            
+            if (isExpanded) {
+                icon.classList.remove('expanded');
+                icon.style.transform = 'rotate(0deg)';
+                devices.classList.remove('expanded');
+                devices.style.display = 'none';
+            } else {
+                icon.classList.add('expanded');
+                icon.style.transform = 'rotate(90deg)';
+                devices.classList.add('expanded');
+                devices.style.display = 'block';
+            }
+        }
+        
+        // 切换设备选择（复选框）
+        function toggleDeviceSelection(event, deviceId) {
+            event.stopPropagation(); // 防止触发设备点击
+            
+            const checkbox = event.target;
+            const deviceItem = checkbox.closest('.device-item');
+            
+            if (checkbox.checked) {
+                if (!selectedDevices.includes(deviceId)) {
+                    selectedDevices.push(deviceId);
+                }
+                deviceItem.classList.add('selected');
+            } else {
+                selectedDevices = selectedDevices.filter(id => id !== deviceId);
+                deviceItem.classList.remove('selected');
+            }
+            
+            // 更新其他设备复选框的禁用状态
+            updateCheckboxDisabledState();
+            
+            // 如果选中多个设备，启用对比模式
+            if (selectedDevices.length > 1) {
+                isMultiSelectMode = true;
+                // 根据当前视图类型更新显示
+                if (currentChartType === 'table') {
+                    showMultiDeviceTableView();
+                } else {
+                    updateMultiDeviceChart();
+                }
+            } else if (selectedDevices.length === 1) {
+                isMultiSelectMode = false;
+                currentDevice = selectedDevices[0];
+                // 根据当前视图类型更新显示
+                if (currentChartType === 'table') {
+                    showTableView();
+                } else {
+                    selectDevice(deviceItem, currentDevice);
+                }
+            }
+            
+            console.log('选中设备:', selectedDevices);
+        }
+        
+        // 更新复选框禁用状态
+        function updateCheckboxDisabledState() {
+            // 如果没有选中任何设备，启用所有复选框
+            if (selectedDevices.length === 0) {
+                document.querySelectorAll('.device-checkbox').forEach(cb => {
+                    cb.disabled = false;
+                });
+                return;
+            }
+            
+            // 获取已选设备的类型
+            const selectedCategory = deviceData[selectedDevices[0]].category;
+            
+            // 禁用不同类型的设备复选框
+            document.querySelectorAll('.device-item').forEach(item => {
+                const deviceId = item.dataset.deviceId;
+                const checkbox = item.querySelector('.device-checkbox');
+                if (!checkbox) return;
+                
+                const device = deviceData[deviceId];
+                // 如果设备类型不同且未选中，则禁用
+                if (device.category !== selectedCategory && !selectedDevices.includes(deviceId)) {
+                    checkbox.disabled = true;
+                } else {
+                    checkbox.disabled = false;
+                }
+            });
+        }
+        
+        // 选择设备（单选模式）
+        function selectDevice(element, deviceId) {
+            if (!isPageValid()) return;
+            // 如果已经在多选模式，不处理单选点击
+            if (isMultiSelectMode && selectedDevices.length > 1) {
+                return;
+            }
+            
+            document.querySelectorAll('.device-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+            
+            currentDevice = deviceId;
+            selectedDevices = [deviceId]; // 重置选中列表
+            
+            // 重置所有复选框
+            document.querySelectorAll('.device-checkbox').forEach(cb => {
+                cb.checked = (cb.closest('.device-item').dataset.deviceId === deviceId);
+            });
+            
+            // 重置禁用状态
+            updateCheckboxDisabledState();
+            
+            const device = deviceData[deviceId];
+            console.log('选择设备:', deviceId, device);
+            
+            // 更新参数标签（根据设备类型显示不同参数）
+            updateParamTabs(device);
+            
+            // 获取当前设备的第一个参数作为默认选中
+            const firstParamKey = Object.keys(device.params)[0];
+            currentParam = firstParamKey;
+            
+            // 更新图表标题
+            const paramConfig = device.params[firstParamKey];
+            document.querySelector('.chart-title').textContent = `${device.name} - ${paramConfig.name}趋势分析`;
+            
+            // 更新设备信息卡片为单设备模式
+            updateDeviceInfoCard(device);
+            
+            // 重新生成图表数据
+            updateChart(firstParamKey, currentChartType);
+        }
+        
+        // 更新多设备对比图表
+        function updateMultiDeviceChart() {
+            if (selectedDevices.length < 2) return;
+            
+            // 获取第一个设备的第一个参数作为对比参数
+            const firstDevice = deviceData[selectedDevices[0]];
+            const paramKey = Object.keys(firstDevice.params)[0];
+            const param = firstDevice.params[paramKey];
+            
+            // 更新标题
+            document.querySelector('.chart-title').textContent = `多设备对比 - ${param.name}`;
+            
+            // 生成多设备对比数据
+            const datasets = selectedDevices.map((deviceId, index) => {
+                const device = deviceData[deviceId];
+                const deviceParam = device.params[paramKey];
+                const colors = ['#1890ff', '#52c41a', '#faad14', '#ff4d4f', '#722ed1'];
+                const color = colors[index % colors.length];
+                
+                // 生成该设备的数据
+                const data = generateDeviceData(deviceId, paramKey);
+                
+                return {
+                    name: device.name,
+                    color: color,
+                    data: data
+                };
+            });
+            
+            // 渲染多设备对比图表
+            renderMultiDeviceChart(datasets, param);
+            
+            // 更新设备信息卡片为多设备对比模式
+            updateMultiDeviceInfoCard();
+        }
+        
+        // 更新设备信息卡片（单设备模式）
+        function updateDeviceInfoCard(device) {
+            const titleEl = document.getElementById('deviceTitle');
+            const metaEl = document.getElementById('deviceMeta');
+            
+            if (!titleEl || !metaEl) return;
+            
+            // 恢复单设备显示
+            titleEl.innerHTML = `
+                <h2>${device.name}</h2>
+                <span class="device-status-badge running">● 正常运行</span>
+            `;
+            
+            metaEl.innerHTML = `
+                <span>
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                    运行时长: ${Math.floor(Math.random() * 2000 + 500)}小时
+                </span>
+                <span>
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
+                    今日能耗: ${(Math.random() * 300 + 100).toFixed(1)} kW·h
+                </span>
+                <span>
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                    上次维护: 2025-0${Math.floor(Math.random() * 2 + 1)}-${Math.floor(Math.random() * 28 + 1).toString().padStart(2, '0')}
+                </span>
+            `;
+        }
+        
+        // 更新设备信息卡片（多设备对比模式）
+        function updateMultiDeviceInfoCard() {
+            const titleEl = document.getElementById('deviceTitle');
+            const metaEl = document.getElementById('deviceMeta');
+            
+            if (!titleEl || !metaEl) return;
+            
+            const firstDevice = deviceData[selectedDevices[0]];
+            const deviceNames = selectedDevices.map(id => deviceData[id].name).join('、');
+            
+            // 多设备对比显示
+            titleEl.innerHTML = `
+                <h2>多设备对比分析</h2>
+                <span class="device-status-badge" style="background: #e6f7ff; color: #1890ff;">● ${firstDevice.category}</span>
+            `;
+            
+            metaEl.innerHTML = `
+                <span>
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                    对比设备: ${selectedDevices.length}台
+                </span>
+                <span style="max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path></svg>
+                    ${deviceNames}
+                </span>
+            `;
+        }
+        
+        // 生成单个设备的数据
+        function generateDeviceData(deviceId, paramKey) {
+            const device = deviceData[deviceId];
+            const param = device.params[paramKey];
+            const values = [];
+            
+            let totalPoints;
+            switch(currentTimeRange) {
+                case '1h': totalPoints = 12; break;
+                case '6h': totalPoints = 24; break;
+                case '7d': totalPoints = 28; break;
+                default: totalPoints = 96; break;
+            }
+            
+            for (let i = 0; i < totalPoints; i++) {
+                const trend = Math.sin(i / totalPoints * Math.PI * 2) * (param.base * 0.05);
+                const randomVariation = (Math.random() - 0.5) * (param.base * 0.08);
+                let value = param.base + trend + randomVariation;
+                
+                if (paramKey === 'pressure' || paramKey === 'smoke' || paramKey === 'position') {
+                    value = value.toFixed(2);
+                } else if (['temperature', 'current', 'vibration', 'flow', 'load'].includes(paramKey)) {
+                    value = value.toFixed(1);
+                } else {
+                    value = Math.floor(value);
+                }
+                
+                values.push(parseFloat(value));
+            }
+            
+            return values;
+        }
+        
+        // 渲染多设备对比图表
+        function renderMultiDeviceChart(datasets, param) {
+            if (!trendChart) return;
+            
+            const hours = chartData.hours;
+            
+            // 生成上限值、下限值数据
+            const maxValues = new Array(hours.length).fill(param.max);
+            const minValues = new Array(hours.length).fill(param.min);
+            
+            // 设备数据系列
+            const deviceSeries = datasets.map(ds => ({
+                name: ds.name,
+                type: currentChartType === 'bar' ? 'bar' : 'line',
+                data: ds.data,
+                smooth: true,
+                symbol: 'circle',
+                symbolSize: 4,
+                lineStyle: { width: 2, color: ds.color },
+                itemStyle: { color: ds.color },
+                emphasis: { focus: 'series' },
+                z: 10
+            }));
+            
+            // 添加阈值线系列
+            const thresholdSeries = [
+                {
+                    name: '上限值',
+                    type: 'line',
+                    data: maxValues,
+                    lineStyle: { color: '#ff4d4f', width: 2, type: 'dashed' },
+                    itemStyle: { color: '#ff4d4f' },
+                    symbol: 'none',
+                    z: 5
+                },
+                {
+                    name: '下限值',
+                    type: 'line',
+                    data: minValues,
+                    lineStyle: { color: '#52c41a', width: 2, type: 'dashed' },
+                    itemStyle: { color: '#52c41a' },
+                    symbol: 'none',
+                    z: 5
+                },
+                {
+                    name: '正常区间',
+                    type: 'line',
+                    data: maxValues,
+                    lineStyle: { opacity: 0 },
+                    areaStyle: {
+                        color: 'rgba(82, 196, 26, 0.1)',
+                        origin: 'start'
+                    },
+                    symbol: 'none',
+                    z: 1
+                }
+            ];
+            
+            const series = [...thresholdSeries, ...deviceSeries];
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'cross' },
+                    formatter: function(params) {
+                        let result = params[0].axisValue + '<br/>';
+                        params.forEach(item => {
+                            if (item.seriesName !== '正常区间') {
+                                result += `${item.marker} ${item.seriesName}: ${item.value}${param.unit}<br/>`;
+                            }
+                        });
+                        return result;
+                    }
+                },
+                legend: { show: false },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '12%',
+                    top: '12%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: currentChartType === 'bar',
+                    data: hours,
+                    axisLabel: { fontSize: 11, color: '#8c8c8c', rotate: 30 }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: param.unit,
+                    axisLabel: { fontSize: 11, color: '#8c8c8c' },
+                    splitLine: { lineStyle: { color: '#f0f0f0' } }
+                },
+                series: series
+            };
+            
+            trendChart.setOption(option, true);
+            
+            // 更新图例显示为多设备列表和阈值
+            updateMultiDeviceLegend(datasets, param);
+        }
+        
+        // 更新多设备图例
+        function updateMultiDeviceLegend(datasets, param) {
+            const legendContainer = document.getElementById('chartLegend');
+            if (!legendContainer) return;
+            
+            let html = '';
+            
+            // 添加阈值图例
+            html += `
+                <div class="legend-item">
+                    <div class="legend-line" style="background: #ff4d4f; border-top: 2px dashed #ff4d4f; height: 0;"></div>
+                    <span>上限阈值 (${param.max}${param.unit})</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line" style="background: #52c41a; border-top: 2px dashed #52c41a; height: 0;"></div>
+                    <span>下限阈值 (${param.min}${param.unit})</span>
+                </div>
+            `;
+            
+            // 添加设备图例
+            datasets.forEach(ds => {
+                const avg = (ds.data.reduce((a, b) => a + b, 0) / ds.data.length).toFixed(1);
+                html += `
+                    <div class="legend-item">
+                        <div class="legend-line" style="background: ${ds.color};"></div>
+                        <span>${ds.name} (均值: ${avg}${param.unit})</span>
+                    </div>
+                `;
+            });
+            
+            legendContainer.innerHTML = html;
+        }
+        
+        // 更新参数标签数值
+        function updateParamTabs(device) {
+            const tabs = document.querySelectorAll('.param-tab');
+            const paramKeys = Object.keys(device.params);
+            
+            tabs.forEach((tab, index) => {
+                const paramKey = paramKeys[index];
+                if (!paramKey) {
+                    tab.style.display = 'none';
+                    return;
+                }
+                
+                tab.style.display = 'block';
+                const param = device.params[paramKey];
+                
+                // 更新参数名称
+                const nameSpan = tab.querySelector('span:first-child');
+                if (nameSpan) nameSpan.textContent = param.name;
+                
+                // 更新参数值
+                const valueSpan = tab.querySelector('.param-value');
+                if (valueSpan) {
+                    const variation = (Math.random() - 0.5) * 0.1;
+                    const value = (param.base * (1 + variation)).toFixed(paramKey === 'pressure' || paramKey === 'smoke' || paramKey === 'position' ? 2 : 1);
+                    valueSpan.textContent = `${value}${param.unit}`;
+                }
+                
+                // 更新onclick事件
+                tab.setAttribute('onclick', `selectParam(this, '${paramKey}')`);
+                
+                // 设置第一个为active
+                if (index === 0) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+        }
+        
+        // 选择参数
+        function selectParam(element, paramType) {
+            if (!isPageValid()) return;
+            document.querySelectorAll('.param-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            element.classList.add('active');
+            
+            currentParam = paramType;
+            
+            // 多设备模式下，更新多设备对比图表
+            if (isMultiSelectMode && selectedDevices.length > 1) {
+                const firstDevice = deviceData[selectedDevices[0]];
+                const param = firstDevice.params[paramType];
+                
+                // 更新标题
+                document.querySelector('.chart-title').textContent = `多设备对比 - ${param.name}`;
+                
+                // 重新生成多设备对比数据
+                const datasets = selectedDevices.map((deviceId, index) => {
+                    const device = deviceData[deviceId];
+                    const colors = ['#1890ff', '#52c41a', '#faad14', '#ff4d4f', '#722ed1'];
+                    const color = colors[index % colors.length];
+                    
+                    // 生成该设备的数据
+                    const data = generateDeviceData(deviceId, paramType);
+                    
+                    return {
+                        name: device.name,
+                        color: color,
+                        data: data
+                    };
+                });
+                
+                // 渲染多设备对比图表
+                renderMultiDeviceChart(datasets, param);
+                return;
+            }
+            
+            // 单设备模式
+            const device = deviceData[currentDevice];
+            const config = device.params[paramType];
+            
+            if (!config) return;
+            
+            // 更新图表标题
+            document.querySelector('.chart-title').textContent = `${device.name} - ${config.name}趋势分析`;
+            
+            // 更新图例
+            const legendItems = document.querySelectorAll('.threshold-legend .legend-item');
+            if (legendItems[1]) legendItems[1].querySelector('span').textContent = `上限阈值 (${config.max}${config.unit})`;
+            if (legendItems[2]) legendItems[2].querySelector('span').textContent = `下限阈值 (${config.min}${config.unit})`;
+            
+            // 更新图表（保持当前图表类型）
+            updateChart(paramType, currentChartType);
+        }
+        
+        // 切换时间范围
+        function changeTimeRange(range) {
+            if (!isPageValid()) return;
+            console.log('切换时间范围:', range);
+            currentTimeRange = range;
+            
+            // 显示/隐藏自定义日期范围选择器
+            const customDateDisplay = document.getElementById('customDateDisplay');
+            if (customDateDisplay) {
+                customDateDisplay.style.display = range === 'custom' ? 'inline-flex' : 'none';
+            }
+            
+            // 如果是自定义范围，不立即更新图表，等待用户点击应用按钮
+            if (range === 'custom') {
+                // 设置默认日期值
+                const now = new Date();
+                const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                document.getElementById('endDate').value = formatDateTimeLocal(now);
+                document.getElementById('startDate').value = formatDateTimeLocal(yesterday);
+                return;
+            }
+            
+            // 更新下拉选择框的值
+            const timeRangeSelect = document.getElementById('timeRange');
+            if (timeRangeSelect) {
+                timeRangeSelect.value = range;
+            }
+            
+            // 重新加载数据，保持当前图表类型
+            updateChart(currentParam, currentChartType);
+        }
+        
+        // 格式化日期为 datetime-local 输入格式
+        function formatDateTimeLocal(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+        
+        // 应用自定义日期范围
+        function applyCustomDateRange() {
+            if (!isPageValid()) return;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (!startDate || !endDate) {
+                alert('请选择开始时间和结束时间');
+                return;
+            }
+            
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            
+            if (start >= end) {
+                alert('开始时间必须早于结束时间');
+                return;
+            }
+            
+            console.log('应用自定义日期范围:', startDate, '至', endDate);
+            
+            // 重新加载数据
+            updateChart(currentParam, currentChartType);
+        }
+        
+        // 切换图表时间范围（通过下拉框）
+        function changeChartRange(range) {
+            if (!isPageValid()) return;
+            console.log('切换图表时间范围:', range);
+            currentTimeRange = range;
+            
+            // 更新时间范围选择器
+            const timeRangeSelect = document.getElementById('timeRange');
+            if (timeRangeSelect) {
+                timeRangeSelect.value = range;
+            }
+            
+            // 重新加载图表数据，保持当前图表类型
+            updateChart(currentParam, currentChartType);
+        }
+        
+        // 导出图表
+        function exportChart() {
+            if (!isPageValid()) return;
+            const url = trendChart.getDataURL({
+                type: 'png',
+                pixelRatio: 2,
+                backgroundColor: '#fff'
+            });
+            const link = document.createElement('a');
+            link.download = '设备运行趋势图.png';
+            link.href = url;
+            link.click();
+        }
+        
+        // 导出数据
+        function exportData() {
+            if (!isPageValid()) return;
+            console.log('导出数据');
+        }
+        
+        // 导出表格
+        function exportTable() {
+            if (!isPageValid()) return;
+            console.log('导出Excel');
+        }
+        
+        // 动态加载 ECharts 并初始化
+        var isChartInitialized = false;
+        function loadEChartsAndInit() {
+            if (isChartInitialized) {
+                console.log('图表已初始化，跳过');
+                return;
+            }
+            
+            if (typeof echarts !== 'undefined') {
+                console.log('ECharts 已存在，直接初始化');
+                isChartInitialized = true;
+                initChart();
+                return;
+            }
+            
+            console.log('开始动态加载 ECharts...');
+            var script = document.createElement('script');
+            script.src = 'assets/echarts.min.js';
+            script.onload = function() {
+                console.log('ECharts 加载成功！');
+                isChartInitialized = true;
+                initChart();
+            };
+            script.onerror = function() {
+                console.error('ECharts 加载失败');
+            };
+            document.head.appendChild(script);
+        }
+        
+        // 页面加载完成后初始化
+        function initPage() {
+            console.log('initPage 被调用');
+            loadEChartsAndInit();
+        }
+        
+        // 窗口大小改变时重新调整图表
+        window.addEventListener('resize', function() {
+            if (trendChart) {
+                trendChart.resize();
+            }
+        });
+        
+        console.log('运行数据页面已加载');
+        
+        // 将函数绑定到 window 对象，确保 HTML 中的 onclick 可以访问
+        window.toggleCategory = toggleCategory;
+        window.selectDevice = selectDevice;
+        window.selectParam = selectParam;
+        window.changeTimeRange = changeTimeRange;
+        window.changeChartRange = changeChartRange;
+        window.switchChartType = switchChartType;
+        window.exportChart = exportChart;
+        window.exportData = exportData;
+        window.exportTable = exportTable;
+        window.applyCustomDateRange = applyCustomDateRange;
+        
+        // 注册页面清理函数
+        if (window.registerPageCleanup) {
+            window.registerPageCleanup(function() {
+                if (trendChart && typeof trendChart.dispose === 'function') {
+                    trendChart.dispose();
+                    console.log('✅ 运行数据 trendChart 已清理');
+                }
+            });
+        }
+        
+        // 自动初始化图表（延迟执行确保DOM已渲染）
+        setTimeout(function() {
+            console.log('自动调用 initPage');
+            initPage();
+        }, 300);
+    </script>
+    
+</body>
+</html>

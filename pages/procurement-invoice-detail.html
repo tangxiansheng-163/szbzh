@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发票详情（甲方）- 采购协同</title>
+    <style>
+        .detail-header { background:#fff; border:1px solid #f0f0f0; border-radius:10px; padding:16px; margin-bottom:14px; }
+        .detail-title { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+        .detail-title h2 { margin:0; font-size:16px; }
+        .detail-sub { margin-top:6px; font-size:13px; color:#8c8c8c; }
+        .info-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:12px 16px; margin-top:12px; }
+        .info-item { display:flex; flex-direction:column; gap:4px; }
+        .info-label { font-size:12px; color:#8c8c8c; }
+        .info-value { font-size:13px; color:#262626; font-weight:600; }
+        .card { border:1px solid #f0f0f0; border-radius:10px; background:#fff; overflow:hidden; }
+        .card-header { padding:12px 16px; background:#fafafa; border-bottom:1px solid #f0f0f0; font-weight:700; color:#262626; }
+        .card-body { padding:16px; }
+        .kv { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-top:1px solid #f0f0f0; }
+        .kv:first-child { border-top:none; }
+        .kv .k { font-size:13px; color:#8c8c8c; }
+        .kv .v { font-size:13px; color:#262626; font-weight:600; }
+        .link { color:#1890ff; text-decoration:none; }
+        .link:hover { text-decoration:underline; }
+        .tips { padding:12px 14px; background:#fff7e6; border:1px solid #ffd591; border-radius:8px; font-size:12px; color:#262626; margin-top:12px; line-height:1.7; }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <a href="pages/procurement-finance-settlement.html" class="breadcrumb-item">结算中心</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">发票详情</span>
+        </div>
+
+        <div class="detail-header">
+            <div class="detail-title">
+                <div>
+                    <h2 id="inv-title">发票详情</h2>
+                    <div id="inv-sub" class="detail-sub">-</div>
+                </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <button id="btn-approve" class="btn btn-primary" style="display:none;">审核通过</button>
+                    <button id="btn-back" class="btn btn-default">返回结算中心</button>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">发票号</div>
+                    <div id="inv-no" class="info-value">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">关联结算单</div>
+                    <div class="info-value"><a id="inv-settle" class="link" href="pages/procurement-finance-settlement.html">-</a></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">供应商（乙方）</div>
+                    <div id="inv-supplier" class="info-value">-</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">金额与状态</div>
+            <div class="card-body">
+                <div class="kv"><div class="k">不含税金额</div><div id="inv-amount" class="v">-</div></div>
+                <div class="kv"><div class="k">税额</div><div id="inv-tax" class="v">-</div></div>
+                <div class="kv"><div class="k">价税合计</div><div id="inv-total" class="v">-</div></div>
+                <div class="kv"><div class="k">开票日期</div><div id="inv-date" class="v">-</div></div>
+                <div class="kv"><div class="k">发票状态</div><div id="inv-status" class="v">-</div></div>
+
+                <div class="tips">
+                    甲方审核口径：发票必须能回溯到结算单的付款依据（合同、订单、退/换/让步与对账结果）。本原型中，审核通过将把发票状态从“已发送/待审核”推进到“甲方已通过”。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function money(n) {
+            var num = parseFloat(n || 0) || 0;
+            return '¥' + num.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        function ensureAssetLoaded(cb) {
+            if (window.FinanceCollabStore) { cb(); return; }
+            var s = document.createElement('script');
+            s.src = 'assets/finance-collab-store.js';
+            s.onload = cb;
+            s.onerror = function () { alert('加载 assets/finance-collab-store.js 失败'); };
+            document.head.appendChild(s);
+        }
+        function getId() {
+            try { return new URLSearchParams(window.location.search).get('id') || ''; } catch (e) { return ''; }
+        }
+        function findInvoice(store, invoiceId) {
+            var settlements = store.settlements || [];
+            for (var i = 0; i < settlements.length; i++) {
+                var s = settlements[i];
+                var inv = (s.invoices || []).find(function (x) { return x.id === invoiceId; });
+                if (inv) return { settlement: s, invoice: inv };
+            }
+            return null;
+        }
+        function render() {
+            var store = window.FinanceCollabStore.getStore();
+            var id = getId();
+            if (!id) { document.getElementById('inv-sub').textContent = '缺少发票ID'; return; }
+            var found = findInvoice(store, id);
+            if (!found) { document.getElementById('inv-sub').textContent = '未找到发票：' + id; return; }
+
+            var s = found.settlement;
+            var inv = found.invoice;
+            window.FinanceCollabStore.setActiveSettlement(s.id);
+
+            document.getElementById('inv-title').textContent = '发票详情 · ' + inv.id;
+            document.getElementById('inv-sub').textContent = '结算单 ' + s.id + ' · ' + ((s.partyB && s.partyB.org) ? s.partyB.org : '-');
+            document.getElementById('inv-no').textContent = inv.id;
+            document.getElementById('inv-supplier').textContent = (s.partyB && s.partyB.org) ? s.partyB.org : '-';
+            var link = document.getElementById('inv-settle');
+            link.textContent = s.id;
+            link.href = 'pages/procurement-finance-settlement.html?id=' + encodeURIComponent(s.id);
+            document.getElementById('inv-amount').textContent = money(inv.amount || 0);
+            document.getElementById('inv-tax').textContent = money(inv.tax || 0);
+            document.getElementById('inv-total').textContent = money(inv.total || 0);
+            document.getElementById('inv-date').textContent = inv.issueDate || '-';
+
+            var st = inv.status || '-';
+            var stText = st === 'sent' ? '待审核（乙方已发送）' : (st === 'a_approved' ? '甲方已通过' : st);
+            document.getElementById('inv-status').textContent = stText;
+
+            var btnApprove = document.getElementById('btn-approve');
+            if (inv.status === 'sent') {
+                btnApprove.style.display = 'inline-block';
+                btnApprove.onclick = function () {
+                    if (!confirm('审核通过发票 ' + inv.id + '？')) return;
+                    window.FinanceCollabStore.actionA_approveInvoice(s.id, inv.id);
+                    render();
+                    alert('已审核通过。');
+                };
+            } else {
+                btnApprove.style.display = 'none';
+            }
+
+            document.getElementById('btn-back').onclick = function () {
+                if (typeof PageLoader !== 'undefined' && PageLoader.loadPage) PageLoader.loadPage('pages/procurement-finance-settlement.html?id=' + encodeURIComponent(s.id));
+                else window.location.href = 'pages/procurement-finance-settlement.html?id=' + encodeURIComponent(s.id);
+            };
+        }
+        ensureAssetLoaded(render);
+    </script>
+</body>
+</html>

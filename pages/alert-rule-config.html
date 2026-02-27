@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预警规则配置</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <style>
+            .rule-page-title{font-size:18px;font-weight:600;margin:0 0 8px 0;color:#262626;}
+            .rule-page-desc{font-size:13px;color:#595959;margin:0;line-height:1.6;}
+            .rule-form-section{margin-bottom:24px;}
+            .rule-form-section:last-child{margin-bottom:0;}
+            .rule-form-section-title{font-size:14px;font-weight:600;color:#262626;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #e8e8e8;}
+            .rule-type-table{margin-top:12px;font-size:13px;}
+            .rule-type-table th,.rule-type-table td{padding:10px 12px;text-align:left;}
+            .rule-type-table th{background:#fafafa;font-weight:600;color:#595959;}
+        </style>
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">预警管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">预警规则配置</span>
+        </div>
+
+        <div class="page-header">
+            <h2 class="rule-page-title">预警规则配置</h2>
+            <p class="rule-page-desc">按《设计协同详细设计》预警管理模块，配置预警类型、触发条件、检测频率、接收人规则及升级规则；支持超时预警、数据异常、同步失败、流程异常等场景；规则优先级：紧急 &gt; 重要 &gt; 一般。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label for="rule-filter-name">规则名称</label>
+                    <input type="text" id="rule-filter-name" name="ruleName" class="form-input" placeholder="规则名称">
+                </div>
+                <div class="filter-item">
+                    <label for="rule-filter-type">预警类型</label>
+                    <select id="rule-filter-type" name="alertType" class="form-select">
+                        <option value="">全部</option>
+                        <option value="timeout">超时预警</option>
+                        <option value="data">数据异常</option>
+                        <option value="sync">同步失败</option>
+                        <option value="process">流程异常</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="rule-filter-level">预警级别</label>
+                    <select id="rule-filter-level" name="alertLevel" class="form-select">
+                        <option value="">全部</option>
+                        <option value="urgent">紧急</option>
+                        <option value="important">重要</option>
+                        <option value="normal">一般</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="rule-filter-status">状态</label>
+                    <select id="rule-filter-status" name="status" class="form-select">
+                        <option value="">全部</option>
+                        <option value="enabled">启用</option>
+                        <option value="disabled">停用</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary" data-open-modal="alert-rule-add-modal">+ 新增规则</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="80">规则编码</th>
+                            <th width="130">规则名称</th>
+                            <th width="90">预警类型</th>
+                            <th width="80">预警级别</th>
+                            <th width="110">检测对象</th>
+                            <th width="140">检测条件</th>
+                            <th width="80">检测频率</th>
+                            <th width="100">接收人规则</th>
+                            <th width="90">升级规则</th>
+                            <th width="70">状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ALERT_REVIEW_TIMEOUT</td>
+                            <td>评审超时预警</td>
+                            <td>超时预警</td>
+                            <td><span class="status-badge status-error">紧急</span></td>
+                            <td>评审任务、会审单</td>
+                            <td>超时 48 小时</td>
+                            <td>每小时</td>
+                            <td>待审批人</td>
+                            <td>1 小时升级</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="alert-rule-edit-modal">编辑</button> <button class="btn btn-sm btn-default">停用</button></td>
+                        </tr>
+                        <tr>
+                            <td>ALERT_SYNC_FAIL</td>
+                            <td>同步失败预警</td>
+                            <td>同步失败</td>
+                            <td><span class="status-badge status-error">紧急</span></td>
+                            <td>ERP/MES/WMS 下发</td>
+                            <td>下发失败</td>
+                            <td>实时</td>
+                            <td>IT 部门、BOM 负责人</td>
+                            <td>30 分钟升级</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="alert-rule-edit-modal">编辑</button> <button class="btn btn-sm btn-default">停用</button></td>
+                        </tr>
+                        <tr>
+                            <td>ALERT_DATA_INCONSISTENT</td>
+                            <td>BOM 版本不一致</td>
+                            <td>数据异常</td>
+                            <td><span class="status-badge status-warning">重要</span></td>
+                            <td>EBOM/MBOM/SBOM</td>
+                            <td>同产品版本不一致</td>
+                            <td>每天</td>
+                            <td>BOM 创建人、部门负责人</td>
+                            <td>4 小时升级</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="alert-rule-edit-modal">编辑</button> <button class="btn btn-sm btn-default">停用</button></td>
+                        </tr>
+                        <tr>
+                            <td>ALERT_CHANGE_TIMEOUT</td>
+                            <td>变更审批超时</td>
+                            <td>超时预警</td>
+                            <td><span class="status-badge status-warning">重要</span></td>
+                            <td>变更单</td>
+                            <td>超时 4 小时</td>
+                            <td>每小时</td>
+                            <td>待审批人、部门负责人</td>
+                            <td>2 小时升级</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="alert-rule-edit-modal">编辑</button> <button class="btn btn-sm btn-default">停用</button></td>
+                        </tr>
+                        <tr>
+                            <td>ALERT_FLOW_ABNORMAL</td>
+                            <td>流程中断预警</td>
+                            <td>流程异常</td>
+                            <td><span class="status-badge status-warning">重要</span></td>
+                            <td>审批流程</td>
+                            <td>流程状态异常或 2 天未流转</td>
+                            <td>每天</td>
+                            <td>流程发起人、部门负责人</td>
+                            <td>2 小时升级</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="alert-rule-edit-modal">编辑</button> <button class="btn btn-sm btn-default">停用</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="section-note" style="margin:12px 20px 0;font-size:12px;color:#8c8c8c;line-height:1.6;">检测机制：实时检测（关键事件触发）、定时检测（按频率）；升级规则：未处理达升级间隔时自动升级级别并扩大接收人；最多升级 3 次。</p>
+            <div class="pagination">
+                <div class="pagination-info">共 5 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 新增规则弹窗 -->
+        <div id="alert-rule-add-modal" class="modal-overlay">
+            <div class="modal" style="max-width:640px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">新增预警规则</span><button type="button" class="modal-close" data-close-modal="alert-rule-add-modal">×</button></div>
+                <div class="modal-body">
+                    <div class="rule-form-section">
+                        <div class="rule-form-section-title">基本信息</div>
+                        <div class="form-item"><label class="form-label required" for="rule-add-code">规则编码</label><input type="text" id="rule-add-code" name="ruleCode" class="form-input" placeholder="如：ALERT_XXX"></div>
+                        <div class="form-item"><label class="form-label required" for="rule-add-name">规则名称</label><input type="text" id="rule-add-name" name="ruleName" class="form-input" placeholder="如：评审超时预警"></div>
+                        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                            <div class="form-item"><label class="form-label required" for="rule-add-type">预警类型</label><select id="rule-add-type" name="alertType" class="form-select"><option value="">请选择</option><option value="timeout">超时预警</option><option value="data">数据异常</option><option value="sync">同步失败</option><option value="process">流程异常</option></select></div>
+                            <div class="form-item"><label class="form-label required" for="rule-add-level">预警级别</label><select id="rule-add-level" name="alertLevel" class="form-select"><option value="normal">一般</option><option value="important">重要</option><option value="urgent">紧急</option></select></div>
+                        </div>
+                    </div>
+                    <div class="rule-form-section">
+                        <div class="rule-form-section-title">检测配置</div>
+                        <div class="form-item"><label class="form-label required" for="rule-add-object">检测对象</label><input type="text" id="rule-add-object" name="detectionObject" class="form-input" placeholder="如：评审任务、会审单、ERP 下发"></div>
+                        <div class="form-item"><label class="form-label required" for="rule-add-condition">检测条件</label><input type="text" id="rule-add-condition" name="detectionCondition" class="form-input" placeholder="如：超时 48 小时、下发失败"></div>
+                        <div class="form-item"><label class="form-label required" for="rule-add-frequency">检测频率</label><select id="rule-add-frequency" name="detectionFrequency" class="form-select"><option value="realtime">实时</option><option value="hourly">每小时</option><option value="daily">每天</option><option value="weekly">每周</option></select></div>
+                    </div>
+                    <div class="rule-form-section">
+                        <div class="rule-form-section-title">接收人与升级</div>
+                        <div class="form-item"><label class="form-label required" for="rule-add-receiver">接收人规则</label><select id="rule-add-receiver" name="receiverRule" class="form-select"><option value="">请选择</option><option value="approver">待审批人</option><option value="creator">BOM 创建人</option><option value="dept">部门负责人</option><option value="it">IT 部门</option><option value="custom">自定义（逗号分隔）</option></select></div>
+                        <div class="form-item"><label class="form-label" for="rule-add-escalation">升级间隔（小时）</label><input type="number" id="rule-add-escalation" name="escalationInterval" class="form-input" placeholder="0 表示不升级" value="0" min="0"></div>
+                        <div class="form-item"><label class="form-label" for="rule-add-remark">备注</label><textarea id="rule-add-remark" name="remark" class="form-textarea" rows="2" placeholder="可选"></textarea></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="alert-rule-add-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="alert-rule-add-modal" onclick="alert('✅ 规则已保存')">保存</button></div>
+            </div>
+        </div>
+
+        <!-- 编辑规则弹窗 -->
+        <div id="alert-rule-edit-modal" class="modal-overlay">
+            <div class="modal" style="max-width:640px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">编辑预警规则</span><button type="button" class="modal-close" data-close-modal="alert-rule-edit-modal">×</button></div>
+                <div class="modal-body">
+                    <div class="rule-form-section">
+                        <div class="rule-form-section-title">基本信息</div>
+                        <div class="form-item"><label class="form-label" for="rule-edit-code">规则编码</label><input type="text" id="rule-edit-code" name="ruleCode" class="form-input" value="ALERT_REVIEW_TIMEOUT" readonly></div>
+                        <div class="form-item"><label class="form-label required" for="rule-edit-name">规则名称</label><input type="text" id="rule-edit-name" name="ruleName" class="form-input" value="评审超时预警"></div>
+                        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                            <div class="form-item"><label class="form-label required" for="rule-edit-type">预警类型</label><select id="rule-edit-type" name="alertType" class="form-select"><option value="timeout" selected>超时预警</option><option value="data">数据异常</option><option value="sync">同步失败</option><option value="process">流程异常</option></select></div>
+                            <div class="form-item"><label class="form-label required" for="rule-edit-level">预警级别</label><select id="rule-edit-level" name="alertLevel" class="form-select"><option value="urgent" selected>紧急</option><option value="important">重要</option><option value="normal">一般</option></select></div>
+                        </div>
+                        <div class="form-item"><label class="form-label" for="rule-edit-status">状态</label><select id="rule-edit-status" name="status" class="form-select"><option value="enabled" selected>启用</option><option value="disabled">停用</option></select></div>
+                    </div>
+                    <div class="rule-form-section">
+                        <div class="rule-form-section-title">检测配置</div>
+                        <div class="form-item"><label class="form-label required" for="rule-edit-object">检测对象</label><input type="text" id="rule-edit-object" name="detectionObject" class="form-input" value="评审任务、会审单"></div>
+                        <div class="form-item"><label class="form-label required" for="rule-edit-condition">检测条件</label><input type="text" id="rule-edit-condition" name="detectionCondition" class="form-input" value="超时 48 小时"></div>
+                        <div class="form-item"><label class="form-label required" for="rule-edit-frequency">检测频率</label><select id="rule-edit-frequency" name="detectionFrequency" class="form-select"><option value="hourly" selected>每小时</option><option value="realtime">实时</option><option value="daily">每天</option><option value="weekly">每周</option></select></div>
+                    </div>
+                    <div class="rule-form-section">
+                        <div class="rule-form-section-title">接收人与升级</div>
+                        <div class="form-item"><label class="form-label required" for="rule-edit-receiver">接收人规则</label><input type="text" id="rule-edit-receiver" name="receiverRule" class="form-input" value="待审批人、部门负责人"></div>
+                        <div class="form-item"><label class="form-label" for="rule-edit-escalation">升级间隔（小时）</label><input type="number" id="rule-edit-escalation" name="escalationInterval" class="form-input" value="1" min="0"></div>
+                        <div class="form-item"><label class="form-label" for="rule-edit-remark">备注</label><textarea id="rule-edit-remark" name="remark" class="form-textarea" rows="2">评审超时 48 小时触发，1 小时未处理升级至上级领导</textarea></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="alert-rule-edit-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="alert-rule-edit-modal" onclick="alert('✅ 已保存')">保存</button></div>
+            </div>
+        </div>
+
+        <!-- 预警类型说明（可折叠） -->
+        <div class="card" style="margin-top:20px;">
+            <div class="card-header">
+                <h3 class="card-title">预警类型与触发场景</h3>
+            </div>
+            <div class="card-body">
+                <table class="rule-type-table">
+                    <thead>
+                        <tr>
+                            <th width="100">预警类型</th>
+                            <th>触发场景</th>
+                            <th width="80">默认级别</th>
+                            <th>默认接收人</th>
+                            <th>升级规则</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>超时预警</td>
+                            <td>评审超时、变更超时、同步超时</td>
+                            <td>紧急→重要</td>
+                            <td>评审人、部门负责人</td>
+                            <td>1 小时未处理升级至上级领导</td>
+                        </tr>
+                        <tr>
+                            <td>数据异常</td>
+                            <td>BOM 数据错误、物料缺失、层级异常、版本不一致</td>
+                            <td>重要</td>
+                            <td>BOM 创建人、部门负责人</td>
+                            <td>4 小时未处理升级至 IT 部门</td>
+                        </tr>
+                        <tr>
+                            <td>同步失败</td>
+                            <td>跨系统同步失败、接口异常</td>
+                            <td>紧急</td>
+                            <td>IT 部门、BOM 负责人</td>
+                            <td>30 分钟未处理升级至 IT 总监</td>
+                        </tr>
+                        <tr>
+                            <td>流程异常</td>
+                            <td>审批流程中断、状态流转异常</td>
+                            <td>重要</td>
+                            <td>流程发起人、部门负责人</td>
+                            <td>2 小时未处理升级至管理员</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>if(typeof PageInteractions!=='undefined')PageInteractions.initButtons();</script>
+</body>
+</html>

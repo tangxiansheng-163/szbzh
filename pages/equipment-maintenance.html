@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>保养管理 - 设备管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/equipment-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">维护管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">保养管理</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理设备保养任务，包括保养计划、保养执行、保养记录、保养效果评估等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="保养任务编号、设备名称">
+                </div>
+                <div class="filter-item">
+                    <label>保养状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="planned">计划中</option>
+                        <option value="executing">执行中</option>
+                        <option value="completed">已完成</option>
+                        <option value="overdue">已逾期</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>计划日期</label>
+                    <input type="date" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary">+ 新建保养任务</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">任务编号</th>
+                            <th width="150">设备名称</th>
+                            <th width="100">保养类型</th>
+                            <th width="120">执行人</th>
+                            <th width="120">计划日期</th>
+                            <th width="120">完成日期</th>
+                            <th width="100">保养状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="maintenance-id" value="1"></td>
+                            <td>MAIN-2025-001</td>
+                            <td>生产设备A-001</td>
+                            <td>定期保养</td>
+                            <td>维护员A</td>
+                            <td>2025-01-26</td>
+                            <td>-</td>
+                            <td><span class="status-badge status-warning">计划中</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">开始保养</button>
+                                <button class="btn btn-sm btn-default">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="maintenance-id" value="2"></td>
+                            <td>MAIN-2025-002</td>
+                            <td>安全设备B-002</td>
+                            <td>日常保养</td>
+                            <td>维护员B</td>
+                            <td>2025-01-25</td>
+                            <td>2025-01-25</td>
+                            <td><span class="status-badge status-success">已完成</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 2 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('保养管理 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

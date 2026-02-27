@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>告警列表 - 设备管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/equipment-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">告警管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">告警列表</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理设备告警信息，包括参数异常、设备故障、阈值超限等告警；支持告警确认、处理、统计、屏蔽、联动等全流程管理。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="告警编号、设备编码、设备名称">
+                </div>
+                <div class="filter-item">
+                    <label>告警类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="parameter">参数异常</option>
+                        <option value="equipment">设备故障</option>
+                        <option value="threshold">阈值超限</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>告警级别</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="urgent">紧急</option>
+                        <option value="important">重要</option>
+                        <option value="normal">一般</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>处理状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待处理</option>
+                        <option value="processing">处理中</option>
+                        <option value="pending-close">待销账</option>
+                        <option value="closed">已销账</option>
+                        <option value="false">误告警</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button type="button" class="btn btn-default btn-batch-handle-alert">批量处理</button>
+                <button type="button" class="btn btn-default btn-export-alert-list">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">告警编号</th>
+                            <th width="100">告警类型</th>
+                            <th width="90">告警级别</th>
+                            <th width="120">设备编码</th>
+                            <th width="150">设备名称</th>
+                            <th width="200">告警内容</th>
+                            <th width="120">触发时间</th>
+                            <th width="100">处理人</th>
+                            <th width="90">处理状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="alert-id" value="1"></td>
+                            <td>AL-2025-001</td>
+                            <td>参数异常</td>
+                            <td><span class="status-badge status-error">紧急</span></td>
+                            <td>EQ-001</td>
+                            <td>空压机A</td>
+                            <td>温度异常，当前温度85℃，超出阈值80℃</td>
+                            <td>2025-01-29 10:30</td>
+                            <td>张运维</td>
+                            <td><span class="status-badge status-warning">待处理</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/equipment-alert-detail.html" data-id="1">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-claim-alert" data-id="1">认领</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="alert-id" value="2"></td>
+                            <td>AL-2025-002</td>
+                            <td>设备故障</td>
+                            <td><span class="status-badge status-warning">重要</span></td>
+                            <td>EQ-002</td>
+                            <td>数控机床</td>
+                            <td>设备运行异常，建议停机检查</td>
+                            <td>2025-01-28 14:20</td>
+                            <td>李运维</td>
+                            <td><span class="status-badge status-processing">处理中</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/equipment-alert-detail.html" data-id="2">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-handle-equipment-alert" data-id="2">处理</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="alert-id" value="3"></td>
+                            <td>AL-2025-003</td>
+                            <td>阈值超限</td>
+                            <td><span class="status-badge status-warning">重要</span></td>
+                            <td>EQ-003</td>
+                            <td>冷却塔</td>
+                            <td>振动值超出阈值，当前值8.5mm/s，阈值7.0mm/s</td>
+                            <td>2025-01-27 09:15</td>
+                            <td>王运维</td>
+                            <td><span class="status-badge status-success">已销账</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/equipment-alert-detail.html" data-id="3">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 3 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            console.log('告警列表 页面已加载');
+            if (typeof PageInteractions !== 'undefined') {
+                PageInteractions.initButtons();
+                PageInteractions.toggleSelectAll('input[name="alert-id"]');
+            }
+            document.querySelectorAll('.btn-claim-alert').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    if (confirm('确定认领该告警？认领后将由您负责处理。')) alert('认领成功。');
+                });
+            });
+            document.querySelectorAll('.btn-handle-equipment-alert').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    if (confirm('确定处理该告警？可在详情页填写处理结果并销账。')) alert('已进入处理流程，可在详情页完成销账。');
+                });
+            });
+            var batchHandleBtn = document.querySelector('.btn-batch-handle-alert');
+            if (batchHandleBtn) {
+                batchHandleBtn.addEventListener('click', function() {
+                    var selected = document.querySelectorAll('input[name="alert-id"]:checked');
+                    if (selected.length === 0) { alert('请先勾选要处理的告警。'); return; }
+                    if (confirm('确定要批量处理选中的 ' + selected.length + ' 条告警吗？')) alert('批量处理已提交。');
+                });
+            }
+            var exportBtn = document.querySelector('.btn-export-alert-list');
+            if (exportBtn) exportBtn.addEventListener('click', function() {
+                if (confirm('确定导出当前列表？')) alert('导出成功，文件已下载。');
+            });
+        </script>
+    </div>
+</body>
+</html>

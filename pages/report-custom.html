@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自定义报表</title>
+</head>
+<body>
+    <div class="content-wrapper report-custom-page">
+        <style>
+            .report-custom-title{font-size:18px;font-weight:600;margin:0 0 8px 0;color:#262626;}
+            .report-custom-desc{font-size:13px;color:#595959;margin:0;line-height:1.6;}
+        </style>
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">报表管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/report-dashboard.html" class="breadcrumb-item">报表中心</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">自定义报表</span>
+        </div>
+
+        <div class="page-header">
+            <h2 class="report-custom-title">自定义报表</h2>
+            <p class="report-custom-desc">由您自行设计报表结构：选择数据源、拖拽字段、配置分组汇总与过滤、可选计算字段与图表绑定。保存后可重复运行、订阅、分享给他人或发布至报表中心。</p>
+        </div>
+
+        <div class="filter-bar" style="padding:12px 20px;margin-bottom:16px;border-radius:8px;background:#fff;border:1px solid #e8e8e8;">
+            <div class="filter-row" style="flex-wrap:wrap;align-items:center;gap:12px;">
+                <div class="filter-item" style="flex-direction:row;align-items:center;gap:8px;">
+                    <label for="rpt-custom-source">数据源</label>
+                    <select id="rpt-custom-source" name="dataSource" class="form-select">
+                        <option value="">全部</option>
+                        <option value="bom">BOM 主数据</option>
+                        <option value="change">变更单</option>
+                        <option value="task">技术任务</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction:row;align-items:center;gap:8px;">
+                    <label for="rpt-custom-status">发布状态</label>
+                    <select id="rpt-custom-status" name="status" class="form-select">
+                        <option value="">全部</option>
+                        <option value="draft">草稿</option>
+                        <option value="published">已发布</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction:row;align-items:center;gap:8px;">
+                    <label for="rpt-custom-keyword">关键词</label>
+                    <input type="text" id="rpt-custom-keyword" name="keyword" class="form-input" placeholder="报表名称">
+                </div>
+                <button class="btn btn-primary">查询</button>
+                <button class="btn btn-default">重置</button>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <a href="pages/report-custom-create.html" class="btn btn-primary">+ 新建报表</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="180">报表名称</th>
+                            <th width="100">数据源</th>
+                            <th>报表列 / 分组</th>
+                            <th width="80">图表</th>
+                            <th width="80">状态</th>
+                            <th width="100">创建人</th>
+                            <th width="100">创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>部门 BOM 创建量统计</td>
+                            <td>BOM 主数据</td>
+                            <td>部门、BOM类型、创建数量、发布数量；按部门+BOM类型分组</td>
+                            <td>柱状图</td>
+                            <td><span class="status-badge status-success">已发布</span></td>
+                            <td>张工</td>
+                            <td>2025-01-20</td>
+                            <td>
+                                <button class="btn btn-sm btn-default" data-open-modal="report-view-modal">预览</button>
+                                <a href="pages/report-custom-create.html?id=1" class="btn btn-sm btn-default">编辑</a>
+                                <button class="btn btn-sm btn-default" data-open-modal="share-modal">分享</button>
+                                <button class="btn btn-sm btn-default">订阅</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>变更类型月度趋势</td>
+                            <td>变更单</td>
+                            <td>变更类型、月份、数量；按变更类型+月份分组</td>
+                            <td>折线图</td>
+                            <td><span class="status-badge status-processing">草稿</span></td>
+                            <td>李工</td>
+                            <td>2025-01-15</td>
+                            <td>
+                                <button class="btn btn-sm btn-default" data-open-modal="report-view-modal">预览</button>
+                                <a href="pages/report-custom-create.html?id=2" class="btn btn-sm btn-default">编辑</a>
+                                <button class="btn btn-sm btn-primary" data-open-modal="publish-modal">发布</button>
+                                <button class="btn btn-sm btn-default">订阅</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 2 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="report-view-modal" class="modal-overlay">
+            <div class="modal" style="max-width:800px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">报表预览</span><button type="button" class="modal-close" data-close-modal="report-view-modal">×</button></div>
+                <div class="modal-body">
+                    <p class="modal-desc" style="margin-bottom:16px;font-size:13px;color:#595959;">根据您设计的报表结构生成的数据预览。</p>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr><th>部门</th><th>BOM 类型</th><th>创建数量</th><th>发布数量</th><th>发布率</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>研发部</td><td>EBOM</td><td>12</td><td>10</td><td>83.3%</td></tr>
+                                <tr><td>研发部</td><td>MBOM</td><td>8</td><td>7</td><td>87.5%</td></tr>
+                                <tr><td>工艺部</td><td>MBOM</td><td>8</td><td>8</td><td>100%</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="report-view-modal">关闭</button><button type="button" class="btn btn-primary">导出 Excel</button><button type="button" class="btn btn-default">导出 PDF</button></div>
+            </div>
+        </div>
+
+        <div id="share-modal" class="modal-overlay">
+            <div class="modal" style="max-width:500px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">分享报表</span><button type="button" class="modal-close" data-close-modal="share-modal">×</button></div>
+                <div class="modal-body">
+                    <p class="modal-desc" style="margin-bottom:16px;">分享后，被分享人可查看、运行、导出该报表。</p>
+                    <div class="form-item">
+                        <label class="form-label" for="share-users">分享给用户</label>
+                        <input type="text" id="share-users" name="users" class="form-input" placeholder="输入用户名，多人逗号分隔">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label" for="share-role">或分享给角色</label>
+                        <select id="share-role" name="role" class="form-select">
+                            <option value="">请选择</option>
+                            <option value="dept">部门负责人</option>
+                            <option value="all">全部用户</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="share-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="share-modal" onclick="alert('✅ 已分享')">确定</button></div>
+            </div>
+        </div>
+
+        <div id="publish-modal" class="modal-overlay">
+            <div class="modal" style="max-width:460px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">发布报表</span><button type="button" class="modal-close" data-close-modal="publish-modal">×</button></div>
+                <div class="modal-body">
+                    <p class="modal-desc" style="margin-bottom:16px;">发布后，报表将出现在报表中心，有权限的用户可访问。是否发布？</p>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="publish-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="publish-modal" onclick="alert('✅ 已发布至报表中心')">确定发布</button></div>
+            </div>
+        </div>
+    </div>
+    <script>if(typeof PageInteractions!=='undefined')PageInteractions.initButtons();</script>
+</body>
+</html>

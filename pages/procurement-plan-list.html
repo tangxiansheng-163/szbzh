@@ -1,0 +1,1974 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>采购计划 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">采购管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">采购计划</span>
+        </div>
+
+        <div class="page-header">
+            <h1 class="page-title">采购计划</h1>
+            <p class="page-description">管理采购计划，包括年度、季度、月度采购计划的制定、审批、执行跟踪；支持计划与实际采购对比分析。计划来源：由需求申请「生成采购计划」下推，或人工新建。</p>
+        </div>
+
+        <div class="filter-bar plan-list-filter">
+            <div class="filter-row">
+                <div class="filter-item filter-item--wide">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" id="filter-keyword" placeholder="计划编号、计划名称、编制人">
+                </div>
+                <div class="filter-item">
+                    <label>计划来源</label>
+                    <select class="form-select" id="filter-source">
+                        <option value="">全部</option>
+                        <option value="demand">需求下推</option>
+                        <option value="manual">人工创建</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>计划类型</label>
+                    <select class="form-select" id="filter-type">
+                        <option value="">全部</option>
+                        <option value="年度计划">年度计划</option>
+                        <option value="季度计划">季度计划</option>
+                        <option value="月度计划">月度计划</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>计划状态</label>
+                    <select class="form-select" id="filter-status">
+                        <option value="">全部</option>
+                        <option value="draft">草稿</option>
+                        <option value="reviewing">审核中</option>
+                        <option value="approved">已通过</option>
+                        <option value="rejected">已驳回</option>
+                        <option value="inquiring">询价中</option>
+                        <option value="pending_exec">待执行</option>
+                        <option value="executing">执行中</option>
+                        <option value="completed">已完成</option>
+                        <option value="terminated">已终止</option>
+                    </select>
+                </div>
+                <div class="filter-item filter-item--daterange">
+                    <label>计划周期</label>
+                    <div class="daterange-inner">
+                        <input type="date" id="filter-date-start" class="form-input" placeholder="开始日期" title="开始日期">
+                        <span class="daterange-sep">至</span>
+                        <input type="date" id="filter-date-end" class="form-input" placeholder="结束日期" title="结束日期">
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button class="btn btn-primary" id="btn-search">查询</button>
+                    <button class="btn btn-default" id="btn-reset">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar plan-list-action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary btn-create-modal"
+                        data-modal="edit-modal"
+                        data-title="新建采购计划"
+                        data-url="pages/procurement-plan-create.html">
+                    + 新建计划
+                </button>
+                <button class="btn btn-default" id="btn-export-plan">导出</button>
+            </div>
+            <div class="action-right plan-list-action-right">
+                <span class="selected-count" id="plan-selected-count" style="display:none;">已选择 <strong>0</strong> 项</span>
+            </div>
+        </div>
+
+        <style>
+        /* 采购计划列表页 - 细节美化 */
+        .plan-list-filter .filter-item--daterange .daterange-inner { display: flex; align-items: center; gap: 8px; }
+        .plan-list-filter .filter-item--daterange .form-input { min-width: 130px; }
+        .plan-list-filter .daterange-sep { color: var(--text-tertiary); font-size: 13px; flex-shrink: 0; }
+        .plan-list-action-bar .action-right { display: flex; align-items: center; gap: 16px; }
+        .plan-list-action-right .selected-count { font-size: 13px; color: #1890ff; background: #e6f7ff; padding: 4px 10px; border-radius: 4px; }
+        .plan-list-action-right .selected-count strong { font-weight: 600; }
+        .plan-list-card .table-wrapper { border-radius: 0 0 var(--radius-md) var(--radius-md); overflow-x: auto; overflow-y: hidden; }
+        .plan-list-card .table-wrapper table { min-width: 1400px; }
+        .plan-list-card .table-wrapper thead th { font-size: 13px; color: rgba(0,0,0,0.65); font-weight: 600; vertical-align: top; }
+        .plan-list-card .table-wrapper tbody td { font-size: 13px; color: rgba(0,0,0,0.85); vertical-align: top; }
+        .plan-list-card .table-wrapper td:last-child { display: table-cell; padding: 13px 16px; vertical-align: top; }
+        .plan-list-card .table-wrapper td:last-child .plan-list-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-start; }
+        .plan-list-card .table-wrapper tbody tr.plan-row--active { background: #f5f5ff; }
+        .plan-list-card .table-wrapper::-webkit-scrollbar { height: 8px; }
+        .plan-list-card .table-wrapper::-webkit-scrollbar-track { background: #f0f0f0; border-radius: 0 0 4px 4px; }
+        .plan-list-card .table-wrapper::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        .plan-list-card .table-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.3); }
+        .plan-list-card .pagination { padding: 16px 24px; background: #fafafa; border-radius: 0 0 var(--radius-md) var(--radius-md); }
+        .plan-complete-rate { display: inline-flex; align-items: center; gap: 6px; }
+        .plan-complete-rate-bar { width: 60px; height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden; position: relative; }
+        .plan-complete-rate-fill { height: 100%; background: linear-gradient(90deg, #52c41a 0%, #73d13d 100%); border-radius: 4px; transition: width 0.3s; }
+        .plan-complete-rate-fill.warning { background: linear-gradient(90deg, #faad14 0%, #ffc53d 100%); }
+        .plan-complete-rate-fill.danger { background: linear-gradient(90deg, #ff4d4f 0%, #ff7875 100%); }
+        .plan-source-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+        .plan-source-badge.demand { background: #e6f7ff; color: #1890ff; }
+        .plan-source-badge.manual { background: #f6ffed; color: #52c41a; }
+        .status-badge.status-danger { background: #fff1f0; color: #ff4d4f; }
+        .status-badge.status-warning { background: #fffbe6; color: #faad14; }
+        /* 询价信息子表：操作列按钮与主表一致（链接式 btn-sm） */
+        #plan-supplier-quote-card .table-wrapper td:last-child { display: table-cell; padding: 8px 10px; vertical-align: top; }
+        #plan-supplier-quote-card .table-wrapper td:last-child .plan-list-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-start; }
+        /* 比价表弹窗：与详情页比价表模块一致 */
+        .compare-modal-table { table-layout: fixed; width: 100%; }
+        .compare-modal-table th,
+        .compare-modal-table td { text-align: center !important; vertical-align: middle !important; }
+        .compare-modal-table .compare-lowest { background: #e6ffed; color: #389e0d; font-weight: 600; }
+        .compare-modal-table tfoot td {
+            background: #fafafa; font-weight: 600; border-top: 2px solid var(--border-color, #e8e8e8); padding: 12px 16px; box-sizing: border-box;
+        }
+        .compare-modal-table tfoot td.compare-lowest { background: #e6ffed; color: #389e0d; text-align: center !important; vertical-align: middle !important; padding: 12px 16px; box-sizing: border-box; }
+        .compare-modal-table tbody td:last-child,
+        .compare-modal-table tfoot td:last-child { display: table-cell !important; padding-right: 16px !important; }
+        </style>
+
+        <div class="card plan-list-card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox" id="select-all-plan"></th>
+                            <th width="120">计划编号</th>
+                            <th width="90">计划来源</th>
+                            <th width="150">计划名称</th>
+                            <th width="100">计划类型</th>
+                            <th width="120">计划周期</th>
+                            <th width="100">预算金额</th>
+                            <th width="100">执行金额</th>
+                            <th width="100">完成率</th>
+                            <th width="90">计划状态</th>
+                            <th width="100">编制人</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="plan-table-body">
+                        <!-- 示例数据：覆盖所有状态，方便验证操作按钮 -->
+                        <!-- 1 草稿 -->
+                        <tr data-id="1" data-source="manual" data-type="年度计划" data-status="draft">
+                            <td><input type="checkbox" name="plan-id" value="1" class="plan-checkbox"></td>
+                            <td>PP-2025-001</td>
+                            <td><span class="plan-source-badge manual">人工创建</span></td>
+                            <td>2025年度设备采购计划（草稿）</td>
+                            <td>年度计划</td>
+                            <td>2025</td>
+                            <td>¥5,000,000.00</td>
+                            <td>¥0.00</td>
+                            <td>
+                                <div class="plan-complete-rate">
+                                    <div class="plan-complete-rate-bar">
+                                        <div class="plan-complete-rate-fill danger" style="width:0%;"></div>
+                                    </div>
+                                    <span>0%</span>
+                                </div>
+                            </td>
+                            <td><span class="status-badge status-warning">草稿</span></td>
+                            <td>张采购</td>
+                            <td>
+                                查看 编辑 删除
+                            </td>
+                        </tr>
+                        <!-- 2 审核中 -->
+                        <tr data-id="2" data-source="manual" data-type="季度计划" data-status="reviewing">
+                            <td><input type="checkbox" name="plan-id" value="2" class="plan-checkbox"></td>
+                            <td>PP-2025-002</td>
+                            <td><span class="plan-source-badge manual">人工创建</span></td>
+                            <td>2025年Q1季度采购计划（审核中）</td>
+                            <td>季度计划</td>
+                            <td>2025-01 ~ 2025-03</td>
+                            <td>¥2,600,000.00</td>
+                            <td>¥200,000.00</td>
+                            <td>
+                                <div class="plan-complete-rate">
+                                    <div class="plan-complete-rate-bar">
+                                        <div class="plan-complete-rate-fill" style="width:10%;"></div>
+                                    </div>
+                                    <span>10%</span>
+                                </div>
+                            </td>
+                            <td><span class="status-badge status-reviewing">审核中</span></td>
+                            <td>张采购</td>
+                            <td>
+                                查看
+                            </td>
+                        </tr>
+                        <!-- 3 已通过 -->
+                        <tr data-id="3" data-source="demand" data-type="月度计划" data-status="approved">
+                            <td><input type="checkbox" name="plan-id" value="3" class="plan-checkbox"></td>
+                            <td>PP-2025-003</td>
+                            <td><span class="plan-source-badge demand">需求下推</span></td>
+                            <td>2025年1月月度采购计划（已通过）</td>
+                            <td>月度计划</td>
+                            <td>2025-01</td>
+                            <td>¥900,000.00</td>
+                            <td>¥680,000.00</td>
+                            <td>
+                                <div class="plan-complete-rate">
+                                    <div class="plan-complete-rate-bar">
+                                        <div class="plan-complete-rate-fill" style="width:80%;"></div>
+                                    </div>
+                                    <span>80%</span>
+                                </div>
+                            </td>
+                            <td><span class="status-badge status-processing">已通过</span></td>
+                            <td>李采购</td>
+                            <td>
+                                查看 生成询价单
+                            </td>
+                        </tr>
+                        <!-- 4 已驳回 -->
+                        <tr data-id="4" data-source="manual" data-type="月度计划" data-status="rejected">
+                            <td><input type="checkbox" name="plan-id" value="4" class="plan-checkbox"></td>
+                            <td>PP-2025-004</td>
+                            <td><span class="plan-source-badge manual">人工创建</span></td>
+                            <td>2025年2月月度采购计划（已驳回）</td>
+                            <td>月度计划</td>
+                            <td>2025-02</td>
+                            <td>¥800,000.00</td>
+                            <td>¥0.00</td>
+                            <td>
+                                <div class="plan-complete-rate">
+                                    <div class="plan-complete-rate-bar">
+                                        <div class="plan-complete-rate-fill warning" style="width:5%;"></div>
+                                    </div>
+                                    <span>5%</span>
+                                </div>
+                            </td>
+                            <td><span class="status-badge status-danger">已驳回</span></td>
+                            <td>李采购</td>
+                            <td>
+                                查看 编辑 删除
+                            </td>
+                        </tr>
+                        <!-- 5 询价中 -->
+                        <tr data-id="5" data-source="demand" data-type="专项计划" data-status="inquiring">
+                            <td><input type="checkbox" name="plan-id" value="5" class="plan-checkbox"></td>
+                            <td>PP-2025-005</td>
+                            <td><span class="plan-source-badge demand">需求下推</span></td>
+                            <td>2025年项目专项采购计划（询价中）</td>
+                            <td>专项计划</td>
+                            <td>2025-03</td>
+                            <td>¥1,200,000.00</td>
+                            <td>¥300,000.00</td>
+                            <td>
+                                <div class="plan-complete-rate">
+                                    <div class="plan-complete-rate-bar">
+                                        <div class="plan-complete-rate-fill" style="width:30%;"></div>
+                                    </div>
+                                    <span>30%</span>
+                                </div>
+                            </td>
+                            <td><span class="status-badge status-processing">询价中</span></td>
+                            <td>王采购</td>
+                            <td>
+                                查看
+                            </td>
+                        </tr>
+                        <!-- 6 待执行 -->
+                        <tr data-id="6" data-source="manual" data-type="季度计划" data-status="pending_exec">
+                            <td><input type="checkbox" name="plan-id" value="6" class="plan-checkbox"></td>
+                            <td>PP-2025-006</td>
+                            <td><span class="plan-source-badge manual">人工创建</span></td>
+                            <td>2025年Q2季度采购计划（待执行）</td>
+                            <td>季度计划</td>
+                            <td>2025-04 ~ 2025-06</td>
+                            <td>¥3,000,000.00</td>
+                            <td>¥0.00</td>
+                            <td>
+                                <div class="plan-complete-rate">
+                                    <div class="plan-complete-rate-bar">
+                                        <div class="plan-complete-rate-fill warning" style="width:0%;"></div>
+                                    </div>
+                                    <span>0%</span>
+                                </div>
+                            </td>
+                            <td><span class="status-badge status-warning">待执行</span></td>
+                            <td>张采购</td>
+                            <td>
+                                查看 开始执行
+                            </td>
+                        </tr>
+                        <!-- 7 执行中 -->
+                        <tr data-id="7" data-source="manual" data-type="年度计划" data-status="executing">
+                            <td><input type="checkbox" name="plan-id" value="7" class="plan-checkbox"></td>
+                            <td>PP-2025-007</td>
+                            <td><span class="plan-source-badge manual">人工创建</span></td>
+                            <td>2025年度备件采购计划（执行中）</td>
+                            <td>年度计划</td>
+                            <td>2025</td>
+                            <td>¥4,500,000.00</td>
+                            <td>¥1,500,000.00</td>
+                            <td>
+                                <div class="plan-complete-rate">
+                                    <div class="plan-complete-rate-bar">
+                                        <div class="plan-complete-rate-fill" style="width:35%;"></div>
+                                    </div>
+                                    <span>35%</span>
+                                </div>
+                            </td>
+                            <td><span class="status-badge status-processing">执行中</span></td>
+                            <td>赵采购</td>
+                            <td>
+                                查看 终止
+                            </td>
+                        </tr>
+                        <!-- 8 已完成 -->
+                        <tr data-id="8" data-source="demand" data-type="专项计划" data-status="completed">
+                            <td><input type="checkbox" name="plan-id" value="8" class="plan-checkbox"></td>
+                            <td>PP-2025-008</td>
+                            <td><span class="plan-source-badge demand">需求下推</span></td>
+                            <td>2024年技改项目采购计划（已完成）</td>
+                            <td>专项计划</td>
+                            <td>2024-01 ~ 2024-12</td>
+                            <td>¥6,800,000.00</td>
+                            <td>¥6,800,000.00</td>
+                            <td>
+                                <div class="plan-complete-rate">
+                                    <div class="plan-complete-rate-bar">
+                                        <div class="plan-complete-rate-fill" style="width:100%;"></div>
+                                    </div>
+                                    <span>100%</span>
+                                </div>
+                            </td>
+                            <td><span class="status-badge status-processing">已完成</span></td>
+                            <td>孙采购</td>
+                            <td>
+                                查看
+                            </td>
+                        </tr>
+                        <!-- 9 已终止 -->
+                        <tr data-id="9" data-source="manual" data-type="月度计划" data-status="terminated">
+                            <td><input type="checkbox" name="plan-id" value="9" class="plan-checkbox"></td>
+                            <td>PP-2025-009</td>
+                            <td><span class="plan-source-badge manual">人工创建</span></td>
+                            <td>2025年3月物料采购计划（已终止）</td>
+                            <td>月度计划</td>
+                            <td>2025-03</td>
+                            <td>¥700,000.00</td>
+                            <td>¥150,000.00</td>
+                            <td>
+                                <div class="plan-complete-rate">
+                                    <div class="plan-complete-rate-bar">
+                                        <div class="plan-complete-rate-fill danger" style="width:20%;"></div>
+                                    </div>
+                                    <span>20%</span>
+                                </div>
+                            </td>
+                            <td><span class="status-badge status-danger">已终止</span></td>
+                            <td>周采购</td>
+                            <td>
+                                查看 继续执行 强制完成
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 <strong id="plan-total-count">9</strong> 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" id="btn-prev-plan" disabled>上一页</button>
+                    <span class="pagination-page">第 <strong>1</strong> 页 / 共 <strong>1</strong> 页</span>
+                    <button class="btn btn-sm btn-default" id="btn-next-plan" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+        <!-- 计划下供应商询价 / 报价信息子表 -->
+        <div class="card" id="plan-supplier-quote-card" style="margin-top:16px;">
+            <div class="card-header">
+                <div class="card-title">询价信息</div>
+            </div>
+            <div class="card-body">
+                <p class="page-description" id="plan-supplier-quote-empty" style="margin-bottom:8px;">
+                    请选择上方一条采购计划，查看该计划下多个供应商的询价 / 报价信息。
+                </p>
+                <div id="plan-supplier-quote-wrapper" style="display:none;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:12px;flex-wrap:wrap;">
+                        <div style="font-size:13px;color:var(--text-secondary);">
+                            当前计划：
+                            <strong id="plan-supplier-quote-planno" style="margin-right:4px;">-</strong>
+                            <span id="plan-supplier-quote-planname"></span>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-default" id="btn-add-supplier-quote">添加供应商报价</button>
+                        </div>
+                    </div>
+                    <div class="table-wrapper" style="max-height:260px;overflow:auto;border:1px solid var(--border-color);border-radius:var(--radius-sm);">
+                        <table style="width:100%;border-collapse:collapse;">
+                            <thead style="position:sticky;top:0;background:#fafafa;z-index:1;">
+                                <tr>
+                                    <th style="padding:8px 10px;text-align:left;font-size:13px;font-weight:600;color:rgba(0,0,0,0.65);border-bottom:1px solid var(--border-color);">供应商</th>
+                                    <th style="padding:8px 10px;text-align:left;font-size:13px;font-weight:600;color:rgba(0,0,0,0.65);border-bottom:1px solid var(--border-color);">联系人</th>
+                                    <th style="padding:8px 10px;text-align:left;font-size:13px;font-weight:600;color:rgba(0,0,0,0.65);border-bottom:1px solid var(--border-color);">联系电话</th>
+                                    <th style="padding:8px 10px;text-align:left;font-size:13px;font-weight:600;color:rgba(0,0,0,0.65);border-bottom:1px solid var(--border-color);">询价单号</th>
+                                    <th style="padding:8px 10px;text-align:left;font-size:13px;font-weight:600;color:rgba(0,0,0,0.65);border-bottom:1px solid var(--border-color);">报价单号</th>
+                                    <th style="padding:8px 10px;text-align:left;font-size:13px;font-weight:600;color:rgba(0,0,0,0.65);border-bottom:1px solid var(--border-color);">询价日期</th>
+                                    <th style="padding:8px 10px;text-align:left;font-size:13px;font-weight:600;color:rgba(0,0,0,0.65);border-bottom:1px solid var(--border-color);">报价日期</th>
+                                    <th style="padding:8px 10px;text-align:right;font-size:13px;font-weight:600;color:rgba(0,0,0,0.65);border-bottom:1px solid var(--border-color);">报价金额(含税)</th>
+                                    <th style="padding:8px 10px;text-align:left;font-size:13px;font-weight:600;color:rgba(0,0,0,0.65);border-bottom:1px solid var(--border-color);">税率</th>
+                                    <th style="padding:8px 10px;text-align:left;font-size:13px;font-weight:600;color:rgba(0,0,0,0.65);border-bottom:1px solid var(--border-color);">期望交期</th>
+                                    <th style="padding:8px 10px;text-align:left;font-size:13px;font-weight:600;color:rgba(0,0,0,0.65);border-bottom:1px solid var(--border-color);">状态</th>
+                                    <th style="padding:8px 10px;text-align:left;font-size:13px;font-weight:600;color:rgba(0,0,0,0.65);border-bottom:1px solid var(--border-color);">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="plan-supplier-quote-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加/维护供应商报价 弹窗（询价信息子表） -->
+        <div class="modal-overlay" id="supplier-quote-modal">
+            <div class="modal" style="max-width:560px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <div class="modal-title" id="supplier-quote-modal-title">添加供应商报价</div>
+                    <div class="modal-close" data-close-modal="supplier-quote-modal">×</div>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="supplier-quote-plan-id" value="">
+                    <input type="hidden" id="supplier-quote-quote-id" value="">
+                    <p class="page-description" style="margin-bottom:12px;font-size:13px;">填写供应商及报价信息，保存后将显示在当前计划的询价信息列表中。</p>
+                    <div class="form-item" style="margin-bottom:12px;">
+                        <label class="form-label">供应商 <span style="color:#ff4d4f;">*</span></label>
+                        <input type="text" class="form-input" id="supplier-quote-supplier" placeholder="供应商名称" required>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div class="form-item" style="margin-bottom:12px;">
+                            <label class="form-label">联系人</label>
+                            <input type="text" class="form-input" id="supplier-quote-contact" placeholder="联系人">
+                        </div>
+                        <div class="form-item" style="margin-bottom:12px;">
+                            <label class="form-label">联系电话</label>
+                            <input type="text" class="form-input" id="supplier-quote-phone" placeholder="联系电话">
+                        </div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div class="form-item" style="margin-bottom:12px;">
+                            <label class="form-label">询价单号</label>
+                            <input type="text" class="form-input" id="supplier-quote-inquiry-no" placeholder="如 RFQ-2025-001">
+                        </div>
+                        <div class="form-item" style="margin-bottom:12px;">
+                            <label class="form-label">报价单号</label>
+                            <input type="text" class="form-input" id="supplier-quote-quote-no" placeholder="如 QT-2025-001">
+                        </div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div class="form-item" style="margin-bottom:12px;">
+                            <label class="form-label">询价日期</label>
+                            <input type="date" class="form-input" id="supplier-quote-inquiry-date">
+                        </div>
+                        <div class="form-item" style="margin-bottom:12px;">
+                            <label class="form-label">报价日期</label>
+                            <input type="date" class="form-input" id="supplier-quote-quote-date">
+                        </div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div class="form-item" style="margin-bottom:12px;">
+                            <label class="form-label">报价金额(含税) <span style="color:#ff4d4f;">*</span></label>
+                            <input type="number" class="form-input" id="supplier-quote-amount" placeholder="0.00" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-item" style="margin-bottom:12px;">
+                            <label class="form-label">税率</label>
+                            <input type="text" class="form-input" id="supplier-quote-tax-rate" placeholder="如 13%">
+                        </div>
+                    </div>
+                    <div class="form-item" style="margin-bottom:0;">
+                        <label class="form-label">期望交期</label>
+                        <input type="date" class="form-input" id="supplier-quote-delivery">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="supplier-quote-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="btn-supplier-quote-submit">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 比价表弹窗（与详情页比价表模块内容一致） -->
+        <div class="modal-overlay" id="compare-table-modal">
+            <div class="modal" style="max-width:1100px; width: 95%;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <div class="modal-title" id="compare-modal-title">比价表</div>
+                    <div class="modal-close" data-close-modal="compare-table-modal">×</div>
+                </div>
+                <div class="modal-body">
+                    <p class="page-description" style="margin-bottom:12px;font-size:13px;">展示本计划下各物料的供应商报价对比，便于比价与选定供应商（原型为静态示例）。</p>
+                    <div class="table-wrapper">
+                        <table class="compare-modal-table">
+                            <thead>
+                                <tr>
+                                    <th width="100">物料编码</th>
+                                    <th width="140">物料名称</th>
+                                    <th width="100">规格型号</th>
+                                    <th width="80">数量</th>
+                                    <th width="80">单位</th>
+                                    <th width="120">供应商A单价</th>
+                                    <th width="120">供应商B单价</th>
+                                    <th width="120">供应商C单价</th>
+                                </tr>
+                            </thead>
+                            <tbody id="compare-modal-body"></tbody>
+                            <tfoot id="compare-modal-foot">
+                                <tr>
+                                    <td colspan="5" style="text-align:center;font-weight:600;">总合计</td>
+                                    <td id="compare-modal-total-a"></td>
+                                    <td id="compare-modal-total-b"></td>
+                                    <td id="compare-modal-total-c"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="compare-table-modal">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 根据采购计划生成合同订单弹窗（与需求申请/询价单页结构一致：合同信息+订单信息+供应商+采购明细） -->
+        <div class="modal-overlay" id="plan-gen-order-modal">
+            <div class="modal" style="max-width: 1020px; width: 96%; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;" onclick="event.stopPropagation()">
+                <div class="modal-header" style="border-top: 3px solid #1890ff;">
+                    <div class="modal-title">根据采购计划生成合同订单</div>
+                    <div class="modal-close" data-close-modal="plan-gen-order-modal">×</div>
+                </div>
+                <div class="modal-body" style="overflow-y: auto; flex: 1; padding: 16px;">
+                    <p class="page-description" style="margin-bottom:14px;">请选择合同模板，填写合同与订单信息、选择供应商并确认计划明细。选择供应商后明细可带出该供应商最近一次成交的含税单价、税率；含税金额、不含税金额自动计算。可先预览、保存合同，再生成合同订单。</p>
+                    <input type="hidden" id="plan-order-plan-id" value="">
+                    <div class="section-title" style="margin-bottom:8px; font-size:13px; font-weight:600;">合同信息</div>
+                    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px 20px; margin-bottom: 16px; font-size: 13px;">
+                        <div class="form-item" style="margin-bottom:0;"><label class="form-label">合同模板 <span style="color:#ff4d4f;">*</span></label><select class="form-select form-input-sm" id="plan-order-contract-template" required style="width:100%;"><option value="">请选择合同模板</option><option value="framework">采购框架合同模板</option><option value="single">单次采购合同模板</option><option value="material">物料采购合同模板</option><option value="custom">自定义模板</option></select></div>
+                        <div class="form-item" style="margin-bottom:0;"><label class="form-label">合同编号</label><input type="text" class="form-input form-input-sm" id="plan-order-contract-no" placeholder="可留空由系统生成" style="width:100%;"></div>
+                        <div class="form-item" style="margin-bottom:0;"><label class="form-label">合同名称 <span style="color:#ff4d4f;">*</span></label><input type="text" class="form-input form-input-sm" id="plan-order-contract-name" placeholder="如：基于采购计划的采购合同" required style="width:100%;"></div>
+                        <div class="form-item" style="margin-bottom:0;"><label class="form-label">合同类型</label><select class="form-select form-input-sm" id="plan-order-contract-type" style="width:100%;"><option value="framework">框架合同</option><option value="single">单次订单</option><option value="supplement">补充协议</option></select></div>
+                        <div class="form-item" style="margin-bottom:0;"><label class="form-label">签订日期</label><input type="date" class="form-input form-input-sm" id="plan-order-contract-date" style="width:100%;"></div>
+                        <div class="form-item" style="margin-bottom:0;"><label class="form-label">有效期起</label><input type="date" class="form-input form-input-sm" id="plan-order-contract-start" style="width:100%;"></div>
+                        <div class="form-item" style="margin-bottom:0;"><label class="form-label">有效期止</label><input type="date" class="form-input form-input-sm" id="plan-order-contract-end" style="width:100%;"></div>
+                    </div>
+                    <div class="section-title" style="margin-bottom:8px; font-size:13px; font-weight:600;">订单信息</div>
+                    <div style="display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 20px; margin-bottom: 16px; font-size: 13px;">
+                        <div class="form-item" style="margin-bottom:0;"><label class="form-label">采购订单编号</label><input type="text" class="form-input" id="plan-order-no" readonly style="background:#f5f5f5;"></div>
+                        <div class="form-item" style="margin-bottom:0;"><label class="form-label">下单日期 <span style="color:#ff4d4f;">*</span></label><input type="date" class="form-input" id="plan-order-date" required></div>
+                        <div class="form-item" style="margin-bottom:0;"><label class="form-label">要求交期 <span style="color:#ff4d4f;">*</span></label><input type="date" class="form-input" id="plan-order-delivery" required></div>
+                        <div class="form-item" style="margin-bottom:0;"><label class="form-label">付款条件</label><select class="form-select form-input-sm" id="plan-order-payment-terms" style="width:100%;"><option value="">请选择</option><option value="prepay">预付款</option><option value="net30">货到30天</option><option value="net60">货到60天</option><option value="net90">货到90天</option><option value="other">其他</option></select></div>
+                        <div class="form-item" style="margin-bottom:0;"><label class="form-label">交货地点</label><input type="text" class="form-input form-input-sm" id="plan-order-delivery-address" placeholder="默认供应商地址" style="width:100%;"></div>
+                        <div class="form-item" style="margin-bottom:0;"><label class="form-label">采购员</label><input type="text" class="form-input" id="plan-order-buyer" placeholder="自动带出或手工录入" style="width:100%;"></div>
+                    </div>
+                    <div class="section-title" style="margin-bottom:8px; font-size:13px; font-weight:600;">供应商与明细</div>
+                    <div class="form-item" style="margin-bottom:12px;">
+                        <label class="form-label">供应商 <span style="color:#ff4d4f;">*</span> <span style="color:var(--text-tertiary);font-weight:normal;">（输入名称或编码搜索）</span></label>
+                        <input type="hidden" id="plan-order-supplier" value="">
+                        <div class="supplier-search-wrap" style="position:relative;max-width:420px;">
+                            <input type="text" class="form-input" id="plan-order-supplier-search" placeholder="输入供应商名称或编码搜索，点击下拉项选择" autocomplete="off" style="width:100%;">
+                            <div class="supplier-dropdown" id="plan-order-supplier-dropdown" style="display:none;position:absolute;left:0;right:0;top:100%;margin-top:4px;max-height:220px;overflow-y:auto;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:10;"></div>
+                        </div>
+                        <p class="form-hint" style="margin-top:6px;font-size:12px;color:var(--text-tertiary);">已选：<span id="plan-order-supplier-display">未选择</span></p>
+                    </div>
+                    <div class="table-wrapper" style="border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                        <table id="plan-order-preview-table" style="width:100%; border-collapse: collapse;">
+                            <thead id="plan-order-thead" style="position:sticky; top:0; background:#fafafa; z-index:1;"></thead>
+                            <tbody id="plan-order-tbody"></tbody>
+                        </table>
+                    </div>
+                    <p class="modal-desc" style="margin-top:12px; color:var(--text-tertiary);" id="plan-order-summary">共 <strong id="plan-order-row-count">0</strong> 条物料明细</p>
+                    <p class="modal-desc" style="margin-top:8px; text-align:right; font-size:13px; font-weight:600; color:rgba(0,0,0,0.85);">合计含税金额：<strong id="plan-order-total-tax">0.00</strong>　合计不含税金额：<strong id="plan-order-total-notax">0.00</strong></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="plan-gen-order-modal">取消</button>
+                    <button type="button" class="btn btn-default" id="btn-plan-order-preview">合同预览</button>
+                    <button type="button" class="btn btn-default" id="btn-plan-order-save-contract">保存合同</button>
+                    <button type="button" class="btn btn-primary" id="btn-plan-order-submit">确定生成合同订单</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        console.log('采购计划列表 页面已加载');
+
+        // 采购计划数据存储：列表、查看、编辑共用，保证业务关联一致
+        window.__planStore = window.__planStore || {};
+        var PLAN_STORE = window.__planStore;
+
+        // 示例：每个采购计划下的供应商询价 / 报价数据（原型模拟）
+        var PLAN_SUPPLIER_QUOTES = {
+            1: [
+                { supplier: '深圳市电子科技有限公司', contact: '张工', phone: '13800000001', inquiryNo: 'RFQ-2025-001', quoteNo: 'QT-2025-001', inquiryDate: '2025-01-05', quoteDate: '2025-01-08', amount: 1250000.00, taxRate: '13%', delivery: '2025-02-28', quoteStatus: '已报价', bidStatus: '已中标', id: 'q1-1' },
+                { supplier: '上海精密机械制造有限公司', contact: '李工', phone: '13900000002', inquiryNo: 'RFQ-2025-001', quoteNo: 'QT-2025-002', inquiryDate: '2025-01-05', quoteDate: '2025-01-09', amount: 1268000.00, taxRate: '13%', delivery: '2025-03-05', quoteStatus: '已报价', bidStatus: '未中标', id: 'q1-2' },
+                { supplier: '北京贸易有限公司', contact: '王经理', phone: '13700000003', inquiryNo: 'RFQ-2025-001', quoteNo: '', inquiryDate: '2025-01-05', quoteDate: '', amount: 0, taxRate: '', delivery: '', quoteStatus: '未报价', bidStatus: '', id: 'q1-3' }
+            ],
+            2: [
+                { supplier: '北京贸易有限公司', contact: '王经理', phone: '13700000003', inquiryNo: 'RFQ-2025-010', quoteNo: 'QT-2025-010', inquiryDate: '2024-12-25', quoteDate: '2024-12-27', amount: 680000.00, taxRate: '13%', delivery: '2025-01-20', quoteStatus: '已报价', bidStatus: '已中标', id: 'q2-1' }
+            ],
+            3: []
+        };
+
+        function formatMoney(v) {
+            var n = parseFloat(v || 0);
+            if (isNaN(n)) n = 0;
+            return '¥' + n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function renderPlanSupplierQuotes(planId) {
+            var emptyEl = document.getElementById('plan-supplier-quote-empty');
+            var wrapper = document.getElementById('plan-supplier-quote-wrapper');
+            var tbody = document.getElementById('plan-supplier-quote-tbody');
+            var planNoEl = document.getElementById('plan-supplier-quote-planno');
+            var planNameEl = document.getElementById('plan-supplier-quote-planname');
+            if (!emptyEl || !wrapper || !tbody) return;
+
+            var plan = PLAN_STORE[planId];
+            var rows = PLAN_SUPPLIER_QUOTES[planId] || [];
+
+            if (!plan) {
+                emptyEl.style.display = 'block';
+                emptyEl.textContent = '未找到该采购计划数据，请重新选择。';
+                wrapper.style.display = 'none';
+                tbody.innerHTML = '';
+                return;
+            }
+
+            if (!rows.length) {
+                emptyEl.style.display = 'block';
+                emptyEl.textContent = '该采购计划下暂未维护供应商询价 / 报价信息，可点击右上角“添加供应商报价”模拟新增。';
+                wrapper.style.display = 'block';
+                tbody.innerHTML = '';
+            } else {
+                emptyEl.style.display = 'none';
+                wrapper.style.display = 'block';
+                tbody.innerHTML = '';
+                rows.forEach(function (r) {
+                    var tr = document.createElement('tr');
+                    tr.innerHTML =
+                        '<td style="padding:8px 10px;font-size:13px;border-bottom:1px solid #f0f0f0;">' + (r.supplier || '-') + '</td>' +
+                        '<td style="padding:8px 10px;font-size:13px;border-bottom:1px solid #f0f0f0;">' + (r.contact || '-') + '</td>' +
+                        '<td style="padding:8px 10px;font-size:13px;border-bottom:1px solid #f0f0f0;">' + (r.phone || '-') + '</td>' +
+                        '<td style="padding:8px 10px;font-size:13px;border-bottom:1px solid #f0f0f0;">' + (r.inquiryNo || '-') + '</td>' +
+                        '<td style="padding:8px 10px;font-size:13px;border-bottom:1px solid #f0f0f0;">' + (r.quoteNo || '-') + '</td>' +
+                        '<td style="padding:8px 10px;font-size:13px;border-bottom:1px solid #f0f0f0;">' + (r.inquiryDate || '-') + '</td>' +
+                        '<td style="padding:8px 10px;font-size:13px;border-bottom:1px solid #f0f0f0;">' + (r.quoteDate || '-') + '</td>' +
+                        '<td style="padding:8px 10px;font-size:13px;text-align:right;border-bottom:1px solid #f0f0f0;">' + formatMoney(r.amount) + '</td>' +
+                        '<td style="padding:8px 10px;font-size:13px;border-bottom:1px solid #f0f0f0;">' + (r.taxRate || '-') + '</td>' +
+                        '<td style="padding:8px 10px;font-size:13px;border-bottom:1px solid #f0f0f0;">' + (r.delivery || '-') + '</td>' +
+                        '<td style="padding:8px 10px;font-size:13px;border-bottom:1px solid #f0f0f0;">' + (r.quoteStatus || '未报价') + '</td>' +
+                        '<td style="padding:8px 10px;font-size:13px;border-bottom:1px solid #f0f0f0;"><div class="plan-list-actions">' +
+                            '<button type="button" class="btn btn-sm btn-default btn-maintain-quote" data-quote-id="' + (r.id || '') + '" data-plan-id="' + planId + '">维护报价</button>' +
+                            (r.quoteStatus === '已报价' ? '<button type="button" class="btn btn-sm btn-primary btn-set-bid" data-quote-id="' + (r.id || '') + '" data-plan-id="' + planId + '">设置中标</button>' : '') +
+                        '</div></td>';
+                    tbody.appendChild(tr);
+                });
+            }
+
+            if (planNoEl) planNoEl.textContent = plan.planNo || '-';
+            if (planNameEl) planNameEl.textContent = plan.planName || '';
+            var wrapperEl = document.getElementById('plan-supplier-quote-wrapper');
+            if (wrapperEl) wrapperEl.setAttribute('data-current-plan-id', String(planId || ''));
+            // 绑定设置中标按钮事件
+            bindSetBidButtons();
+        }
+
+        // 打开「添加/维护供应商报价」弹窗
+        function openSupplierQuoteModal(mode, planId, quoteData) {
+            var overlay = document.getElementById('supplier-quote-modal');
+            var titleEl = document.getElementById('supplier-quote-modal-title');
+            if (!overlay || !titleEl) return;
+            var planIdStr = String(planId || '');
+            document.getElementById('supplier-quote-plan-id').value = planIdStr;
+            document.getElementById('supplier-quote-quote-id').value = quoteData ? (quoteData.id || '') : '';
+            if (titleEl) titleEl.textContent = mode === 'maintain' ? '维护报价' : '添加供应商报价';
+            var supplier = document.getElementById('supplier-quote-supplier');
+            var contact = document.getElementById('supplier-quote-contact');
+            var phone = document.getElementById('supplier-quote-phone');
+            var inquiryNo = document.getElementById('supplier-quote-inquiry-no');
+            var quoteNo = document.getElementById('supplier-quote-quote-no');
+            var inquiryDate = document.getElementById('supplier-quote-inquiry-date');
+            var quoteDate = document.getElementById('supplier-quote-quote-date');
+            var amount = document.getElementById('supplier-quote-amount');
+            var taxRate = document.getElementById('supplier-quote-tax-rate');
+            var delivery = document.getElementById('supplier-quote-delivery');
+            if (mode === 'maintain' && quoteData) {
+                supplier.value = quoteData.supplier || '';
+                contact.value = quoteData.contact || '';
+                phone.value = quoteData.phone || '';
+                inquiryNo.value = quoteData.inquiryNo || '';
+                quoteNo.value = quoteData.quoteNo || '';
+                inquiryDate.value = quoteData.inquiryDate || '';
+                quoteDate.value = quoteData.quoteDate || '';
+                amount.value = quoteData.amount != null && quoteData.amount !== '' ? Number(quoteData.amount) : '';
+                taxRate.value = quoteData.taxRate || '';
+                delivery.value = quoteData.delivery || '';
+            } else {
+                supplier.value = '';
+                contact.value = '';
+                phone.value = '';
+                inquiryNo.value = '';
+                quoteNo.value = '';
+                inquiryDate.value = '';
+                quoteDate.value = '';
+                amount.value = '';
+                taxRate.value = '';
+                delivery.value = '';
+            }
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSupplierQuoteModal() {
+            var overlay = document.getElementById('supplier-quote-modal');
+            if (overlay) {
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        var compareRowsHtml = '<tr><td>EQ-1001</td><td>数控机床</td><td>XK7132</td><td>3</td><td>台</td><td>¥140,000.00</td><td>¥145,000.00</td><td class="compare-lowest">¥139,333.33</td></tr>' +
+            '<tr><td>EQ-2001</td><td>空压机</td><td>30kW</td><td>2</td><td>台</td><td>¥42,500.00</td><td class="compare-lowest">¥41,000.00</td><td>¥43,000.00</td></tr>';
+        function openCompareModal(planId) {
+            var overlay = document.getElementById('compare-table-modal');
+            var titleEl = document.getElementById('compare-modal-title');
+            var bodyEl = document.getElementById('compare-modal-body');
+            var footEl = document.getElementById('compare-modal-foot');
+            var totalA = document.getElementById('compare-modal-total-a');
+            var totalB = document.getElementById('compare-modal-total-b');
+            var totalC = document.getElementById('compare-modal-total-c');
+            if (!overlay || !bodyEl) return;
+            var plan = PLAN_STORE[planId];
+            if (titleEl) titleEl.textContent = plan && plan.planName ? '比价表 - ' + plan.planName : '比价表';
+            if (bodyEl) bodyEl.innerHTML = compareRowsHtml;
+            if (footEl) footEl.style.display = 'table-footer-group';
+            if (totalA) totalA.textContent = '¥505,000.00';
+            if (totalB) totalB.textContent = '¥517,000.00';
+            if (totalC) { totalC.textContent = '¥504,000.00'; totalC.classList.add('compare-lowest'); }
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeCompareModal() {
+            var overlay = document.getElementById('compare-table-modal');
+            if (overlay) {
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // 绑定「添加供应商报价」「维护报价」弹窗
+        function bindSupplierQuoteModal() {
+            var overlay = document.getElementById('supplier-quote-modal');
+            if (overlay && !overlay.getAttribute('data-quote-close-bound')) {
+                overlay.setAttribute('data-quote-close-bound', '1');
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay) closeSupplierQuoteModal();
+                });
+                var closeBtns = overlay.querySelectorAll('[data-close-modal="supplier-quote-modal"]');
+                closeBtns.forEach(function(btn) {
+                    btn.addEventListener('click', function() { closeSupplierQuoteModal(); });
+                });
+            }
+            var compareOverlay = document.getElementById('compare-table-modal');
+            if (compareOverlay && !compareOverlay.getAttribute('data-compare-close-bound')) {
+                compareOverlay.setAttribute('data-compare-close-bound', '1');
+                compareOverlay.addEventListener('click', function(e) {
+                    if (e.target === compareOverlay) closeCompareModal();
+                });
+                var compareCloseBtns = compareOverlay.querySelectorAll('[data-close-modal="compare-table-modal"]');
+                compareCloseBtns.forEach(function(btn) {
+                    btn.addEventListener('click', function() { closeCompareModal(); });
+                });
+            }
+            var btnAdd = document.getElementById('btn-add-supplier-quote');
+            if (btnAdd && !btnAdd.getAttribute('data-quote-modal-bound')) {
+                btnAdd.setAttribute('data-quote-modal-bound', '1');
+                btnAdd.addEventListener('click', function() {
+                    var wrapper = document.getElementById('plan-supplier-quote-wrapper');
+                    var planId = wrapper ? wrapper.getAttribute('data-current-plan-id') : '';
+                    if (!planId) {
+                        alert('请先选择上方一条采购计划。');
+                        return;
+                    }
+                    openSupplierQuoteModal('add', planId, null);
+                });
+            }
+            var btnSubmit = document.getElementById('btn-supplier-quote-submit');
+            if (btnSubmit && !btnSubmit.getAttribute('data-quote-submit-bound')) {
+                btnSubmit.setAttribute('data-quote-submit-bound', '1');
+                btnSubmit.addEventListener('click', function() {
+                    var planId = document.getElementById('supplier-quote-plan-id') && document.getElementById('supplier-quote-plan-id').value;
+                    var quoteId = document.getElementById('supplier-quote-quote-id') && document.getElementById('supplier-quote-quote-id').value;
+                    var supplier = document.getElementById('supplier-quote-supplier') && document.getElementById('supplier-quote-supplier').value.trim();
+                    var amountEl = document.getElementById('supplier-quote-amount');
+                    var amountVal = amountEl ? amountEl.value : '';
+                    if (!planId) { alert('缺少计划信息，请关闭后重新操作。'); return; }
+                    if (!supplier) { alert('请填写供应商。'); return; }
+                    var amountNum = parseFloat(amountVal);
+                    if (isNaN(amountNum) || amountNum < 0) { alert('请填写有效的报价金额(含税)。'); return; }
+                    var contact = (document.getElementById('supplier-quote-contact') && document.getElementById('supplier-quote-contact').value) || '';
+                    var phone = (document.getElementById('supplier-quote-phone') && document.getElementById('supplier-quote-phone').value) || '';
+                    var inquiryNo = (document.getElementById('supplier-quote-inquiry-no') && document.getElementById('supplier-quote-inquiry-no').value) || '';
+                    var quoteNo = (document.getElementById('supplier-quote-quote-no') && document.getElementById('supplier-quote-quote-no').value) || '';
+                    var inquiryDate = (document.getElementById('supplier-quote-inquiry-date') && document.getElementById('supplier-quote-inquiry-date').value) || '';
+                    var quoteDate = (document.getElementById('supplier-quote-quote-date') && document.getElementById('supplier-quote-quote-date').value) || '';
+                    var taxRate = (document.getElementById('supplier-quote-tax-rate') && document.getElementById('supplier-quote-tax-rate').value) || '';
+                    var delivery = (document.getElementById('supplier-quote-delivery') && document.getElementById('supplier-quote-delivery').value) || '';
+                    var quoteStatus = (amountVal !== '' && amountNum > 0) || quoteNo ? '已报价' : '未报价';
+                    if (!PLAN_SUPPLIER_QUOTES[planId]) PLAN_SUPPLIER_QUOTES[planId] = [];
+                    var list = PLAN_SUPPLIER_QUOTES[planId];
+                    if (quoteId) {
+                        var idx = list.findIndex(function(q) { return q.id === quoteId; });
+                        if (idx >= 0) {
+                            list[idx] = Object.assign({}, list[idx], {
+                                supplier: supplier,
+                                contact: contact,
+                                phone: phone,
+                                inquiryNo: inquiryNo,
+                                quoteNo: quoteNo,
+                                inquiryDate: inquiryDate,
+                                quoteDate: quoteDate,
+                                amount: amountNum,
+                                taxRate: taxRate,
+                                delivery: delivery,
+                                quoteStatus: quoteStatus
+                            });
+                        }
+                    } else {
+                        var maxN = 0;
+                        list.forEach(function(q) {
+                            var match = (q.id || '').match(/q\d+-(\d+)/);
+                            var m = match ? parseInt(match[1], 10) : 0;
+                            if (m > maxN) maxN = m;
+                        });
+                        var newId = 'q' + planId + '-' + (maxN + 1);
+                        var plan = PLAN_STORE[planId];
+                        var inquiryNoDefault = (plan && plan.planNo) ? 'RFQ-' + (plan.planNo.replace('PP-', '') || '') : 'RFQ-2025-001';
+                        list.push({
+                            id: newId,
+                            supplier: supplier,
+                            contact: contact,
+                            phone: phone,
+                            inquiryNo: inquiryNo || inquiryNoDefault,
+                            quoteNo: quoteNo,
+                            inquiryDate: inquiryDate || new Date().toISOString().slice(0, 10),
+                            quoteDate: quoteDate,
+                            amount: amountNum,
+                            taxRate: taxRate,
+                            delivery: delivery,
+                            quoteStatus: quoteStatus,
+                            bidStatus: quoteStatus === '已报价' ? '未中标' : ''
+                        });
+                    }
+                    renderPlanSupplierQuotes(planId);
+                    closeSupplierQuoteModal();
+                });
+            }
+        }
+
+        // 维护报价：事件委托（子表行动态生成）
+        document.addEventListener('click', function(e) {
+            var target = e.target && (e.target.classList.contains('btn-maintain-quote') ? e.target : e.target.closest('.btn-maintain-quote'));
+            if (!target) return;
+            var planId = target.getAttribute('data-plan-id');
+            var quoteId = target.getAttribute('data-quote-id');
+            if (!planId || !quoteId) return;
+            var list = PLAN_SUPPLIER_QUOTES[planId] || [];
+            var quote = list.find(function(q) { return q.id === quoteId; });
+            if (quote) openSupplierQuoteModal('maintain', planId, quote);
+        });
+        // 比价表：事件委托（询价中状态行）
+        document.addEventListener('click', function(e) {
+            var target = e.target && (e.target.classList.contains('btn-show-compare-modal') ? e.target : e.target.closest('.btn-show-compare-modal'));
+            if (!target) return;
+            var planId = target.getAttribute('data-plan-id');
+            if (planId) openCompareModal(planId);
+        });
+
+        // 绑定设置中标按钮事件
+        function bindSetBidButtons() {
+            document.querySelectorAll('.btn-set-bid').forEach(function(btn) {
+                if (btn.getAttribute('data-bid-bound')) return;
+                btn.setAttribute('data-bid-bound', '1');
+                btn.addEventListener('click', function() {
+                    var quoteId = this.getAttribute('data-quote-id');
+                    var planId = this.getAttribute('data-plan-id');
+                    var currentStatus = this.getAttribute('data-bid-status') || '';
+                    var newStatus = currentStatus === '已中标' ? '未中标' : '已中标';
+                    if (!confirm('确定要将该供应商设置为' + (newStatus === '已中标' ? '已中标' : '未中标') + '吗？')) return;
+                    // 更新数据
+                    var quotes = PLAN_SUPPLIER_QUOTES[planId] || [];
+                    var quote = quotes.find(function(q) { return q.id === quoteId; });
+                    if (quote) {
+                        quote.bidStatus = newStatus;
+                        // 如果设置为已中标，其他供应商自动设为未中标
+                        if (newStatus === '已中标') {
+                            quotes.forEach(function(q) {
+                                if (q.id !== quoteId && q.bidStatus === '已中标') {
+                                    q.bidStatus = '未中标';
+                                }
+                            });
+                        }
+                        renderPlanSupplierQuotes(planId);
+                        alert('操作成功！');
+                    }
+                });
+            });
+        }
+
+        function formatCompleteRate(rateStr) {
+            var rate = parseFloat((rateStr || '0%').replace('%', ''));
+            if (isNaN(rate)) rate = 0;
+            var rateClass = rate >= 70 ? '' : (rate >= 40 ? 'warning' : 'danger');
+            return '<div class="plan-complete-rate"><div class="plan-complete-rate-bar"><div class="plan-complete-rate-fill ' + rateClass + '" style="width:' + rate + '%;"></div></div><span>' + rate + '%</span></div>';
+        }
+        function buildPlanRowHtml(id, data, sourceText) {
+            // 状态样式与文案映射
+            var status = data.status || 'reviewing';
+            var statusTextMap = {
+                draft: '草稿',
+                reviewing: '审核中',
+                approved: '已通过',
+                rejected: '已驳回',
+                inquiring: '询价中',
+                pending_exec: '待执行',
+                executing: '执行中',
+                completed: '已完成',
+                terminated: '已终止'
+            };
+            var statusText = data.statusText || statusTextMap[status] || '审核中';
+            var statusClass = 'status-reviewing';
+            if (status === 'approved' || status === 'inquiring' || status === 'executing' || status === 'completed') {
+                statusClass = 'status-processing';
+            } else if (status === 'rejected' || status === 'terminated') {
+                statusClass = 'status-danger';
+            } else if (status === 'draft' || status === 'pending_exec') {
+                statusClass = 'status-warning';
+            }
+
+            var planSource = sourceText || (data.planSource || '人工创建');
+            var sourceBadgeClass = planSource === '需求下推' ? 'demand' : 'manual';
+
+            // 操作按钮按状态控制
+            var actions = [];
+            var viewBtn = '<button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-plan-detail.html" data-id="' + id + '">查看</button>';
+            var editBtn = '<button class="btn btn-sm btn-default btn-edit" data-url="pages/procurement-plan-edit.html" data-id="' + id + '">编辑</button>';
+            var deleteBtn = '<button class="btn btn-sm btn-default btn-delete-plan" data-id="' + id + '">删除</button>';
+            var submitBtn = '<button class="btn btn-sm btn-default btn-submit-review" data-id="' + id + '">提交审核</button>';
+            var genInquiryBtn = '<button type="button" class="btn btn-sm btn-default btn-gen-inquiry-from-plan" data-plan-id="' + id + '">生成询价单</button>';
+            var genOrderBtn = '<button type="button" class="btn btn-sm btn-default btn-gen-order-from-plan" data-plan-id="' + id + '">生成合同订单</button>';
+            var startExecBtn = '<button type="button" class="btn btn-sm btn-default btn-start-exec" data-id="' + id + '">开始执行</button>';
+            var terminateBtn = '<button type="button" class="btn btn-sm btn-default btn-terminate-exec" data-id="' + id + '">终止</button>';
+            var resumeBtn = '<button type="button" class="btn btn-sm btn-default btn-resume-exec" data-id="' + id + '">继续执行</button>';
+            var forceDoneBtn = '<button type="button" class="btn btn-sm btn-default btn-force-complete" data-id="' + id + '">强制完成</button>';
+
+            actions.push(viewBtn);
+            if (status === 'draft' || status === 'rejected') {
+                actions.push(editBtn, deleteBtn, submitBtn);
+            } else if (status === 'approved') {
+                // 已通过：查看 + 生成询价单 + 生成合同订单
+                actions.push(genInquiryBtn, genOrderBtn);
+            } else if (status === 'inquiring') {
+                actions.push('<button type="button" class="btn btn-sm btn-default btn-show-compare-modal" data-plan-id="' + id + '">比价表</button>');
+            } else if (status === 'pending_exec') {
+                actions.push(startExecBtn);
+            } else if (status === 'executing') {
+                actions.push(terminateBtn);
+            } else if (status === 'terminated') {
+                actions.push(resumeBtn, forceDoneBtn);
+            }
+            // 已完成 等状态仅查看
+
+            return '<td><input type="checkbox" name="plan-id" value="' + id + '" class="plan-checkbox"></td>' +
+                '<td>' + (data.planNo || '') + '</td>' +
+                '<td><span class="plan-source-badge ' + sourceBadgeClass + '">' + planSource + '</span></td>' +
+                '<td>' + (data.planName || '') + '</td>' +
+                '<td>' + (data.planType || '') + '</td>' +
+                '<td>' + (data.planCycle || '') + '</td>' +
+                '<td>¥' + (parseFloat(data.budgetAmount || '0').toLocaleString('zh-CN', {minimumFractionDigits: 2, maximumFractionDigits: 2})) + '</td>' +
+                '<td>¥' + (parseFloat(data.execAmount || '0').toLocaleString('zh-CN', {minimumFractionDigits: 2, maximumFractionDigits: 2})) + '</td>' +
+                '<td>' + formatCompleteRate(data.completeRate || '0%') + '</td>' +
+                '<td><span class="status-badge ' + statusClass + '">' + statusText + '</span></td>' +
+                '<td>' + (data.creator || '') + '</td>' +
+                '<td><div class="plan-list-actions">' + actions.join(' ') + '</div></td>';
+        }
+
+        // 根据 PLAN_STORE 统一渲染主表（保证操作按钮样式与脚本逻辑一致）
+        function renderPlanTableFromStore() {
+            var tbody = document.getElementById('plan-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            Object.keys(PLAN_STORE).sort(function(a, b){ return parseInt(a,10) - parseInt(b,10); }).forEach(function(id) {
+                var p = PLAN_STORE[id];
+                if (!p) return;
+                var tr = document.createElement('tr');
+                tr.setAttribute('data-id', id);
+                tr.setAttribute('data-source', p.planSource === '需求下推' ? 'demand' : 'manual');
+                tr.setAttribute('data-type', p.planType || '');
+                tr.setAttribute('data-status', p.status || 'reviewing');
+                tr.innerHTML = buildPlanRowHtml(id, p, p.planSource);
+                tbody.appendChild(tr);
+            });
+            var countEl = document.getElementById('plan-total-count');
+            if (countEl) countEl.textContent = tbody.querySelectorAll('tr').length;
+        }
+
+        // 新增或导入计划时插入一条并刷新列表
+        function insertPlanRow(data, sourceText) {
+            if (!data || !data.planNo) return;
+            var planSource = data.planSource === '需求下推' ? '需求下推' : (data.planSource || '人工创建');
+            var nextId = 1;
+            Object.keys(PLAN_STORE).forEach(function(k) {
+                var num = parseInt(k, 10);
+                if (!isNaN(num)) nextId = Math.max(nextId, num + 1);
+            });
+            PLAN_STORE[nextId] = {
+                id: nextId,
+                planNo: data.planNo,
+                planName: data.planName,
+                planType: data.planType || '月度计划',
+                planCycle: data.planCycle,
+                planSource: planSource,
+                planAmount: data.planAmount || '0.00',
+                budgetAmount: data.budgetAmount || '0.00',
+                execAmount: data.execAmount || '0.00',
+                completeRate: data.completeRate || '0%',
+                status: data.status || 'draft',
+                statusText: data.statusText || '草稿',
+                creator: data.creator || '当前用户',
+                sourceDemandNos: data.sourceDemandNos || (planSource === '需求下推' ? ['DEM-2025-001'] : []),
+                lines: data.lines || []
+            };
+            renderPlanTableFromStore();
+            bindPlanCheckboxEvents();
+            if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+        }
+
+        (function initPlanStore() {
+            // 1 草稿
+            PLAN_STORE[1] = {
+                id: 1,
+                planNo: 'PP-2025-001',
+                planName: '2025年度设备采购计划（草稿）',
+                planType: '年度计划',
+                planCycle: '2025',
+                planSource: '人工创建',
+                planAmount: '5000000.00',
+                budgetAmount: '5000000.00',
+                execAmount: '0.00',
+                completeRate: '0%',
+                status: 'draft',
+                statusText: '草稿',
+                creator: '张采购',
+                sourceDemandNos: [],
+                lines: [
+                    { materialCode: 'EQ-1001', materialName: '数控机床', spec: 'XK7132', qty: '3', unit: '台', requiredDate: '2025-06-30' },
+                    { materialCode: 'EQ-2001', materialName: '空压机', spec: '30kW', qty: '2', unit: '台', requiredDate: '2025-09-15' }
+                ]
+            };
+            // 2 审核中
+            PLAN_STORE[2] = {
+                id: 2,
+                planNo: 'PP-2025-002',
+                planName: '2025年Q1季度采购计划（审核中）',
+                planType: '季度计划',
+                planCycle: '2025-01 ~ 2025-03',
+                planSource: '人工创建',
+                planAmount: '2600000.00',
+                budgetAmount: '2600000.00',
+                execAmount: '200000.00',
+                completeRate: '10%',
+                status: 'reviewing',
+                statusText: '审核中',
+                creator: '张采购',
+                sourceDemandNos: [],
+                lines: [
+                    { materialCode: 'RM-1001', materialName: '碳素钢板', spec: 'Q235 10mm', qty: '50', unit: '吨', requiredDate: '2025-02-10' }
+                ]
+            };
+            // 3 已通过
+            PLAN_STORE[3] = {
+                id: 3,
+                planNo: 'PP-2025-003',
+                planName: '2025年1月月度采购计划（已通过）',
+                planType: '月度计划',
+                planCycle: '2025-01',
+                planSource: '需求下推',
+                planAmount: '900000.00',
+                budgetAmount: '900000.00',
+                execAmount: '680000.00',
+                completeRate: '80%',
+                status: 'approved',
+                statusText: '已通过',
+                creator: '李采购',
+                sourceDemandNos: ['DEM-2025-001', 'DEM-2025-002'],
+                lines: [
+                    { materialCode: 'M001-A', materialName: '电机组件', spec: '型号A', qty: '10', unit: '台', requiredDate: '2025-01-20' },
+                    { materialCode: 'M003', materialName: '轴承', spec: '6204', qty: '200', unit: '个', requiredDate: '2025-01-25' }
+                ]
+            };
+            // 4 已驳回
+            PLAN_STORE[4] = {
+                id: 4,
+                planNo: 'PP-2025-004',
+                planName: '2025年2月月度采购计划（已驳回）',
+                planType: '月度计划',
+                planCycle: '2025-02',
+                planSource: '人工创建',
+                planAmount: '800000.00',
+                budgetAmount: '800000.00',
+                execAmount: '0.00',
+                completeRate: '5%',
+                status: 'rejected',
+                statusText: '已驳回',
+                creator: '李采购',
+                sourceDemandNos: [],
+                lines: [
+                    { materialCode: 'PK-0001', materialName: '纸箱', spec: '600*400*400', qty: '500', unit: '个', requiredDate: '2025-02-18' }
+                ]
+            };
+            // 5 询价中
+            PLAN_STORE[5] = {
+                id: 5,
+                planNo: 'PP-2025-005',
+                planName: '2025年项目专项采购计划（询价中）',
+                planType: '专项计划',
+                planCycle: '2025-03',
+                planSource: '需求下推',
+                planAmount: '1200000.00',
+                budgetAmount: '1200000.00',
+                execAmount: '300000.00',
+                completeRate: '30%',
+                status: 'inquiring',
+                statusText: '询价中',
+                creator: '王采购',
+                sourceDemandNos: ['DEM-2025-010'],
+                lines: [
+                    { materialCode: 'PRJ-1001', materialName: '项目专用工装', spec: '治具A', qty: '4', unit: '套', requiredDate: '2025-03-15' },
+                    { materialCode: 'PRJ-2001', materialName: '项目辅料包', spec: '物料清单见附件', qty: '1', unit: '批', requiredDate: '2025-03-10' }
+                ]
+            };
+            // 6 待执行
+            PLAN_STORE[6] = {
+                id: 6,
+                planNo: 'PP-2025-006',
+                planName: '2025年Q2季度采购计划（待执行）',
+                planType: '季度计划',
+                planCycle: '2025-04 ~ 2025-06',
+                planSource: '人工创建',
+                planAmount: '3000000.00',
+                budgetAmount: '3000000.00',
+                execAmount: '0.00',
+                completeRate: '0%',
+                status: 'pending_exec',
+                statusText: '待执行',
+                creator: '张采购',
+                sourceDemandNos: [],
+                lines: [
+                    { materialCode: 'RM-2001', materialName: '铝型材', spec: '6063-T5', qty: '30', unit: '吨', requiredDate: '2025-05-05' }
+                ]
+            };
+            // 7 执行中
+            PLAN_STORE[7] = {
+                id: 7,
+                planNo: 'PP-2025-007',
+                planName: '2025年度备件采购计划（执行中）',
+                planType: '年度计划',
+                planCycle: '2025',
+                planSource: '人工创建',
+                planAmount: '4500000.00',
+                budgetAmount: '4500000.00',
+                execAmount: '1500000.00',
+                completeRate: '35%',
+                status: 'executing',
+                statusText: '执行中',
+                creator: '赵采购',
+                sourceDemandNos: [],
+                lines: [
+                    { materialCode: 'SP-0001', materialName: '易损备件包', spec: '年度', qty: '1', unit: '批', requiredDate: '2025-07-01' },
+                    { materialCode: 'SP-0002', materialName: '轴承备件', spec: '多规格', qty: '500', unit: '个', requiredDate: '2025-04-15' }
+                ]
+            };
+            // 8 已完成
+            PLAN_STORE[8] = {
+                id: 8,
+                planNo: 'PP-2025-008',
+                planName: '2024年技改项目采购计划（已完成）',
+                planType: '专项计划',
+                planCycle: '2024-01 ~ 2024-12',
+                planSource: '需求下推',
+                planAmount: '6800000.00',
+                budgetAmount: '6800000.00',
+                execAmount: '6800000.00',
+                completeRate: '100%',
+                status: 'completed',
+                statusText: '已完成',
+                creator: '孙采购',
+                sourceDemandNos: ['DEM-2024-001'],
+                lines: [
+                    { materialCode: 'UP-1001', materialName: '生产线改造包', spec: '含设备+安装', qty: '1', unit: '项', requiredDate: '2024-11-30' }
+                ]
+            };
+            // 9 已终止
+            PLAN_STORE[9] = {
+                id: 9,
+                planNo: 'PP-2025-009',
+                planName: '2025年3月物料采购计划（已终止）',
+                planType: '月度计划',
+                planCycle: '2025-03',
+                planSource: '人工创建',
+                planAmount: '700000.00',
+                budgetAmount: '700000.00',
+                execAmount: '150000.00',
+                completeRate: '20%',
+                status: 'terminated',
+                statusText: '已终止',
+                creator: '周采购',
+                sourceDemandNos: [],
+                lines: [
+                    { materialCode: 'RM-3001', materialName: '不锈钢棒材', spec: '304 φ20', qty: '5', unit: '吨', requiredDate: '2025-03-20' }
+                ]
+            };
+        })();
+
+        // 页面初始化时先根据 PLAN_STORE 统一渲染一遍主表
+        renderPlanTableFromStore();
+
+        (function () {
+            var keyFromDemand = 'newPlanFromDemand';
+            var rawFromDemand = sessionStorage.getItem(keyFromDemand);
+            if (rawFromDemand) {
+                try {
+                    var data = JSON.parse(rawFromDemand);
+                    sessionStorage.removeItem(keyFromDemand);
+                    data.planSource = data.planSource || '需求下推';
+                    data.sourceDemandNos = data.sourceDemandNos || ['DEM-2025-001'];
+                    data.lines = data.lines || [];
+                    insertPlanRow(data, '需求下推');
+                } catch (e) {}
+            }
+            var keyManual = 'newPlanManual';
+            var rawManual = sessionStorage.getItem(keyManual);
+            if (rawManual) {
+                try {
+                    var data = JSON.parse(rawManual);
+                    sessionStorage.removeItem(keyManual);
+                    data.planSource = data.planSource || '人工创建';
+                    data.sourceDemandNos = data.sourceDemandNos || [];
+                    data.lines = data.lines || [];
+                    insertPlanRow(data, '人工创建');
+                } catch (e) {}
+            }
+        })();
+
+        // 设置当前选中计划行，并联动下方供应商询价/报价子表（仅高亮，不影响复选框勾选）
+        function setCurrentPlanSelection(planId) {
+            var rows = document.querySelectorAll('#plan-table-body tr');
+            var activeRow = null;
+            rows.forEach(function (row) {
+                if (row.getAttribute('data-id') === String(planId)) {
+                    row.classList.add('plan-row--active');
+                    activeRow = row;
+                } else {
+                    row.classList.remove('plan-row--active');
+                }
+            });
+            if (planId && activeRow) {
+                renderPlanSupplierQuotes(planId);
+            } else {
+                var emptyEl = document.getElementById('plan-supplier-quote-empty');
+                var wrapper = document.getElementById('plan-supplier-quote-wrapper');
+                var tbody = document.getElementById('plan-supplier-quote-tbody');
+                if (emptyEl) {
+                    emptyEl.style.display = 'block';
+                    emptyEl.textContent = '请选择上方一条采购计划，查看该计划下多个供应商的询价 / 报价信息。';
+                }
+                if (wrapper) wrapper.style.display = 'none';
+                if (tbody) tbody.innerHTML = '';
+            }
+        }
+        // 更新选中计数
+        function updatePlanSelectedCount() {
+            var selected = document.querySelectorAll('#plan-table-body .plan-checkbox:checked');
+            var count = selected.length;
+            var countEl = document.getElementById('plan-selected-count');
+            if (countEl) {
+                countEl.innerHTML = '已选择 <strong>' + count + '</strong> 项';
+                countEl.style.display = count > 0 ? 'inline-block' : 'none';
+            }
+            // 这里只负责展示勾选数量，不改变当前高亮行
+        }
+        // 绑定复选框事件和行点击事件
+        function bindPlanCheckboxEvents() {
+            var selectAll = document.getElementById('select-all-plan');
+            var checkboxes = document.querySelectorAll('#plan-table-body .plan-checkbox');
+            var rows = document.querySelectorAll('#plan-table-body tr');
+            if (selectAll && checkboxes.length) {
+                selectAll.addEventListener('change', function() {
+                    checkboxes.forEach(function(cb) { cb.checked = selectAll.checked; });
+                    updatePlanSelectedCount();
+                });
+                checkboxes.forEach(function(cb) {
+                    cb.addEventListener('change', function() {
+                        selectAll.checked = checkboxes.length === document.querySelectorAll('#plan-table-body .plan-checkbox:checked').length;
+                        updatePlanSelectedCount();
+                    });
+                });
+            }
+            // 点击行时仅切换当前行高亮和下方子表（排除点击按钮和复选框的情况，不自动勾选）
+            rows.forEach(function(row) {
+                row.addEventListener('click', function(e) {
+                    // 如果点击的是按钮、复选框或链接，不处理行点击
+                    if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT' || e.target.closest('button') || e.target.closest('a')) {
+                        return;
+                    }
+                    var planId = row.getAttribute('data-id');
+                    if (planId) {
+                        setCurrentPlanSelection(planId);
+                    }
+                });
+            });
+        }
+        // 计划筛选（多条件）
+        function applyPlanFilters() {
+            var keyword = (document.getElementById('filter-keyword') && document.getElementById('filter-keyword').value.trim().toLowerCase()) || '';
+            var sourceVal = (document.getElementById('filter-source') && document.getElementById('filter-source').value) || '';
+            var typeVal = (document.getElementById('filter-type') && document.getElementById('filter-type').value) || '';
+            var statusVal = (document.getElementById('filter-status') && document.getElementById('filter-status').value) || '';
+            var dateStart = (document.getElementById('filter-date-start') && document.getElementById('filter-date-start').value) || '';
+            var dateEnd = (document.getElementById('filter-date-end') && document.getElementById('filter-date-end').value) || '';
+            var rows = document.querySelectorAll('#plan-table-body tr');
+            var visibleCount = 0;
+            rows.forEach(function(tr) {
+                var source = tr.getAttribute('data-source') || '';
+                var type = tr.getAttribute('data-type') || '';
+                var status = tr.getAttribute('data-status') || '';
+                var tds = tr.querySelectorAll('td');
+                var planNo = tds[1] ? tds[1].textContent.trim() : '';
+                var planName = tds[3] ? tds[3].textContent.trim() : '';
+                var creator = tds[11] ? tds[11].textContent.trim() : '';
+                var cycle = tds[5] ? tds[5].textContent.trim() : '';
+                var show = true;
+                if (sourceVal && source !== sourceVal) show = false;
+                if (typeVal && type !== typeVal) show = false;
+                if (statusVal && status !== statusVal) show = false;
+                if (keyword && planNo.toLowerCase().indexOf(keyword) === -1 && planName.toLowerCase().indexOf(keyword) === -1 && creator.toLowerCase().indexOf(keyword) === -1) show = false;
+                if (dateStart || dateEnd) {
+                    var cycleParts = cycle.split(' ~ ');
+                    var cycleStart = cycleParts[0] || '';
+                    var cycleEnd = cycleParts[1] || cycleStart;
+                    if (dateStart && cycleEnd < dateStart) show = false;
+                    if (dateEnd && cycleStart > dateEnd) show = false;
+                }
+                tr.style.display = show ? '' : 'none';
+                if (show) visibleCount++;
+            });
+            var countEl = document.getElementById('plan-total-count');
+            if (countEl) countEl.textContent = visibleCount;
+            updatePlanSelectedCount();
+        }
+        if (document.getElementById('btn-search')) document.getElementById('btn-search').addEventListener('click', applyPlanFilters);
+        if (document.getElementById('btn-reset')) {
+            document.getElementById('btn-reset').addEventListener('click', function() {
+                if (document.getElementById('filter-keyword')) document.getElementById('filter-keyword').value = '';
+                if (document.getElementById('filter-source')) document.getElementById('filter-source').value = '';
+                if (document.getElementById('filter-type')) document.getElementById('filter-type').value = '';
+                if (document.getElementById('filter-status')) document.getElementById('filter-status').value = '';
+                if (document.getElementById('filter-date-start')) document.getElementById('filter-date-start').value = '';
+                if (document.getElementById('filter-date-end')) document.getElementById('filter-date-end').value = '';
+                document.querySelectorAll('#plan-table-body tr').forEach(function(tr) { tr.style.display = ''; });
+                var countEl = document.getElementById('plan-total-count');
+                if (countEl) countEl.textContent = document.querySelectorAll('#plan-table-body tr').length;
+                updatePlanSelectedCount();
+            });
+        }
+        // 导出功能
+        if (document.getElementById('btn-export-plan')) {
+            document.getElementById('btn-export-plan').addEventListener('click', function() {
+                var selected = document.querySelectorAll('#plan-table-body .plan-checkbox:checked');
+                if (selected.length === 0) {
+                    alert('请先选择要导出的采购计划');
+                    return;
+                }
+                alert('已导出 ' + selected.length + ' 条采购计划（原型为模拟）。');
+            });
+        }
+
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+        bindPlanCheckboxEvents();
+        bindSupplierQuoteModal();
+        updatePlanSelectedCount();
+        // 列表操作按钮事件：提交审核、删除、开始执行、终止、继续执行、强制完成等（原型模拟状态流转）
+        document.addEventListener('click', function(e) {
+            var target = e.target;
+            // 提交审核（草稿 / 已驳回 -> 审核中）
+            if (target.classList.contains('btn-submit-review')) {
+                var id = target.getAttribute('data-id');
+                if (!id) return;
+                if (!confirm('确认提交该采购计划进行审核吗？')) return;
+                var plan = PLAN_STORE[id];
+                if (plan) {
+                    plan.status = 'reviewing';
+                    plan.statusText = '审核中';
+                    var row = document.querySelector('#plan-table-body tr[data-id=\"' + id + '\"]');
+                    if (row) {
+                        row.setAttribute('data-status', 'reviewing');
+                        row.innerHTML = buildPlanRowHtml(id, plan, plan.planSource);
+                    }
+                    alert('已提交审核（原型模拟，无后台接口）');
+                }
+                return;
+            }
+            // 删除（草稿 / 已驳回）
+            if (target.classList.contains('btn-delete-plan')) {
+                var delId = target.getAttribute('data-id');
+                if (!delId) return;
+                if (!confirm('确认删除该采购计划吗？')) return;
+                if (PLAN_STORE[delId]) {
+                    delete PLAN_STORE[delId];
+                    renderPlanTableFromStore();
+                    bindPlanCheckboxEvents();
+                    updatePlanSelectedCount();
+                    alert('已删除（原型模拟，无后台接口）');
+                }
+                return;
+            }
+            // 开始执行（待执行 -> 执行中）
+            if (target.classList.contains('btn-start-exec')) {
+                var startId = target.getAttribute('data-id');
+                if (!startId) return;
+                if (!confirm('确认开始执行该采购计划吗？')) return;
+                var p1 = PLAN_STORE[startId];
+                if (p1) {
+                    p1.status = 'executing';
+                    p1.statusText = '执行中';
+                    var row1 = document.querySelector('#plan-table-body tr[data-id=\"' + startId + '\"]');
+                    if (row1) {
+                        row1.setAttribute('data-status', 'executing');
+                        row1.innerHTML = buildPlanRowHtml(startId, p1, p1.planSource);
+                    }
+                    alert('已开始执行（原型模拟，无后台接口）');
+                }
+                return;
+            }
+            // 终止（执行中 -> 已终止）
+            if (target.classList.contains('btn-terminate-exec')) {
+                var termId = target.getAttribute('data-id');
+                if (!termId) return;
+                if (!confirm('确认终止该采购计划的执行吗？')) return;
+                var p2 = PLAN_STORE[termId];
+                if (p2) {
+                    p2.status = 'terminated';
+                    p2.statusText = '已终止';
+                    var row2 = document.querySelector('#plan-table-body tr[data-id=\"' + termId + '\"]');
+                    if (row2) {
+                        row2.setAttribute('data-status', 'terminated');
+                        row2.innerHTML = buildPlanRowHtml(termId, p2, p2.planSource);
+                    }
+                    alert('已终止执行（原型模拟，无后台接口）');
+                }
+                return;
+            }
+            // 继续执行（已终止 -> 执行中）
+            if (target.classList.contains('btn-resume-exec')) {
+                var resumeId = target.getAttribute('data-id');
+                if (!resumeId) return;
+                if (!confirm('确认继续执行该采购计划吗？')) return;
+                var p3 = PLAN_STORE[resumeId];
+                if (p3) {
+                    p3.status = 'executing';
+                    p3.statusText = '执行中';
+                    var row3 = document.querySelector('#plan-table-body tr[data-id=\"' + resumeId + '\"]');
+                    if (row3) {
+                        row3.setAttribute('data-status', 'executing');
+                        row3.innerHTML = buildPlanRowHtml(resumeId, p3, p3.planSource);
+                    }
+                    alert('已继续执行（原型模拟，无后台接口）');
+                }
+                return;
+            }
+            // 强制完成（已终止 -> 已完成）
+            if (target.classList.contains('btn-force-complete')) {
+                var forceId = target.getAttribute('data-id');
+                if (!forceId) return;
+                if (!confirm('确认将该采购计划强制完成吗？')) return;
+                var p4 = PLAN_STORE[forceId];
+                if (p4) {
+                    p4.status = 'completed';
+                    p4.statusText = '已完成';
+                    // 强制完成：完成率 100%，执行金额等于计划金额
+                    p4.completeRate = '100%';
+                    p4.execAmount = p4.planAmount || p4.execAmount;
+                    var row4 = document.querySelector('#plan-table-body tr[data-id=\"' + forceId + '\"]');
+                    if (row4) {
+                        row4.setAttribute('data-status', 'completed');
+                        row4.innerHTML = buildPlanRowHtml(forceId, p4, p4.planSource);
+                    }
+                    alert('已强制完成（原型模拟，无后台接口）');
+                }
+                return;
+            }
+        });
+        // 页面初始化时，默认高亮第一条采购计划并渲染其供应商询价数据（不勾选）
+        (function initDefaultPlanSelection() {
+            var firstRow = document.querySelector('#plan-table-body tr');
+            if (firstRow) {
+                var pid = firstRow.getAttribute('data-id');
+                if (pid) {
+                    setCurrentPlanSelection(pid);
+                }
+            }
+        })();
+
+        // ==== 从采购计划生成询价比价单 ====
+        var PLAN_INQUIRY_SUPPLIERS = [
+            { name: '深圳市电子科技有限公司', code: 'SUP-SZ-001' },
+            { name: '上海精密机械制造有限公司', code: 'SUP-SH-002' },
+            { name: '北京贸易有限公司', code: 'SUP-BJ-003' },
+            { name: '供应商甲', code: 'SUP-A' },
+            { name: '供应商乙', code: 'SUP-B' },
+            { name: '供应商丙', code: 'SUP-C' }
+        ];
+        function getPlanInquirySelectedSuppliers() {
+            var tags = document.querySelectorAll('#plan-inquiry-supplier-selected .inquiry-supplier-tag');
+            return [].slice.call(tags).map(function(t) { return t.getAttribute('data-value') || ''; }).filter(Boolean);
+        }
+        function renderPlanInquiryDropdown(keyword) {
+            var dropdown = document.getElementById('plan-inquiry-supplier-dropdown');
+            if (!dropdown) return;
+            var selected = getPlanInquirySelectedSuppliers();
+            var k = (keyword || '').toLowerCase().trim();
+            var list = PLAN_INQUIRY_SUPPLIERS.filter(function(s) {
+                if (selected.indexOf(s.name) !== -1) return false;
+                return !k || s.name.toLowerCase().indexOf(k) !== -1 || (s.code && s.code.toLowerCase().indexOf(k) !== -1);
+            });
+            if (list.length === 0) {
+                dropdown.innerHTML = '<div style="padding:12px 14px;color:var(--text-tertiary);font-size:13px;">无匹配供应商' + (k ? '，或已全部添加' : '，请输入关键词搜索') + '</div>';
+            } else {
+                dropdown.innerHTML = list.map(function(s) {
+                    return '<div class="inquiry-supplier-option" data-name="' + s.name.replace(/"/g, '&quot;') + '" style="padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0f0f0;" onmouseover="this.style.background=\'#f5f5f5\'" onmouseout="this.style.background=\'\'">' + s.name + ' <span style="color:var(--text-tertiary);">' + (s.code || '') + '</span></div>';
+                }).join('');
+            }
+            dropdown.style.display = 'block';
+        }
+        function addPlanInquirySupplierTag(name) {
+            var container = document.getElementById('plan-inquiry-supplier-selected');
+            if (!container || getPlanInquirySelectedSuppliers().indexOf(name) !== -1) return;
+            var tag = document.createElement('span');
+            tag.className = 'inquiry-supplier-tag';
+            tag.setAttribute('data-value', name);
+            tag.style.cssText = 'display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#e6f7ff;border:1px solid #91d5ff;border-radius:4px;font-size:13px;';
+            tag.innerHTML = name + ' <button type="button" class="inquiry-supplier-tag-remove" style="background:none;border:none;cursor:pointer;padding:0;margin-left:2px;color:#1890ff;font-size:14px;line-height:1;">&times;</button>';
+            container.appendChild(tag);
+            tag.querySelector('.inquiry-supplier-tag-remove').addEventListener('click', function(e) { e.preventDefault(); tag.remove(); });
+        }
+        function initPlanInquirySupplierSearch() {
+            var searchEl = document.getElementById('plan-inquiry-supplier-search');
+            var dropdown = document.getElementById('plan-inquiry-supplier-dropdown');
+            var selectedContainer = document.getElementById('plan-inquiry-supplier-selected');
+            if (!searchEl || !dropdown || !selectedContainer) return;
+            if (searchEl.getAttribute('data-init') === '1') return;
+            searchEl.setAttribute('data-init', '1');
+            var blurTimer = null;
+            searchEl.addEventListener('focus', function() {
+                clearTimeout(blurTimer);
+                renderPlanInquiryDropdown(searchEl.value);
+            });
+            searchEl.addEventListener('keyup', function() { renderPlanInquiryDropdown(searchEl.value); });
+            // 与需求申请页一致：blur 延迟 300ms，多选时点击添加后不关闭下拉，便于连续多选
+            searchEl.addEventListener('blur', function() {
+                blurTimer = setTimeout(function() { dropdown.style.display = 'none'; }, 300);
+            });
+            // 多选：点击添加后不关闭下拉，清空搜索并刷新列表（已选从列表中排除），便于连续多选
+            dropdown.addEventListener('click', function(e) {
+                var opt = e.target.closest('.inquiry-supplier-option');
+                if (opt) {
+                    var name = opt.getAttribute('data-name');
+                    if (name) {
+                        clearTimeout(blurTimer);
+                        addPlanInquirySupplierTag(name);
+                        searchEl.value = '';
+                        renderPlanInquiryDropdown('');
+                        dropdown.style.display = 'block';
+                        searchEl.focus();
+                    }
+                }
+            });
+            selectedContainer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('inquiry-supplier-tag-remove')) e.target.closest('.inquiry-supplier-tag').remove();
+            });
+        }
+        function fillPlanInquiryModal(planIds) {
+            var tbody = document.getElementById('plan-inquiry-tbody');
+            var summary = document.getElementById('plan-inquiry-summary');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            var rows = [];
+            (planIds || []).forEach(function(id) {
+                var plan = PLAN_STORE[id];
+                if (!plan) return;
+                (plan.lines || []).forEach(function(l) {
+                    rows.push({ planNo: plan.planNo, line: l });
+                });
+            });
+            var tdStyle = 'padding:10px 12px;font-size:13px;color:rgba(0,0,0,0.85);border-bottom:1px solid #f0f0f0;';
+            rows.forEach(function(r) {
+                var l = r.line || {};
+                var tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td style="' + tdStyle + '">' + (r.planNo || '-') + '</td>' +
+                    '<td style="' + tdStyle + '">' + (l.materialCode || '-') + '</td>' +
+                    '<td style="' + tdStyle + '">' + (l.materialName || '-') + '</td>' +
+                    '<td style="' + tdStyle + '">' + (l.spec || '-') + '</td>' +
+                    '<td style="' + tdStyle + '">' + (l.qty || '-') + '</td>' +
+                    '<td style="' + tdStyle + '">' + (l.unit || '-') + '</td>' +
+                    '<td style="' + tdStyle + '">' + (l.requiredDate || '-') + '</td>';
+                tbody.appendChild(tr);
+            });
+            var countEl = document.getElementById('plan-inquiry-row-count');
+            if (countEl) countEl.textContent = rows.length;
+            if (summary) summary.innerHTML = '共 <strong id="plan-inquiry-row-count">' + rows.length + '</strong> 条物料明细';
+        }
+        function openPlanInquiryModal(planId) {
+            // 单条模式：从操作列按钮传入 planId
+            var planIds = planId ? [planId] : [];
+            if (planIds.length === 0) {
+                alert('请选择一条采购计划');
+                return;
+            }
+            // 检查计划是否有明细
+            var plan = PLAN_STORE[planIds[0]];
+            if (!plan || !plan.lines || plan.lines.length === 0) {
+                alert('该采购计划暂无明细，无法生成询价比价单');
+                return;
+            }
+            // reset supplier selections
+            var selectedContainer = document.getElementById('plan-inquiry-supplier-selected');
+            var searchEl = document.getElementById('plan-inquiry-supplier-search');
+            var dropdown = document.getElementById('plan-inquiry-supplier-dropdown');
+            if (selectedContainer) selectedContainer.innerHTML = '';
+            if (searchEl) searchEl.value = '';
+            if (dropdown) dropdown.style.display = 'none';
+            // default dates
+            var today = new Date();
+            var eff = document.getElementById('plan-inquiry-effective-date');
+            var ddl = document.getElementById('plan-inquiry-deadline');
+            if (eff) eff.value = today.toISOString().slice(0,10);
+            if (ddl) { var d7 = new Date(today); d7.setDate(d7.getDate()+7); ddl.value = d7.toISOString().slice(0,10); }
+            fillPlanInquiryModal(planIds);
+            initPlanInquirySupplierSearch();
+            // 确保确认按钮已绑定（全局初始化，只绑定一次）
+            var confirmBtn = document.getElementById('btn-confirm-plan-inquiry');
+            if (confirmBtn && !confirmBtn.getAttribute('data-init')) {
+                confirmBtn.setAttribute('data-init','1');
+                confirmBtn.addEventListener('click', function() {
+                    var suppliers = getPlanInquirySelectedSuppliers();
+                    if (!suppliers.length) { alert('请至少选择一家供应商'); return; }
+                    var eff = (document.getElementById('plan-inquiry-effective-date') && document.getElementById('plan-inquiry-effective-date').value) || '';
+                    var ddl = (document.getElementById('plan-inquiry-deadline') && document.getElementById('plan-inquiry-deadline').value) || '';
+                    if (!eff) { alert('请选择单据起效日期'); return; }
+                    if (!ddl) { alert('请选择报价截止日期'); return; }
+                    if (ddl < eff) { alert('报价截止日期不能早于单据起效日期'); return; }
+                    var planIds = window.__planInquirySelectedIds || [];
+                    var planNos = planIds.map(function(id){ return (PLAN_STORE[id] && PLAN_STORE[id].planNo) ? PLAN_STORE[id].planNo : id; });
+                    // 生成询价单号
+                    var inquiryNo = 'RFQ-2025-' + String(Math.floor(Math.random()*900)+100);
+                    // 汇总物料名称/数量展示（列表用）
+                    var allLines = [];
+                    planIds.forEach(function(id){ var p=PLAN_STORE[id]; if(p && p.lines) allLines = allLines.concat(p.lines); });
+                    var materialName = allLines.length ? (allLines[0].materialName || '采购计划物料') : '采购计划物料';
+                    var quantity = allLines.length ? (allLines.length + '条') : '-';
+                    try {
+                        sessionStorage.setItem('newInquiryFromPlan', JSON.stringify({
+                            inquiryNo: inquiryNo,
+                            suppliers: suppliers,
+                            quoteSupplierCount: suppliers.length + '家',
+                            materialName: materialName,
+                            quantity: quantity,
+                            lowestQuote: '-',
+                            status: 'pending',
+                            statusText: '待报价',
+                            inquiryDate: new Date().toISOString().slice(0,10),
+                            effectiveDate: eff,
+                            deadline: ddl,
+                            sourcePlanNos: planNos
+                        }));
+                    } catch(e) {}
+                    var modal = document.getElementById('gen-inquiry-from-plan-modal');
+                    if (modal) { modal.classList.remove('active'); document.body.style.overflow = ''; }
+                    if (typeof PageLoader !== 'undefined' && PageLoader.loadPage) {
+                        PageLoader.loadPage('pages/procurement-quote-list.html');
+                    } else {
+                        window.location.href = 'pages/procurement-quote-list.html';
+                    }
+                });
+            }
+            var modal = document.getElementById('gen-inquiry-from-plan-modal');
+            if (modal) { modal.classList.add('active'); document.body.style.overflow = 'hidden'; }
+            // 缓存这次选择
+            window.__planInquirySelectedIds = planIds;
+        }
+        // 暴露到全局，供详情页调用
+        window.openPlanInquiryModal = openPlanInquiryModal;
+        window.PLAN_INQUIRY_SUPPLIERS = PLAN_INQUIRY_SUPPLIERS;
+        window.getPlanInquirySelectedSuppliers = getPlanInquirySelectedSuppliers;
+        window.renderPlanInquiryDropdown = renderPlanInquiryDropdown;
+        window.addPlanInquirySupplierTag = addPlanInquirySupplierTag;
+        window.initPlanInquirySupplierSearch = initPlanInquirySupplierSearch;
+        window.fillPlanInquiryModal = fillPlanInquiryModal;
+
+        // 操作列按钮：生成询价比价单（单条）
+        if (!document.body.hasAttribute('data-plan-inquiry-buttons-init')) {
+            document.body.setAttribute('data-plan-inquiry-buttons-init', '1');
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.classList.contains('btn-gen-inquiry-from-plan')) {
+                    var planId = e.target.getAttribute('data-plan-id');
+                    if (planId) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openPlanInquiryModal(planId);
+                    }
+                }
+            });
+        }
+
+        // ==== 从采购计划生成合同订单（与需求申请/询价单页逻辑一致） ====
+        var PLAN_ORDER_SUPPLIER_LIST = [
+            { name: '深圳市电子科技有限公司', code: 'SUP-SZ-001' },
+            { name: '上海精密机械制造有限公司', code: 'SUP-SH-002' },
+            { name: '北京贸易有限公司', code: 'SUP-BJ-003' },
+            { name: '供应商甲', code: 'SUP-A' },
+            { name: '供应商乙', code: 'SUP-B' },
+            { name: '供应商丙', code: 'SUP-C' },
+            { name: '广州精密制造有限公司', code: 'SUP-GZ-004' },
+            { name: '杭州智造科技有限公司', code: 'SUP-HZ-005' },
+            { name: '东莞电路板有限公司', code: 'SUP-DG-006' },
+            { name: '苏州电子有限公司', code: 'SUP-SZ-007' }
+        ];
+        function getPlanOrderSupplierLastDeal(supplierName) {
+            var mock = {
+                '深圳市电子科技有限公司': [{ price: 100, rate: 13 }, { price: 80, rate: 13 }, { price: 50, rate: 6 }],
+                '上海精密机械制造有限公司': [{ price: 95, rate: 13 }, { price: 78, rate: 13 }, { price: 48, rate: 6 }],
+                '北京贸易有限公司': [{ price: 98, rate: 13 }, { price: 82, rate: 13 }, { price: 52, rate: 6 }],
+                '供应商甲': [{ price: 90, rate: 13 }, { price: 75, rate: 13 }, { price: 45, rate: 6 }],
+                '供应商乙': [{ price: 88, rate: 6 }, { price: 72, rate: 6 }, { price: 44, rate: 6 }],
+                '供应商丙': [{ price: 102, rate: 13 }, { price: 85, rate: 13 }, { price: 55, rate: 13 }],
+                '广州精密制造有限公司': [{ price: 92, rate: 13 }, { price: 76, rate: 13 }, { price: 47, rate: 6 }],
+                '杭州智造科技有限公司': [{ price: 96, rate: 13 }, { price: 79, rate: 13 }, { price: 49, rate: 6 }],
+                '东莞电路板有限公司': [{ price: 94, rate: 13 }, { price: 77, rate: 13 }, { price: 48, rate: 6 }],
+                '苏州电子有限公司': [{ price: 99, rate: 13 }, { price: 81, rate: 13 }, { price: 51, rate: 6 }]
+            };
+            return mock[supplierName] || [{ price: '', rate: '' }];
+        }
+        function applyPlanOrderSupplierLastDeal(supplierName) {
+            var tbody = document.getElementById('plan-order-tbody');
+            if (!tbody || !supplierName) return;
+            var dealList = getPlanOrderSupplierLastDeal(supplierName);
+            tbody.querySelectorAll('tr').forEach(function(tr, idx) {
+                var data = dealList[idx] || dealList[0] || { price: '', rate: '' };
+                var priceInput = tr.querySelector('.plan-order-unit-price');
+                var rateInput = tr.querySelector('.plan-order-tax-rate');
+                if (priceInput) priceInput.value = data.price !== undefined && data.price !== '' ? data.price : '';
+                if (rateInput) rateInput.value = data.rate !== undefined && data.rate !== '' ? data.rate : '';
+                recalcPlanOrderRow(tr);
+            });
+            updatePlanOrderTotals();
+        }
+        function renderPlanOrderSupplierDropdown(keyword) {
+            var dropdown = document.getElementById('plan-order-supplier-dropdown');
+            var k = (keyword || '').toLowerCase().trim();
+            var list = PLAN_ORDER_SUPPLIER_LIST.filter(function(s) {
+                return !k || s.name.toLowerCase().indexOf(k) !== -1 || (s.code && s.code.toLowerCase().indexOf(k) !== -1);
+            });
+            if (!dropdown) return;
+            if (list.length === 0) {
+                dropdown.innerHTML = '<div style="padding:12px 14px;color:var(--text-tertiary);font-size:13px;">无匹配供应商，请调整关键词</div>';
+            } else {
+                dropdown.innerHTML = list.map(function(s) {
+                    return '<div class="plan-order-supplier-option" data-name="' + s.name.replace(/"/g, '&quot;') + '" style="padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0f0f0;" onmouseover="this.style.background=\'#f5f5f5\'" onmouseout="this.style.background=\'\'">' + s.name + ' <span style="color:var(--text-tertiary);">' + (s.code || '') + '</span></div>';
+                }).join('');
+            }
+            dropdown.style.display = 'block';
+        }
+        function selectPlanOrderSupplier(name) {
+            var hiddenEl = document.getElementById('plan-order-supplier');
+            var displayEl = document.getElementById('plan-order-supplier-display');
+            var searchEl = document.getElementById('plan-order-supplier-search');
+            var dropdown = document.getElementById('plan-order-supplier-dropdown');
+            if (hiddenEl) hiddenEl.value = name || '';
+            if (displayEl) displayEl.textContent = name ? name : '未选择';
+            if (searchEl) searchEl.value = '';
+            if (dropdown) dropdown.style.display = 'none';
+            if (name) applyPlanOrderSupplierLastDeal(name);
+        }
+        function recalcPlanOrderRow(tr) {
+            if (!tr) return;
+            var cells = tr.querySelectorAll('td');
+            if (cells.length < 11) return;
+            var qtyText = (cells[4] && cells[4].textContent) ? cells[4].textContent.trim() : '';
+            var qty = parseFloat(String(qtyText).replace(/,/g, '')) || 0;
+            var priceInput = tr.querySelector('.plan-order-unit-price');
+            var rateInput = tr.querySelector('.plan-order-tax-rate');
+            var taxAmountInput = tr.querySelector('.plan-order-amount-tax');
+            var notaxAmountInput = tr.querySelector('.plan-order-amount-notax');
+            if (!priceInput || !taxAmountInput || !notaxAmountInput) return;
+            var price = parseFloat(String(priceInput.value).replace(/,/g, '')) || 0;
+            var rate = parseFloat(String(rateInput && rateInput.value).replace(/,/g, '')) || 0;
+            var amountTax = price * qty;
+            var amountNotax = (rate >= 0 && rate <= 100) ? amountTax / (1 + rate / 100) : amountTax;
+            taxAmountInput.value = amountTax.toFixed(2);
+            notaxAmountInput.value = amountNotax.toFixed(2);
+        }
+        function updatePlanOrderTotals() {
+            var tbody = document.getElementById('plan-order-tbody');
+            var totalTaxEl = document.getElementById('plan-order-total-tax');
+            var totalNotaxEl = document.getElementById('plan-order-total-notax');
+            if (!tbody || !totalTaxEl || !totalNotaxEl) return;
+            var sumTax = 0, sumNotax = 0;
+            tbody.querySelectorAll('tr').forEach(function(tr) {
+                var taxInput = tr.querySelector('.plan-order-amount-tax');
+                var notaxInput = tr.querySelector('.plan-order-amount-notax');
+                if (taxInput && taxInput.value) sumTax += parseFloat(String(taxInput.value).replace(/,/g, '')) || 0;
+                if (notaxInput && notaxInput.value) sumNotax += parseFloat(String(notaxInput.value).replace(/,/g, '')) || 0;
+            });
+            totalTaxEl.textContent = sumTax.toFixed(2);
+            totalNotaxEl.textContent = sumNotax.toFixed(2);
+        }
+        function fillPlanGenOrderModal(planId) {
+            var plan = PLAN_STORE[planId];
+            if (!plan || !plan.lines || !plan.lines.length) return;
+            var theadEl = document.getElementById('plan-order-thead');
+            var tbodyEl = document.getElementById('plan-order-tbody');
+            var summaryEl = document.getElementById('plan-order-summary');
+            if (!theadEl || !tbodyEl) return;
+            var thStyle = 'padding:10px 12px;text-align:left;font-size:13px;font-weight:600;color:rgba(0,0,0,0.65);border-bottom:1px solid var(--border-color);';
+            var tdStyle = 'padding:10px 12px;font-size:13px;color:rgba(0,0,0,0.85);';
+            var inputStyle = 'width:100%;min-width:70px;padding:6px 8px;font-size:13px;border:1px solid #d9d9d9;border-radius:4px;box-sizing:border-box;';
+            theadEl.innerHTML = '<tr><th style="' + thStyle + '">计划编号</th><th style="' + thStyle + '">物料编码</th><th style="' + thStyle + '">物料名称</th><th style="' + thStyle + '">规格型号</th><th style="' + thStyle + '">需求数量</th><th style="' + thStyle + '">单位</th><th style="' + thStyle + '">需求到货日期</th><th style="' + thStyle + '">含税单价</th><th style="' + thStyle + '">税率(%)</th><th style="' + thStyle + '">含税金额</th><th style="' + thStyle + '">不含税金额</th></tr>';
+            tbodyEl.innerHTML = '';
+            var planNo = plan.planNo || '-';
+            plan.lines.forEach(function(l) {
+                var trHtml = '<tr style="border-bottom:1px solid #f0f0f0;">' +
+                    '<td style="' + tdStyle + '">' + (planNo || '-') + '</td>' +
+                    '<td style="' + tdStyle + '">' + (l.materialCode || '-') + '</td>' +
+                    '<td style="' + tdStyle + '">' + (l.materialName || '-') + '</td>' +
+                    '<td style="' + tdStyle + '">' + (l.spec || '-') + '</td>' +
+                    '<td style="' + tdStyle + '">' + (l.qty != null ? l.qty : '-') + '</td>' +
+                    '<td style="' + tdStyle + '">' + (l.unit || '-') + '</td>' +
+                    '<td style="' + tdStyle + '">' + (l.requiredDate || '-') + '</td>' +
+                    '<td style="' + tdStyle + '"><input type="text" class="form-input plan-order-unit-price" placeholder="选供应商后带出" style="' + inputStyle + '"></td>' +
+                    '<td style="' + tdStyle + '"><input type="text" class="form-input plan-order-tax-rate" placeholder="如13" style="' + inputStyle + '"></td>' +
+                    '<td style="' + tdStyle + '"><input type="text" class="form-input plan-order-amount-tax" readonly style="' + inputStyle + ';background:#f5f5f5;"></td>' +
+                    '<td style="' + tdStyle + '"><input type="text" class="form-input plan-order-amount-notax" readonly style="' + inputStyle + ';background:#f5f5f5;"></td></tr>';
+                tbodyEl.innerHTML += trHtml;
+            });
+            if (summaryEl) summaryEl.innerHTML = '共 <strong id="plan-order-row-count">' + plan.lines.length + '</strong> 条物料明细';
+            updatePlanOrderTotals();
+            var modal = document.getElementById('plan-gen-order-modal');
+            if (modal && !modal.getAttribute('data-recalc-bound')) {
+                modal.setAttribute('data-recalc-bound', '1');
+                modal.addEventListener('input', function(e) {
+                    if (e.target && (e.target.classList.contains('plan-order-unit-price') || e.target.classList.contains('plan-order-tax-rate'))) {
+                        var tr = e.target.closest('tr');
+                        if (tr) { recalcPlanOrderRow(tr); updatePlanOrderTotals(); }
+                    }
+                });
+                modal.addEventListener('change', function(e) {
+                    if (e.target && (e.target.classList.contains('plan-order-unit-price') || e.target.classList.contains('plan-order-tax-rate'))) {
+                        var tr = e.target.closest('tr');
+                        if (tr) { recalcPlanOrderRow(tr); updatePlanOrderTotals(); }
+                    }
+                });
+            }
+        }
+        function openPlanGenOrderModal(planId) {
+            var plan = PLAN_STORE[planId];
+            if (!plan || !plan.lines || plan.lines.length === 0) {
+                alert('该采购计划暂无明细，无法生成合同订单');
+                return;
+            }
+            document.getElementById('plan-order-plan-id').value = planId;
+            var today = new Date();
+            var poNo = 'PO-' + today.getFullYear() + '-' + String(Math.floor(Math.random() * 900) + 100);
+            document.getElementById('plan-order-no').value = poNo;
+            document.getElementById('plan-order-contract-template').value = 'single';
+            document.getElementById('plan-order-contract-no').value = '';
+            document.getElementById('plan-order-contract-name').value = '基于采购计划 ' + (plan.planNo || '') + ' 的采购合同';
+            document.getElementById('plan-order-contract-type').value = 'single';
+            document.getElementById('plan-order-contract-date').value = today.toISOString().slice(0, 10);
+            document.getElementById('plan-order-contract-start').value = today.toISOString().slice(0, 10);
+            var endDate = new Date(today);
+            endDate.setFullYear(endDate.getFullYear() + 1);
+            document.getElementById('plan-order-contract-end').value = endDate.toISOString().slice(0, 10);
+            document.getElementById('plan-order-date').value = today.toISOString().slice(0, 10);
+            var d7 = new Date(today);
+            d7.setDate(d7.getDate() + 30);
+            document.getElementById('plan-order-delivery').value = d7.toISOString().slice(0, 10);
+            document.getElementById('plan-order-payment-terms').value = '';
+            document.getElementById('plan-order-delivery-address').value = '';
+            document.getElementById('plan-order-buyer').value = '当前用户';
+            selectPlanOrderSupplier('');
+            document.getElementById('plan-order-supplier-search').value = '';
+            document.getElementById('plan-order-supplier-dropdown').style.display = 'none';
+            fillPlanGenOrderModal(planId);
+            var overlay = document.getElementById('plan-gen-order-modal');
+            if (!overlay.getAttribute('data-plan-order-bound')) {
+                overlay.setAttribute('data-plan-order-bound', '1');
+                overlay.addEventListener('click', function(e) { if (e.target === overlay) { overlay.classList.remove('active'); document.body.style.overflow = ''; } });
+                overlay.querySelectorAll('[data-close-modal="plan-gen-order-modal"]').forEach(function(btn) {
+                    btn.addEventListener('click', function() { overlay.classList.remove('active'); document.body.style.overflow = ''; });
+                });
+                document.getElementById('btn-plan-order-preview').addEventListener('click', function() {
+                    alert('合同预览：将根据所选模板及当前填写的合同信息、订单信息、采购明细生成预览（原型模拟）。');
+                });
+                document.getElementById('btn-plan-order-save-contract').addEventListener('click', function() {
+                    if (!document.getElementById('plan-order-contract-template').value) { alert('请先选择合同模板'); return; }
+                    if (!document.getElementById('plan-order-contract-name').value.trim()) { alert('请填写合同名称'); return; }
+                    alert('合同已保存为草稿（原型模拟），可继续编辑后生成合同订单。');
+                });
+                document.getElementById('btn-plan-order-submit').addEventListener('click', function() {
+                    if (!document.getElementById('plan-order-supplier').value.trim()) { alert('请选择供应商'); return; }
+                    if (!document.getElementById('plan-order-contract-template').value) { alert('请先选择合同模板'); return; }
+                    if (!document.getElementById('plan-order-contract-name').value.trim()) { alert('请填写合同名称'); return; }
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                    alert('已根据采购计划生成合同订单（原型模拟）。');
+                });
+            }
+            initPlanOrderSupplierSearch();
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function initPlanOrderSupplierSearch() {
+            var searchEl = document.getElementById('plan-order-supplier-search');
+            var dropdown = document.getElementById('plan-order-supplier-dropdown');
+            if (!searchEl || !dropdown || searchEl.getAttribute('data-plan-order-search-init')) return;
+            searchEl.setAttribute('data-plan-order-search-init', '1');
+            var blurTimer = null;
+            searchEl.addEventListener('focus', function() { clearTimeout(blurTimer); renderPlanOrderSupplierDropdown(searchEl.value); });
+            searchEl.addEventListener('keyup', function() { renderPlanOrderSupplierDropdown(searchEl.value); });
+            searchEl.addEventListener('blur', function() { blurTimer = setTimeout(function() { dropdown.style.display = 'none'; }, 180); });
+            dropdown.addEventListener('mousedown', function(e) {
+                var opt = e.target.closest('.plan-order-supplier-option');
+                if (opt) { e.preventDefault(); e.stopPropagation(); var name = opt.getAttribute('data-name'); if (name) selectPlanOrderSupplier(name); }
+            });
+        }
+        if (!document.body.hasAttribute('data-plan-gen-order-btn-init')) {
+            document.body.setAttribute('data-plan-gen-order-btn-init', '1');
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.classList.contains('btn-gen-order-from-plan')) {
+                    var planId = e.target.getAttribute('data-plan-id');
+                    if (planId) { e.preventDefault(); e.stopPropagation(); openPlanGenOrderModal(planId); }
+                }
+            });
+        }
+        </script>
+    </div>
+</body>
+</html>

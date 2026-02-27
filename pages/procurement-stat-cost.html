@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成本统计 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <style>
+        /* 成本统计 - 优化后的样式 */
+        .cost-stat-wrap { max-width: 100%; margin: 0; }
+        
+        /* 筛选区：紧凑设计 */
+        .cost-stat-filter { background: var(--bg-card); border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+        .cost-stat-filter-inner { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 12px; }
+        .cost-stat-filter-item { display: flex; flex-direction: column; gap: 4px; min-width: 120px; }
+        .cost-stat-filter-item label { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
+        .cost-stat-filter-item .form-select, .cost-stat-filter-item .form-input { width: 100%; padding: 5px 8px; font-size: 12px; }
+        .cost-stat-filter-actions { display: flex; align-items: flex-end; gap: 6px; margin-left: auto; }
+        .cost-stat-filter-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color); flex-wrap: wrap; gap: 6px; }
+        .cost-stat-filter-hint { font-size: 11px; color: var(--text-tertiary); }
+        .cost-stat-filter-export { display: flex; gap: 6px; }
+        
+        /* KPI卡片：紧凑布局，6个一行 */
+        .cost-stat-kpi { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 12px; }
+        .cost-stat-kpi-card { background: var(--bg-card); border-radius: var(--radius-sm); padding: 10px 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+        .cost-stat-kpi-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+        .cost-stat-kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--border-color); }
+        .cost-stat-kpi-card.primary::before { background: #1890ff; }
+        .cost-stat-kpi-card.success::before { background: #52c41a; }
+        .cost-stat-kpi-card.warning::before { background: #faad14; }
+        .cost-stat-kpi-card.danger::before { background: #ff4d4f; }
+        .cost-stat-kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+        .cost-stat-kpi-label { font-size: 11px; color: var(--text-secondary); font-weight: 500; line-height: 1.3; }
+        .cost-stat-kpi-icon { font-size: 14px; opacity: 0.3; }
+        .cost-stat-kpi-value { font-size: 18px; font-weight: 700; color: var(--text-primary); line-height: 1.2; font-variant-numeric: tabular-nums; margin-bottom: 4px; }
+        .cost-stat-kpi-card.primary .cost-stat-kpi-value { color: #1890ff; }
+        .cost-stat-kpi-card.success .cost-stat-kpi-value { color: #52c41a; }
+        .cost-stat-kpi-card.warning .cost-stat-kpi-value { color: #faad14; }
+        .cost-stat-kpi-card.danger .cost-stat-kpi-value { color: #ff4d4f; }
+        .cost-stat-kpi-desc { font-size: 10px; color: var(--text-tertiary); line-height: 1.3; }
+        .cost-stat-kpi-trend { font-size: 10px; margin-top: 2px; display: flex; align-items: center; gap: 2px; }
+        .cost-stat-kpi-trend.up { color: #ff4d4f; }
+        .cost-stat-kpi-trend.down { color: #52c41a; }
+        .cost-stat-kpi-trend.flat { color: var(--text-tertiary); }
+        
+        /* 区块样式 */
+        .cost-stat-section { margin-bottom: 12px; }
+        .cost-stat-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 6px; }
+        .cost-stat-section-header.has-tabs { align-items: flex-end; }
+        .cost-stat-section-title { font-size: 13px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 6px; }
+        .cost-stat-section-title::before { content: ''; width: 2px; height: 12px; background: #1890ff; border-radius: 1px; }
+        
+        /* 图表区：紧凑布局 */
+        .cost-stat-charts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+        .cost-stat-chart-card { background: var(--bg-card); border-radius: var(--radius-sm); padding: 10px 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
+        .cost-stat-chart-card.full { grid-column: 1 / -1; }
+        .cost-stat-chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .cost-stat-chart-title { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+        .cost-stat-chart-actions { display: flex; gap: 4px; }
+        .cost-stat-chart-placeholder { min-height: 160px; background: linear-gradient(135deg, var(--bg-fill) 0%, rgba(24,144,255,0.05) 100%); border-radius: var(--radius-sm); border: 1px dashed var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-tertiary); font-size: 11px; text-align: center; padding: 16px; }
+        .cost-stat-chart-placeholder.compact { min-height: 140px; padding: 12px; }
+        .cost-stat-chart-placeholder-icon { font-size: 24px; margin-bottom: 6px; opacity: 0.5; }
+        
+        /* 表格区：紧凑设计 */
+        .cost-stat-table-tabs { display: flex; gap: 2px; flex-wrap: wrap; background: var(--bg-fill); padding: 2px; border-radius: var(--radius-sm); }
+        .cost-stat-table-tab { padding: 6px 12px; font-size: 12px; color: var(--text-secondary); background: transparent; border: none; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s; font-weight: 500; }
+        .cost-stat-table-tab:hover { color: var(--text-primary); background: var(--bg-card); }
+        .cost-stat-table-tab.active { color: #1890ff; font-weight: 600; background: var(--bg-card); box-shadow: var(--shadow-sm); }
+        .cost-stat-table-pane { display: none; animation: fadeIn 0.3s; }
+        .cost-stat-table-pane.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .cost-stat-table-section .card { margin-bottom: 0; }
+        .cost-stat-table-section .table-wrapper { padding: 0; }
+        .cost-stat-table-section table { font-size: 12px; line-height: 1.4; width: 100%; }
+        .cost-stat-table-section th { background: var(--bg-fill); font-weight: 600; color: var(--text-primary); }
+        .cost-stat-table-section th, .cost-stat-table-section td { padding: 8px 10px; text-align: left; }
+        .cost-stat-table-section tbody tr { transition: background 0.2s; }
+        .cost-stat-table-section tbody tr:hover { background: rgba(24,144,255,0.05); }
+        .cost-stat-table-section tbody tr:nth-child(even) { background: rgba(0,0,0,0.02); }
+        .cost-stat-table-section td { font-variant-numeric: tabular-nums; }
+        .cost-stat-sum-row { background: var(--bg-fill) !important; font-weight: 600; }
+        .cost-stat-sum-row td { border-top: 1px solid var(--border-color); padding-top: 8px; }
+        .cost-stat-table-section a { color: #1890ff; text-decoration: none; font-weight: 500; }
+        .cost-stat-table-section a:hover { text-decoration: underline; }
+        
+        /* 变化指示器 */
+        .cost-stat-change { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; }
+        .cost-stat-change.up { color: #ff4d4f; }
+        .cost-stat-change.down { color: #52c41a; }
+        .cost-stat-change.flat { color: var(--text-tertiary); }
+        .cost-stat-change::before { content: ''; width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; }
+        .cost-stat-change.up::before { border-bottom: 6px solid #ff4d4f; }
+        .cost-stat-change.down::before { border-top: 6px solid #52c41a; }
+        .cost-stat-change.flat::before { display: none; }
+        
+        @media (max-width: 1600px) {
+            .cost-stat-kpi { grid-template-columns: repeat(3, 1fr); }
+            .cost-stat-charts { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 1200px) {
+            .cost-stat-kpi { grid-template-columns: repeat(2, 1fr); }
+            .cost-stat-charts { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .cost-stat-kpi { grid-template-columns: 1fr; }
+            .cost-stat-filter-actions { margin-left: 0; width: 100%; }
+        }
+        </style>
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">报表统计</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">成本统计</span>
+        </div>
+
+        <div class="page-header">
+            <h1 class="page-title">成本统计</h1>
+            <p class="page-description">深度分析采购成本趋势与结构，识别成本变化原因与节约空间，支持多维度对比分析，助力成本管控优化。</p>
+        </div>
+
+        <div class="cost-stat-wrap">
+            <!-- 筛选区 -->
+            <div class="cost-stat-filter">
+                <div class="cost-stat-filter-inner">
+                    <div class="cost-stat-filter-item">
+                        <label>统计周期</label>
+                        <select class="form-select">
+                            <option value="month">月度</option>
+                            <option value="quarter">季度</option>
+                            <option value="year">年度</option>
+                            <option value="custom">自定义</option>
+                        </select>
+                    </div>
+                    <div class="cost-stat-filter-item">
+                        <label>周期</label>
+                        <input type="month" class="form-input" value="2025-01">
+                    </div>
+                    <div class="cost-stat-filter-item">
+                        <label>对比基准</label>
+                        <select class="form-select">
+                            <option value="last-month">上月</option>
+                            <option value="last-quarter">上季度</option>
+                            <option value="last-year">去年同期</option>
+                            <option value="budget">预算</option>
+                        </select>
+                    </div>
+                    <div class="cost-stat-filter-item">
+                        <label>采购组织</label>
+                        <select class="form-select">
+                            <option value="">全部</option>
+                            <option value="org1">深圳采购中心</option>
+                            <option value="org2">上海采购中心</option>
+                            <option value="org3">北京采购中心</option>
+                        </select>
+                    </div>
+                    <div class="cost-stat-filter-item">
+                        <label>物料类型</label>
+                        <select class="form-select">
+                            <option value="">全部</option>
+                            <option value="elec">电子元器件</option>
+                            <option value="struct">结构件</option>
+                            <option value="pack">包装辅材</option>
+                            <option value="equip">设备及备件</option>
+                        </select>
+                    </div>
+                    <div class="cost-stat-filter-item">
+                        <label>供应商</label>
+                        <select class="form-select">
+                            <option value="">全部</option>
+                            <option value="sup1">华强电子</option>
+                            <option value="sup2">京东方科技</option>
+                            <option value="sup3">中芯国际</option>
+                        </select>
+                    </div>
+                    <div class="cost-stat-filter-actions">
+                        <button class="btn btn-primary">查询</button>
+                        <button class="btn btn-default">重置</button>
+                    </div>
+                </div>
+                <div class="cost-stat-filter-footer">
+                    <span class="cost-stat-filter-hint">📊 数据截止：2025-01-31 | 统计周期：2025年1月 | 对比基准：2024年12月</span>
+                    <div class="cost-stat-filter-export">
+                        <button class="btn btn-default">📥 导出 Excel</button>
+                        <button class="btn btn-default">📄 导出 PDF</button>
+                        <button class="btn btn-default">📊 生成报告</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 核心指标（6个） -->
+            <div class="cost-stat-kpi">
+                <div class="cost-stat-kpi-card primary">
+                    <div class="cost-stat-kpi-header">
+                        <div class="cost-stat-kpi-label">采购总成本</div>
+                        <div class="cost-stat-kpi-icon">💰</div>
+                    </div>
+                    <div class="cost-stat-kpi-value">¥258.6万</div>
+                    <div class="cost-stat-kpi-desc">预算 270万 · 完成率 95.8%</div>
+                    <div class="cost-stat-kpi-trend up">↑ 环比 +4.2%</div>
+                </div>
+                <div class="cost-stat-kpi-card danger">
+                    <div class="cost-stat-kpi-header">
+                        <div class="cost-stat-kpi-label">环比变化</div>
+                        <div class="cost-stat-kpi-icon">📈</div>
+                    </div>
+                    <div class="cost-stat-kpi-value">+4.2%</div>
+                    <div class="cost-stat-kpi-desc">较上月增加 ¥10.4万</div>
+                    <div class="cost-stat-kpi-trend up">↑ 成本上升</div>
+                </div>
+                <div class="cost-stat-kpi-card danger">
+                    <div class="cost-stat-kpi-header">
+                        <div class="cost-stat-kpi-label">同比变化</div>
+                        <div class="cost-stat-kpi-icon">📊</div>
+                    </div>
+                    <div class="cost-stat-kpi-value">+8.5%</div>
+                    <div class="cost-stat-kpi-desc">较去年同期增加 ¥20.3万</div>
+                    <div class="cost-stat-kpi-trend up">↑ 成本上升</div>
+                </div>
+                <div class="cost-stat-kpi-card success">
+                    <div class="cost-stat-kpi-header">
+                        <div class="cost-stat-kpi-label">成本节约</div>
+                        <div class="cost-stat-kpi-icon">💵</div>
+                    </div>
+                    <div class="cost-stat-kpi-value">¥11.4万</div>
+                    <div class="cost-stat-kpi-desc">vs 预算 · 节约率 4.2%</div>
+                    <div class="cost-stat-kpi-trend down">↓ 成本控制良好</div>
+                </div>
+                <div class="cost-stat-kpi-card">
+                    <div class="cost-stat-kpi-header">
+                        <div class="cost-stat-kpi-label">平均单价</div>
+                        <div class="cost-stat-kpi-icon">📦</div>
+                    </div>
+                    <div class="cost-stat-kpi-value">¥25.3</div>
+                    <div class="cost-stat-kpi-desc">环比 +1.2% · 同比 +2.8%</div>
+                    <div class="cost-stat-kpi-trend up">↑ 单价略有上升</div>
+                </div>
+                <div class="cost-stat-kpi-card warning">
+                    <div class="cost-stat-kpi-header">
+                        <div class="cost-stat-kpi-label">成本波动率</div>
+                        <div class="cost-stat-kpi-icon">📉</div>
+                    </div>
+                    <div class="cost-stat-kpi-value">3.2%</div>
+                    <div class="cost-stat-kpi-desc">标准差 / 均值 · 目标 <3%</div>
+                    <div class="cost-stat-kpi-trend flat">— 波动可控</div>
+                </div>
+            </div>
+
+            <!-- 图表区 -->
+            <div class="cost-stat-section">
+                <div class="cost-stat-section-header">
+                    <span class="cost-stat-section-title">成本可视化分析</span>
+                    <div class="cost-stat-chart-actions">
+                        <button class="btn btn-sm btn-default">切换视图</button>
+                    </div>
+                </div>
+                <div class="cost-stat-charts">
+                    <div class="cost-stat-chart-card full">
+                        <div class="cost-stat-chart-header">
+                            <div class="cost-stat-chart-title">采购成本趋势分析（折线图）</div>
+                            <div class="cost-stat-chart-actions">
+                                <button class="btn btn-sm btn-default">月度</button>
+                                <button class="btn btn-sm btn-default">周度</button>
+                            </div>
+                        </div>
+                        <div class="cost-stat-chart-placeholder wide">
+                            <div class="cost-stat-chart-placeholder-icon">📊</div>
+                            <div>按月展示采购成本趋势，含上月/去年同期/预算参考线</div>
+                            <div style="font-size: 11px; margin-top: 8px; opacity: 0.7;">支持多系列对比，识别成本变化趋势</div>
+                        </div>
+                    </div>
+                    <div class="cost-stat-chart-card">
+                        <div class="cost-stat-chart-header">
+                            <div class="cost-stat-chart-title">物料分类成本占比（饼图）</div>
+                        </div>
+                        <div class="cost-stat-chart-placeholder compact">
+                            <div class="cost-stat-chart-placeholder-icon">🥧</div>
+                            <div>电子元器件 48.4% · 结构件 20.2% · 包装辅材 14.7% · 设备 12.4% · 其他 4.3%</div>
+                        </div>
+                    </div>
+                    <div class="cost-stat-chart-card">
+                        <div class="cost-stat-chart-header">
+                            <div class="cost-stat-chart-title">各物料分类环比变化（柱状图）</div>
+                        </div>
+                        <div class="cost-stat-chart-placeholder compact">
+                            <div class="cost-stat-chart-placeholder-icon">📊</div>
+                            <div>正负柱状图，涨跌一目了然，识别成本变化原因</div>
+                        </div>
+                    </div>
+                    <div class="cost-stat-chart-card">
+                        <div class="cost-stat-chart-header">
+                            <div class="cost-stat-chart-title">供应商成本贡献（柱状图）</div>
+                        </div>
+                        <div class="cost-stat-chart-placeholder compact">
+                            <div class="cost-stat-chart-placeholder-icon">📊</div>
+                            <div>各供应商采购金额占比与排名</div>
+                        </div>
+                    </div>
+                    <div class="cost-stat-chart-card">
+                        <div class="cost-stat-chart-header">
+                            <div class="cost-stat-chart-title">成本节约分析（柱状图）</div>
+                        </div>
+                        <div class="cost-stat-chart-placeholder compact">
+                            <div class="cost-stat-chart-placeholder-icon">📊</div>
+                            <div>实际成本 vs 预算成本，展示节约空间</div>
+                        </div>
+                    </div>
+                    <div class="cost-stat-chart-card">
+                        <div class="cost-stat-chart-header">
+                            <div class="cost-stat-chart-title">单价趋势对比（折线图）</div>
+                        </div>
+                        <div class="cost-stat-chart-placeholder compact">
+                            <div class="cost-stat-chart-placeholder-icon">📈</div>
+                            <div>主要物料单价变化趋势，识别价格波动</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 统计表：Tab切换 -->
+            <div class="cost-stat-section cost-stat-table-section">
+                <div class="cost-stat-section-header has-tabs">
+                    <div class="cost-stat-table-tabs">
+                        <button type="button" class="cost-stat-table-tab active" data-tab="category">按物料分类</button>
+                        <button type="button" class="cost-stat-table-tab" data-tab="supplier">按供应商</button>
+                        <button type="button" class="cost-stat-table-tab" data-tab="org">按采购组织</button>
+                        <button type="button" class="cost-stat-table-tab" data-tab="detail">按物料明细</button>
+                        <button type="button" class="cost-stat-table-tab" data-tab="trend">成本趋势</button>
+                    </div>
+                    <button class="btn btn-sm btn-default">📥 导出</button>
+                </div>
+                <div class="cost-stat-table-panes">
+                    <div class="cost-stat-table-pane active" id="pane-category">
+                        <div class="card">
+                            <div class="table-wrapper">
+                                <table class="list-table-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>物料分类</th>
+                                            <th>本月金额(元)</th>
+                                            <th>上月金额(元)</th>
+                                            <th>环比变化</th>
+                                            <th>去年同期(元)</th>
+                                            <th>同比变化</th>
+                                            <th>占比</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><a href="pages/procurement-stat-purchase.html">电子元器件</a></td>
+                                            <td>1,250,000</td>
+                                            <td>1,180,000</td>
+                                            <td><span class="cost-stat-change up">+5.9%</span></td>
+                                            <td>1,150,000</td>
+                                            <td><span class="cost-stat-change up">+8.7%</span></td>
+                                            <td>48.4%</td>
+                                        </tr>
+                                        <tr>
+                                            <td><a href="pages/procurement-stat-purchase.html">结构件</a></td>
+                                            <td>520,000</td>
+                                            <td>550,000</td>
+                                            <td><span class="cost-stat-change down">-5.5%</span></td>
+                                            <td>510,000</td>
+                                            <td><span class="cost-stat-change up">+2.0%</span></td>
+                                            <td>20.2%</td>
+                                        </tr>
+                                        <tr>
+                                            <td><a href="pages/procurement-stat-purchase.html">包装辅材</a></td>
+                                            <td>380,000</td>
+                                            <td>360,000</td>
+                                            <td><span class="cost-stat-change up">+5.6%</span></td>
+                                            <td>350,000</td>
+                                            <td><span class="cost-stat-change up">+8.6%</span></td>
+                                            <td>14.7%</td>
+                                        </tr>
+                                        <tr>
+                                            <td><a href="pages/procurement-stat-purchase.html">设备及备件</a></td>
+                                            <td>320,000</td>
+                                            <td>280,000</td>
+                                            <td><span class="cost-stat-change up">+14.3%</span></td>
+                                            <td>290,000</td>
+                                            <td><span class="cost-stat-change up">+10.3%</span></td>
+                                            <td>12.4%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>其他</td>
+                                            <td>110,000</td>
+                                            <td>105,000</td>
+                                            <td><span class="cost-stat-change up">+4.8%</span></td>
+                                            <td>100,000</td>
+                                            <td><span class="cost-stat-change up">+10.0%</span></td>
+                                            <td>4.3%</td>
+                                        </tr>
+                                        <tr class="cost-stat-sum-row">
+                                            <td><strong>合计</strong></td>
+                                            <td><strong>2,580,000</strong></td>
+                                            <td><strong>2,475,000</strong></td>
+                                            <td><span class="cost-stat-change up"><strong>+4.2%</strong></span></td>
+                                            <td><strong>2,400,000</strong></td>
+                                            <td><span class="cost-stat-change up"><strong>+7.5%</strong></span></td>
+                                            <td><strong>100%</strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cost-stat-table-pane" id="pane-supplier">
+                        <div class="card">
+                            <div class="table-wrapper">
+                                <table class="list-table-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>供应商</th>
+                                            <th>采购金额(元)</th>
+                                            <th>金额占比</th>
+                                            <th>环比变化</th>
+                                            <th>同比变化</th>
+                                            <th>平均单价</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><a href="pages/procurement-stat-supplier.html">华强电子有限公司</a></td>
+                                            <td>980,000</td>
+                                            <td>38.0%</td>
+                                            <td><span class="cost-stat-change up">+6.2%</span></td>
+                                            <td><span class="cost-stat-change up">+9.5%</span></td>
+                                            <td>81,667</td>
+                                        </tr>
+                                        <tr>
+                                            <td><a href="pages/procurement-stat-supplier.html">京东方科技集团</a></td>
+                                            <td>650,000</td>
+                                            <td>25.2%</td>
+                                            <td><span class="cost-stat-change up">+4.8%</span></td>
+                                            <td><span class="cost-stat-change up">+7.2%</span></td>
+                                            <td>81,250</td>
+                                        </tr>
+                                        <tr>
+                                            <td><a href="pages/procurement-stat-supplier.html">中芯国际半导体</a></td>
+                                            <td>480,000</td>
+                                            <td>18.6%</td>
+                                            <td><span class="cost-stat-change up">+3.1%</span></td>
+                                            <td><span class="cost-stat-change up">+5.8%</span></td>
+                                            <td>80,000</td>
+                                        </tr>
+                                        <tr>
+                                            <td><a href="pages/procurement-stat-supplier.html">立讯精密工业</a></td>
+                                            <td>280,000</td>
+                                            <td>10.9%</td>
+                                            <td><span class="cost-stat-change down">-2.5%</span></td>
+                                            <td><span class="cost-stat-change up">+1.2%</span></td>
+                                            <td>31,111</td>
+                                        </tr>
+                                        <tr>
+                                            <td>其他供应商</td>
+                                            <td>190,000</td>
+                                            <td>7.4%</td>
+                                            <td><span class="cost-stat-change up">+5.6%</span></td>
+                                            <td><span class="cost-stat-change up">+8.9%</span></td>
+                                            <td>19,000</td>
+                                        </tr>
+                                        <tr class="cost-stat-sum-row">
+                                            <td><strong>合计</strong></td>
+                                            <td><strong>2,580,000</strong></td>
+                                            <td><strong>100%</strong></td>
+                                            <td><span class="cost-stat-change up"><strong>+4.2%</strong></span></td>
+                                            <td><span class="cost-stat-change up"><strong>+7.5%</strong></span></td>
+                                            <td><strong>57,333</strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cost-stat-table-pane" id="pane-org">
+                        <div class="card">
+                            <div class="table-wrapper">
+                                <table class="list-table-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>采购组织</th>
+                                            <th>采购金额(元)</th>
+                                            <th>金额占比</th>
+                                            <th>环比变化</th>
+                                            <th>预算金额(元)</th>
+                                            <th>节约金额(元)</th>
+                                            <th>节约率</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>深圳采购中心</td>
+                                            <td>1,161,000</td>
+                                            <td>45.0%</td>
+                                            <td><span class="cost-stat-change up">+4.5%</span></td>
+                                            <td>1,200,000</td>
+                                            <td><span class="cost-stat-change down">39,000</span></td>
+                                            <td>3.3%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>上海采购中心</td>
+                                            <td>903,000</td>
+                                            <td>35.0%</td>
+                                            <td><span class="cost-stat-change up">+3.8%</span></td>
+                                            <td>950,000</td>
+                                            <td><span class="cost-stat-change down">47,000</span></td>
+                                            <td>4.9%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>北京采购中心</td>
+                                            <td>516,000</td>
+                                            <td>20.0%</td>
+                                            <td><span class="cost-stat-change up">+4.8%</span></td>
+                                            <td>550,000</td>
+                                            <td><span class="cost-stat-change down">34,000</span></td>
+                                            <td>6.2%</td>
+                                        </tr>
+                                        <tr class="cost-stat-sum-row">
+                                            <td><strong>合计</strong></td>
+                                            <td><strong>2,580,000</strong></td>
+                                            <td><strong>100%</strong></td>
+                                            <td><span class="cost-stat-change up"><strong>+4.2%</strong></span></td>
+                                            <td><strong>2,700,000</strong></td>
+                                            <td><span class="cost-stat-change down"><strong>120,000</strong></span></td>
+                                            <td><strong>4.4%</strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cost-stat-table-pane" id="pane-detail">
+                        <div class="card">
+                            <div class="table-wrapper">
+                                <table class="list-table-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>物料编码</th>
+                                            <th>物料名称</th>
+                                            <th>物料类型</th>
+                                            <th>单价(元)</th>
+                                            <th>采购数量</th>
+                                            <th>金额(元)</th>
+                                            <th>环比单价变化</th>
+                                            <th>同比单价变化</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>M-E-001</td>
+                                            <td>主控芯片 STM32</td>
+                                            <td>电子元器件</td>
+                                            <td>36.00</td>
+                                            <td>5,000</td>
+                                            <td>180,000</td>
+                                            <td><span class="cost-stat-change up">+2.1%</span></td>
+                                            <td><span class="cost-stat-change up">+4.5%</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>M-E-002</td>
+                                            <td>电源模块 12V</td>
+                                            <td>电子元器件</td>
+                                            <td>40.00</td>
+                                            <td>3,200</td>
+                                            <td>128,000</td>
+                                            <td><span class="cost-stat-change down">-1.2%</span></td>
+                                            <td><span class="cost-stat-change up">+1.8%</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>M-S-001</td>
+                                            <td>铝合金外壳</td>
+                                            <td>结构件</td>
+                                            <td>47.50</td>
+                                            <td>2,000</td>
+                                            <td>95,000</td>
+                                            <td><span class="cost-stat-change up">+5.3%</span></td>
+                                            <td><span class="cost-stat-change up">+8.2%</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>M-P-001</td>
+                                            <td>防静电包装袋</td>
+                                            <td>包装辅材</td>
+                                            <td>0.90</td>
+                                            <td>50,000</td>
+                                            <td>45,000</td>
+                                            <td><span class="cost-stat-change flat">0%</span></td>
+                                            <td><span class="cost-stat-change flat">0%</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>M-E-003</td>
+                                            <td>传感器模块</td>
+                                            <td>电子元器件</td>
+                                            <td>140.00</td>
+                                            <td>1,500</td>
+                                            <td>210,000</td>
+                                            <td><span class="cost-stat-change up">+8.5%</span></td>
+                                            <td><span class="cost-stat-change up">+12.3%</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>M-E-004</td>
+                                            <td>显示屏模组</td>
+                                            <td>电子元器件</td>
+                                            <td>400.00</td>
+                                            <td>800</td>
+                                            <td>320,000</td>
+                                            <td><span class="cost-stat-change up">+3.2%</span></td>
+                                            <td><span class="cost-stat-change up">+6.8%</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="pagination">
+                                <span class="pagination-info">共 102 条记录，每页显示 10 条</span>
+                                <div class="pagination-controls">
+                                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                                    <span class="pagination-page">第 1 / 11 页</span>
+                                    <button class="btn btn-sm btn-default">下一页</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cost-stat-table-pane" id="pane-trend">
+                        <div class="card">
+                            <div class="table-wrapper">
+                                <table class="list-table-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>月份</th>
+                                            <th>采购金额(元)</th>
+                                            <th>环比变化</th>
+                                            <th>同比变化</th>
+                                            <th>预算金额(元)</th>
+                                            <th>完成率</th>
+                                            <th>节约金额(元)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>2025-01</td>
+                                            <td>2,580,000</td>
+                                            <td><span class="cost-stat-change up">+4.2%</span></td>
+                                            <td><span class="cost-stat-change up">+7.5%</span></td>
+                                            <td>2,700,000</td>
+                                            <td>95.6%</td>
+                                            <td><span class="cost-stat-change down">120,000</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2024-12</td>
+                                            <td>2,475,000</td>
+                                            <td><span class="cost-stat-change up">+2.8%</span></td>
+                                            <td><span class="cost-stat-change up">+5.2%</span></td>
+                                            <td>2,600,000</td>
+                                            <td>95.2%</td>
+                                            <td><span class="cost-stat-change down">125,000</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2024-11</td>
+                                            <td>2,407,000</td>
+                                            <td><span class="cost-stat-change down">-1.5%</span></td>
+                                            <td><span class="cost-stat-change up">+3.8%</span></td>
+                                            <td>2,550,000</td>
+                                            <td>94.4%</td>
+                                            <td><span class="cost-stat-change down">143,000</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2024-10</td>
+                                            <td>2,444,000</td>
+                                            <td><span class="cost-stat-change up">+3.2%</span></td>
+                                            <td><span class="cost-stat-change up">+6.5%</span></td>
+                                            <td>2,500,000</td>
+                                            <td>97.8%</td>
+                                            <td><span class="cost-stat-change down">56,000</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2024-09</td>
+                                            <td>2,368,000</td>
+                                            <td><span class="cost-stat-change down">-2.1%</span></td>
+                                            <td><span class="cost-stat-change up">+4.2%</span></td>
+                                            <td>2,450,000</td>
+                                            <td>96.7%</td>
+                                            <td><span class="cost-stat-change down">82,000</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function(){
+            // Tab切换功能
+            document.querySelectorAll('.cost-stat-table-tab').forEach(function(btn){
+                btn.addEventListener('click', function(){
+                    var tab = this.dataset.tab;
+                    document.querySelectorAll('.cost-stat-table-tab').forEach(function(b){ b.classList.remove('active'); });
+                    document.querySelectorAll('.cost-stat-table-pane').forEach(function(p){ p.classList.remove('active'); });
+                    this.classList.add('active');
+                    var pane = document.getElementById('pane-' + tab);
+                    if (pane) pane.classList.add('active');
+                });
+            });
+            
+            // 按钮交互
+            if (typeof PageInteractions !== 'undefined') { 
+                PageInteractions.initButtons(); 
+            }
+        })();
+    </script>
+</body>
+</html>

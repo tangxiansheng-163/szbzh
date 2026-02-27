@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设计工作台</title>
+</head>
+<body>
+    <div class="content-wrapper workbench-page">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/design-task-list.html" class="breadcrumb-item">设计任务</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">设计工作台</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">同技术任务共用一个 BOM 树，谁添加谁可编辑、调层级、删除。左侧物料可检索、过滤，拖拽到右侧树添加节点；选中节点后可在下方管理附件与可替换物料。</p>
+        </div>
+
+        <div id="wb-workbench-fullscreen-wrap" class="workbench-fullscreen-wrap">
+            <div class="workbench-task-bar">
+                <div class="task-meta">
+                    <span><strong>DT-2025-001</strong> 智能控制器电气设计</span>
+                    <span class="task-meta-sep">|</span>
+                    <span>技术任务 <strong><a href="pages/tech-task-detail.html?id=1">TT-2025-001</a></strong></span>
+                    <span class="task-meta-sep">|</span>
+                    <span>共用 BOM · 智能控制器</span>
+                    <span class="status-badge status-processing">执行中</span>
+                </div>
+                <div class="task-actions">
+                    <button type="button" class="btn btn-default" id="wb-workbench-fullscreen" title="全屏">全屏</button>
+                    <button type="button" class="btn btn-default" data-open-modal="save-draft-modal">保存草稿</button>
+                    <button type="button" class="btn btn-primary" data-open-modal="submit-review-modal">提交审核</button>
+                    <button type="button" class="btn btn-default btn-back" data-url="pages/design-task-list.html">返回</button>
+                </div>
+            </div>
+
+            <div class="workbench-layout">
+                <div class="workbench-material-panel" id="wb-material-panel">
+                <div class="panel-header">物料信息</div>
+                <div class="panel-toolbar">
+                    <input type="text" class="material-search" id="wb-mat-search" placeholder="检索物料编码、名称、规格">
+                    <div class="material-filters">
+                        <select class="form-select" id="wb-mat-type">
+                            <option value="">物料类型</option>
+                            <option value="parts">零部件</option>
+                            <option value="raw">原材料</option>
+                            <option value="semi">半成品</option>
+                        </select>
+                        <select class="form-select" id="wb-mat-status">
+                            <option value="">状态</option>
+                            <option value="enabled">启用</option>
+                            <option value="disabled">停用</option>
+                        </select>
+                    </div>
+                    <div class="panel-hint">支持检索、点选过滤；拖拽物料到右侧树可添加为子节点。</div>
+                </div>
+                <div class="workbench-material-list" id="wb-mat-list">
+                    <div class="material-item" draggable="true" data-code="M006" data-name="散热器" data-spec="HS-40x40" data-unit="个" data-type="parts" data-status="enabled">
+                        <span class="mat-code">M006</span>
+                        <span class="mat-name">散热器</span>
+                        <span class="mat-unit">个</span>
+                    </div>
+                    <div class="material-item" draggable="true" data-code="M007" data-name="电容 100uF" data-spec="CAP-100U-25V" data-unit="个" data-type="raw" data-status="enabled">
+                        <span class="mat-code">M007</span>
+                        <span class="mat-name">电容 100uF</span>
+                        <span class="mat-unit">个</span>
+                    </div>
+                    <div class="material-item" draggable="true" data-code="M008" data-name="电阻 10k" data-spec="RES-10K-1/4W" data-unit="个" data-type="raw" data-status="enabled">
+                        <span class="mat-code">M008</span>
+                        <span class="mat-name">电阻 10k</span>
+                        <span class="mat-unit">个</span>
+                    </div>
+                    <div class="material-item" draggable="true" data-code="M009" data-name="连接器" data-spec="CON-4P" data-unit="个" data-type="parts" data-status="enabled">
+                        <span class="mat-code">M009</span>
+                        <span class="mat-name">连接器</span>
+                        <span class="mat-unit">个</span>
+                    </div>
+                    <div class="material-item" draggable="true" data-code="M010" data-name="外壳" data-spec="CASE-ABS" data-unit="件" data-type="parts" data-status="enabled">
+                        <span class="mat-code">M010</span>
+                        <span class="mat-name">外壳</span>
+                        <span class="mat-unit">件</span>
+                    </div>
+                </div>
+                </div>
+                <div class="workbench-tree-wrap">
+                <div class="workbench-tree-toolbar">
+                    <span class="tree-toolbar-title">BOM 树</span>
+                    <div class="tree-actions">
+                        <button type="button" class="btn btn-sm btn-primary" data-open-modal="add-root-modal">新增根节点</button>
+                        <span class="tree-toolbar-sep">|</span>
+                        <button type="button" class="btn btn-sm btn-default" data-open-modal="ref-bom-modal">引用 BOM</button>
+                        <button type="button" class="btn btn-sm btn-default" data-open-modal="copy-bom-modal">复制 BOM</button>
+                        <span class="tree-batch-bar" id="wb-batch-bar" style="display:none;">
+                            <span class="tree-toolbar-sep">|</span>
+                            <span class="batch-info">已选 <strong id="wb-batch-count">0</strong> 项</span>
+                            <button type="button" class="btn btn-sm btn-default" data-open-modal="batch-key-modal">批量关键件</button>
+                            <button type="button" class="btn btn-sm btn-default" data-open-modal="batch-replace-modal">批量可替换件</button>
+                            <button type="button" class="btn btn-sm btn-default" data-open-modal="batch-loss-modal">批量损耗率</button>
+                            <span class="tree-toolbar-sep">|</span>
+                        </span>
+                        <button type="button" class="btn btn-sm btn-default" data-open-modal="import-bom-modal">导入</button>
+                        <span class="tree-toolbar-sep">|</span>
+                        <button type="button" class="btn btn-sm btn-default" id="wb-expand-all">展开全部</button>
+                        <button type="button" class="btn btn-sm btn-default" id="wb-collapse-all">折叠全部</button>
+                    </div>
+                </div>
+                <div class="workbench-tree-body droppable" id="wb-tree-body">
+                    <table class="bom-tree">
+                        <thead>
+                            <tr>
+                                <th class="col-check" width="36"><input type="checkbox" class="bom-tree-select-all" id="wb-bom-select-all" aria-label="全选" title="全选本人节点"></th>
+                                <th class="col-no">序号</th>
+                                <th class="col-level">层级号</th>
+                                <th>物料</th>
+                                <th>物料编码</th>
+                                <th>规格型号</th>
+                                <th class="col-qty">数量</th>
+                                <th class="col-unit">单位</th>
+                                <th class="col-key">关键件</th>
+                                <th class="col-replace">可替换件</th>
+                                <th class="col-loss">损耗率</th>
+                                <th class="col-supplier">推荐供应商</th>
+                                <th class="col-price">参考价格</th>
+                                <th class="col-remark">备注</th>
+                                <th class="col-owner">添加人</th>
+                                <th class="col-actions">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="wb-tree-tbody">
+                            <tr class="bom-tree-row" data-node-id="1" data-owner="own" data-level="1" data-expanded="1" draggable="true">
+                                <td class="col-check" onclick="event.stopPropagation()"><input type="checkbox" class="bom-tree-row-check" name="bom-tree-check"></td>
+                                <td class="col-no">1</td>
+                                <td class="col-level">1</td>
+                                <td><div class="tree-cell"><span class="tree-drag-handle" title="拖动调整层级">⋮⋮</span><span class="tree-toggle expanded">▸</span><span class="tree-indent"></span><span>智能控制器</span></div></td>
+                                <td>M000</td>
+                                <td>—</td>
+                                <td class="col-qty"><input type="number" class="bom-qty-input" value="1" min="0" step="0.01"></td>
+                                <td class="col-unit"><select class="bom-unit-select"><option selected>台</option><option>件</option><option>个</option><option>套</option><option>kg</option></select></td>
+                                <td class="col-key"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-key-check" checked> 是</label></td>
+                                <td class="col-replace"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-replace-check"> 是</label></td>
+                                <td class="col-loss"><input type="number" class="bom-input-sm" value="0" min="0" max="100" step="0.01" placeholder="%"></td>
+                                <td class="col-supplier"><input type="text" class="bom-input-sm" placeholder="选填"></td>
+                                <td class="col-price"><input type="number" class="bom-input-sm" min="0" step="0.01" placeholder="元"></td>
+                                <td class="col-remark"><input type="text" class="bom-input-sm" placeholder="选填"></td>
+                                <td class="col-owner"><span class="owner-tag">本人</span></td>
+                                <td class="col-actions"><div class="cell-act"><button type="button" class="btn btn-sm btn-default btn-add-child">子</button><button type="button" class="btn btn-sm btn-default btn-delete-node">删</button></div></td>
+                            </tr>
+                            <tr class="bom-tree-row selected" data-node-id="2" data-owner="own" data-level="2" draggable="true">
+                                <td class="col-check" onclick="event.stopPropagation()"><input type="checkbox" class="bom-tree-row-check" name="bom-tree-check"></td>
+                                <td class="col-no">2</td>
+                                <td class="col-level">1.1</td>
+                                <td><div class="tree-cell"><span class="tree-drag-handle" title="拖动调整层级">⋮⋮</span><span class="tree-toggle empty">▸</span><span class="tree-indent tree-indent-l2"></span><span>主控板</span></div></td>
+                                <td>M001</td>
+                                <td>CTRL-MAIN-V1</td>
+                                <td class="col-qty"><input type="number" class="bom-qty-input" value="1" min="0" step="0.01"></td>
+                                <td class="col-unit"><select class="bom-unit-select"><option>台</option><option selected>件</option><option>个</option><option>套</option><option>kg</option></select></td>
+                                <td class="col-key"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-key-check" checked> 是</label></td>
+                                <td class="col-replace"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-replace-check"> 是</label></td>
+                                <td class="col-loss"><input type="number" class="bom-input-sm" value="0" min="0" max="100" step="0.01" placeholder="%"></td>
+                                <td class="col-supplier"><input type="text" class="bom-input-sm" placeholder="选填"></td>
+                                <td class="col-price"><input type="number" class="bom-input-sm" min="0" step="0.01" placeholder="元"></td>
+                                <td class="col-remark"><input type="text" class="bom-input-sm" placeholder="选填"></td>
+                                <td class="col-owner"><span class="owner-tag">本人</span></td>
+                                <td class="col-actions"><div class="cell-act"><button type="button" class="btn btn-sm btn-default btn-add-child">子</button><button type="button" class="btn btn-sm btn-default btn-delete-node">删</button></div></td>
+                            </tr>
+                            <tr class="bom-tree-row locked" data-node-id="3" data-owner="other" data-level="2">
+                                <td class="col-check"></td>
+                                <td class="col-no">3</td>
+                                <td class="col-level">1.2</td>
+                                <td><div class="tree-cell"><span class="tree-toggle empty">▸</span><span class="tree-indent tree-indent-l2"></span><span>传感器模块</span></div></td>
+                                <td>M003</td>
+                                <td>SN-温度-01</td>
+                                <td class="col-qty">1</td>
+                                <td class="col-unit">个</td>
+                                <td class="col-key">是</td>
+                                <td class="col-replace">否</td>
+                                <td class="col-loss">—</td>
+                                <td class="col-supplier">—</td>
+                                <td class="col-price">—</td>
+                                <td class="col-remark">—</td>
+                                <td class="col-owner"><span class="owner-tag other">李</span></td>
+                                <td class="col-actions"><span class="lock-hint">仅添加人</span></td>
+                            </tr>
+                            <tr class="bom-tree-row locked" data-node-id="4" data-owner="other" data-level="2">
+                                <td class="col-check"></td>
+                                <td class="col-no">4</td>
+                                <td class="col-level">1.3</td>
+                                <td><div class="tree-cell"><span class="tree-toggle empty">▸</span><span class="tree-indent tree-indent-l2"></span><span>不锈钢螺栓</span></div></td>
+                                <td>M002</td>
+                                <td>M8×20</td>
+                                <td class="col-qty">4</td>
+                                <td class="col-unit">个</td>
+                                <td class="col-key">否</td>
+                                <td class="col-replace">是</td>
+                                <td class="col-loss">—</td>
+                                <td class="col-supplier">—</td>
+                                <td class="col-price">—</td>
+                                <td class="col-remark">—</td>
+                                <td class="col-owner"><span class="owner-tag other">王</span></td>
+                                <td class="col-actions"><span class="lock-hint">仅添加人</span></td>
+                            </tr>
+                            <tr class="bom-tree-row" data-node-id="5" data-owner="own" data-level="2" data-expanded="1" draggable="true">
+                                <td class="col-check" onclick="event.stopPropagation()"><input type="checkbox" class="bom-tree-row-check" name="bom-tree-check"></td>
+                                <td class="col-no">5</td>
+                                <td class="col-level">1.4</td>
+                                <td><div class="tree-cell"><span class="tree-drag-handle" title="拖动调整层级">⋮⋮</span><span class="tree-toggle expanded">▸</span><span class="tree-indent tree-indent-l2"></span><span>电源模块</span></div></td>
+                                <td>M004</td>
+                                <td>PSU-24V-5A</td>
+                                <td class="col-qty"><input type="number" class="bom-qty-input" value="1" min="0" step="0.01"></td>
+                                <td class="col-unit"><select class="bom-unit-select"><option>台</option><option selected>件</option><option>个</option><option>套</option><option>kg</option></select></td>
+                                <td class="col-key"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-key-check"> 是</label></td>
+                                <td class="col-replace"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-replace-check" checked> 是</label></td>
+                                <td class="col-loss"><input type="number" class="bom-input-sm" value="0" min="0" max="100" step="0.01" placeholder="%"></td>
+                                <td class="col-supplier"><input type="text" class="bom-input-sm" placeholder="选填"></td>
+                                <td class="col-price"><input type="number" class="bom-input-sm" min="0" step="0.01" placeholder="元"></td>
+                                <td class="col-remark"><input type="text" class="bom-input-sm" placeholder="选填"></td>
+                                <td class="col-owner"><span class="owner-tag">本人</span></td>
+                                <td class="col-actions"><div class="cell-act"><button type="button" class="btn btn-sm btn-default btn-add-child">子</button><button type="button" class="btn btn-sm btn-default btn-delete-node">删</button></div></td>
+                            </tr>
+                            <tr class="bom-tree-row" data-node-id="6" data-owner="own" data-level="3" draggable="true">
+                                <td class="col-check" onclick="event.stopPropagation()"><input type="checkbox" class="bom-tree-row-check" name="bom-tree-check"></td>
+                                <td class="col-no">6</td>
+                                <td class="col-level">1.4.1</td>
+                                <td><div class="tree-cell"><span class="tree-drag-handle" title="拖动调整层级">⋮⋮</span><span class="tree-toggle empty">▸</span><span class="tree-indent tree-indent-l3"></span><span>接线端子</span></div></td>
+                                <td>M005</td>
+                                <td>TB-10P</td>
+                                <td class="col-qty"><input type="number" class="bom-qty-input" value="2" min="0" step="0.01"></td>
+                                <td class="col-unit"><select class="bom-unit-select"><option>台</option><option>件</option><option selected>个</option><option>套</option><option>kg</option></select></td>
+                                <td class="col-key"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-key-check"> 是</label></td>
+                                <td class="col-replace"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-replace-check"> 是</label></td>
+                                <td class="col-loss"><input type="number" class="bom-input-sm" value="0" min="0" max="100" step="0.01" placeholder="%"></td>
+                                <td class="col-supplier"><input type="text" class="bom-input-sm" placeholder="选填"></td>
+                                <td class="col-price"><input type="number" class="bom-input-sm" min="0" step="0.01" placeholder="元"></td>
+                                <td class="col-remark"><input type="text" class="bom-input-sm" placeholder="选填"></td>
+                                <td class="col-owner"><span class="owner-tag">本人</span></td>
+                                <td class="col-actions"><div class="cell-act"><button type="button" class="btn btn-sm btn-default btn-add-child">子</button><button type="button" class="btn btn-sm btn-default btn-delete-node">删</button></div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card wb-below-tree-card" id="wb-below-tree-card">
+                    <div class="card-header card-header-with-tabs">
+                        <span class="card-title">附件与可替换物料</span>
+                        <div class="dt-detail-tab-bar">
+                            <label class="dt-detail-tab"><input type="radio" name="wb-below-tab" value="attach" checked> 附件列表</label>
+                            <label class="dt-detail-tab wb-tab-replace" id="wb-tab-replace-label" style="display:none;"><input type="radio" name="wb-below-tab" value="replace"> 可替换物料</label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="dt-detail-tab-pane" data-tab="attach">
+                            <div class="wb-below-toolbar">
+                                <button type="button" class="btn btn-sm btn-primary" id="wb-attach-upload-btn" title="为当前选中的 BOM 节点上传附件">上传附件</button>
+                                <span class="wb-below-hint" id="wb-attach-upload-hint">请先在 BOM 树中选中节点</span>
+                            </div>
+                            <div class="table-wrapper">
+                                <table class="output-table dt-attach-table" id="wb-attach-table">
+                                    <thead>
+                                        <tr>
+                                            <th>类型</th>
+                                            <th>物料编码</th>
+                                            <th>物料名称</th>
+                                            <th>规格型号</th>
+                                            <th>文件名称</th>
+                                            <th>版本</th>
+                                            <th>格式</th>
+                                            <th>上传时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="wb-attach-tbody"></tbody>
+                                </table>
+                            </div>
+                            <div class="empty-hint" id="wb-attach-empty">选中 BOM 节点后显示其附件；无附件时显示空。</div>
+                        </div>
+                        <div class="dt-detail-tab-pane" data-tab="replace">
+                            <div class="wb-below-toolbar">
+                                <button type="button" class="btn btn-sm btn-primary" id="wb-replace-add-btn" title="新增可替换物料">新增物料</button>
+                                <span class="wb-below-hint" id="wb-replace-add-hint">请先选中可替换件节点</span>
+                            </div>
+                            <div class="table-wrapper">
+                                <table class="output-table" id="wb-replace-table">
+                                    <thead>
+                                        <tr>
+                                            <th width="60">序号</th>
+                                            <th>物料编码</th>
+                                            <th>物料名称</th>
+                                            <th>规格型号</th>
+                                            <th>数量</th>
+                                            <th>单位</th>
+                                            <th>备注</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="wb-replace-tbody"></tbody>
+                                </table>
+                            </div>
+                            <div class="empty-hint" id="wb-replace-empty">当前选中的可替换件暂无替代物料。</div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        <div id="ref-bom-modal" class="modal-overlay" data-wb-modal>
+            <div class="modal" style="max-width: 520px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">引用 BOM</span>
+                    <div class="modal-close" data-close-modal="ref-bom-modal">×</div>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-desc">从已发布的 EBOM/MBOM 借用结构，支持完整借用（作为子件）或部分借用（复制指定层级明细）。</p>
+                    <div class="form-item">
+                        <label class="form-label">源 BOM</label>
+                        <select class="form-input form-select" id="ref-bom-source">
+                            <option value="">请选择</option>
+                            <option value="ebom-1">EBOM-智能控制器 V1.0（已发布）</option>
+                            <option value="ebom-2">EBOM-传感器模块 V1.0（已发布）</option>
+                            <option value="mbom-1">MBOM-主控板装配 V1.0（已发布）</option>
+                        </select>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">借用方式</label>
+                        <select class="form-input form-select" id="ref-bom-type">
+                            <option value="full">完整借用（作为子件）</option>
+                            <option value="partial">部分借用（复制明细）</option>
+                        </select>
+                    </div>
+                    <div class="form-item" id="ref-bom-level-wrap" style="display:none;">
+                        <label class="form-label">复制最大层级</label>
+                        <input type="number" class="form-input" id="ref-bom-level" min="1" max="10" value="2" placeholder="1–10">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="ref-bom-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="ref-bom-submit">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="copy-bom-modal" class="modal-overlay" data-wb-modal>
+            <div class="modal" style="max-width: 520px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">复制 BOM</span>
+                    <div class="modal-close" data-close-modal="copy-bom-modal">×</div>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-desc">从已发布的 EBOM/MBOM/SBOM 复制结构到当前 BOM 树，支持整体复制或部分复制（指定层级）。</p>
+                    <div class="form-item">
+                        <label class="form-label">源 BOM</label>
+                        <select class="form-input form-select" id="copy-bom-source">
+                            <option value="">请选择</option>
+                            <option value="ebom-1">EBOM-智能控制器 V1.0</option>
+                            <option value="ebom-2">EBOM-传感器模块 V1.0</option>
+                            <option value="mbom-1">MBOM-主控板装配 V1.0</option>
+                            <option value="sbom-1">SBOM-智能控制器 V1.0</option>
+                        </select>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">复制类型</label>
+                        <select class="form-input form-select" id="copy-bom-type">
+                            <option value="full">整体复制</option>
+                            <option value="partial">部分复制</option>
+                        </select>
+                    </div>
+                    <div class="form-item" id="copy-bom-level-wrap" style="display:none;">
+                        <label class="form-label">复制最大层级</label>
+                        <input type="number" class="form-input" id="copy-bom-level" min="1" max="10" value="2" placeholder="1–10">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="copy-bom-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="copy-bom-submit">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="import-bom-modal" class="modal-overlay" data-wb-modal>
+            <div class="modal" style="max-width: 520px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">导入 BOM</span>
+                    <div class="modal-close" data-close-modal="import-bom-modal">×</div>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-desc">使用标准 Excel 模板填写 BOM 明细（物料编码、数量、层级等）后上传，系统校验后追加到当前 BOM 树。</p>
+                    <div class="form-item">
+                        <a href="#" class="link-download" id="import-bom-tpl">下载 BOM 导入模板.xlsx</a>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">选择文件</label>
+                        <input type="file" class="form-input" id="import-bom-file" accept=".xlsx,.xls">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="import-bom-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="import-bom-submit">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="add-root-modal" class="modal-overlay" data-wb-modal>
+            <div class="modal" style="max-width: 520px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">新增根节点</span>
+                    <div class="modal-close" data-close-modal="add-root-modal">×</div>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-desc">在 BOM 树顶层添加根节点，可填写物料信息或从左侧物料面板拖拽添加。</p>
+                    <div class="form-item">
+                        <label class="form-label">物料编码</label>
+                        <input type="text" class="form-input" id="add-root-code" placeholder="如 M001">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">物料名称</label>
+                        <input type="text" class="form-input" id="add-root-name" placeholder="必填">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">规格型号</label>
+                        <input type="text" class="form-input" id="add-root-spec" placeholder="选填">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">数量</label>
+                        <input type="number" class="form-input" id="add-root-qty" min="0" step="0.01" value="1">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">单位</label>
+                        <select class="form-input form-select" id="add-root-unit">
+                            <option>台</option><option selected>件</option><option>个</option><option>套</option><option>kg</option>
+                        </select>
+                    </div>
+                    <div class="form-item">
+                        <label class="filter-checkbox" style="margin:0;"><input type="checkbox" id="add-root-key"> 关键件</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="add-root-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="add-root-submit">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="add-child-modal" class="modal-overlay" data-wb-modal>
+            <div class="modal" style="max-width: 520px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">新增子节点</span>
+                    <div class="modal-close" data-close-modal="add-child-modal">×</div>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-desc" id="add-child-desc">在当前节点下添加子节点。</p>
+                    <div class="form-item">
+                        <label class="form-label">物料编码</label>
+                        <input type="text" class="form-input" id="add-child-code" placeholder="如 M001">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">物料名称</label>
+                        <input type="text" class="form-input" id="add-child-name" placeholder="必填">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">规格型号</label>
+                        <input type="text" class="form-input" id="add-child-spec" placeholder="选填">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">数量</label>
+                        <input type="number" class="form-input" id="add-child-qty" min="0" step="0.01" value="1">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">单位</label>
+                        <select class="form-input form-select" id="add-child-unit">
+                            <option>台</option><option selected>件</option><option>个</option><option>套</option><option>kg</option>
+                        </select>
+                    </div>
+                    <div class="form-item">
+                        <label class="filter-checkbox" style="margin:0;"><input type="checkbox" id="add-child-key"> 关键件</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="add-child-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="add-child-submit">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="delete-node-modal" class="modal-overlay" data-wb-modal>
+            <div class="modal" style="max-width: 420px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">删除节点</span>
+                    <div class="modal-close" data-close-modal="delete-node-modal">×</div>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-desc">确定删除节点「<strong id="delete-node-name"></strong>」及其所有子节点？此操作不可恢复。</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="delete-node-modal">取消</button>
+                    <button type="button" class="btn btn-primary btn-danger" id="delete-node-submit">确定删除</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="save-draft-modal" class="modal-overlay" data-wb-modal>
+            <div class="modal" style="max-width: 420px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">保存草稿</span>
+                    <div class="modal-close" data-close-modal="save-draft-modal">×</div>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-desc">确定保存当前 BOM 树草稿？保存后可继续编辑，后续再提交审核。</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="save-draft-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="save-draft-submit">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="submit-review-modal" class="modal-overlay" data-wb-modal>
+            <div class="modal" style="max-width: 520px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">提交审核</span>
+                    <div class="modal-close" data-close-modal="submit-review-modal">×</div>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-desc">提交后任务进入待审核状态，审核人可在「待我审核」中处理。</p>
+                    <div class="form-item">
+                        <label class="form-label">审核说明</label>
+                        <textarea class="form-input form-textarea" id="submit-review-remark" placeholder="选填，提交时可补充说明"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="submit-review-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="submit-review-submit">确定提交</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="upload-attach-modal" class="modal-overlay" data-wb-modal>
+            <div class="modal" style="max-width: 520px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">上传附件</span>
+                    <div class="modal-close" data-close-modal="upload-attach-modal">×</div>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-desc">为节点「<strong id="upload-attach-node-name"></strong>」上传图纸、技术文档等附件。选择文件后点击确定上传。</p>
+                    <div class="form-item">
+                        <label class="form-label">选择文件</label>
+                        <input type="file" class="form-input" id="upload-attach-file" multiple>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">已上传</label>
+                        <ul class="attach-list" id="upload-attach-list">
+                            <li class="attach-list-empty">暂无附件</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="upload-attach-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="upload-attach-submit">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="batch-key-modal" class="modal-overlay" data-wb-modal>
+            <div class="modal" style="max-width: 400px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">批量设置关键件</span>
+                    <div class="modal-close" data-close-modal="batch-key-modal">×</div>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-desc">将所选 <strong id="batch-key-count">0</strong> 个节点的关键件设为：</p>
+                    <div class="form-item">
+                        <label class="form-label">关键件</label>
+                        <select class="form-input form-select" id="batch-key-value">
+                            <option value="1">是</option>
+                            <option value="0">否</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="batch-key-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="batch-key-submit">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="batch-replace-modal" class="modal-overlay" data-wb-modal>
+            <div class="modal" style="max-width: 400px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">批量设置可替换件</span>
+                    <div class="modal-close" data-close-modal="batch-replace-modal">×</div>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-desc">将所选 <strong id="batch-replace-count">0</strong> 个节点的可替换件设为：</p>
+                    <div class="form-item">
+                        <label class="form-label">可替换件</label>
+                        <select class="form-input form-select" id="batch-replace-value">
+                            <option value="1">是</option>
+                            <option value="0">否</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="batch-replace-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="batch-replace-submit">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="batch-loss-modal" class="modal-overlay" data-wb-modal>
+            <div class="modal" style="max-width: 400px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">批量设置损耗率</span>
+                    <div class="modal-close" data-close-modal="batch-loss-modal">×</div>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-desc">将所选 <strong id="batch-loss-count">0</strong> 个节点的损耗率设为：</p>
+                    <div class="form-item">
+                        <label class="form-label">损耗率（%）</label>
+                        <input type="number" class="form-input" id="batch-loss-value" min="0" max="100" step="0.01" value="0" placeholder="0">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="batch-loss-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="batch-loss-submit">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="add-replace-material-modal" class="modal-overlay" data-wb-modal>
+            <div class="modal" style="max-width: 520px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">新增可替换物料</span>
+                    <div class="modal-close" data-close-modal="add-replace-material-modal">×</div>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-desc">为「<strong id="add-replace-node-name"></strong>」添加可替换物料。</p>
+                    <div class="form-item">
+                        <label class="form-label">物料编码</label>
+                        <input type="text" class="form-input" id="add-replace-code" placeholder="如 M002-A">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">物料名称</label>
+                        <input type="text" class="form-input" id="add-replace-name" placeholder="必填">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">规格型号</label>
+                        <input type="text" class="form-input" id="add-replace-spec" placeholder="选填">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">数量</label>
+                        <input type="number" class="form-input" id="add-replace-qty" min="0" step="0.01" value="1">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">单位</label>
+                        <select class="form-input form-select" id="add-replace-unit">
+                            <option>台</option><option>件</option><option selected>个</option><option>套</option><option>kg</option>
+                        </select>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">备注</label>
+                        <input type="text" class="form-input" id="add-replace-remark" placeholder="选填">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="add-replace-material-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="add-replace-submit">确定</button>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <script>
+        (function () {
+            if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+
+            var tbody = document.getElementById('wb-tree-tbody');
+            var matList = document.getElementById('wb-mat-list');
+            var searchEl = document.getElementById('wb-mat-search');
+            var typeEl = document.getElementById('wb-mat-type');
+            var statusEl = document.getElementById('wb-mat-status');
+            var dragOverRow = null;
+
+            function filterMaterialList() {
+                var q = (searchEl && searchEl.value || '').trim().toLowerCase();
+                var type = (typeEl && typeEl.value) || '';
+                var status = (statusEl && statusEl.value) || '';
+                var items = document.querySelectorAll('.material-item');
+                items.forEach(function (el) {
+                    var show = true;
+                    if (q) {
+                        var code = (el.getAttribute('data-code') || '').toLowerCase();
+                        var name = (el.getAttribute('data-name') || '').toLowerCase();
+                        var spec = (el.getAttribute('data-spec') || '').toLowerCase();
+                        show = code.indexOf(q) >= 0 || name.indexOf(q) >= 0 || spec.indexOf(q) >= 0;
+                    }
+                    if (show && type && el.getAttribute('data-type') !== type) show = false;
+                    if (show && status && el.getAttribute('data-status') !== status) show = false;
+                    el.style.display = show ? '' : 'none';
+                });
+            }
+            if (searchEl) searchEl.addEventListener('input', filterMaterialList);
+            if (typeEl) typeEl.addEventListener('change', filterMaterialList);
+            if (statusEl) statusEl.addEventListener('change', filterMaterialList);
+
+            var fullscreenWrap = document.getElementById('wb-workbench-fullscreen-wrap');
+            var fullscreenBtn = document.getElementById('wb-workbench-fullscreen');
+            function isWorkbenchFullscreen() {
+                var el = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
+                return el === fullscreenWrap;
+            }
+            function updateFullscreenBtnText() {
+                if (!fullscreenBtn) return;
+                fullscreenBtn.textContent = isWorkbenchFullscreen() ? '退出全屏' : '全屏';
+                fullscreenBtn.title = isWorkbenchFullscreen() ? '退出全屏' : '全屏';
+            }
+            function toggleFullscreenClass() {
+                if (!fullscreenWrap) return;
+                if (isWorkbenchFullscreen()) {
+                    fullscreenWrap.classList.add('wb-fullscreen-active');
+                } else {
+                    fullscreenWrap.classList.remove('wb-fullscreen-active');
+                }
+            }
+            if (fullscreenWrap && fullscreenBtn) {
+                fullscreenBtn.addEventListener('click', function () {
+                    if (isWorkbenchFullscreen()) {
+                        var fn = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen;
+                        if (fn) fn.call(document);
+                    } else {
+                        var req = fullscreenWrap.requestFullscreen || fullscreenWrap.webkitRequestFullscreen || fullscreenWrap.mozRequestFullScreen;
+                        if (req) req.call(fullscreenWrap);
+                    }
+                });
+                document.addEventListener('fullscreenchange', function () { updateFullscreenBtnText(); toggleFullscreenClass(); });
+                document.addEventListener('webkitfullscreenchange', function () { updateFullscreenBtnText(); toggleFullscreenClass(); });
+                document.addEventListener('mozfullscreenchange', function () { updateFullscreenBtnText(); toggleFullscreenClass(); });
+                updateFullscreenBtnText();
+                toggleFullscreenClass();
+            }
+
+            var treeBody = document.getElementById('wb-tree-body');
+            var expandAllBtn = document.getElementById('wb-expand-all');
+            var collapseAllBtn = document.getElementById('wb-collapse-all');
+
+            function hasChildren(row) {
+                if (!row || !row.nextElementSibling) return false;
+                var next = row.nextElementSibling;
+                if (!next.classList || !next.classList.contains('bom-tree-row')) return false;
+                var myLevel = parseInt(row.getAttribute('data-level'), 10) || 1;
+                var nextLevel = parseInt(next.getAttribute('data-level'), 10) || 1;
+                return nextLevel > myLevel;
+            }
+
+            function refreshTreeVisibility() {
+                var rows = tbody && tbody.querySelectorAll('.bom-tree-row');
+                if (!rows || !rows.length) return;
+                var n = rows.length;
+                for (var i = 0; i < n; i++) {
+                    var r = rows[i];
+                    var level = parseInt(r.getAttribute('data-level'), 10) || 1;
+                    var hasCh = hasChildren(r);
+                    if (hasCh && r.getAttribute('data-expanded') === null) r.setAttribute('data-expanded', '1');
+                    var expanded = r.getAttribute('data-expanded') === '1';
+                    var visible = true;
+                    if (level > 1) {
+                        var pid = -1;
+                        for (var j = i - 1; j >= 0; j--) {
+                            var L = parseInt(rows[j].getAttribute('data-level'), 10) || 1;
+                            if (L === level - 1) { pid = j; break; }
+                        }
+                        if (pid >= 0) {
+                            var p = rows[pid];
+                            var pVis = !p.classList.contains('row-hidden');
+                            var pExp = p.getAttribute('data-expanded') === '1';
+                            visible = pVis && pExp;
+                        }
+                    }
+                    if (visible) r.classList.remove('row-hidden'); else r.classList.add('row-hidden');
+                    var toggle = r.querySelector('.tree-toggle');
+                    if (toggle) {
+                        if (hasCh) {
+                            toggle.classList.remove('empty');
+                            toggle.classList.toggle('expanded', expanded);
+                        } else {
+                            toggle.classList.add('empty');
+                            toggle.classList.remove('expanded');
+                        }
+                    }
+                }
+            }
+
+            if (treeBody && expandAllBtn) {
+                expandAllBtn.addEventListener('click', function () {
+                    treeBody.classList.remove('tree-fold-all');
+                    var rows = tbody && tbody.querySelectorAll('.bom-tree-row');
+                    if (rows) rows.forEach(function (r) { if (hasChildren(r)) r.setAttribute('data-expanded', '1'); });
+                    refreshTreeVisibility();
+                });
+            }
+            if (treeBody && collapseAllBtn) {
+                collapseAllBtn.addEventListener('click', function () {
+                    treeBody.classList.remove('tree-fold-all');
+                    var rows = tbody && tbody.querySelectorAll('.bom-tree-row');
+                    if (rows) rows.forEach(function (r) { if (hasChildren(r)) r.setAttribute('data-expanded', '0'); });
+                    refreshTreeVisibility();
+                });
+            }
+
+            var items = document.querySelectorAll('.material-item');
+
+            function getLevelIndent(level) {
+                var n = Math.max(1, level || 1);
+                if (n === 1) return '';
+                if (n === 2) return ' tree-indent-l2';
+                if (n === 3) return ' tree-indent-l3';
+                return ' tree-indent-l4';
+            }
+
+            function renumberNo() {
+                var rows = tbody && tbody.querySelectorAll('.bom-tree-row');
+                if (!rows) return;
+                for (var i = 0; i < rows.length; i++) {
+                    var td = rows[i].querySelector('.col-no');
+                    if (td) td.textContent = String(i + 1);
+                }
+            }
+
+            function updateLevelNumbers() {
+                var rows = tbody && tbody.querySelectorAll('.bom-tree-row');
+                if (!rows || !rows.length) return;
+                var maxL = 10;
+                var c = [];
+                for (var i = 0; i <= maxL; i++) c[i] = 0;
+                for (var i = 0; i < rows.length; i++) {
+                    var L = parseInt(rows[i].getAttribute('data-level'), 10) || 1;
+                    if (L < 1) L = 1;
+                    if (L > maxL) L = maxL;
+                    c[L]++;
+                    for (var j = L + 1; j <= maxL; j++) c[j] = 0;
+                    var parts = [];
+                    for (var k = 1; k <= L; k++) parts.push(c[k]);
+                    var levelNum = parts.join('.');
+                    var td = rows[i].querySelector('.col-level');
+                    if (td) td.textContent = levelNum;
+                }
+            }
+
+            function moveTreeNode(srcRow, targetRow) {
+                if (!tbody || !srcRow || !targetRow || srcRow === targetRow) return;
+                var rows = tbody.querySelectorAll('.bom-tree-row');
+                var srcIdx = -1, targetIdx = -1;
+                for (var i = 0; i < rows.length; i++) {
+                    if (rows[i] === srcRow) srcIdx = i;
+                    if (rows[i] === targetRow) targetIdx = i;
+                }
+                if (srcIdx < 0 || targetIdx < 0) return;
+                var srcLevel = parseInt(srcRow.getAttribute('data-level'), 10) || 1;
+                var targetLevel = parseInt(targetRow.getAttribute('data-level'), 10) || 1;
+                var toMove = [srcRow];
+                for (var j = srcIdx + 1; j < rows.length; j++) {
+                    var l = parseInt(rows[j].getAttribute('data-level'), 10) || 1;
+                    if (l <= srcLevel) break;
+                    toMove.push(rows[j]);
+                }
+                for (var k = 0; k < toMove.length; k++) {
+                    if (toMove[k] === targetRow) return;
+                }
+                var delta = (targetLevel + 1) - srcLevel;
+                var movedRows = [];
+                for (var m = 0; m < toMove.length; m++) {
+                    var r = toMove[m];
+                    var oldL = parseInt(r.getAttribute('data-level'), 10) || 1;
+                    var newL = Math.max(1, oldL + delta);
+                    r.setAttribute('data-level', String(newL));
+                    var cell = r.querySelector('.tree-cell');
+                    if (cell) {
+                        var ind = cell.querySelector('.tree-indent');
+                        if (ind) {
+                            ind.className = 'tree-indent' + getLevelIndent(newL);
+                        }
+                    }
+                    movedRows.push(r);
+                    r.parentNode.removeChild(r);
+                }
+                var insertAfter = targetRow;
+                for (var n = 0; n < movedRows.length; n++) {
+                    if (insertAfter.nextElementSibling) {
+                        tbody.insertBefore(movedRows[n], insertAfter.nextElementSibling);
+                    } else {
+                        tbody.appendChild(movedRows[n]);
+                    }
+                    insertAfter = movedRows[n];
+                }
+                targetRow.setAttribute('data-expanded', '1');
+                renumberNo();
+                updateLevelNumbers();
+                refreshTreeVisibility();
+            }
+
+            function addNodeToTree(parentRow, data) {
+                if (!tbody || !data) return;
+                var level = parentRow ? (parseInt(parentRow.getAttribute('data-level'), 10) || 1) + 1 : 1;
+                var indent = getLevelIndent(level);
+                var tr = document.createElement('tr');
+                tr.className = 'bom-tree-row';
+                tr.setAttribute('data-node-id', 'new-' + Date.now());
+                tr.setAttribute('data-owner', 'own');
+                tr.setAttribute('data-level', String(level));
+                tr.setAttribute('draggable', 'true');
+                var name_ = (data.name || data.code || '').toString().replace(/</g, '&lt;');
+                var code_ = (data.code || '').toString().replace(/</g, '&lt;');
+                var spec_ = (data.spec || '—').toString().replace(/</g, '&lt;');
+                var unit = (data.unit || '件').replace(/</g, '&lt;');
+                var qty = (data.qty != null && data.qty !== '') ? String(data.qty) : '1';
+                var keyChecked = data.key ? ' checked' : '';
+                var opts = ['台','件','个','套','kg'];
+                var selOpts = opts.map(function (o) { return '<option' + (o === unit ? ' selected' : '') + '>' + o + '</option>'; }).join('');
+                tr.innerHTML =
+                    '<td class="col-check" onclick="event.stopPropagation()"><input type="checkbox" class="bom-tree-row-check" name="bom-tree-check"></td>' +
+                    '<td class="col-no">0</td>' +
+                    '<td class="col-level">—</td>' +
+                    '<td><div class="tree-cell"><span class="tree-drag-handle" title="拖动调整层级">⋮⋮</span><span class="tree-toggle empty">▸</span><span class="tree-indent' + indent + '"></span><span>' + name_ + '</span></div></td>' +
+                    '<td>' + code_ + '</td>' +
+                    '<td>' + spec_ + '</td>' +
+                    '<td class="col-qty"><input type="number" class="bom-qty-input" value="' + qty.replace(/"/g, '&quot;') + '" min="0" step="0.01"></td>' +
+                    '<td class="col-unit"><select class="bom-unit-select">' + selOpts + '</select></td>' +
+                    '<td class="col-key"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-key-check"' + keyChecked + '> 是</label></td>' +
+                    '<td class="col-replace"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-replace-check"' + (data.replace ? ' checked' : '') + '> 是</label></td>' +
+                    '<td class="col-loss"><input type="number" class="bom-input-sm" value="0" min="0" max="100" step="0.01" placeholder="%"></td>' +
+                    '<td class="col-supplier"><input type="text" class="bom-input-sm" placeholder="选填"></td>' +
+                    '<td class="col-price"><input type="number" class="bom-input-sm" min="0" step="0.01" placeholder="元"></td>' +
+                    '<td class="col-remark"><input type="text" class="bom-input-sm" placeholder="选填"></td>' +
+                    '<td class="col-owner"><span class="owner-tag">本人</span></td>' +
+                    '<td class="col-actions"><div class="cell-act"><button type="button" class="btn btn-sm btn-default btn-add-child">子</button><button type="button" class="btn btn-sm btn-default btn-delete-node">删</button></div></td>';
+                if (parentRow && parentRow.nextElementSibling) {
+                    tbody.insertBefore(tr, parentRow.nextElementSibling);
+                } else {
+                    tbody.appendChild(tr);
+                }
+                renumberNo();
+                updateLevelNumbers();
+                refreshTreeVisibility();
+            }
+
+            if (tbody) {
+                tbody.addEventListener('dragstart', function (e) {
+                    var row = e.target.closest('.bom-tree-row');
+                    if (row && row.getAttribute('data-owner') === 'own') {
+                        e.dataTransfer.setData('application/json', JSON.stringify({
+                            type: 'bom-tree-node',
+                            nodeId: row.getAttribute('data-node-id')
+                        }));
+                        e.dataTransfer.effectAllowed = 'move';
+                        e.target.closest('tr').classList.add('bom-tree-dragging');
+                        return;
+                    }
+                });
+                tbody.addEventListener('dragend', function (e) {
+                    var row = e.target.closest('.bom-tree-row');
+                    if (row) row.classList.remove('bom-tree-dragging');
+                    if (dragOverRow) { dragOverRow.classList.remove('drag-over'); dragOverRow = null; }
+                });
+            }
+            items.forEach(function (el) {
+                el.addEventListener('dragstart', function (e) {
+                    e.dataTransfer.setData('application/json', JSON.stringify({
+                        type: 'material',
+                        code: el.getAttribute('data-code'),
+                        name: el.getAttribute('data-name'),
+                        spec: el.getAttribute('data-spec'),
+                        unit: el.getAttribute('data-unit') || '件'
+                    }));
+                    e.dataTransfer.effectAllowed = 'copy';
+                });
+                el.addEventListener('dragend', function () {
+                    var r = document.querySelector('.bom-tree-row.drag-over');
+                    if (r) r.classList.remove('drag-over');
+                    dragOverRow = null;
+                });
+            });
+
+            if (tbody) {
+                tbody.addEventListener('dragover', function (e) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'copy';
+                    var row = e.target.closest('.bom-tree-row');
+                    if (row && row.getAttribute('data-owner') === 'own') {
+                        if (dragOverRow && dragOverRow !== row) dragOverRow.classList.remove('drag-over');
+                        dragOverRow = row;
+                        row.classList.add('drag-over');
+                    } else if (dragOverRow) {
+                        dragOverRow.classList.remove('drag-over');
+                        dragOverRow = null;
+                    }
+                });
+                tbody.addEventListener('dragleave', function (e) {
+                    var rel = e.relatedTarget;
+                    if (rel && tbody.contains(rel)) return;
+                    if (dragOverRow) {
+                        dragOverRow.classList.remove('drag-over');
+                        dragOverRow = null;
+                    }
+                });
+                tbody.addEventListener('drop', function (e) {
+                    e.preventDefault();
+                    if (dragOverRow) dragOverRow.classList.remove('drag-over');
+                    dragOverRow = null;
+                    var targetRow = e.target.closest('.bom-tree-row');
+                    if (!targetRow || targetRow.getAttribute('data-owner') !== 'own') return;
+                    try {
+                        var data = JSON.parse(e.dataTransfer.getData('application/json') || '{}');
+                        if (data.type === 'bom-tree-node') {
+                            var srcNodeId = data.nodeId;
+                            var srcRow = tbody.querySelector('.bom-tree-row[data-node-id="' + srcNodeId + '"]');
+                            if (srcRow && srcRow !== targetRow) moveTreeNode(srcRow, targetRow);
+                        } else if (data.type === 'material' || data.code !== undefined) {
+                            addNodeToTree(targetRow, data);
+                        }
+                    } catch (_) {}
+                });
+            }
+            if (tbody) {
+                updateLevelNumbers();
+                refreshTreeVisibility();
+            }
+
+            var wbCurrentRow = null;
+
+            function openWbModal(id) {
+                var el = document.getElementById(id);
+                if (el) el.classList.add('active');
+            }
+            function closeWbModal(id) {
+                var el = document.getElementById(id);
+                if (el) el.classList.remove('active');
+            }
+
+            function getNodeName(row) {
+                var cell = row && row.querySelector('.tree-cell');
+                if (!cell) return '未命名';
+                var spans = cell.querySelectorAll('span');
+                for (var i = spans.length - 1; i >= 0; i--) {
+                    var s = spans[i];
+                    if (!s.classList.contains('tree-toggle') && !s.classList.contains('tree-indent')) return (s.textContent || '').trim() || '未命名';
+                }
+                return '未命名';
+            }
+
+            function removeNodeAndDescendants(row) {
+                if (!tbody || !row || !row.parentNode) return;
+                var level = parseInt(row.getAttribute('data-level'), 10) || 1;
+                var toRemove = [row];
+                var next = row.nextElementSibling;
+                while (next && next.classList && next.classList.contains('bom-tree-row')) {
+                    var l = parseInt(next.getAttribute('data-level'), 10) || 1;
+                    if (l <= level) break;
+                    toRemove.push(next);
+                    next = next.nextElementSibling;
+                }
+                toRemove.forEach(function (r) { r.remove(); });
+                renumberNo();
+                updateLevelNumbers();
+                refreshTreeVisibility();
+            }
+
+            document.querySelectorAll('[data-open-modal]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var id = btn.getAttribute('data-open-modal');
+                    if (id && (id === 'batch-key-modal' || id === 'batch-replace-modal' || id === 'batch-loss-modal')) {
+                        var n = document.querySelectorAll('.bom-tree-row-check:checked').length;
+                        if (n === 0) { alert('请先勾选要批量设置的节点'); return; }
+                        var countEl = document.getElementById(id.replace('-modal', '-count'));
+                        if (countEl) countEl.textContent = n;
+                        if (id === 'batch-loss-modal') {
+                            var lossInput = document.getElementById('batch-loss-value');
+                            if (lossInput) lossInput.value = '0';
+                        }
+                    }
+                    if (id) openWbModal(id);
+                });
+            });
+            document.querySelectorAll('[data-close-modal]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var id = btn.getAttribute('data-close-modal');
+                    if (id) closeWbModal(id);
+                });
+            });
+            document.querySelectorAll('.modal-overlay[data-wb-modal]').forEach(function (overlay) {
+                overlay.addEventListener('click', function (e) {
+                    if (e.target === overlay) closeWbModal(overlay.id);
+                });
+            });
+
+            var attachTbody = document.getElementById('wb-attach-tbody');
+            var replaceTbody = document.getElementById('wb-replace-tbody');
+            var attachEmpty = document.getElementById('wb-attach-empty');
+            var replaceEmpty = document.getElementById('wb-replace-empty');
+            var tabReplaceLabel = document.getElementById('wb-tab-replace-label');
+            var paneAttach = document.querySelector('#wb-below-tree-card .dt-detail-tab-pane[data-tab="attach"]');
+            var paneReplace = document.querySelector('#wb-below-tree-card .dt-detail-tab-pane[data-tab="replace"]');
+            var ATTACH_MOCK = {
+                '1': [],
+                '2': [{ type: '图纸', materialCode: 'M001', materialName: '主控板', spec: 'CTRL-MAIN-V1', fileName: '主控板原理图 V1.0', fileVersion: 'V1.0', format: 'DWG', uploadTime: '2025-01-18 14:20' }],
+                '3': [],
+                '4': [],
+                '5': [{ type: '图纸', materialCode: 'M004', materialName: '电源模块', spec: 'PSU-24V-5A', fileName: '电源模块接线图.dwg', fileVersion: 'V1.0', format: 'DWG', uploadTime: '2025-01-19 10:00' }],
+                '6': []
+            };
+            var REPLACE_MOCK = {
+                '4': [{ no: 1, code: 'M002-A', name: '不锈钢螺栓(镀锌)', spec: 'M8×20-Zn', qty: 4, unit: '个', remark: '镀锌防锈' }, { no: 2, code: 'M002-B', name: '钛合金螺栓', spec: 'M8×20-Ti', qty: 4, unit: '个', remark: '轻量化替代' }],
+                '5': [{ no: 1, code: 'M004-A', name: '电源模块 24V/3A', spec: 'PSU-24V-3A', qty: 1, unit: '件', remark: '功率略小' }]
+            };
+            function isReplaceYes(row) {
+                if (!row) return false;
+                var replaceCell = row.querySelector('.col-replace');
+                if (!replaceCell) return false;
+                var checkbox = replaceCell.querySelector('.bom-replace-check');
+                if (checkbox) return !!checkbox.checked;
+                return (replaceCell.textContent || '').trim() === '是';
+            }
+            function getNodeId(row) { return row ? (row.getAttribute('data-node-id') || '') : ''; }
+            function refreshBelowTreeCard(selectedRow) {
+                var nodeId = getNodeId(selectedRow);
+                if (attachTbody) {
+                    var list = nodeId ? (ATTACH_MOCK[nodeId] || []) : [];
+                    attachTbody.innerHTML = list.map(function (a, i) {
+                        return '<tr data-attach-index="' + i + '"><td>' + (a.type || '—') + '</td><td>' + (a.materialCode || '—') + '</td><td>' + (a.materialName || '—') + '</td><td>' + (a.spec || '—') + '</td><td>' + (a.fileName || '—') + '</td><td>' + (a.fileVersion || '—') + '</td><td>' + (a.format || '—') + '</td><td>' + (a.uploadTime || '—') + '</td><td><button type="button" class="btn btn-sm btn-default btn-attach-preview">预览</button><button type="button" class="btn btn-sm btn-default btn-attach-delete">删除</button></td></tr>';
+                    }).join('');
+                    if (attachEmpty) {
+                        attachEmpty.style.display = list.length === 0 ? 'block' : 'none';
+                        attachEmpty.textContent = nodeId ? '当前节点暂无附件。' : '请选中 BOM 节点查看其附件。';
+                    }
+                var uploadBtn = document.getElementById('wb-attach-upload-btn');
+                var uploadHint = document.getElementById('wb-attach-upload-hint');
+                if (uploadBtn) uploadBtn.disabled = !nodeId;
+                if (uploadHint) uploadHint.style.display = nodeId ? 'none' : 'inline';
+                }
+                var showReplace = !!selectedRow && isReplaceYes(selectedRow);
+                if (tabReplaceLabel) tabReplaceLabel.style.display = showReplace ? '' : 'none';
+                if (replaceTbody) {
+                    var replist = showReplace && nodeId ? (REPLACE_MOCK[nodeId] || []) : [];
+                    replaceTbody.innerHTML = replist.map(function (r, i) {
+                        return '<tr data-replace-index="' + i + '"><td>' + (i + 1) + '</td><td>' + (r.code || '—') + '</td><td>' + (r.name || '—') + '</td><td>' + (r.spec || '—') + '</td><td>' + (r.qty || '—') + '</td><td>' + (r.unit || '—') + '</td><td>' + (r.remark || '—') + '</td><td><button type="button" class="btn btn-sm btn-default btn-replace-delete">删除</button></td></tr>';
+                    }).join('');
+                    if (replaceEmpty) replaceEmpty.style.display = (showReplace && replist.length === 0) ? 'block' : 'none';
+                }
+                var addReplaceBtn = document.getElementById('wb-replace-add-btn');
+                var addReplaceHint = document.getElementById('wb-replace-add-hint');
+                if (addReplaceBtn) addReplaceBtn.disabled = !showReplace;
+                if (addReplaceHint) addReplaceHint.style.display = showReplace ? 'none' : 'inline';
+                if (showReplace === false && paneReplace) {
+                    var radioReplace = document.querySelector('input[name="wb-below-tab"][value="replace"]');
+                    if (radioReplace && radioReplace.checked) {
+                        var radioAttach = document.querySelector('input[name="wb-below-tab"][value="attach"]');
+                        if (radioAttach) radioAttach.checked = true;
+                    }
+                }
+            }
+            function selectRow(row) {
+                if (!tbody) return;
+                var rows = tbody.querySelectorAll('.bom-tree-row');
+                rows.forEach(function (r) { r.classList.remove('selected'); });
+                if (row) row.classList.add('selected');
+                refreshBelowTreeCard(row);
+            }
+
+            if (tbody) {
+                tbody.addEventListener('click', function (e) {
+                    var row = e.target.closest('.bom-tree-row');
+                    if (!row) return;
+                    if (e.target.closest('.col-actions') || e.target.closest('.col-check')) return;
+                    if (e.target.closest('.tree-toggle')) {
+                        if (!hasChildren(row)) return;
+                        var exp = row.getAttribute('data-expanded') === '1';
+                        row.setAttribute('data-expanded', exp ? '0' : '1');
+                        refreshTreeVisibility();
+                        return;
+                    }
+                    if (row.getAttribute('data-owner') !== 'own') return;
+                    if (e.target.closest('.btn-add-child')) {
+                        wbCurrentRow = row;
+                        var desc = document.getElementById('add-child-desc');
+                        if (desc) desc.textContent = '在「' + getNodeName(row) + '」下添加子节点。';
+                        openWbModal('add-child-modal');
+                        return;
+                    }
+                    if (e.target.closest('.btn-delete-node')) {
+                        wbCurrentRow = row;
+                        var nameEl = document.getElementById('delete-node-name');
+                        if (nameEl) nameEl.textContent = getNodeName(row);
+                        openWbModal('delete-node-modal');
+                        return;
+                    }
+                    selectRow(row);
+                });
+            }
+            var initSelected = tbody && tbody.querySelector('.bom-tree-row.selected');
+            if (initSelected) refreshBelowTreeCard(initSelected);
+
+            function updateBatchBar() {
+                var checked = document.querySelectorAll('.bom-tree-row-check:checked');
+                var n = checked.length;
+                var bar = document.getElementById('wb-batch-bar');
+                var countEl = document.getElementById('wb-batch-count');
+                var selectAll = document.getElementById('wb-bom-select-all');
+                if (bar) bar.style.display = n > 0 ? 'inline-flex' : 'none';
+                if (countEl) countEl.textContent = n;
+                if (selectAll) {
+                    var ownChecks = document.querySelectorAll('.bom-tree-row[data-owner="own"] .bom-tree-row-check');
+                    selectAll.checked = ownChecks.length > 0 && n === ownChecks.length;
+                }
+            }
+            var selectAllEl = document.getElementById('wb-bom-select-all');
+            if (selectAllEl) selectAllEl.addEventListener('change', function () {
+                var rows = tbody && tbody.querySelectorAll('.bom-tree-row[data-owner="own"]');
+                if (rows) rows.forEach(function (r) {
+                    var cb = r.querySelector('.bom-tree-row-check');
+                    if (cb) cb.checked = selectAllEl.checked;
+                });
+                updateBatchBar();
+            });
+            if (tbody) tbody.addEventListener('change', function (e) {
+                if (e.target.classList && e.target.classList.contains('bom-tree-row-check')) updateBatchBar();
+                if (e.target.classList && e.target.classList.contains('bom-replace-check')) {
+                    var row = e.target.closest('.bom-tree-row');
+                    var sel = tbody.querySelector('.bom-tree-row.selected');
+                    if (sel === row) refreshBelowTreeCard(row);
+                }
+            });
+
+            function getCheckedRows() {
+                var rows = [];
+                document.querySelectorAll('.bom-tree-row-check:checked').forEach(function (cb) {
+                    var row = cb.closest('.bom-tree-row');
+                    if (row && row.getAttribute('data-owner') === 'own') rows.push(row);
+                });
+                return rows;
+            }
+            var batchKeySubmit = document.getElementById('batch-key-submit');
+            if (batchKeySubmit) batchKeySubmit.addEventListener('click', function () {
+                var rows = getCheckedRows();
+                var sel = document.getElementById('batch-key-value');
+                var isYes = sel && sel.value === '1';
+                rows.forEach(function (r) {
+                    var cb = r.querySelector('.col-key .bom-key-check');
+                    if (cb) cb.checked = isYes;
+                });
+                closeWbModal('batch-key-modal');
+                updateBatchBar();
+            });
+            var batchReplaceSubmit = document.getElementById('batch-replace-submit');
+            if (batchReplaceSubmit) batchReplaceSubmit.addEventListener('click', function () {
+                var rows = getCheckedRows();
+                var sel = document.getElementById('batch-replace-value');
+                var isYes = sel && sel.value === '1';
+                rows.forEach(function (r) {
+                    var cb = r.querySelector('.col-replace .bom-replace-check');
+                    if (cb) cb.checked = isYes;
+                });
+                var selRow = tbody && tbody.querySelector('.bom-tree-row.selected');
+                if (selRow && rows.indexOf(selRow) >= 0) refreshBelowTreeCard(selRow);
+                closeWbModal('batch-replace-modal');
+                updateBatchBar();
+            });
+            var batchLossSubmit = document.getElementById('batch-loss-submit');
+            if (batchLossSubmit) batchLossSubmit.addEventListener('click', function () {
+                var rows = getCheckedRows();
+                var input = document.getElementById('batch-loss-value');
+                var val = input ? input.value : '0';
+                rows.forEach(function (r) {
+                    var inp = r.querySelector('.col-loss .bom-input-sm');
+                    if (inp) inp.value = val;
+                });
+                closeWbModal('batch-loss-modal');
+                updateBatchBar();
+            });
+
+            var wbAttachUploadBtn = document.getElementById('wb-attach-upload-btn');
+            if (wbAttachUploadBtn) wbAttachUploadBtn.addEventListener('click', function () {
+                var sel = tbody && tbody.querySelector('.bom-tree-row.selected');
+                if (!sel) { alert('请先选中 BOM 节点'); return; }
+                wbCurrentRow = sel;
+                var nameEl = document.getElementById('upload-attach-node-name');
+                if (nameEl) nameEl.textContent = getNodeName(sel);
+                openWbModal('upload-attach-modal');
+            });
+
+            var wbReplaceAddBtn = document.getElementById('wb-replace-add-btn');
+            if (wbReplaceAddBtn) wbReplaceAddBtn.addEventListener('click', function () {
+                var sel = tbody && tbody.querySelector('.bom-tree-row.selected');
+                if (!sel || !isReplaceYes(sel)) { alert('请先选中可替换件节点'); return; }
+                wbCurrentRow = sel;
+                var nameEl = document.getElementById('add-replace-node-name');
+                if (nameEl) nameEl.textContent = getNodeName(sel);
+                document.getElementById('add-replace-code').value = '';
+                document.getElementById('add-replace-name').value = '';
+                document.getElementById('add-replace-spec').value = '';
+                document.getElementById('add-replace-qty').value = '1';
+                document.getElementById('add-replace-unit').selectedIndex = 2;
+                document.getElementById('add-replace-remark').value = '';
+                openWbModal('add-replace-material-modal');
+            });
+
+            if (attachTbody) attachTbody.addEventListener('click', function (e) {
+                var btn = e.target.closest('.btn-attach-preview');
+                if (btn) {
+                    var tr = btn.closest('tr');
+                    var idx = tr ? parseInt(tr.getAttribute('data-attach-index'), 10) : -1;
+                    var sel = tbody && tbody.querySelector('.bom-tree-row.selected');
+                    var nodeId = getNodeId(sel);
+                    var list = nodeId ? (ATTACH_MOCK[nodeId] || []) : [];
+                    if (idx >= 0 && list[idx]) alert('预览：' + (list[idx].fileName || '') + '（原型演示）');
+                    return;
+                }
+                btn = e.target.closest('.btn-attach-delete');
+                if (btn) {
+                    var tr = btn.closest('tr');
+                    var idx = tr ? parseInt(tr.getAttribute('data-attach-index'), 10) : -1;
+                    var sel = tbody && tbody.querySelector('.bom-tree-row.selected');
+                    var nodeId = getNodeId(sel);
+                    if (idx >= 0 && nodeId && ATTACH_MOCK[nodeId]) {
+                        ATTACH_MOCK[nodeId].splice(idx, 1);
+                        refreshBelowTreeCard(sel);
+                    }
+                }
+            });
+
+            if (replaceTbody) replaceTbody.addEventListener('click', function (e) {
+                var btn = e.target.closest('.btn-replace-delete');
+                if (btn) {
+                    var tr = btn.closest('tr');
+                    var idx = tr ? parseInt(tr.getAttribute('data-replace-index'), 10) : -1;
+                    var sel = tbody && tbody.querySelector('.bom-tree-row.selected');
+                    var nodeId = getNodeId(sel);
+                    if (idx >= 0 && nodeId && REPLACE_MOCK[nodeId]) {
+                        REPLACE_MOCK[nodeId].splice(idx, 1);
+                        refreshBelowTreeCard(sel);
+                    }
+                }
+            });
+
+            var addReplaceSubmit = document.getElementById('add-replace-submit');
+            if (addReplaceSubmit) addReplaceSubmit.addEventListener('click', function () {
+                var name = (document.getElementById('add-replace-name').value || '').trim();
+                if (!name) { alert('请填写物料名称'); return; }
+                var sel = tbody && tbody.querySelector('.bom-tree-row.selected');
+                var nodeId = getNodeId(sel);
+                if (!nodeId) { closeWbModal('add-replace-material-modal'); return; }
+                if (!REPLACE_MOCK[nodeId]) REPLACE_MOCK[nodeId] = [];
+                var code = (document.getElementById('add-replace-code').value || '').trim();
+                var spec = (document.getElementById('add-replace-spec').value || '').trim();
+                var qty = document.getElementById('add-replace-qty').value || '1';
+                var unitSel = document.getElementById('add-replace-unit');
+                var unit = unitSel && unitSel.options[unitSel.selectedIndex] ? unitSel.options[unitSel.selectedIndex].text : '个';
+                var remark = (document.getElementById('add-replace-remark').value || '').trim();
+                REPLACE_MOCK[nodeId].push({ code: code || '—', name: name, spec: spec || '—', qty: qty, unit: unit, remark: remark || '—' });
+                closeWbModal('add-replace-material-modal');
+                refreshBelowTreeCard(sel);
+            });
+
+            var refType = document.getElementById('ref-bom-type');
+            var refLevelWrap = document.getElementById('ref-bom-level-wrap');
+            if (refType && refLevelWrap) {
+                refType.addEventListener('change', function () {
+                    refLevelWrap.style.display = refType.value === 'partial' ? 'block' : 'none';
+                });
+            }
+            var copyType = document.getElementById('copy-bom-type');
+            var copyLevelWrap = document.getElementById('copy-bom-level-wrap');
+            if (copyType && copyLevelWrap) {
+                copyType.addEventListener('change', function () {
+                    copyLevelWrap.style.display = copyType.value === 'partial' ? 'block' : 'none';
+                });
+            }
+
+            var refSubmit = document.getElementById('ref-bom-submit');
+            if (refSubmit) {
+                refSubmit.addEventListener('click', function () {
+                    var src = document.getElementById('ref-bom-source');
+                    if (!src || !src.value) { alert('请选择源 BOM'); return; }
+                    closeWbModal('ref-bom-modal');
+                    alert('引用 BOM 已提交，实际接入时将写入当前 BOM 树。');
+                });
+            }
+            var copySubmit = document.getElementById('copy-bom-submit');
+            if (copySubmit) {
+                copySubmit.addEventListener('click', function () {
+                    var src = document.getElementById('copy-bom-source');
+                    if (!src || !src.value) { alert('请选择源 BOM'); return; }
+                    closeWbModal('copy-bom-modal');
+                    alert('复制 BOM 已提交，实际接入时将合并到当前 BOM 树。');
+                });
+            }
+            var importSubmit = document.getElementById('import-bom-submit');
+            var importFile = document.getElementById('import-bom-file');
+            if (importSubmit) {
+                importSubmit.addEventListener('click', function () {
+                    if (!importFile || !importFile.files || !importFile.files.length) {
+                        alert('请选择要导入的 Excel 文件');
+                        return;
+                    }
+                    closeWbModal('import-bom-modal');
+                    alert('导入已提交，实际接入时将解析文件并追加到当前 BOM 树。');
+                    if (importFile) importFile.value = '';
+                });
+            }
+            var tplLink = document.getElementById('import-bom-tpl');
+            if (tplLink) {
+                tplLink.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    alert('模板下载（原型占位）。实际接入时提供标准 Excel 模板。');
+                });
+            }
+
+            function collectAddNodeForm(prefix) {
+                var code = document.getElementById(prefix + '-code');
+                var name = document.getElementById(prefix + '-name');
+                var spec = document.getElementById(prefix + '-spec');
+                var qty = document.getElementById(prefix + '-qty');
+                var unit = document.getElementById(prefix + '-unit');
+                var key = document.getElementById(prefix + '-key');
+                return {
+                    code: (code && code.value) ? code.value.trim() : '',
+                    name: (name && name.value) ? name.value.trim() : '',
+                    spec: (spec && spec.value) ? spec.value.trim() : '',
+                    qty: (qty && qty.value) ? qty.value : '1',
+                    unit: (unit && unit.options[unit.selectedIndex]) ? unit.options[unit.selectedIndex].text : '件',
+                    key: !!(key && key.checked)
+                };
+            }
+            function resetAddNodeForm(prefix) {
+                var code = document.getElementById(prefix + '-code');
+                var name = document.getElementById(prefix + '-name');
+                var spec = document.getElementById(prefix + '-spec');
+                var qty = document.getElementById(prefix + '-qty');
+                var unit = document.getElementById(prefix + '-unit');
+                var key = document.getElementById(prefix + '-key');
+                if (code) code.value = '';
+                if (name) name.value = '';
+                if (spec) spec.value = '';
+                if (qty) qty.value = '1';
+                if (unit) unit.selectedIndex = 1;
+                if (key) key.checked = false;
+            }
+
+            var addRootSubmit = document.getElementById('add-root-submit');
+            if (addRootSubmit) {
+                addRootSubmit.addEventListener('click', function () {
+                    var d = collectAddNodeForm('add-root');
+                    if (!d.name) { alert('请填写物料名称'); return; }
+                    addNodeToTree(null, d);
+                    resetAddNodeForm('add-root');
+                    closeWbModal('add-root-modal');
+                });
+            }
+            var addChildSubmit = document.getElementById('add-child-submit');
+            if (addChildSubmit) {
+                addChildSubmit.addEventListener('click', function () {
+                    var d = collectAddNodeForm('add-child');
+                    if (!d.name) { alert('请填写物料名称'); return; }
+                    if (!wbCurrentRow) { closeWbModal('add-child-modal'); return; }
+                    addNodeToTree(wbCurrentRow, d);
+                    resetAddNodeForm('add-child');
+                    closeWbModal('add-child-modal');
+                    wbCurrentRow = null;
+                });
+            }
+            var deleteNodeSubmit = document.getElementById('delete-node-submit');
+            if (deleteNodeSubmit) {
+                deleteNodeSubmit.addEventListener('click', function () {
+                    if (wbCurrentRow) {
+                        removeNodeAndDescendants(wbCurrentRow);
+                        wbCurrentRow = null;
+                    }
+                    closeWbModal('delete-node-modal');
+                });
+            }
+            var saveDraftSubmit = document.getElementById('save-draft-submit');
+            if (saveDraftSubmit) {
+                saveDraftSubmit.addEventListener('click', function () {
+                    closeWbModal('save-draft-modal');
+                    alert('草稿已保存。');
+                });
+            }
+            var submitReviewSubmit = document.getElementById('submit-review-submit');
+            if (submitReviewSubmit) {
+                submitReviewSubmit.addEventListener('click', function () {
+                    var remark = document.getElementById('submit-review-remark');
+                    if (remark) remark.value = '';
+                    closeWbModal('submit-review-modal');
+                    alert('已提交审核。');
+                });
+            }
+            var uploadAttachSubmit = document.getElementById('upload-attach-submit');
+            var uploadAttachFile = document.getElementById('upload-attach-file');
+            if (uploadAttachSubmit) {
+                uploadAttachSubmit.addEventListener('click', function () {
+                    if (!uploadAttachFile || !uploadAttachFile.files || !uploadAttachFile.files.length) {
+                        alert('请选择要上传的文件');
+                        return;
+                    }
+                    closeWbModal('upload-attach-modal');
+                    if (uploadAttachFile) uploadAttachFile.value = '';
+                    alert('附件上传成功（原型占位）。');
+                });
+            }
+        })();
+        </script>
+    </div>
+</body>
+</html>

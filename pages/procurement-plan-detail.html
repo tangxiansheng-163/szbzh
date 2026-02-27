@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>计划详情 - 采购</title>
+    <style>
+        .plan-detail-wrapper { max-width: 1200px; margin: 0 auto; }
+        .form-info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 24px; }
+        .form-info-item { display: flex; flex-direction: column; gap: 4px; }
+        .form-info-label { color: var(--text-tertiary); font-size: 12px; font-weight: 500; }
+        .form-info-value { color: var(--text-primary); font-size: 14px; font-weight: 500; }
+        .form-info-value .status-badge { font-weight: normal; }
+        .plan-source-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+        .plan-source-badge.demand { background: #e6f7ff; color: #1890ff; }
+        .plan-source-badge.manual { background: #f6ffed; color: #52c41a; }
+        .plan-complete-rate { display: inline-flex; align-items: center; gap: 8px; }
+        .plan-complete-rate-bar { width: 80px; height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden; }
+        .plan-complete-rate-fill { height: 100%; background: linear-gradient(90deg, #52c41a 0%, #73d13d 100%); border-radius: 4px; }
+        .plan-complete-rate-fill.warning { background: linear-gradient(90deg, #faad14 0%, #ffc53d 100%); }
+        .plan-complete-rate-fill.danger { background: linear-gradient(90deg, #ff4d4f 0%, #ff7875 100%); }
+        .table-wrapper { overflow-x: auto; border: 1px solid var(--border-color, #e8e8e8); border-radius: 6px; margin-top: 12px; }
+        .table-wrapper table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        .table-wrapper th, .table-wrapper td { padding: 12px 16px; text-align: left; font-size: 13px; border-bottom: 1px solid #f0f0f0; }
+        .table-wrapper th { background: #fafafa; font-weight: 600; color: rgba(0,0,0,0.65); }
+        .table-wrapper tbody tr:hover { background: #fafafa; }
+        .card { margin-bottom: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color, #e8e8e8); overflow: hidden; box-shadow: var(--shadow-sm); }
+        .card-header { padding: 16px 24px; border-bottom: 1px solid #e8e8e8; background: #fafafa; display: flex; align-items: center; justify-content: space-between; }
+        .card-title { margin: 0; font-size: 15px; font-weight: 600; color: var(--text-primary); }
+        .card-body { padding: 24px; }
+        .page-description { font-size: 13px; color: var(--text-secondary); margin: 0 0 16px 0; line-height: 1.6; }
+        .source-demand-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+        .source-demand-tag { display: inline-block; padding: 4px 12px; background: #e6f7ff; color: #1890ff; border-radius: 4px; font-size: 13px; font-weight: 500; }
+        .detail-actions { display: flex; gap: 12px; }
+        .empty-lines { padding: 40px; text-align: center; color: var(--text-tertiary); font-size: 13px; }
+        .detail-tabs-nav { display:flex; gap:12px; border-bottom:1px solid #e8e8e8; padding:0 24px; }
+        .detail-tabs-nav button { border:none; background:none; padding:12px 4px; font-size:13px; color:var(--text-secondary); cursor:pointer; position:relative; }
+        .detail-tabs-nav button.active { color:#1890ff; font-weight:500; }
+        .detail-tabs-nav button.active::after { content:''; position:absolute; left:0; right:0; bottom:-1px; height:2px; background:#1890ff; border-radius:2px; }
+        .detail-tab-panel { display:none; padding:24px; }
+        .detail-tab-panel.active { display:block; }
+        .compare-table { table-layout: fixed; width: 100%; }
+        .compare-table th,
+        .compare-table td { text-align: center !important; vertical-align: middle !important; }
+        .compare-table .compare-lowest { background: #e6ffed; color: #389e0d; font-weight: 600; }
+        .compare-table tfoot td {
+            background: #fafafa; font-weight: 600; border-top: 2px solid var(--border-color, #e8e8e8); padding: 12px 16px;
+            text-align: center !important; vertical-align: middle !important; box-sizing: border-box;
+        }
+        /* 总合计行最低价仅改背景色，布局与另外两格完全一致 */
+        .compare-table tfoot td.compare-lowest {
+            background: #e6ffed; color: #389e0d;
+            text-align: center !important; vertical-align: middle !important; padding: 12px 16px; box-sizing: border-box;
+        }
+        /* 覆盖全局 .table-wrapper td:last-child 的 display:flex，否则最后一格变成 flex 导致 text-align:center 失效、内容左对齐 */
+        .compare-table tbody td:last-child,
+        .compare-table tfoot td:last-child {
+            display: table-cell !important; padding-right: 16px !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper plan-detail-wrapper">
+        <div class="card" id="plan-detail-card">
+            <div class="card-header">
+                <h3 class="card-title">采购计划基本信息</h3>
+                <div class="detail-actions">
+                    <button type="button" class="btn btn-primary" id="btn-plan-detail-edit">编辑计划</button>
+                    <button type="button" class="btn btn-default" id="btn-plan-detail-gen-inquiry">生成询价单</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="form-info-grid" id="plan-info-grid">
+                    <!-- 由脚本根据 __planStore[id] 填充 -->
+                </div>
+            </div>
+        </div>
+        <div class="card" id="plan-source-card" style="display:none;">
+            <div class="card-header">
+                <h3 class="card-title">计划来源与关联需求</h3>
+            </div>
+            <div class="card-body">
+                <p class="page-description">本计划由需求申请「生成采购计划」下推生成，关联以下需求单。点击需求单号可查看需求详情。</p>
+                <div class="source-demand-list" id="plan-source-demand-nos"></div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="detail-tabs-nav">
+                <button type="button" class="active" data-tab="tab-plan-lines">计划明细</button>
+                <button type="button" data-tab="tab-inquiry">询价单</button>
+                <button type="button" data-tab="tab-compare">比价表</button>
+                <button type="button" data-tab="tab-contract">采购合同</button>
+                <button type="button" data-tab="tab-po">采购订单</button>
+                <button type="button" data-tab="tab-delivery">到货单</button>
+                <button type="button" data-tab="tab-inspect">检验单</button>
+                <button type="button" data-tab="tab-stockin">入库单</button>
+            </div>
+            <div id="detail-tabs-content">
+                <div class="detail-tab-panel active" id="tab-plan-lines">
+                    <div class="card-body">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th width="120">物料编码</th>
+                                        <th width="150">物料名称</th>
+                                        <th width="120">规格型号</th>
+                                        <th width="100">需求数量</th>
+                                        <th width="80">单位</th>
+                                        <th width="120">需求到货日期</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="plan-detail-lines"></tbody>
+                            </table>
+                        </div>
+                        <div class="empty-lines" id="plan-lines-empty" style="display:none;">暂无明细</div>
+                    </div>
+                </div>
+                <div class="detail-tab-panel" id="tab-inquiry">
+                    <div class="card-body">
+                        <p class="page-description">展示当前采购计划关联的询价单及供应商报价情况（原型为静态示例）。</p>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th width="140">询价单号</th>
+                                        <th width="160">供应商</th>
+                                        <th width="120">报价单号</th>
+                                        <th width="120">询价日期</th>
+                                        <th width="120">报价日期</th>
+                                        <th width="100">最低报价(含税)</th>
+                                        <th width="100">状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="plan-detail-inquiry-body">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="empty-lines" id="plan-detail-inquiry-empty">暂无关联的询价单</div>
+                    </div>
+                </div>
+                <div class="detail-tab-panel" id="tab-compare">
+                    <div class="card-body">
+                        <p class="page-description">展示本计划下各物料的供应商报价对比，便于比价与选定供应商（原型为静态示例）。</p>
+                        <div class="table-wrapper">
+                            <table class="compare-table">
+                                <thead>
+                                    <tr>
+                                        <th width="100">物料编码</th>
+                                        <th width="140">物料名称</th>
+                                        <th width="100">规格型号</th>
+                                        <th width="80">数量</th>
+                                        <th width="80">单位</th>
+                                        <th width="120">供应商A单价</th>
+                                        <th width="120">供应商B单价</th>
+                                        <th width="120">供应商C单价</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="plan-detail-compare-body">
+                                </tbody>
+                                <tfoot id="plan-detail-compare-foot" style="display:none;">
+                                    <tr>
+                                        <td colspan="5" style="text-align:center;font-weight:600;">总合计</td>
+                                        <td id="plan-detail-compare-total-a"></td>
+                                        <td id="plan-detail-compare-total-b"></td>
+                                        <td id="plan-detail-compare-total-c"></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div class="empty-lines" id="plan-detail-compare-empty">暂无比价数据</div>
+                    </div>
+                </div>
+                <div class="detail-tab-panel" id="tab-contract">
+                    <div class="card-body">
+                        <p class="page-description">展示与本计划相关联的采购合同信息（原型为静态示例）。</p>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th width="160">合同编号</th>
+                                        <th width="160">合同名称</th>
+                                        <th width="140">供应商</th>
+                                        <th width="120">合同金额</th>
+                                        <th width="120">签订日期</th>
+                                        <th width="100">状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="plan-detail-contract-body">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="empty-lines" id="plan-detail-contract-empty">暂无关联的采购合同</div>
+                    </div>
+                </div>
+                <div class="detail-tab-panel" id="tab-po">
+                    <div class="card-body">
+                        <p class="page-description">展示由本计划下推生成的采购订单列表（原型为静态示例）。</p>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th width="140">采购订单号</th>
+                                        <th width="160">供应商</th>
+                                        <th width="120">下单日期</th>
+                                        <th width="120">订单金额</th>
+                                        <th width="100">已到货金额</th>
+                                        <th width="100">状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="plan-detail-po-body">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="empty-lines" id="plan-detail-po-empty">暂无关联的采购订单</div>
+                    </div>
+                </div>
+                <div class="detail-tab-panel" id="tab-delivery">
+                    <div class="card-body">
+                        <p class="page-description">展示供应商到货单信息，用于跟踪执行进度（原型为静态示例）。</p>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th width="140">到货单号</th>
+                                        <th width="160">供应商</th>
+                                        <th width="120">到货日期</th>
+                                        <th width="120">到货数量</th>
+                                        <th width="120">到货金额</th>
+                                        <th width="100">状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="plan-detail-delivery-body">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="empty-lines" id="plan-detail-delivery-empty">暂无关联的到货单</div>
+                    </div>
+                </div>
+                <div class="detail-tab-panel" id="tab-inspect">
+                    <div class="card-body">
+                        <p class="page-description">展示与本计划相关的检验单信息（原型为静态示例）。</p>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th width="140">检验单号</th>
+                                        <th width="160">供应商</th>
+                                        <th width="120">检验日期</th>
+                                        <th width="120">合格数量</th>
+                                        <th width="120">不合格数量</th>
+                                        <th width="100">检验结果</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="plan-detail-inspect-body">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="empty-lines" id="plan-detail-inspect-empty">暂无关联的检验单</div>
+                    </div>
+                </div>
+                <div class="detail-tab-panel" id="tab-stockin">
+                    <div class="card-body">
+                        <p class="page-description">展示入库单信息，方便从计划侧查看物资入库执行情况（原型为静态示例）。</p>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th width="140">入库单号</th>
+                                        <th width="160">仓库</th>
+                                        <th width="120">入库日期</th>
+                                        <th width="120">入库数量</th>
+                                        <th width="120">入库金额</th>
+                                        <th width="100">状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="plan-detail-stockin-body">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="empty-lines" id="plan-detail-stockin-empty">暂无关联的入库单</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+(function() {
+    var id = typeof window.__modalContentId !== 'undefined' ? window.__modalContentId : (new URLSearchParams(window.location.search).get('id') || '');
+    var store = window.__planStore || {};
+    var plan = store[id] || null;
+    if (!plan) {
+        document.getElementById('plan-detail-card').querySelector('.card-body').innerHTML = '<p class="page-description">未找到该计划或数据未加载。请从采购计划列表点击「查看」打开。</p>';
+        document.getElementById('plan-detail-card').querySelector('.card-body').id = '';
+        return;
+    }
+    function formatCompleteRate(rateStr) {
+        var rate = parseFloat((rateStr || '0%').replace('%', ''));
+        if (isNaN(rate)) rate = 0;
+        var rateClass = rate >= 70 ? '' : (rate >= 40 ? 'warning' : 'danger');
+        return '<div class="plan-complete-rate"><div class="plan-complete-rate-bar"><div class="plan-complete-rate-fill ' + rateClass + '" style="width:' + rate + '%;"></div></div><span>' + rate + '%</span></div>';
+    }
+    function formatCurrency(amount) {
+        return '¥' + parseFloat(amount || '0').toLocaleString('zh-CN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+    var grid = document.getElementById('plan-info-grid');
+    var planSource = plan.planSource || '人工创建';
+    var sourceBadgeClass = planSource === '需求下推' ? 'demand' : 'manual';
+    var statusClass = (plan.status === 'effective' || plan.statusText === '已生效') ? 'status-processing' : 'status-reviewing';
+    grid.innerHTML =
+        '<div class="form-info-item"><span class="form-info-label">计划编号</span><span class="form-info-value">' + (plan.planNo || '-') + '</span></div>' +
+        '<div class="form-info-item"><span class="form-info-label">计划来源</span><span class="form-info-value"><span class="plan-source-badge ' + sourceBadgeClass + '">' + planSource + '</span></span></div>' +
+        '<div class="form-info-item"><span class="form-info-label">计划名称</span><span class="form-info-value">' + (plan.planName || '-') + '</span></div>' +
+        '<div class="form-info-item"><span class="form-info-label">计划类型</span><span class="form-info-value">' + (plan.planType || '-') + '</span></div>' +
+        '<div class="form-info-item"><span class="form-info-label">计划周期</span><span class="form-info-value">' + (plan.planCycle || '-') + '</span></div>' +
+        '<div class="form-info-item"><span class="form-info-label">计划状态</span><span class="form-info-value"><span class="status-badge ' + statusClass + '">' + (plan.statusText || '审核中') + '</span></span></div>' +
+        '<div class="form-info-item"><span class="form-info-label">预算金额</span><span class="form-info-value">' + formatCurrency(plan.budgetAmount) + '</span></div>' +
+        '<div class="form-info-item"><span class="form-info-label">执行金额</span><span class="form-info-value">' + formatCurrency(plan.execAmount) + '</span></div>' +
+        '<div class="form-info-item"><span class="form-info-label">完成率</span><span class="form-info-value">' + formatCompleteRate(plan.completeRate || '0%') + '</span></div>' +
+        '<div class="form-info-item"><span class="form-info-label">编制人</span><span class="form-info-value">' + (plan.creator || '-') + '</span></div>';
+    if (plan.planSource === '需求下推' && plan.sourceDemandNos && plan.sourceDemandNos.length) {
+        document.getElementById('plan-source-card').style.display = 'block';
+        var demandList = document.getElementById('plan-source-demand-nos');
+        demandList.innerHTML = plan.sourceDemandNos.map(function(no) {
+            return '<span class="source-demand-tag">' + no + '</span>';
+        }).join('');
+    }
+    // 计划明细
+    var lines = plan.lines || [];
+    var tbody = document.getElementById('plan-detail-lines');
+    var emptyEl = document.getElementById('plan-lines-empty');
+    if (lines.length) {
+        tbody.innerHTML = lines.map(function(l) {
+            return '<tr><td>' + (l.materialCode || '-') + '</td><td>' + (l.materialName || '-') + '</td><td>' + (l.spec || '-') + '</td><td>' + (l.qty || '-') + '</td><td>' + (l.unit || '-') + '</td><td>' + (l.requiredDate || '-') + '</td></tr>';
+        }).join('');
+        emptyEl.style.display = 'none';
+    } else {
+        tbody.innerHTML = '';
+        emptyEl.style.display = 'block';
+    }
+
+    // 其它业务单据模块：按计划状态展示数据（已通过及之后阶段逐步有数据，已完成时全部有数据）
+    function fillSimpleTable(tbodyId, emptyId, rowsHtml) {
+        var tb = document.getElementById(tbodyId);
+        var emp = document.getElementById(emptyId);
+        if (!tb || !emp) return;
+        if (rowsHtml) {
+            tb.innerHTML = rowsHtml;
+            emp.style.display = 'none';
+        } else {
+            tb.innerHTML = '';
+            emp.style.display = 'block';
+        }
+    }
+    var status = plan.status || '';
+    var editBtnEl = document.getElementById('btn-plan-detail-edit');
+    var genInquiryBtnEl = document.getElementById('btn-plan-detail-gen-inquiry');
+    if (editBtnEl) editBtnEl.style.display = (status === 'draft' || status === 'rejected') ? '' : 'none';
+    if (genInquiryBtnEl) genInquiryBtnEl.style.display = (status === 'approved' || status === 'inquiring') ? '' : 'none';
+    var hasInquiryCompare = ['approved', 'inquiring', 'pending_exec', 'executing', 'completed'].indexOf(status) >= 0;
+    var hasPoContract = ['pending_exec', 'executing', 'completed'].indexOf(status) >= 0;
+    var hasDeliveryInspectStockin = ['executing', 'completed'].indexOf(status) >= 0;
+    var isCompleted = status === 'completed';
+
+    var inquiryRows = '<tr><td>RFQ-2025-001</td><td>深圳市电子科技有限公司</td><td>QT-2025-001</td><td>2025-01-05</td><td>2025-01-08</td><td>¥1,250,000.00</td><td>已中标</td></tr>' +
+        '<tr><td>RFQ-2025-001</td><td>上海精密机械制造有限公司</td><td>QT-2025-002</td><td>2025-01-05</td><td>2025-01-09</td><td>¥1,268,000.00</td><td>未中标</td></tr>' +
+        '<tr><td>RFQ-2025-001</td><td>北京贸易有限公司</td><td>QT-2025-003</td><td>2025-01-05</td><td>2025-01-10</td><td>¥1,240,000.00</td><td>未中标</td></tr>';
+    var compareRows = '<tr><td>EQ-1001</td><td>数控机床</td><td>XK7132</td><td>3</td><td>台</td><td>¥140,000.00</td><td>¥145,000.00</td><td class="compare-lowest">¥139,333.33</td></tr>' +
+        '<tr><td>EQ-2001</td><td>空压机</td><td>30kW</td><td>2</td><td>台</td><td>¥42,500.00</td><td class="compare-lowest">¥41,000.00</td><td>¥43,000.00</td></tr>';
+    var poRow = isCompleted
+        ? '<tr><td>PO-2025-001</td><td>深圳市电子科技有限公司</td><td>2025-01-10</td><td>¥1,250,000.00</td><td>¥1,250,000.00</td><td>已完成</td></tr>'
+        : '<tr><td>PO-2025-001</td><td>深圳市电子科技有限公司</td><td>2025-01-10</td><td>¥1,250,000.00</td><td>¥600,000.00</td><td>部分到货</td></tr>';
+    var contractRow = isCompleted
+        ? '<tr><td>CT-2025-001</td><td>电机年度采购合同</td><td>深圳市电子科技有限公司</td><td>¥3,000,000.00</td><td>2025-01-03</td><td>已完成</td></tr>'
+        : '<tr><td>CT-2025-001</td><td>电机年度采购合同</td><td>深圳市电子科技有限公司</td><td>¥3,000,000.00</td><td>2025-01-03</td><td>履行中</td></tr>';
+    var deliveryRow = isCompleted
+        ? '<tr><td>DN-2025-001</td><td>深圳市电子科技有限公司</td><td>2025-01-18</td><td>5 台</td><td>¥1,250,000.00</td><td>已到货</td></tr>'
+        : '<tr><td>DN-2025-001</td><td>深圳市电子科技有限公司</td><td>2025-01-18</td><td>3 台</td><td>¥600,000.00</td><td>已到货</td></tr>';
+    var inspectRow = isCompleted
+        ? '<tr><td>INSP-2025-001</td><td>深圳市电子科技有限公司</td><td>2025-01-19</td><td>5 台</td><td>0</td><td>合格</td></tr>'
+        : '<tr><td>INSP-2025-001</td><td>深圳市电子科技有限公司</td><td>2025-01-19</td><td>3 台</td><td>0</td><td>合格</td></tr>';
+    var stockinRow = isCompleted
+        ? '<tr><td>RK-2025-001</td><td>总仓</td><td>2025-01-20</td><td>5 台</td><td>¥1,250,000.00</td><td>已入库</td></tr>'
+        : '<tr><td>RK-2025-001</td><td>总仓</td><td>2025-01-20</td><td>3 台</td><td>¥600,000.00</td><td>已入库</td></tr>';
+
+    if (hasInquiryCompare) {
+        fillSimpleTable('plan-detail-inquiry-body', 'plan-detail-inquiry-empty', inquiryRows);
+        fillSimpleTable('plan-detail-compare-body', 'plan-detail-compare-empty', compareRows);
+        var compareFoot = document.getElementById('plan-detail-compare-foot');
+        var totalA = document.getElementById('plan-detail-compare-total-a');
+        var totalB = document.getElementById('plan-detail-compare-total-b');
+        var totalC = document.getElementById('plan-detail-compare-total-c');
+        if (compareFoot) compareFoot.style.display = 'table-footer-group';
+        if (totalA) totalA.textContent = '¥505,000.00';
+        if (totalB) totalB.textContent = '¥517,000.00';
+        if (totalC) { totalC.textContent = '¥504,000.00'; totalC.classList.add('compare-lowest'); }
+    } else {
+        fillSimpleTable('plan-detail-inquiry-body', 'plan-detail-inquiry-empty', '');
+        fillSimpleTable('plan-detail-compare-body', 'plan-detail-compare-empty', '');
+        var compareFootHide = document.getElementById('plan-detail-compare-foot');
+        if (compareFootHide) compareFootHide.style.display = 'none';
+    }
+    if (hasPoContract) {
+        fillSimpleTable('plan-detail-po-body', 'plan-detail-po-empty', poRow);
+        fillSimpleTable('plan-detail-contract-body', 'plan-detail-contract-empty', contractRow);
+    } else {
+        fillSimpleTable('plan-detail-po-body', 'plan-detail-po-empty', '');
+        fillSimpleTable('plan-detail-contract-body', 'plan-detail-contract-empty', '');
+    }
+    if (hasDeliveryInspectStockin) {
+        fillSimpleTable('plan-detail-delivery-body', 'plan-detail-delivery-empty', deliveryRow);
+        fillSimpleTable('plan-detail-inspect-body', 'plan-detail-inspect-empty', inspectRow);
+        fillSimpleTable('plan-detail-stockin-body', 'plan-detail-stockin-empty', stockinRow);
+    } else {
+        fillSimpleTable('plan-detail-delivery-body', 'plan-detail-delivery-empty', '');
+        fillSimpleTable('plan-detail-inspect-body', 'plan-detail-inspect-empty', '');
+        fillSimpleTable('plan-detail-stockin-body', 'plan-detail-stockin-empty', '');
+    }
+    document.getElementById('btn-plan-detail-edit').addEventListener('click', function() {
+        window.__modalContentId = id;
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.closeModal('list-view-modal');
+            PageInteractions.openModal('edit-modal', '编辑采购计划', 'pages/procurement-plan-edit.html?id=' + id);
+        } else {
+            window.location.href = 'pages/procurement-plan-edit.html?id=' + id;
+        }
+    });
+    // 返回列表按钮已取消，统一通过外层弹窗关闭来返回列表
+
+    // 从单条计划生成询价单（直接打开弹窗，复用列表页的弹窗逻辑）
+    var genBtn = document.getElementById('btn-plan-detail-gen-inquiry');
+    if (genBtn) {
+        genBtn.addEventListener('click', function() {
+            if (!plan || !plan.lines || plan.lines.length === 0) {
+                alert('该采购计划暂无明细，无法生成询价单');
+                return;
+            }
+            // 直接调用列表页的 openPlanInquiryModal 函数（如果存在），否则跳转到列表页
+            if (typeof window.openPlanInquiryModal === 'function') {
+                window.openPlanInquiryModal(id);
+            } else {
+                // 如果列表页未加载，先跳转再触发
+                try {
+                    sessionStorage.setItem('planInquiryPrefill', JSON.stringify({ planId: id }));
+                } catch(e) {}
+                if (typeof PageLoader !== 'undefined' && PageLoader.loadPage) {
+                    PageLoader.loadPage('pages/procurement-plan-list.html').then(function() {
+                        setTimeout(function() {
+                            var btn = document.querySelector('.btn-gen-inquiry-from-plan[data-plan-id="' + id + '"]');
+                            if (btn) btn.click();
+                        }, 300);
+                    });
+                } else {
+                    window.location.href = 'pages/procurement-plan-list.html';
+                }
+            }
+        });
+    }
+
+    // 详情页下方业务模块 Tab 切换
+    (function initDetailTabs() {
+        var navButtons = document.querySelectorAll('.detail-tabs-nav button');
+        var panels = document.querySelectorAll('.detail-tab-panel');
+        if (!navButtons.length || !panels.length) return;
+        navButtons.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var targetId = btn.getAttribute('data-tab');
+                if (!targetId) return;
+                navButtons.forEach(function(b){ b.classList.toggle('active', b === btn); });
+                panels.forEach(function(p){ p.classList.toggle('active', p.id === targetId); });
+            });
+        });
+    })();
+})();
+    </script>
+</body>
+</html>

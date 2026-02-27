@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预警处理</title>
+</head>
+<body>
+    <div class="content-wrapper alert-handle-page">
+        <style>
+            .alert-handle-title{font-size:18px;font-weight:600;margin:0 0 8px 0;color:#262626;}
+            .alert-handle-desc{font-size:13px;color:#595959;margin:0;line-height:1.6;}
+            .handle-hero{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:20px;}
+            .handle-hero-c{background:#fff;border-radius:8px;padding:20px 24px;box-shadow:0 1px 4px rgba(0,0,0,0.04);border:1px solid #e8e8e8;}
+            .handle-hero-c.urgent{border-left:4px solid #ff4d4f;background:linear-gradient(135deg,#fff2f0 0%,#fff 50%);}
+            .handle-hero-c.important{border-left:4px solid #faad14;background:linear-gradient(135deg,#fffbe6 0%,#fff 50%);}
+            .handle-hero-c.normal{border-left:4px solid #52c41a;}
+            .handle-hero-c.pending{border-left:4px solid #1890ff;background:linear-gradient(135deg,#e6f7ff 0%,#fff 50%);}
+            .handle-hero-c.overdue{border-left:4px solid #ff4d4f;background:linear-gradient(135deg,#fff1f0 0%,#fff 40%);}
+            .handle-hero-l{font-size:12px;color:#8c8c8c;margin-bottom:8px;font-weight:500;}
+            .handle-hero-v{font-size:28px;font-weight:700;color:#262626;line-height:1.2;}
+            .handle-hero-c.urgent .handle-hero-v,.handle-hero-c.overdue .handle-hero-v{color:#ff4d4f;}
+            .handle-hero-c.important .handle-hero-v{color:#faad14;}
+            .handle-hero-c.pending .handle-hero-v{color:#1890ff;}
+            .handle-hero-d{font-size:12px;color:#8c8c8c;margin-top:8px;line-height:1.5;}
+            .handle-row-urgent{background:#fff2f0!important;}
+            .handle-row-urgent:hover{background:#ffe7e4!important;}
+            .handle-row-important{background:#fffbe6!important;}
+            .handle-row-important:hover{background:#fff7cc!important;}
+            .handle-row-normal{background:#f6ffed!important;}
+            .handle-row-normal:hover{background:#d9f7be!important;}
+            .handle-time-ok{font-size:12px;color:#52c41a;}
+            .handle-time-warn{font-size:12px;color:#faad14;}
+            .handle-time-over{font-size:12px;color:#ff4d4f;font-weight:500;}
+            .handle-empty{text-align:center;padding:60px 24px;color:#8c8c8c;}
+            .handle-empty-icon{font-size:48px;margin-bottom:16px;opacity:0.5;}
+            .handle-empty-text{font-size:15px;margin-bottom:8px;color:#595959;}
+            .handle-empty-hint{font-size:13px;}
+            .handle-empty a{color:#1890ff;}
+            .handle-form-section{margin-bottom:20px;}
+            .handle-form-section:last-child{margin-bottom:0;}
+            .handle-form-section-title{font-size:14px;font-weight:600;color:#262626;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #e8e8e8;}
+            .handle-page .filter-bar{padding:12px 20px;margin-bottom:16px;border-radius:8px;background:#fff;border:1px solid #e8e8e8;box-shadow:0 1px 2px rgba(0,0,0,0.03);}
+            .handle-page .filter-row{flex-wrap:wrap;align-items:center;gap:12px 16px;}
+            .handle-page .filter-item{flex-direction:row;align-items:center;gap:6px;}
+            .handle-page .filter-item label{flex-shrink:0;margin-bottom:0;font-size:13px;}
+            .handle-page .filter-item .form-select{min-width:100px;width:auto;}
+            .handle-page .card.alert-handle-table-card{margin-bottom:0;}
+            .handle-page .card.alert-handle-table-card .table-wrapper{min-height:120px;}
+            @media (max-width:1200px){.handle-hero{grid-template-columns:repeat(3,1fr);}}
+            @media (max-width:768px){.handle-hero{grid-template-columns:1fr 1fr;}.handle-page .filter-item{flex-direction:column;align-items:stretch;}}
+        </style>
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">预警管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">预警处理</span>
+        </div>
+
+        <div class="page-header">
+            <h2 class="alert-handle-title">预警处理</h2>
+            <p class="alert-handle-desc">待我处理的预警列表。按《设计协同详细设计》预警处理业务规则：紧急预警 30 分钟内响应、1 小时内处理完成；重要预警 1 小时内响应、4 小时内处理完成；一般预警 1 个工作日内处理完成。支持确认、处理或忽略，处理完成后记录处理结果。</p>
+        </div>
+
+        <!-- 待处理看板 -->
+        <div class="handle-hero">
+            <div class="handle-hero-c pending">
+                <div class="handle-hero-l">待我处理</div>
+                <div class="handle-hero-v">5</div>
+                <div class="handle-hero-d">需在规定时限内响应</div>
+            </div>
+            <div class="handle-hero-c urgent">
+                <div class="handle-hero-l">紧急</div>
+                <div class="handle-hero-v">2</div>
+                <div class="handle-hero-d">30 分钟响应 / 1 小时处理</div>
+            </div>
+            <div class="handle-hero-c important">
+                <div class="handle-hero-l">重要</div>
+                <div class="handle-hero-v">3</div>
+                <div class="handle-hero-d">1 小时响应 / 4 小时处理</div>
+            </div>
+            <div class="handle-hero-c normal">
+                <div class="handle-hero-l">一般</div>
+                <div class="handle-hero-v">1</div>
+                <div class="handle-hero-d">1 个工作日处理</div>
+            </div>
+            <div class="handle-hero-c overdue">
+                <div class="handle-hero-l">已超时</div>
+                <div class="handle-hero-v">1</div>
+                <div class="handle-hero-d">请尽快处理</div>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label for="handle-filter-type">预警类型</label>
+                    <select id="handle-filter-type" name="alertType" class="form-select">
+                        <option value="">全部</option>
+                        <option value="timeout">超时预警</option>
+                        <option value="data">数据异常</option>
+                        <option value="sync">同步失败</option>
+                        <option value="process">流程异常</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="handle-filter-level">预警级别</label>
+                    <select id="handle-filter-level" name="alertLevel" class="form-select">
+                        <option value="">全部</option>
+                        <option value="urgent">紧急</option>
+                        <option value="important">重要</option>
+                        <option value="normal">一般</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="handle-filter-sort">排序</label>
+                    <select id="handle-filter-sort" name="sort" class="form-select">
+                        <option value="urgency">按紧急程度</option>
+                        <option value="time">按触发时间</option>
+                        <option value="overdue">超时优先</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <a href="pages/alert-list.html" class="btn btn-default">查看全部预警</a>
+            </div>
+        </div>
+
+        <div class="card alert-handle-table-card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="120">预警编号</th>
+                            <th width="90">预警类型</th>
+                            <th width="80">预警级别</th>
+                            <th width="100">检测对象</th>
+                            <th>预警内容</th>
+                            <th width="150">触发时间</th>
+                            <th width="120">响应时限</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="handle-row-urgent">
+                            <td>ALT-2025-001</td>
+                            <td>同步失败</td>
+                            <td><span class="status-badge status-error">紧急</span></td>
+                            <td>ERP 下发</td>
+                            <td>MBOM-002 下发 ERP 失败：物料 M003 在 ERP 中不存在</td>
+                            <td>2025-01-28 14:00</td>
+                            <td><span class="handle-time-over">已超时 30 分钟</span></td>
+                            <td><button class="btn btn-sm btn-primary" data-open-modal="handle-modal">处理</button> <button class="btn btn-sm btn-default" data-open-modal="confirm-modal">确认</button> <button class="btn btn-sm btn-link" data-open-modal="ignore-modal">忽略</button></td>
+                        </tr>
+                        <tr class="handle-row-important">
+                            <td>ALT-2025-002</td>
+                            <td>超时预警</td>
+                            <td><span class="status-badge status-warning">重要</span></td>
+                            <td>会审单</td>
+                            <td>会审单 BG-HS-2025-001 工艺部审批超时 4 小时</td>
+                            <td>2025-01-28 12:30</td>
+                            <td><span class="handle-time-warn">1 小时内响应</span></td>
+                            <td><button class="btn btn-sm btn-primary" data-open-modal="handle-modal">处理</button> <button class="btn btn-sm btn-default" data-open-modal="confirm-modal">确认</button> <button class="btn btn-sm btn-link" data-open-modal="ignore-modal">忽略</button></td>
+                        </tr>
+                        <tr class="handle-row-important">
+                            <td>ALT-2025-005</td>
+                            <td>数据异常</td>
+                            <td><span class="status-badge status-warning">重要</span></td>
+                            <td>EBOM/MBOM</td>
+                            <td>EBOM PROD-002 与 MBOM 版本不一致</td>
+                            <td>2025-01-28 11:00</td>
+                            <td><span class="handle-time-ok">4 小时内处理</span></td>
+                            <td><button class="btn btn-sm btn-primary" data-open-modal="handle-modal">处理</button> <button class="btn btn-sm btn-default" data-open-modal="confirm-modal">确认</button> <button class="btn btn-sm btn-link" data-open-modal="ignore-modal">忽略</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 3 条待处理</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 空状态示例（当无数据时显示，此处隐藏） -->
+        <div class="handle-empty" id="handle-empty-state" style="display:none;">
+            <div class="handle-empty-icon">✓</div>
+            <div class="handle-empty-text">暂无待处理预警</div>
+            <p class="handle-empty-hint">当前没有需要您处理的预警，可前往 <a href="pages/alert-list.html">预警列表</a> 查看全部记录。</p>
+        </div>
+
+        <!-- 确认预警弹窗 -->
+        <div id="confirm-modal" class="modal-overlay">
+            <div class="modal" style="max-width:480px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">确认预警</span><button type="button" class="modal-close" data-close-modal="confirm-modal">×</button></div>
+                <div class="modal-body">
+                    <p class="modal-desc">确认已收到该预警，后续将进行跟踪处理。确认后预警状态将更新为「处理中」。</p>
+                    <div class="form-item" style="margin-top:16px;">
+                        <label class="form-label" for="confirm-remark">备注</label>
+                        <textarea id="confirm-remark" name="confirmRemark" class="form-textarea" rows="2" placeholder="可选，如：已联系相关人员"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="confirm-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="confirm-modal" onclick="alert('✅ 已确认')">确认</button></div>
+            </div>
+        </div>
+
+        <!-- 处理预警弹窗 -->
+        <div id="handle-modal" class="modal-overlay">
+            <div class="modal" style="max-width:600px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">预警处理</span><button type="button" class="modal-close" data-close-modal="handle-modal">×</button></div>
+                <div class="modal-body">
+                    <div class="handle-form-section">
+                        <div class="handle-form-section-title">预警信息</div>
+                        <div style="background:#fafafa;padding:12px 16px;border-radius:6px;margin-bottom:16px;font-size:14px;color:#595959;line-height:1.6;">MBOM-002 下发 ERP 失败：物料 M003 在 ERP 中不存在。建议：补充物料至 ERP 后重新下发。</div>
+                    </div>
+                    <div class="handle-form-section">
+                        <div class="handle-form-section-title">处理结果</div>
+                        <div class="form-item">
+                            <label class="form-label required" for="handle-result">处理方式</label>
+                            <select id="handle-result" name="handleResult" class="form-select">
+                                <option value="">请选择</option>
+                                <option value="fixed">已修复问题</option>
+                                <option value="remind">已提醒相关人员</option>
+                                <option value="coordinated">已协调处理</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label" for="handle-desc">处理说明</label>
+                            <textarea id="handle-desc" name="handleDesc" class="form-textarea" rows="4" placeholder="请描述处理过程与结果，如：已补充物料 M003 至 ERP，重新下发成功"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="handle-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="handle-modal" onclick="alert('✅ 处理完成')">提交</button></div>
+            </div>
+        </div>
+
+        <!-- 忽略预警弹窗 -->
+        <div id="ignore-modal" class="modal-overlay">
+            <div class="modal" style="max-width:500px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">忽略预警</span><button type="button" class="modal-close" data-close-modal="ignore-modal">×</button></div>
+                <div class="modal-body">
+                    <p class="modal-desc" style="margin-bottom:16px;">确定忽略该预警？忽略后该预警将标记为「已忽略」，不再提醒。建议填写忽略原因以便追溯。</p>
+                    <div class="form-item">
+                        <label class="form-label" for="ignore-reason">忽略原因</label>
+                        <textarea id="ignore-reason" name="ignoreReason" class="form-textarea" rows="3" placeholder="可选，如：非本人负责范围、重复预警等"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="ignore-modal">取消</button><button type="button" class="btn btn-default" data-close-modal="ignore-modal" onclick="alert('✅ 已忽略')">确定忽略</button></div>
+            </div>
+        </div>
+    </div>
+    <script>if(typeof PageInteractions!=='undefined')PageInteractions.initButtons();</script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>控制台测试</title>
+</head>
+<body>
+    <h1>控制台测试页面</h1>
+    <p>请按 F12 打开控制台查看输出</p>
+    <button onclick="testStore()">测试 Store</button>
+    <button onclick="clearAndReload()">清除数据并刷新</button>
+    <div id="output"></div>
+    
+    <script src="assets/finance-collab-store.js"></script>
+    <script>
+        console.log('=== 页面加载完成 ===');
+        
+        function testStore() {
+            console.log('测试按钮被点击');
+            console.log('FinanceCollabStore 存在:', !!window.FinanceCollabStore);
+            
+            if (window.FinanceCollabStore) {
+                var store = window.FinanceCollabStore.getStore();
+                console.log('getStore() 返回:', store);
+                
+                if (store) {
+                    console.log('settlements:', store.settlements);
+                    console.log('settlements.length:', store.settlements ? store.settlements.length : 'N/A');
+                    
+                    document.getElementById('output').innerHTML = 
+                        '<h3>测试结果</h3>' +
+                        '<p>store 存在: ' + (store ? '是' : '否') + '</p>' +
+                        '<p>settlements 存在: ' + (store.settlements ? '是' : '否') + '</p>' +
+                        '<p>settlements 数量: ' + (store.settlements ? store.settlements.length : 0) + '</p>';
+                } else {
+                    document.getElementById('output').innerHTML = '<p style="color:red">store 为 null</p>';
+                }
+            } else {
+                document.getElementById('output').innerHTML = '<p style="color:red">FinanceCollabStore 不存在</p>';
+            }
+        }
+        
+        function clearAndReload() {
+            console.log('清除 localStorage...');
+            localStorage.removeItem('FINANCE_COLLAB_STORE_V1');
+            console.log('localStorage 已清除，刷新页面...');
+            location.reload();
+        }
+        
+        // 页面加载时自动测试
+        setTimeout(function() {
+            console.log('自动测试...');
+            testStore();
+        }, 500);
+    </script>
+</body>
+</html>

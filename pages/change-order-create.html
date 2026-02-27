@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创建变更单</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <!-- 面包屑 -->
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">变更管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">创建变更单</span>
+        </div>
+
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <p class="page-description">基于会审结论创建</p>
+        </div>
+
+        <!-- 表单卡片 -->
+        <div class="card">
+            <div class="card-body">
+                <form>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label required">名称</label>
+                                <input type="text" class="form-input" placeholder="请输入名称">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label">类型</label>
+                                <select class="form-select">
+                                    <option value="">请选择类型</option>
+                                    <option value="type1">类型一</option>
+                                    <option value="type2">类型二</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-item">
+                        <label class="form-label">描述</label>
+                        <textarea class="form-textarea" placeholder="请输入描述"></textarea>
+                    </div>
+
+                    <div class="form-item" style="margin-top: 24px;">
+                        <button type="button" class="btn btn-primary">保存</button>
+                        <button type="button" class="btn btn-default">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('创建变更单 页面已加载');
+    </script>
+</body>
+</html>

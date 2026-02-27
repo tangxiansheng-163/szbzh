@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>测试数据存储</title>
+</head>
+<body>
+    <h1>测试 FinanceCollabStore</h1>
+    <div id="result"></div>
+    
+    <script src="assets/finance-collab-store.js"></script>
+    <script>
+        console.log('=== 测试开始 ===');
+        console.log('FinanceCollabStore 存在:', !!window.FinanceCollabStore);
+        
+        var result = document.getElementById('result');
+        
+        if (window.FinanceCollabStore) {
+            console.log('调用 getStore()...');
+            var store = window.FinanceCollabStore.getStore();
+            console.log('store:', store);
+            
+            if (store) {
+                console.log('settlements:', store.settlements);
+                console.log('settlements.length:', store.settlements ? store.settlements.length : 0);
+                
+                result.innerHTML = '<h2>测试结果</h2>' +
+                    '<p>FinanceCollabStore: 存在</p>' +
+                    '<p>store: ' + (store ? '存在' : 'null') + '</p>' +
+                    '<p>settlements: ' + (store.settlements ? '存在' : 'null') + '</p>' +
+                    '<p>settlements.length: ' + (store.settlements ? store.settlements.length : 0) + '</p>' +
+                    '<h3>结算单列表:</h3>' +
+                    '<ul>' + 
+                    (store.settlements || []).map(function(s) {
+                        return '<li>' + s.id + ' - ' + (s.partyB && s.partyB.org || '-') + ' - ¥' + (s.amount && s.amount.settlementAmount || 0) + '</li>';
+                    }).join('') +
+                    '</ul>';
+            } else {
+                result.innerHTML = '<p style="color:red;">store 为 null</p>';
+            }
+        } else {
+            result.innerHTML = '<p style="color:red;">FinanceCollabStore 不存在</p>';
+        }
+        
+        console.log('=== 测试结束 ===');
+    </script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订单详情 - 供应链协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/supply-chain-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">订单协同</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/supply-chain-order-list.html" class="breadcrumb-item">订单管理</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">订单详情</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">订单数据来自「采购下推」或「人工创建」。采购下推订单由采购协同中采购订单审批通过后自动推送，不允许编辑，详情页不显示「编辑」；人工创建订单在本应用内新建，可编辑，详情页显示「编辑」。</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">订单基本信息</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-info-grid" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 24px;">
+                    <div class="form-item">
+                        <label class="form-label">订单编号</label>
+                        <div class="form-static">SO-2025-001</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">订单来源</label>
+                        <div class="form-static"><span class="plan-source-badge demand">采购下推</span></div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">来源单号</label>
+                        <div class="form-static">PO-2025-001</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">订单状态</label>
+                        <div class="form-static"><span class="status-badge status-processing">执行中</span></div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">需求方</label>
+                        <div class="form-static">深圳市电子科技有限公司</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">需求方联系人</label>
+                        <div class="form-static">李工</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">联系电话</label>
+                        <div class="form-static">13800000001</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">创建人</label>
+                        <div class="form-static">张协同</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">下单日期</label>
+                        <div class="form-static">2025-01-15</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">要求交期</label>
+                        <div class="form-static">2025-02-20</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">确认时间</label>
+                        <div class="form-static">2025-01-16 09:30</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">交付进度</label>
+                        <div class="form-static">45%</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">订单总金额</label>
+                        <div class="form-static">¥156,800.00</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">付款条件</label>
+                        <div class="form-static">货到30天</div>
+                    </div>
+                    <div class="form-item" style="grid-column:1 / span 2;">
+                        <label class="form-label">交货地点</label>
+                        <div class="form-static">深圳市宝安区深科技工业园A栋仓库</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">质保期</label>
+                        <div class="form-static">12个月</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">物料明细</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper" style="max-height:360px;overflow:auto;">
+                    <table class="output-table">
+                        <thead>
+                            <tr>
+                                <th width="50">序号</th>
+                                <th width="140">物料编码</th>
+                                <th width="200">物料名称</th>
+                                <th width="150">规格型号</th>
+                                <th width="90">数量</th>
+                                <th width="70">单位</th>
+                                <th width="100">单价</th>
+                                <th width="110">金额</th>
+                                <th width="110">要求到货日期</th>
+                                <th width="100">已交货数量</th>
+                                <th width="100">交货金额</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>MAT-1001</td>
+                                <td>控制器</td>
+                                <td>型号 A1</td>
+                                <td>10</td>
+                                <td>台</td>
+                                <td>¥5,680.00</td>
+                                <td>¥56,800.00</td>
+                                <td>2025-02-10</td>
+                                <td>4</td>
+                                <td>¥22,720.00</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>MAT-1002</td>
+                                <td>传感器</td>
+                                <td>φ10</td>
+                                <td>50</td>
+                                <td>只</td>
+                                <td>¥1,380.00</td>
+                                <td>¥69,000.00</td>
+                                <td>2025-02-15</td>
+                                <td>24</td>
+                                <td>¥33,120.00</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>MAT-1003</td>
+                                <td>安装辅材包</td>
+                                <td>标准套装</td>
+                                <td>5</td>
+                                <td>套</td>
+                                <td>¥1,576.00</td>
+                                <td>¥7,880.00</td>
+                                <td>2025-02-15</td>
+                                <td>0</td>
+                                <td>¥0.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top:12px;text-align:right;font-size:13px;color:var(--text-secondary,#666);">
+                    共 <strong>3</strong> 条物料明细，合计金额 <strong>¥133,680.00</strong>，已交货金额 <strong>¥55,840.00</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar" style="margin-top:16px;">
+            <div class="action-left">
+                <button type="button" class="btn btn-default" onclick="if(typeof PageLoader!=='undefined')PageLoader.loadPage('pages/supply-chain-order-list.html');else location.href='pages/supply-chain-order-list.html';">返回列表</button>
+                <!-- 采购下推订单不显示编辑按钮；人工创建订单时显示：<button class="btn btn-default">编辑</button> -->
+            </div>
+        </div>
+    </div>
+    <style>
+        .plan-source-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+        .plan-source-badge.demand { background: #e6f7ff; color: #1890ff; }
+        .plan-source-badge.manual { background: #f6ffed; color: #52c41a; }
+    </style>
+</body>
+</html>

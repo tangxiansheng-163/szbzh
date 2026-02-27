@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>维护计划 - 设备管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/equipment-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">维护管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">维护计划</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理设备维护计划，包括巡检计划、保养计划、预防性维修计划；支持计划制定、审批、执行跟踪、效率统计。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="计划编号、设备编码、设备名称">
+                </div>
+                <div class="filter-item">
+                    <label>计划类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="inspection">巡检计划</option>
+                        <option value="maintenance">保养计划</option>
+                        <option value="repair">维修计划</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>计划状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="draft">草稿</option>
+                        <option value="pending">待审批</option>
+                        <option value="approved">已审批</option>
+                        <option value="enabled">已启用</option>
+                        <option value="paused">已暂停</option>
+                        <option value="disabled">已停用</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>执行周期</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="daily">每日</option>
+                        <option value="weekly">每周</option>
+                        <option value="monthly">每月</option>
+                        <option value="quarterly">每季度</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary btn-create-modal"
+                        data-modal="plan-create-modal"
+                        data-title="新建维护计划"
+                        data-url="pages/equipment-maintenance-plan-create.html">
+                    + 新建计划
+                </button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">计划编号</th>
+                            <th width="150">计划名称</th>
+                            <th width="100">计划类型</th>
+                            <th width="120">设备编码</th>
+                            <th width="150">设备名称</th>
+                            <th width="100">执行周期</th>
+                            <th width="100">责任人</th>
+                            <th width="100">下次执行</th>
+                            <th width="90">计划状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="plan-id" value="1"></td>
+                            <td>MP-2025-001</td>
+                            <td>空压机A定期保养</td>
+                            <td>保养计划</td>
+                            <td>EQ-001</td>
+                            <td>空压机A</td>
+                            <td>每月</td>
+                            <td>张运维</td>
+                            <td>2025-02-01</td>
+                            <td><span class="status-badge status-published">已启用</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/equipment-maintenance-plan-detail.html" data-id="1">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/equipment-maintenance-plan-edit.html" data-id="1">编辑</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="plan-id" value="2"></td>
+                            <td>MP-2025-002</td>
+                            <td>数控机床日常巡检</td>
+                            <td>巡检计划</td>
+                            <td>EQ-002</td>
+                            <td>数控机床</td>
+                            <td>每日</td>
+                            <td>李运维</td>
+                            <td>2025-01-30</td>
+                            <td><span class="status-badge status-published">已启用</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/equipment-maintenance-plan-detail.html" data-id="2">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/equipment-maintenance-plan-edit.html" data-id="2">编辑</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="plan-id" value="3"></td>
+                            <td>MP-2025-003</td>
+                            <td>冷却塔预防性维修</td>
+                            <td>维修计划</td>
+                            <td>EQ-003</td>
+                            <td>冷却塔</td>
+                            <td>每季度</td>
+                            <td>王运维</td>
+                            <td>2025-04-01</td>
+                            <td><span class="status-badge status-warning">已暂停</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/equipment-maintenance-plan-detail.html" data-id="3">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/equipment-maintenance-plan-edit.html" data-id="3">编辑</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 3 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('维护计划列表 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+            PageInteractions.toggleSelectAll('input[name="plan-id"]');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>供应商排名 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">供应商绩效</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">供应商排名</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">根据综合绩效指标对供应商进行排名，支持按不同维度（交付、质量、服务、价格）排名。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>排名维度</label>
+                    <select class="form-select">
+                        <option value="comprehensive">综合排名</option>
+                        <option value="delivery">交付及时率</option>
+                        <option value="quality">质量合格率</option>
+                        <option value="service">服务满意度</option>
+                        <option value="price">价格竞争力</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>统计周期</label>
+                    <select class="form-select">
+                        <option value="month">月度</option>
+                        <option value="quarter">季度</option>
+                        <option value="year">年度</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>周期</label>
+                    <input type="month" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="60">排名</th>
+                            <th width="150">供应商</th>
+                            <th width="100">综合评分</th>
+                            <th width="100">交付及时率</th>
+                            <th width="100">质量合格率</th>
+                            <th width="100">服务满意度</th>
+                            <th width="100">价格竞争力</th>
+                            <th width="100">订单金额</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="status-badge" style="background: #ffd700; color: #000;">1</span></td>
+                            <td>深圳市电子科技</td>
+                            <td>96.0分</td>
+                            <td>95.5%</td>
+                            <td>98.2%</td>
+                            <td>4.5分</td>
+                            <td>4.2分</td>
+                            <td>¥1,250,000</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-ranking-detail.html" data-id="1">查看详情</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-badge" style="background: #c0c0c0; color: #000;">2</span></td>
+                            <td>上海精密机械</td>
+                            <td>93.5分</td>
+                            <td>92.3%</td>
+                            <td>96.8%</td>
+                            <td>4.3分</td>
+                            <td>4.0分</td>
+                            <td>¥890,000</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-ranking-detail.html" data-id="2">查看详情</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-badge" style="background: #cd7f32; color: #fff;">3</span></td>
+                            <td>北京贸易有限公司</td>
+                            <td>91.2分</td>
+                            <td>90.5%</td>
+                            <td>95.2%</td>
+                            <td>4.1分</td>
+                            <td>4.5分</td>
+                            <td>¥650,000</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-ranking-detail.html" data-id="3">查看详情</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 3 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            console.log('供应商排名 页面已加载');
+            if (typeof PageInteractions !== 'undefined') {
+                PageInteractions.initButtons();
+            }
+        </script>
+    </div>
+</body>
+</html>

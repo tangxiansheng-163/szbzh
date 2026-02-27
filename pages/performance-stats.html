@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>绩效统计</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">考核与改进</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">绩效统计</span>
+        </div>
+
+        <div class="page-header">
+            <h2 class="page-title">绩效统计</h2>
+            <p class="page-description">按《BOM全生命周期管理体系》考核要求，采用「系统自动统计+人工核查」方式，月度统计指标数据、季度开展综合考核、年度总评；支持个人/部门视图，按部门类型展示差异化指标及综合得分排名。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>考核周期</label>
+                    <select class="form-select" id="perf-period">
+                        <option value="2025-01">2025年1月</option>
+                        <option value="2024-12">2024年12月</option>
+                        <option value="2024-Q4">2024年Q4</option>
+                        <option value="2024-Q3">2024年Q3</option>
+                        <option value="2024">2024年</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>考核对象</label>
+                    <select class="form-select" id="perf-object-type">
+                        <option value="person">个人</option>
+                        <option value="dept">部门</option>
+                    </select>
+                </div>
+                <div class="filter-item" id="perf-dept-filter">
+                    <label>部门</label>
+                    <select class="form-select" id="perf-dept">
+                        <option value="">全部</option>
+                        <option value="rd">研发部</option>
+                        <option value="process">工艺部</option>
+                        <option value="prod">生产部</option>
+                        <option value="purchase">采购部</option>
+                        <option value="inventory">库存部</option>
+                        <option value="quality">质量部</option>
+                        <option value="it">IT部</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">导出报表</button>
+            </div>
+        </div>
+
+        <!-- 部门绩效统计（考核对象=部门时显示） -->
+        <div class="card" id="perf-dept-card" style="display:none; margin-bottom:20px;">
+            <div class="card-header">
+                <h3 class="card-title">部门绩效统计</h3>
+                <span class="card-extra">2025年1月 · 按部门类型展示差异化考核指标</span>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="60">排名</th>
+                                <th width="100">部门</th>
+                                <th width="90">EBOM准确率</th>
+                                <th width="90">EBOM变更及时率</th>
+                                <th width="90">MBOM转化及时率</th>
+                                <th width="90">MBOM完整性</th>
+                                <th width="90">BOM执行合规率</th>
+                                <th width="90">跨系统同步率</th>
+                                <th width="90">异常处理及时率</th>
+                                <th width="80">综合得分</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="rank-badge rank-1">1</span></td><td>研发部</td><td><span class="kpi-ok">99.6%</span></td><td><span class="kpi-warn">95%</span></td><td>—</td><td>—</td><td><span class="kpi-ok">99.8%</span></td><td>—</td><td><span class="kpi-ok">96%</span></td><td><strong>96</strong></td></tr>
+                            <tr><td><span class="rank-badge rank-2">2</span></td><td>工艺部</td><td>—</td><td>—</td><td><span class="kpi-ok">97.2%</span></td><td><span class="kpi-ok">99.3%</span></td><td><span class="kpi-ok">99.7%</span></td><td>—</td><td><span class="kpi-ok">95%</span></td><td><strong>93</strong></td></tr>
+                            <tr><td><span class="rank-badge rank-3">3</span></td><td>采购部</td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="kpi-ok">99.9%</span></td><td>—</td><td><span class="kpi-ok">97%</span></td><td><strong>90</strong></td></tr>
+                            <tr><td>4</td><td>生产部</td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="kpi-ok">99.6%</span></td><td>—</td><td><span class="kpi-ok">94%</span></td><td><strong>88</strong></td></tr>
+                            <tr><td>5</td><td>IT部</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="kpi-warn">97.5%</span></td><td><span class="kpi-ok">98%</span></td><td><strong>85</strong></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="section-note">研发：EBOM准确率(30%)+EBOM变更及时率(40%)+BOM执行合规率(20%)+异常处理(10%)；工艺：MBOM转化(35%)+MBOM完整性(35%)+BOM执行合规率(20%)+异常处理(10%)；生产/采购/库存：BOM执行合规率(60%)+异常处理(40%)；IT：跨系统同步(70%)+异常处理(30%)</p>
+            </div>
+        </div>
+
+        <div class="card" id="perf-person-card">
+            <div class="card-header">
+                <h3 class="card-title">个人绩效排名</h3>
+                <span class="card-extra">2025年1月 · 按综合得分排序</span>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="60">排名</th>
+                                <th width="100">部门</th>
+                                <th width="100">人员</th>
+                                <th width="100">任务完成率</th>
+                                <th width="100">BOM 创建数</th>
+                                <th width="100">变更及时率</th>
+                                <th width="100">数据准确率</th>
+                                <th width="100">异常处理率</th>
+                                <th width="90">综合得分</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="rank-badge rank-1">1</span></td>
+                                <td>研发部</td>
+                                <td>张工</td>
+                                <td>98%</td>
+                                <td>12</td>
+                                <td><span class="kpi-ok">95%</span></td>
+                                <td><span class="kpi-ok">99%</span></td>
+                                <td><span class="kpi-ok">96%</span></td>
+                                <td><strong>96</strong></td>
+                            </tr>
+                            <tr>
+                                <td><span class="rank-badge rank-2">2</span></td>
+                                <td>研发部</td>
+                                <td>李设计师</td>
+                                <td>95%</td>
+                                <td>8</td>
+                                <td><span class="kpi-ok">90%</span></td>
+                                <td><span class="kpi-ok">97%</span></td>
+                                <td><span class="kpi-warn">92%</span></td>
+                                <td><strong>92</strong></td>
+                            </tr>
+                            <tr>
+                                <td><span class="rank-badge rank-3">3</span></td>
+                                <td>工艺部</td>
+                                <td>李工</td>
+                                <td>92%</td>
+                                <td>10</td>
+                                <td><span class="kpi-ok">88%</span></td>
+                                <td><span class="kpi-ok">96%</span></td>
+                                <td><span class="kpi-ok">95%</span></td>
+                                <td><strong>90</strong></td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>工艺部</td>
+                                <td>王工艺师</td>
+                                <td>88%</td>
+                                <td>5</td>
+                                <td><span class="kpi-warn">85%</span></td>
+                                <td><span class="kpi-ok">95%</span></td>
+                                <td><span class="kpi-ok">93%</span></td>
+                                <td><strong>87</strong></td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>生产部</td>
+                                <td>王工</td>
+                                <td>85%</td>
+                                <td>3</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td><span class="kpi-ok">94%</span></td>
+                                <td><strong>84</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination">
+                    <div class="pagination-info">共 5 条记录</div>
+                    <div class="pagination-controls">
+                        <button class="page-btn" disabled>&lt;</button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn" disabled>&gt;</button>
+                    </div>
+                </div>
+                <p class="section-note" style="margin-top:12px;">综合得分 = Σ(单项指标得分 × 指标权重)；单项得分=100-扣分，扣分=(标准值-实际值)/扣分单位×扣分分值；考核结果与部门绩效、个人绩效挂钩。</p>
+            </div>
+        </div>
+    </div>
+    <style>
+        .page-title{font-size:18px;font-weight:600;margin:0 0 8px 0;color:#333;}
+        .page-description{font-size:13px;color:#666;margin:0;}
+        .card-extra{font-size:12px;color:#999;font-weight:400;}
+        .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;font-weight:600;font-size:14px;}
+        .rank-1{background:#fff7e6;color:#fa8c16;}
+        .rank-2{background:#f6ffed;color:#52c41a;}
+        .rank-3{background:#e6f7ff;color:#1890ff;}
+        .kpi-ok{color:#52c41a;}
+        .kpi-warn{color:#faad14;}
+        .section-note{font-size:12px;color:#8c8c8c;margin:0;line-height:1.6;}
+    </style>
+    <script>
+(function(){
+    var params=new URLSearchParams(window.location.search);
+    var obj=params.get('object');
+    var dept=params.get('dept');
+    if(obj==='dept'){
+        var ot=document.getElementById('perf-object-type');
+        var dc=document.getElementById('perf-dept-card');
+        var pc=document.getElementById('perf-person-card');
+        if(ot){ot.value='dept';}
+        if(dc){dc.style.display='block';}
+        if(pc){pc.style.display='none';}
+        if(dept){
+            var sd=document.getElementById('perf-dept');
+            if(sd){sd.value=dept;}
+        }
+    }
+    var otEl=document.getElementById('perf-object-type');
+    if(otEl){
+        otEl.addEventListener('change',function(){
+            var dc=document.getElementById('perf-dept-card');
+            var pc=document.getElementById('perf-person-card');
+            if(this.value==='dept'){
+                if(dc)dc.style.display='block';
+                if(pc)pc.style.display='none';
+            }else{
+                if(dc)dc.style.display='none';
+                if(pc)pc.style.display='block';
+            }
+        });
+    }
+})();
+if(typeof PageInteractions!=='undefined')PageInteractions.initButtons();
+    </script>
+</body>
+</html>

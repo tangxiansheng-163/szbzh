@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物料档案</title>
+    <style>.form-input-sm,.form-select-sm{padding:4px 8px;font-size:13px;height:28px;}</style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">基础信息</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">物料档案</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">维护物料档案，包括物料编码、名称、规格、类型、计量单位、替代关系及生命周期状态；物料档案是 BOM 创建的基础数据，需先完成物料档案维护方可创建 BOM。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="物料编码、物料名称、规格型号">
+                </div>
+                <div class="filter-item">
+                    <label>物料类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="raw">原材料</option>
+                        <option value="aux">辅料</option>
+                        <option value="pack">包装材料</option>
+                        <option value="part">零部件</option>
+                        <option value="equip">设备</option>
+                        <option value="tool">工具</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="enabled">启用</option>
+                        <option value="disabled">停用</option>
+                        <option value="pending">待审核</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary" data-open-modal="material-add-modal">+ 新增</button>
+                <button class="btn btn-default" data-open-modal="material-import-modal">批量导入</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th>物料编码</th>
+                            <th>物料名称</th>
+                            <th>规格型号</th>
+                            <th>物料类型</th>
+                            <th>等级</th>
+                            <th>计量单位</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="mid" value="1"></td>
+                            <td>M001</td>
+                            <td>智能控制器主控板</td>
+                            <td>CTRL-MAIN-V1</td>
+                            <td>零部件</td>
+                            <td>A</td>
+                            <td>件</td>
+                            <td><span class="status-badge status-published">启用</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/material-detail.html" data-id="1">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/material-edit.html" data-id="1">编辑</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="mid" value="2"></td>
+                            <td>M002</td>
+                            <td>不锈钢螺栓</td>
+                            <td>M8×20</td>
+                            <td>原材料</td>
+                            <td>C</td>
+                            <td>个</td>
+                            <td><span class="status-badge status-published">启用</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/material-detail.html" data-id="2">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/material-edit.html" data-id="2">编辑</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="mid" value="3"></td>
+                            <td>M003</td>
+                            <td>传感器模块</td>
+                            <td>SN-温度-01</td>
+                            <td>零部件</td>
+                            <td>B</td>
+                            <td>个</td>
+                            <td><span class="status-badge status-warning">待审核</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/material-detail.html" data-id="3">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/material-edit.html" data-id="3">编辑</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 3 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="material-add-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:720px;max-height:90vh;overflow-y:auto;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">新增物料档案</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <div class="section-title" style="margin-bottom:12px;">基本信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label required">物料编码</label><input type="text" class="form-input" placeholder="按编码规则生成或手工录入"></div>
+                        <div class="form-item"><label class="form-label required">物料名称</label><input type="text" class="form-input" placeholder="物料标准名称"></div>
+                        <div class="form-item"><label class="form-label">物料简称</label><input type="text" class="form-input" placeholder="用于报表展示"></div>
+                        <div class="form-item"><label class="form-label required">规格型号</label><input type="text" class="form-input" placeholder="物料规格型号描述"></div>
+                        <div class="form-item"><label class="form-label required">物料类型</label><select class="form-select"><option value="">请选择</option><option value="raw">原材料</option><option value="aux">辅料</option><option value="pack">包装材料</option><option value="part">零部件</option><option value="equip">设备</option><option value="tool">工具</option><option value="other">其他</option></select></div>
+                        <div class="form-item"><label class="form-label required">物料等级</label><select class="form-select"><option value="C">C（一般）</option><option value="B">B（重要）</option><option value="A">A（关键）</option></select></div>
+                        <div class="form-item"><label class="form-label required">计量单位</label><select class="form-select"><option value="">请选择</option><option value="件">件</option><option value="个">个</option><option value="台">台</option><option value="套">套</option><option value="kg">千克</option><option value="m">米</option><option value="L">升</option><option value="m2">平方米</option></select></div>
+                        <div class="form-item"><label class="form-label">采购单位</label><input type="text" class="form-input" placeholder="与计量单位一致可留空"></div>
+                        <div class="form-item"><label class="form-label">库存单位</label><input type="text" class="form-input" placeholder="与计量单位一致可留空"></div>
+                        <div class="form-item"><label class="form-label">状态</label><select class="form-select"><option value="enabled" selected>启用</option><option value="disabled">停用</option><option value="pending">待审核</option></select></div>
+                    </div>
+
+                    <div class="section-title" style="margin:20px 0 12px;">库存与采购</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label">安全库存</label><input type="number" class="form-input" placeholder="0" min="0" step="0.01"></div>
+                        <div class="form-item"><label class="form-label">最大库存</label><input type="number" class="form-input" placeholder="≥安全库存" min="0" step="0.01"></div>
+                        <div class="form-item"><label class="form-label required">采购提前期(天)</label><input type="number" class="form-input" placeholder="7" value="7" min="0"></div>
+                        <div class="form-item"><label class="form-label">参考价格</label><input type="number" class="form-input" placeholder="元，不含税" min="0" step="0.01"></div>
+                        <div class="form-item"><label class="form-label">价格上限</label><input type="number" class="form-input" placeholder="采购控制上限" min="0" step="0.01"></div>
+                        <div class="form-item"><label class="form-label">价格下限</label><input type="number" class="form-input" placeholder="采购控制下限" min="0" step="0.01"></div>
+                        <div class="form-item"><label class="form-label required">标准损耗率</label><input type="number" class="form-input" placeholder="如 0.05 表示 5%" value="0" min="0" max="1" step="0.01"></div>
+                    </div>
+
+                    <div class="section-title" style="margin:20px 0 12px;">存储与保质</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label">存储条件</label><input type="text" class="form-input" placeholder="特殊存储要求"></div>
+                        <div class="form-item"><label class="form-label">保质期(天)</label><input type="number" class="form-input" placeholder="物料保质期" min="0"></div>
+                    </div>
+
+                    <div class="section-title" style="margin:20px 0 12px;">属性信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label">图纸编号</label><input type="text" class="form-input" placeholder="关联技术图纸"></div>
+                        <div class="form-item"><label class="form-label">材质</label><input type="text" class="form-input" placeholder="如 不锈钢"></div>
+                        <div class="form-item"><label class="form-label">重量(kg)</label><input type="number" class="form-input" placeholder="单件重量" min="0" step="0.001"></div>
+                        <div class="form-item"><label class="form-label">是否关键件</label><select class="form-select"><option value="0">否</option><option value="1">是</option></select></div>
+                        <div class="form-item"><label class="form-label">是否合规物料</label><select class="form-select"><option value="1" selected>是</option><option value="0">否</option></select></div>
+                    </div>
+
+                    <div class="section-title" style="margin:20px 0 12px;">替代物料（可多条）</div>
+                    <div class="table-wrapper">
+                        <table class="output-table">
+                            <thead><tr><th width="50">序号</th><th>替代物料编码</th><th>替代物料名称</th><th width="100">替代类型</th><th width="80">优先级</th><th width="60"></th></tr></thead>
+                            <tbody id="material-add-substitute-tbody">
+                                <tr class="mat-substitute-row"><td class="mat-substitute-seq">1</td><td><input type="text" class="form-input form-input-sm" placeholder="物料编码" style="width:100%;"></td><td><input type="text" class="form-input form-input-sm" placeholder="物料名称" style="width:100%;"></td><td><select class="form-select form-select-sm" style="width:100%;"><option value="mutual">互替</option><option value="prefer">优选</option></select></td><td><input type="number" class="form-input form-input-sm" value="1" min="1" style="width:60px;"></td><td><button type="button" class="btn btn-sm btn-link btn-remove-mat-substitute">删除</button></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button type="button" class="btn btn-link btn-add-mat-substitute" style="margin-top:8px;">+ 添加替代物料</button>
+
+                    <div class="section-title" style="margin:20px 0 12px;">供应商（可多个）</div>
+                    <div class="table-wrapper">
+                        <table class="output-table">
+                            <thead><tr><th width="50">序号</th><th>供应商编码</th><th>供应商名称</th><th width="80">是否主供</th><th width="60"></th></tr></thead>
+                            <tbody id="material-add-supplier-tbody">
+                                <tr class="mat-supplier-row"><td class="mat-supplier-seq">1</td><td><input type="text" class="form-input form-input-sm" placeholder="供应商编码" style="width:100%;"></td><td><input type="text" class="form-input form-input-sm" placeholder="供应商名称" style="width:100%;"></td><td><select class="form-select form-select-sm" style="width:100%;"><option value="0">否</option><option value="1">是</option></select></td><td><button type="button" class="btn btn-sm btn-link btn-remove-mat-supplier">删除</button></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button type="button" class="btn btn-link btn-add-mat-supplier" style="margin-top:8px;">+ 添加供应商</button>
+
+                    <div class="section-title" style="margin:20px 0 12px;">技术与质量</div>
+                    <div style="display:grid;grid-template-columns:1fr;gap:12px;">
+                        <div class="form-item"><label class="form-label">技术参数</label><textarea class="form-textarea" rows="2" placeholder="关键技术参数描述"></textarea></div>
+                        <div class="form-item"><label class="form-label">质量标准</label><textarea class="form-textarea" rows="2" placeholder="质量检验标准"></textarea></div>
+                        <div class="form-item"><label class="form-label">备注</label><textarea class="form-textarea" rows="2" placeholder="其他补充说明"></textarea></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="material-add-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="material-add-modal" onclick="alert('✅ 物料档案已保存')">保存</button></div>
+            </div>
+        </div>
+        <div id="material-import-modal" class="modal-overlay">
+            <div class="modal" style="max-width:480px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">批量导入物料档案</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <p class="modal-desc">使用 Excel 模板填写物料信息后上传，支持批量创建、更新物料档案。</p>
+                    <div class="form-item" style="margin-top:16px;"><label class="form-label">选择文件</label><input type="file" class="form-input" accept=".xlsx,.xls"></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="material-import-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="material-import-modal" onclick="alert('✅ 导入成功，共 15 条')">确认导入</button></div>
+            </div>
+        </div>
+        <script>
+            console.log('物料档案 页面已加载');
+            if (typeof PageInteractions !== 'undefined') {
+                PageInteractions.initButtons();
+                PageInteractions.toggleSelectAll('input[name="mid"]');
+            }
+            document.querySelectorAll('.action-left .btn-default').forEach(function(btn) {
+                if (btn.textContent.indexOf('导出') !== -1) btn.addEventListener('click', function() {
+                    if (confirm('确定导出当前物料列表？')) alert('导出成功，文件已下载。');
+                });
+            });
+            (function(){
+            var subTpl='<tr class="mat-substitute-row"><td class="mat-substitute-seq"></td><td><input type="text" class="form-input form-input-sm" placeholder="物料编码" style="width:100%;"></td><td><input type="text" class="form-input form-input-sm" placeholder="物料名称" style="width:100%;"></td><td><select class="form-select form-select-sm" style="width:100%;"><option value="mutual">互替</option><option value="prefer">优选</option></select></td><td><input type="number" class="form-input form-input-sm" value="1" min="1" style="width:60px;"></td><td><button type="button" class="btn btn-sm btn-link btn-remove-mat-substitute">删除</button></td></tr>';
+            var supTpl='<tr class="mat-supplier-row"><td class="mat-supplier-seq"></td><td><input type="text" class="form-input form-input-sm" placeholder="供应商编码" style="width:100%;"></td><td><input type="text" class="form-input form-input-sm" placeholder="供应商名称" style="width:100%;"></td><td><select class="form-select form-select-sm" style="width:100%;"><option value="0">否</option><option value="1">是</option></select></td><td><button type="button" class="btn btn-sm btn-link btn-remove-mat-supplier">删除</button></td></tr>';
+            function refreshSeq(sel,seqClass){var t=document.querySelector(sel);if(!t)return;t.querySelectorAll('tr').forEach(function(r,i){var c=r.querySelector('.'+seqClass);if(c)c.textContent=i+1;});}
+            function bindSub(e){var btn=e.querySelector('.btn-remove-mat-substitute');if(btn)btn.onclick=function(){var t=document.getElementById('material-add-substitute-tbody');if(t.querySelectorAll('.mat-substitute-row').length<=1)return;e.remove();refreshSeq('#material-add-substitute-tbody','mat-substitute-seq');};}
+            function bindSup(e){var btn=e.querySelector('.btn-remove-mat-supplier');if(btn)btn.onclick=function(){var t=document.getElementById('material-add-supplier-tbody');if(t.querySelectorAll('.mat-supplier-row').length<=1)return;e.remove();refreshSeq('#material-add-supplier-tbody','mat-supplier-seq');};}
+            document.querySelector('.btn-add-mat-substitute')&&document.querySelector('.btn-add-mat-substitute').addEventListener('click',function(){var t=document.getElementById('material-add-substitute-tbody');if(!t)return;t.insertAdjacentHTML('beforeend',subTpl);var r=t.lastElementChild;bindSub(r);refreshSeq('#material-add-substitute-tbody','mat-substitute-seq');});
+            document.querySelector('.btn-add-mat-supplier')&&document.querySelector('.btn-add-mat-supplier').addEventListener('click',function(){var t=document.getElementById('material-add-supplier-tbody');if(!t)return;t.insertAdjacentHTML('beforeend',supTpl);var r=t.lastElementChild;bindSup(r);refreshSeq('#material-add-supplier-tbody','mat-supplier-seq');});
+            document.querySelectorAll('#material-add-substitute-tbody .mat-substitute-row').forEach(bindSub);
+            document.querySelectorAll('#material-add-supplier-tbody .mat-supplier-row').forEach(bindSup);
+        })();
+        </script>
+    </div>
+</body>
+</html>

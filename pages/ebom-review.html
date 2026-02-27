@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EBOM评审</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">BOM管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/ebom-list.html" class="breadcrumb-item">EBOM列表</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">EBOM评审</span>
+        </div>
+        <div class="page-header">
+            <p class="page-description">对 EBOM 进行评审：研发内部→工艺→质量，全部通过后可发布。填写评审意见并通过/驳回。</p>
+        </div>
+        <div class="action-bar">
+            <div class="action-left">
+                <button type="button" class="btn btn-default btn-back" data-url="pages/ebom-list.html">← 返回列表</button>
+            </div>
+        </div>
+        <div class="card" id="ebom-review-card">
+            <div class="card-body">
+                <div class="section-title">待评审 EBOM</div>
+                <div class="form-info-grid" id="ebom-review-info">
+                    <div class="form-info-item"><span class="form-info-label">BOM编码</span><span class="form-info-value" id="rv-code">—</span></div>
+                    <div class="form-info-item"><span class="form-info-label">产品名称</span><span class="form-info-value" id="rv-name">—</span></div>
+                    <div class="form-info-item"><span class="form-info-label">版本号</span><span class="form-info-value" id="rv-version">—</span></div>
+                    <div class="form-info-item"><span class="form-info-label">创建人</span><span class="form-info-value" id="rv-creator">—</span></div>
+                </div>
+                <div class="section-title" style="margin-top:20px;">评审</div>
+                <div class="form-item">
+                    <label class="form-label required">评审结论</label>
+                    <select class="form-select" id="rv-result">
+                        <option value="">请选择</option>
+                        <option value="pass">通过</option>
+                        <option value="reject">驳回</option>
+                    </select>
+                </div>
+                <div class="form-item">
+                    <label class="form-label required">评审意见</label>
+                    <textarea class="form-textarea" id="rv-remark" rows="4" placeholder="请填写评审意见"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" id="rv-submit">提交</button>
+                    <button type="button" class="btn btn-default btn-back" data-url="pages/ebom-list.html">取消</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" id="ebom-review-empty" style="display:none;">
+            <div class="card-body">
+                <div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <div class="empty-text">请从 EBOM 列表选择待评审项</div>
+                    <div class="empty-description">草稿状态 EBOM 可点击「提交评审」进入本页</div>
+                    <a href="pages/ebom-list.html" class="btn btn-primary" style="margin-top:12px;">前往列表</a>
+                </div>
+            </div>
+        </div>
+        <script>
+            (function () {
+                if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+                var q = window.location.search || '';
+                var m = /[?&]id=(\d+)/.exec(q);
+                if (!m) try { var p = new URLSearchParams(q).get('page') || ''; m = /id=(\d+)/.exec(p); } catch (e) {}
+                var id = (m && m[1]) ? m[1] : '';
+                var card = document.getElementById('ebom-review-card');
+                var empty = document.getElementById('ebom-review-empty');
+                var MOCK = { '3': { code: '01-02-1003-01-V1', name: '执行器', version: 'V0.9', creator: '王工' }, '4': { code: '01-02-1004-01-V1', name: '电源模块', version: 'V0.5', creator: '赵工' } };
+                var d = id ? (MOCK[id] || { code: '—', name: '—', version: '—', creator: '—' }) : null;
+                if (!id) {
+                    if (card) card.style.display = 'none';
+                    if (empty) empty.style.display = 'block';
+                } else {
+                    if (card) card.style.display = 'block';
+                    if (empty) empty.style.display = 'none';
+                    document.getElementById('rv-code').textContent = d.code;
+                    document.getElementById('rv-name').textContent = d.name;
+                    document.getElementById('rv-version').textContent = d.version;
+                    document.getElementById('rv-creator').textContent = d.creator;
+                }
+                var submitBtn = document.getElementById('rv-submit');
+                if (submitBtn) submitBtn.addEventListener('click', function () {
+                    var result = document.getElementById('rv-result');
+                    var remark = document.getElementById('rv-remark');
+                    if (!result || !result.value) { alert('请选择评审结论'); return; }
+                    if (!remark || !remark.value.trim()) { alert('请填写评审意见'); return; }
+                    alert('评审已提交（原型演示）');
+                    if (typeof PageLoader !== 'undefined') PageLoader.loadPage('pages/ebom-list.html');
+                });
+            })();
+        </script>
+    </div>
+</body>
+</html>

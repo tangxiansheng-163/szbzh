@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>供应商档案 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">系统配置</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">供应商档案</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">维护供应商档案，包括供应商编码、名称、类型、资质、联系方式、合作状态等；供应商信息是采购业务的基础数据。</p>
+            <p class="page-description" style="margin-top:8px;color:#666;font-size:13px;">信息来源有两种：①<strong>人工创建</strong>—仅录入供应商档案信息，创建后需<strong>发起评审</strong>，由专人进行评审；②<strong>准入申请</strong>—由供应商链协同系统发起准入申请，由采购协同专人评审。无论哪种来源，<strong>评审</strong>须由专人进行<strong>现场考察</strong>或<strong>免现场考察</strong>，且须上传<strong>评审考核报告</strong>或<strong>其他资料</strong>，给定等级（A/B/C/D），等级决定是否通过（A/B/C 通过，D 级不合格不通过）。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="供应商编码、名称、统一社会信用代码">
+                </div>
+                <div class="filter-item">
+                    <label>供应商类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="manufacturer">生产制造商</option>
+                        <option value="trader">贸易商</option>
+                        <option value="service">服务商</option>
+                        <option value="logistics">物流商</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>供应商状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待评审</option>
+                        <option value="reviewing">评审中</option>
+                        <option value="approved">已通过</option>
+                        <option value="rejected">已驳回</option>
+                        <option value="eliminated">已淘汰</option>
+                        <option value="blacklist">黑名单</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>供应商等级</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="A">A级（优秀供应商）</option>
+                        <option value="B">B级（合格供应商）</option>
+                        <option value="C">C级（待改进）</option>
+                        <option value="D">D级（不合格）</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>信息来源</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="manual">人工创建</option>
+                        <option value="admission">准入申请</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary" data-open-modal="supplier-add-modal">+ 新增供应商</button>
+                <button class="btn btn-default">批量导入</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">供应商编码</th>
+                            <th width="180">供应商名称</th>
+                            <th width="120">统一社会信用代码</th>
+                            <th width="100">供应商类型</th>
+                            <th width="80">供应商等级</th>
+                            <th width="90">供应商状态</th>
+                            <th width="90">信息来源</th>
+                            <th width="100">联系人</th>
+                            <th width="120">联系电话</th>
+                            <th width="110">创建时间</th>
+                            <th width="110">评审时间</th>
+                            <th width="90">创建人</th>
+                            <th width="90">申请人</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-inspect="on-site" data-doc="评审考核报告.pdf">
+                            <td><input type="checkbox" name="supplier-id" value="1"></td>
+                            <td>SUP-001</td>
+                            <td>深圳市电子科技有限公司</td>
+                            <td>91440300MA5XXXXXXX</td>
+                            <td>生产制造商</td>
+                            <td><span class="status-badge status-success">A级</span></td>
+                            <td><span class="status-badge status-published">已通过</span></td>
+                            <td>人工创建</td>
+                            <td>张经理</td>
+                            <td>138****8888</td>
+                            <td>2025-01-05</td>
+                            <td>2025-01-12</td>
+                            <td>张三</td>
+                            <td>-</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="supplier-view-modal" data-supplier-id="1">查看</button>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="supplier-edit-modal" data-supplier-id="1">编辑</button>
+                            </td>
+                        </tr>
+                        <tr data-inspect="waive" data-doc="考察说明及附件.zip">
+                            <td><input type="checkbox" name="supplier-id" value="2"></td>
+                            <td>SUP-002</td>
+                            <td>上海精密机械制造有限公司</td>
+                            <td>91310000MA6XXXXXXX</td>
+                            <td>生产制造商</td>
+                            <td><span class="status-badge status-success">B级</span></td>
+                            <td><span class="status-badge status-published">已通过</span></td>
+                            <td>准入申请</td>
+                            <td>李经理</td>
+                            <td>139****9999</td>
+                            <td>2024-11-20</td>
+                            <td>2024-12-08</td>
+                            <td>-</td>
+                            <td>李四（供应链）</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="supplier-view-modal" data-supplier-id="2">查看</button>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="supplier-edit-modal" data-supplier-id="2">编辑</button>
+                            </td>
+                        </tr>
+                        <tr data-inspect="on-site" data-doc="评审报告.pdf">
+                            <td><input type="checkbox" name="supplier-id" value="3"></td>
+                            <td>SUP-003</td>
+                            <td>北京贸易有限公司</td>
+                            <td>91110000MA7XXXXXXX</td>
+                            <td>贸易商</td>
+                            <td><span class="status-badge status-warning">C级</span></td>
+                            <td><span class="status-badge status-warning">已淘汰</span></td>
+                            <td>准入申请</td>
+                            <td>王经理</td>
+                            <td>137****7777</td>
+                            <td>2024-06-15</td>
+                            <td>2024-07-01</td>
+                            <td>-</td>
+                            <td>王五（供应链）</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="supplier-view-modal" data-supplier-id="3">查看</button>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="supplier-edit-modal" data-supplier-id="3">编辑</button>
+                            </td>
+                        </tr>
+                        <tr data-inspect="" data-doc="" data-supplier-id="4">
+                            <td><input type="checkbox" name="supplier-id" value="4"></td>
+                            <td>SUP-004</td>
+                            <td>广州新材料有限公司</td>
+                            <td>91440100MA8XXXXXXX</td>
+                            <td>生产制造商</td>
+                            <td><span class="status-badge status-default">-</span></td>
+                            <td><span class="status-badge status-warning">待评审</span></td>
+                            <td>人工创建</td>
+                            <td>陈经理</td>
+                            <td>136****6666</td>
+                            <td>2025-02-01</td>
+                            <td>-</td>
+                            <td>赵六</td>
+                            <td>-</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="supplier-view-modal" data-supplier-id="4">查看</button>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="supplier-edit-modal" data-supplier-id="4">编辑</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-supplier-review" data-supplier-id="4">评审</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 4 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 供应商查看弹窗（只读） -->
+        <div id="supplier-view-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:640px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">供应商详情</span><button type="button" class="modal-close" data-close-modal="supplier-view-modal">×</button></div>
+                <div class="modal-body">
+                    <div class="section-title" style="margin-bottom:12px;">基本信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:13px;">
+                        <div><span style="color:#666;">供应商编码：</span><span id="view-supplier-code">-</span></div>
+                        <div><span style="color:#666;">供应商名称：</span><span id="view-supplier-name">-</span></div>
+                        <div><span style="color:#666;">统一社会信用代码：</span><span id="view-supplier-credit">-</span></div>
+                        <div><span style="color:#666;">供应商类型：</span><span id="view-supplier-type">-</span></div>
+                        <div><span style="color:#666;">供应商等级：</span><span id="view-supplier-level">-</span></div>
+                        <div><span style="color:#666;">供应商状态：</span><span id="view-supplier-status">-</span></div>
+                        <div><span style="color:#666;">信息来源：</span><span id="view-supplier-source">-</span></div>
+                        <div id="view-supplier-apply-no-wrap" style="display:none;"><span style="color:#666;">准入申请单号：</span><span id="view-supplier-apply-no">-</span></div>
+                        <div><span style="color:#666;">联系人：</span><span id="view-supplier-contact">-</span></div>
+                        <div><span style="color:#666;">联系电话：</span><span id="view-supplier-phone">-</span></div>
+                        <div><span style="color:#666;">创建时间：</span><span id="view-supplier-create-time">-</span></div>
+                        <div><span style="color:#666;">评审时间：</span><span id="view-supplier-review-time">-</span></div>
+                        <div><span style="color:#666;">创建人：</span><span id="view-supplier-creator">-</span></div>
+                        <div><span style="color:#666;">申请人：</span><span id="view-supplier-applicant">-</span></div>
+                    </div>
+                    <div class="section-title" style="margin:16px 0 8px;">评审信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:13px;">
+                        <div><span style="color:#666;">考察方式：</span><span id="view-supplier-inspect">-</span></div>
+                        <div><span style="color:#666;">评审考核报告/资料：</span><span id="view-supplier-review-doc">-</span></div>
+                    </div>
+                    <p id="view-supplier-grade-tip" style="display:none;margin-top:12px;padding:10px;background:#f6ffed;border:1px solid #b7eb8f;border-radius:6px;font-size:13px;color:#389e0d;">准入申请由采购协同工作人员评审时给定等级（A/B/C/D），等级决定是否通过：A/B/C 通过，D 级不合格不通过。</p>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="supplier-view-modal">关闭</button></div>
+            </div>
+        </div>
+
+        <!-- 供应商编辑弹窗（复用新增结构，打开时填充） -->
+        <div id="supplier-edit-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:800px;max-height:90vh;overflow-y:auto;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title" id="supplier-edit-modal-title">编辑供应商</span><button type="button" class="modal-close" data-close-modal="supplier-edit-modal">×</button></div>
+                <div class="modal-body">
+                    <div class="section-title" style="margin-bottom:12px;">基本信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label">供应商编码</label><input type="text" id="edit-supplier-code" class="form-input" readonly></div>
+                        <div class="form-item"><label class="form-label">信息来源</label><input type="text" id="edit-supplier-source" class="form-input" readonly placeholder="-"></div>
+                        <div class="form-item" id="edit-apply-no-wrap" style="display:none;"><label class="form-label">准入申请单号</label><input type="text" id="edit-supplier-apply-no" class="form-input" readonly></div>
+                        <div class="form-item" style="grid-column:1/-1;"><label class="form-label required">供应商名称</label><input type="text" id="edit-supplier-name" class="form-input" placeholder="供应商全称"></div>
+                        <div class="form-item"><label class="form-label">统一社会信用代码</label><input type="text" id="edit-supplier-credit" class="form-input" placeholder="18位"></div>
+                        <div class="form-item"><label class="form-label">供应商类型</label><select id="edit-supplier-type" class="form-select"><option value="">请选择</option><option value="manufacturer">生产制造商</option><option value="trader">贸易商</option><option value="service">服务商</option></select></div>
+                        <div class="form-item"><label class="form-label">供应商等级</label><select id="edit-supplier-level" class="form-select"><option value="A">A级（优秀供应商）</option><option value="B">B级（合格供应商）</option><option value="C">C级（待改进）</option><option value="D">D级（不合格）</option></select></div>
+                        <div class="form-item"><label class="form-label">供应商状态</label><select id="edit-supplier-status" class="form-select"><option value="pending">待评审</option><option value="approved">已通过</option><option value="rejected">已驳回</option><option value="eliminated">已淘汰</option></select></div>
+                        <div class="form-item" style="grid-column:1/-1;"><span style="font-size:12px;color:#666;">评审给定等级决定是否通过（A/B/C 通过，D 不合格不通过）。</span></div>
+                        <div class="form-item"><label class="form-label">联系人</label><input type="text" id="edit-supplier-contact" class="form-input"></div>
+                        <div class="form-item"><label class="form-label">联系电话</label><input type="tel" id="edit-supplier-phone" class="form-input"></div>
+                        <div class="form-item"><label class="form-label">创建人</label><input type="text" id="edit-supplier-creator" class="form-input" readonly placeholder="-"></div>
+                        <div class="form-item"><label class="form-label">申请人</label><input type="text" id="edit-supplier-applicant" class="form-input" readonly placeholder="准入申请时有值"></div>
+                    </div>
+                    <div class="section-title" style="margin:16px 0 12px;">评审信息</div>
+                    <p style="font-size:12px;color:#666;margin-bottom:12px;">由专人在评审环节填写（待评审时点击列表「评审」按钮）。须现场考察或免现场考察，并上传评审考核报告或资料、给定等级。</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label">考察方式</label><select id="edit-supplier-inspect" class="form-select"><option value="on-site">现场考察</option><option value="waive">免现场考察</option></select></div>
+                        <div class="form-item" style="grid-column:1/-1;"><label class="form-label">评审考核报告或其他资料</label><input type="file" id="edit-supplier-review-doc" class="form-input" accept=".pdf,.doc,.docx,.jpg,.png" multiple> <span style="font-size:12px;color:#999;">已上传：<span id="edit-supplier-doc-list">-</span></span></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="supplier-edit-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="supplier-edit-modal" onclick="alert('✅ 供应商信息已保存')">保存</button></div>
+            </div>
+        </div>
+
+        <div id="supplier-add-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:800px;max-height:90vh;overflow-y:auto;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">新增供应商（人工创建档案信息）</span><button type="button" class="modal-close" data-close-modal="supplier-add-modal">×</button></div>
+                <div class="modal-body">
+                    <p style="font-size:13px;color:#666;margin-bottom:16px;">本操作仅用于<strong>人工创建</strong>供应商档案信息，保存后状态为「待评审」，需由专人发起评审（现场考察或免现场考察，并上传评审考核报告或资料，给定等级）。准入申请由供应商链协同系统发起，记录在列表中以「准入申请」来源展示。</p>
+                    <div class="section-title" style="margin-bottom:12px;">基本信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label required">供应商编码</label><input type="text" class="form-input" placeholder="系统自动生成或手工录入"></div>
+                        <div class="form-item"><label class="form-label required">创建人</label><input type="text" class="form-input" id="add-supplier-creator" placeholder="当前登录用户" value="当前用户"></div>
+                        <div class="form-item" style="grid-column:1/-1;"><label class="form-label required">供应商名称</label><input type="text" class="form-input" placeholder="供应商全称"></div>
+                        <div class="form-item"><label class="form-label required">统一社会信用代码</label><input type="text" class="form-input" placeholder="18位统一社会信用代码"></div>
+                        <div class="form-item"><label class="form-label required">供应商类型</label><select class="form-select" id="supplier-category" name="supplier-category"><option value="">请选择</option><option value="manufacturer">生产企业</option><option value="trader">贸易商</option><option value="service">服务商</option></select></div>
+                        <div class="form-item"><label class="form-label required">注册地址</label><input type="text" class="form-input" placeholder="企业营业执照注册地址" id="reg-address" name="reg-address"></div>
+                        <div class="form-item"><label class="form-label">经营地址</label><input type="text" class="form-input" placeholder="实际经营地址，可与注册地址不同" id="biz-address" name="biz-address"></div>
+                        <div class="form-item"><label class="form-label required">法定代表人</label><input type="text" class="form-input" placeholder="企业法定代表人姓名" id="legal-rep" name="legal-rep"></div>
+                        <div class="form-item"><label class="form-label">注册资本(万元)</label><input type="number" class="form-input" placeholder="注册资本" min="0" step="0.01" id="reg-capital" name="reg-capital"></div>
+                        <div class="form-item"><label class="form-label required">成立时间</label><input type="date" class="form-input" id="establish-date" name="establish-date"></div>
+                        <div class="form-item"><label class="form-label required">营业期限起</label><input type="date" class="form-input" id="biz-start" name="biz-start"></div>
+                        <div class="form-item"><label class="form-label required">营业期限止</label><input type="date" class="form-input" placeholder="长期有效填2099-12-31" id="biz-end" name="biz-end"></div>
+                    </div>
+
+                    <div class="section-title" style="margin:20px 0 12px;">联系信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label required">联系人姓名</label><input type="text" class="form-input" placeholder="主要业务联系人" id="contact-name" name="contact-name"></div>
+                        <div class="form-item"><label class="form-label required">联系电话</label><input type="tel" class="form-input" placeholder="手机号或座机号" id="contact-phone" name="contact-phone"></div>
+                        <div class="form-item"><label class="form-label required">联系邮箱</label><input type="email" class="form-input" placeholder="主要联系邮箱" id="contact-email" name="contact-email"></div>
+                        <div class="form-item"><label class="form-label">紧急联系人</label><input type="text" class="form-input" placeholder="紧急情况联系人" id="emergency-contact" name="emergency-contact"></div>
+                        <div class="form-item"><label class="form-label">紧急联系电话</label><input type="tel" class="form-input" placeholder="紧急联系电话" id="emergency-phone" name="emergency-phone"></div>
+                    </div>
+
+                    <p style="font-size:12px;color:#1890ff;margin:12px 0;padding:8px 12px;background:#e6f7ff;border-radius:6px;">保存后状态为「待评审」，请由专人在列表中点击该条「评审」按钮进行评审。</p>
+
+                    <div class="section-title" style="margin:20px 0 12px;">资质信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label">供应商等级</label><input type="text" class="form-input" placeholder="评审时由专人给定" readonly style="background:#f5f5f5;"></div>
+                        <div class="form-item"><label class="form-label">供应商状态</label><input type="text" class="form-input" value="待评审" readonly style="background:#f5f5f5;" title="创建后需发起评审"></div>
+                        <div class="form-item"><label class="form-label">质量体系认证</label><input type="text" class="form-input" placeholder="如：ISO9001" id="quality-cert" name="quality-cert"></div>
+                        <div class="form-item"><label class="form-label">环保认证</label><input type="text" class="form-input" placeholder="如：ISO14001" id="env-cert" name="env-cert"></div>
+                        <div class="form-item"><label class="form-label">资质到期日期</label><input type="date" class="form-input" id="cert-expiry" name="cert-expiry"></div>
+                        <div class="form-item"><label class="form-label">主要物料类别</label><input type="text" class="form-input" placeholder="逗号分隔，如：电子元器件,机械零部件" id="main-materials" name="main-materials"></div>
+                        <div class="form-item" style="grid-column:1/-1;"><label class="form-label">资质证书</label><input type="file" class="form-input" accept=".pdf,.jpg,.png" multiple id="cert-files" name="cert-files"></div>
+                        <div class="form-item" style="grid-column:1/-1;"><label class="form-label">产能信息</label><textarea class="form-textarea" rows="2" placeholder="关键物料的月产能、年产能描述" id="capacity-info" name="capacity-info"></textarea></div>
+                    </div>
+
+                    <div class="section-title" style="margin:20px 0 12px;">财务信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label required">开户银行</label><input type="text" class="form-input" placeholder="银行开户行名称" id="bank-name" name="bank-name"></div>
+                        <div class="form-item"><label class="form-label required">银行账号</label><input type="text" class="form-input" placeholder="银行账号" id="bank-account" name="bank-account"></div>
+                        <div class="form-item"><label class="form-label required">税号</label><input type="text" class="form-input" placeholder="纳税人识别号" id="tax-number" name="tax-number"></div>
+                        <div class="form-item"><label class="form-label required">发票类型</label><select class="form-select" id="invoice-type" name="invoice-type"><option value="normal">增值税普通发票</option><option value="special">增值税专用发票</option></select></div>
+                        <div class="form-item"><label class="form-label required">税率</label><input type="number" class="form-input" placeholder="0.13" value="0.13" min="0" max="1" step="0.0001" id="tax-rate" name="tax-rate"></div>
+                    </div>
+
+                    <div class="section-title" style="margin:20px 0 12px;">备注</div>
+                    <div class="form-item"><label class="form-label">备注</label><textarea class="form-textarea" rows="3" placeholder="其他补充说明"></textarea></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="supplier-add-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="supplier-add-modal" onclick="alert('✅ 供应商档案已保存，状态为待评审。请由专人发起评审（现场考察或免现场考察，并上传评审考核报告或资料，给定等级）。')">保存</button></div>
+            </div>
+        </div>
+
+        <!-- 评审弹窗（待评审时由专人填写考察方式、上传报告、给定等级） -->
+        <div id="supplier-review-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:560px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title" id="supplier-review-modal-title">供应商评审</span><button type="button" class="modal-close" data-close-modal="supplier-review-modal">×</button></div>
+                <div class="modal-body">
+                    <p style="font-size:13px;color:#666;margin-bottom:12px;">由专人进行评审：选择考察方式，上传评审考核报告或其他资料（至少一份），给定等级。等级决定是否通过（A/B/C 通过，D 不合格不通过）。</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label">供应商</label><input type="text" id="review-supplier-name" class="form-input" readonly style="background:#f5f5f5;"></div>
+                        <div class="form-item"><label class="form-label required">考察方式</label><select id="review-inspect" class="form-select"><option value="on-site">现场考察</option><option value="waive">免现场考察</option></select></div>
+                        <div class="form-item" style="grid-column:1/-1;"><label class="form-label required">评审考核报告或其他资料</label><input type="file" id="review-doc" class="form-input" accept=".pdf,.doc,.docx,.jpg,.png" multiple> <span style="font-size:12px;color:#999;">须上传至少一份</span></div>
+                        <div class="form-item"><label class="form-label required">评审等级</label><select id="review-level" class="form-select"><option value="A">A级（优秀供应商）</option><option value="B">B级（合格供应商）</option><option value="C">C级（待改进）</option><option value="D">D级（不合格）</option></select></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="supplier-review-modal">取消</button><button type="button" class="btn btn-primary" id="supplier-review-submit-btn">提交评审</button></div>
+            </div>
+        </div>
+        <script>
+        console.log('供应商档案 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+            PageInteractions.toggleSelectAll('input[name="supplier-id"]');
+        }
+        (function() {
+            document.addEventListener('click', function(e) {
+                var viewBtn = e.target && e.target.closest ? e.target.closest('[data-open-modal="supplier-view-modal"]') : null;
+                if (viewBtn) {
+                    var row = viewBtn.closest('tr');
+                    var cells = row ? row.querySelectorAll('td') : [];
+                    if (cells.length >= 14) {
+                        document.getElementById('view-supplier-code').textContent = (cells[1] && cells[1].textContent) || '-';
+                        document.getElementById('view-supplier-name').textContent = (cells[2] && cells[2].textContent) || '-';
+                        document.getElementById('view-supplier-credit').textContent = (cells[3] && cells[3].textContent) || '-';
+                        document.getElementById('view-supplier-type').textContent = (cells[4] && cells[4].textContent) || '-';
+                        document.getElementById('view-supplier-level').textContent = (cells[5] && cells[5].textContent) || '-';
+                        document.getElementById('view-supplier-status').textContent = (cells[6] && cells[6].textContent) || '-';
+                        var sourceText = (cells[7] && cells[7].textContent.trim()) || '';
+                        document.getElementById('view-supplier-source').textContent = sourceText || '-';
+                        document.getElementById('view-supplier-contact').textContent = (cells[8] && cells[8].textContent) || '-';
+                        document.getElementById('view-supplier-phone').textContent = (cells[9] && cells[9].textContent) || '-';
+                        document.getElementById('view-supplier-create-time').textContent = (cells[10] && cells[10].textContent) || '-';
+                        document.getElementById('view-supplier-review-time').textContent = (cells[11] && cells[11].textContent) || '-';
+                        document.getElementById('view-supplier-creator').textContent = (cells[12] && cells[12].textContent.trim()) || '-';
+                        document.getElementById('view-supplier-applicant').textContent = (cells[13] && cells[13].textContent.trim()) || '-';
+                        var inspectVal = row.getAttribute('data-inspect');
+                        document.getElementById('view-supplier-inspect').textContent = inspectVal === 'waive' ? '免现场考察' : (inspectVal === 'on-site' ? '现场考察' : '-');
+                        document.getElementById('view-supplier-review-doc').textContent = row.getAttribute('data-doc') || '未上传';
+                        var applyWrap = document.getElementById('view-supplier-apply-no-wrap');
+                        var gradeTip = document.getElementById('view-supplier-grade-tip');
+                        if (sourceText === '准入申请') {
+                            if (applyWrap) applyWrap.style.display = 'block';
+                            document.getElementById('view-supplier-apply-no').textContent = 'SA-2025-00' + (row.querySelector('[name="supplier-id"]') ? row.querySelector('[name="supplier-id"]').value : 'x');
+                            if (gradeTip) gradeTip.style.display = 'block';
+                        } else {
+                            if (applyWrap) applyWrap.style.display = 'none';
+                            if (gradeTip) gradeTip.style.display = 'none';
+                        }
+                    }
+                    return;
+                }
+                var editBtn = e.target && e.target.closest ? e.target.closest('[data-open-modal="supplier-edit-modal"]') : null;
+                if (editBtn) {
+                    var row = editBtn.closest('tr');
+                    var cells = row ? row.querySelectorAll('td') : [];
+                    if (cells.length >= 14) {
+                        var codeEl = document.getElementById('edit-supplier-code'); if (codeEl) codeEl.value = (cells[1] && cells[1].textContent) || '';
+                        var sourceEl = document.getElementById('edit-supplier-source'); if (sourceEl) sourceEl.value = (cells[7] && cells[7].textContent.trim()) || '';
+                        var nameEl = document.getElementById('edit-supplier-name'); if (nameEl) nameEl.value = (cells[2] && cells[2].textContent) || '';
+                        var creditEl = document.getElementById('edit-supplier-credit'); if (creditEl) creditEl.value = (cells[3] && cells[3].textContent) || '';
+                        var typeEl = document.getElementById('edit-supplier-type'); if (typeEl) typeEl.value = (cells[4] && cells[4].textContent.trim()) === '生产制造商' ? 'manufacturer' : ((cells[4] && cells[4].textContent.trim()) === '贸易商' ? 'trader' : 'service');
+                        var levelText = (cells[5] && cells[5].textContent.trim()) || '';
+                        var levelEl = document.getElementById('edit-supplier-level'); if (levelEl) levelEl.value = levelText.indexOf('A') === 0 ? 'A' : (levelText.indexOf('B') === 0 ? 'B' : (levelText.indexOf('C') === 0 ? 'C' : 'D'));
+                        var statusEl = document.getElementById('edit-supplier-status'); if (statusEl) statusEl.value = (cells[6] && cells[6].textContent.trim()) === '已通过' ? 'approved' : ((cells[6] && cells[6].textContent.trim()) === '已驳回' ? 'rejected' : ((cells[6] && cells[6].textContent.trim()) === '已淘汰' ? 'eliminated' : 'pending'));
+                        var contactEl = document.getElementById('edit-supplier-contact'); if (contactEl) contactEl.value = (cells[8] && cells[8].textContent) || '';
+                        var phoneEl = document.getElementById('edit-supplier-phone'); if (phoneEl) phoneEl.value = (cells[9] && cells[9].textContent) || '';
+                        var creatorEl = document.getElementById('edit-supplier-creator'); if (creatorEl) creatorEl.value = (cells[12] && cells[12].textContent.trim()) || '';
+                        var applicantEl = document.getElementById('edit-supplier-applicant'); if (applicantEl) applicantEl.value = (cells[13] && cells[13].textContent.trim()) || '';
+                        var applyWrap = document.getElementById('edit-apply-no-wrap');
+                        var applyNoEl = document.getElementById('edit-supplier-apply-no');
+                        if ((cells[7] && cells[7].textContent.trim()) === '准入申请') {
+                            if (applyWrap) applyWrap.style.display = 'block';
+                            if (applyNoEl) applyNoEl.value = 'SA-2025-00' + (row.querySelector('[name="supplier-id"]') ? row.querySelector('[name="supplier-id"]').value : 'x');
+                        } else {
+                            if (applyWrap) applyWrap.style.display = 'none';
+                        }
+                        var inspectVal = row.getAttribute('data-inspect');
+                        var inspectEl = document.getElementById('edit-supplier-inspect'); if (inspectEl) inspectEl.value = inspectVal || 'on-site';
+                        var docList = document.getElementById('edit-supplier-doc-list'); if (docList) docList.textContent = row.getAttribute('data-doc') || '-';
+                    }
+                    return;
+                }
+                var reviewBtn = e.target && e.target.closest ? e.target.closest('.btn-supplier-review') : null;
+                if (reviewBtn) {
+                    e.preventDefault();
+                    var row = reviewBtn.closest('tr');
+                    var cells = row ? row.querySelectorAll('td') : [];
+                    if (cells.length >= 14) {
+                        document.getElementById('review-supplier-name').value = (cells[2] && cells[2].textContent.trim()) || '';
+                        document.getElementById('review-inspect').value = 'on-site';
+                        document.getElementById('review-level').value = 'A';
+                        document.getElementById('review-doc').value = '';
+                        var overlay = document.getElementById('supplier-review-modal');
+                        if (overlay) {
+                            overlay.setAttribute('data-review-row-id', row.querySelector('[name="supplier-id"]') ? row.querySelector('[name="supplier-id"]').value : '');
+                            overlay.setAttribute('data-review-row', ''); 
+                            overlay.dataset.reviewRowId = row.querySelector('[name="supplier-id"]') ? row.querySelector('[name="supplier-id"]').value : '';
+                            overlay.classList.add('active');
+                            document.body.style.overflow = 'hidden';
+                        }
+                    }
+                    return;
+                }
+            }, true);
+        })();
+        (function() {
+            var submitBtn = document.getElementById('supplier-review-submit-btn');
+            if (submitBtn) {
+                submitBtn.addEventListener('click', function() {
+                    var docInput = document.getElementById('review-doc');
+                    if (!docInput || !docInput.files || docInput.files.length === 0) {
+                        alert('请上传评审考核报告或其他资料（至少一份）');
+                        return;
+                    }
+                    var level = (document.getElementById('review-level') || {}).value;
+                    var inspect = (document.getElementById('review-inspect') || {}).value;
+                    var overlay = document.getElementById('supplier-review-modal');
+                    var rowId = overlay ? (overlay.getAttribute('data-review-row-id') || overlay.dataset.reviewRowId || '') : '';
+                    var row = rowId ? document.querySelector('tr[data-supplier-id="' + rowId + '"]') : null;
+                    if (!row && rowId) {
+                        var input = document.querySelector('tr input[name="supplier-id"][value="' + rowId + '"]');
+                        row = input ? input.closest('tr') : null;
+                    }
+                    if (row) {
+                        var cells = row.querySelectorAll('td');
+                        if (cells.length >= 14) {
+                            var levelText = level === 'A' ? 'A级' : (level === 'B' ? 'B级' : (level === 'C' ? 'C级' : 'D级'));
+                            var statusText = level === 'D' ? '已驳回' : '已通过';
+                            cells[5].innerHTML = '<span class="status-badge status-' + (level === 'D' ? 'default' : 'success') + '">' + levelText + '</span>';
+                            cells[6].innerHTML = '<span class="status-badge status-' + (level === 'D' ? 'warning' : 'published') + '">' + statusText + '</span>';
+                            var today = new Date();
+                            cells[11].textContent = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+                            row.setAttribute('data-inspect', inspect);
+                            row.setAttribute('data-doc', docInput.files[0] ? docInput.files[0].name : '已上传');
+                            var opCell = cells[cells.length - 1];
+                            var reviewBtn = opCell.querySelector('.btn-supplier-review');
+                            if (reviewBtn) reviewBtn.remove();
+                        }
+                    }
+                    if (overlay) { overlay.classList.remove('active'); document.body.style.overflow = ''; }
+                    alert(level === 'D' ? '评审已提交，结果为：不通过（D 级）。' : '评审已提交，结果为：通过（' + (level === 'A' ? 'A级' : level === 'B' ? 'B级' : 'C级') + '）。');
+                });
+            }
+        })();
+        </script>
+    </div>
+</body>
+</html>

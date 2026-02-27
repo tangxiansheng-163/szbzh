@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关联分析 - 能源管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/energy-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">能源统计分析</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">关联分析</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">分析能源消耗与其他因素的关联关系，包括产量关联、温度关联、设备关联等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关联因素</label>
+                    <select class="form-select">
+                        <option value="production">产量</option>
+                        <option value="temperature">温度</option>
+                        <option value="equipment">设备</option>
+                        <option value="time">时间</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>时间范围</label>
+                    <input type="date" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">关联分析结果</h3>
+            </div>
+            <div class="card-body">
+                <div style="padding: 20px; background: #f5f5f5; border-radius: 4px; text-align: center; color: #999; min-height: 300px;">
+                    关联分析图表展示区域（可集成ECharts等图表库）
+                    <br><br>
+                    展示能耗与产量、温度、设备运行时间等因素的关联关系
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('关联分析 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

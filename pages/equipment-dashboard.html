@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备概览 - 设备管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <span class="breadcrumb-item active">工作台</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">设备概览</span>
+        </div>
+
+        <div class="page-header">
+            <h1 class="page-title">设备管理协同系统</h1>
+            <p class="page-description">全面管理设备台账、运行监控、维护保养、告警处理等业务，实现设备全生命周期数字化管理。</p>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 24px;">
+            <div class="stat-card">
+                <div class="stat-value" style="color: #1890ff;">156</div>
+                <div class="stat-label">设备总数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color: #52c41a;">128</div>
+                <div class="stat-label">正常运行</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color: #faad14;">18</div>
+                <div class="stat-label">维护中</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color: #ff4d4f;">5</div>
+                <div class="stat-label">告警中</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color: #722ed1;">89.5%</div>
+                <div class="stat-label">平均OEE</div>
+            </div>
+        </div>
+
+        <!-- 快捷入口 -->
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">
+                <h3 class="card-title">快捷入口</h3>
+            </div>
+            <div class="card-body">
+                <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px;">
+                    <a href="pages/equipment-list.html" class="quick-link" style="text-align: center; padding: 20px; border: 1px solid #f0f0f0; border-radius: 8px; text-decoration: none; transition: all 0.3s;">
+                        <div style="font-size: 32px; margin-bottom: 8px;">📋</div>
+                        <div style="font-size: 14px; color: #262626;">设备台账</div>
+                    </a>
+                    <a href="pages/equipment-monitor-realtime.html" class="quick-link" style="text-align: center; padding: 20px; border: 1px solid #f0f0f0; border-radius: 8px; text-decoration: none; transition: all 0.3s;">
+                        <div style="font-size: 32px; margin-bottom: 8px;">📊</div>
+                        <div style="font-size: 14px; color: #262626;">实时监控</div>
+                    </a>
+                    <a href="pages/equipment-maintenance-plan.html" class="quick-link" style="text-align: center; padding: 20px; border: 1px solid #f0f0f0; border-radius: 8px; text-decoration: none; transition: all 0.3s;">
+                        <div style="font-size: 32px; margin-bottom: 8px;">🔧</div>
+                        <div style="font-size: 14px; color: #262626;">维护计划</div>
+                    </a>
+                    <a href="pages/equipment-alert-list.html" class="quick-link" style="text-align: center; padding: 20px; border: 1px solid #f0f0f0; border-radius: 8px; text-decoration: none; transition: all 0.3s;">
+                        <div style="font-size: 32px; margin-bottom: 8px;">⚠️</div>
+                        <div style="font-size: 14px; color: #262626;">告警管理</div>
+                    </a>
+                    <a href="pages/equipment-fault-report.html" class="quick-link" style="text-align: center; padding: 20px; border: 1px solid #f0f0f0; border-radius: 8px; text-decoration: none; transition: all 0.3s;">
+                        <div style="font-size: 32px; margin-bottom: 8px;">📝</div>
+                        <div style="font-size: 14px; color: #262626;">故障上报</div>
+                    </a>
+                    <a href="pages/equipment-inspection.html" class="quick-link" style="text-align: center; padding: 20px; border: 1px solid #f0f0f0; border-radius: 8px; text-decoration: none; transition: all 0.3s;">
+                        <div style="font-size: 32px; margin-bottom: 8px;">🔍</div>
+                        <div style="font-size: 14px; color: #262626;">巡检管理</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 待办事项和告警 -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <!-- 待办事项 -->
+            <div class="card">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 class="card-title">待办事项</h3>
+                    <a href="pages/equipment-todo.html" style="font-size: 13px; color: #1890ff;">查看更多 →</a>
+                </div>
+                <div class="card-body">
+                    <div class="todo-list">
+                        <div class="todo-item" style="display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+                            <span class="status-badge status-warning" style="margin-right: 12px;">待处理</span>
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; color: #262626;">空压机A 保养到期提醒</div>
+                                <div style="font-size: 12px; color: #8c8c8c; margin-top: 4px;">计划日期：2025-02-15</div>
+                            </div>
+                            <a href="pages/equipment-maintenance.html" class="btn btn-sm btn-primary">处理</a>
+                        </div>
+                        <div class="todo-item" style="display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+                            <span class="status-badge status-error" style="margin-right: 12px;">紧急</span>
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; color: #262626;">数控机床 温度异常告警</div>
+                                <div style="font-size: 12px; color: #8c8c8c; margin-top: 4px;">发生时间：2025-02-13 09:30</div>
+                            </div>
+                            <a href="pages/equipment-alert-handle.html" class="btn btn-sm btn-primary">处理</a>
+                        </div>
+                        <div class="todo-item" style="display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+                            <span class="status-badge status-warning" style="margin-right: 12px;">待审核</span>
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; color: #262626;">冷却塔 故障上报审核</div>
+                                <div style="font-size: 12px; color: #8c8c8c; margin-top: 4px;">上报人：张工</div>
+                            </div>
+                            <a href="pages/equipment-fault-review.html" class="btn btn-sm btn-primary">审核</a>
+                        </div>
+                        <div class="todo-item" style="display: flex; align-items: center; padding: 12px 0;">
+                            <span class="status-badge status-processing" style="margin-right: 12px;">巡检中</span>
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; color: #262626;">车间A 日常巡检任务</div>
+                                <div style="font-size: 12px; color: #8c8c8c; margin-top: 4px;">截止日期：2025-02-14</div>
+                            </div>
+                            <a href="pages/equipment-inspection.html" class="btn btn-sm btn-default">查看</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 实时告警 -->
+            <div class="card">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 class="card-title">实时告警</h3>
+                    <a href="pages/equipment-alert-list.html" style="font-size: 13px; color: #1890ff;">查看更多 →</a>
+                </div>
+                <div class="card-body">
+                    <div class="alert-list">
+                        <div class="alert-item" style="display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+                            <span class="status-badge status-error" style="margin-right: 12px;">严重</span>
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; color: #262626;">数控机床 主轴温度过高</div>
+                                <div style="font-size: 12px; color: #8c8c8c; margin-top: 4px;">当前值：85°C | 阈值：80°C</div>
+                            </div>
+                            <span style="font-size: 12px; color: #8c8c8c;">10分钟前</span>
+                        </div>
+                        <div class="alert-item" style="display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+                            <span class="status-badge status-warning" style="margin-right: 12px;">警告</span>
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; color: #262626;">空压机A 压力波动异常</div>
+                                <div style="font-size: 12px; color: #8c8c8c; margin-top: 4px;">当前值：0.65MPa | 标准：0.7±0.05MPa</div>
+                            </div>
+                            <span style="font-size: 12px; color: #8c8c8c;">25分钟前</span>
+                        </div>
+                        <div class="alert-item" style="display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+                            <span class="status-badge status-warning" style="margin-right: 12px;">警告</span>
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; color: #262626;">冷却塔 冷却水流量偏低</div>
+                                <div style="font-size: 12px; color: #8c8c8c; margin-top: 4px;">当前值：45m³/h | 标准：50m³/h</div>
+                            </div>
+                            <span style="font-size: 12px; color: #8c8c8c;">1小时前</span>
+                        </div>
+                        <div class="alert-item" style="display: flex; align-items: center; padding: 12px 0;">
+                            <span class="status-badge status-success" style="margin-right: 12px;">已恢复</span>
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; color: #262626;">生产线B 振动异常</div>
+                                <div style="font-size: 12px; color: #8c8c8c; margin-top: 4px;">已自动恢复，持续时间：15分钟</div>
+                            </div>
+                            <span style="font-size: 12px; color: #8c8c8c;">2小时前</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 设备状态分布和OEE趋势 -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <!-- 设备状态分布 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">设备状态分布</h3>
+                </div>
+                <div class="card-body">
+                    <div style="display: flex; align-items: center; justify-content: space-around; padding: 20px;">
+                        <div style="text-align: center;">
+                            <div style="width: 120px; height: 120px; border-radius: 50%; background: conic-gradient(#52c41a 0% 82%, #faad14 82% 94%, #ff4d4f 94% 97%, #d9d9d9 97% 100%); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                                <div style="width: 80px; height: 80px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600;">156</div>
+                            </div>
+                            <div style="font-size: 14px; color: #262626;">设备总数</div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="width: 12px; height: 12px; border-radius: 2px; background: #52c41a;"></span>
+                                <span style="font-size: 13px; color: #595959;">正常运行</span>
+                                <span style="font-size: 13px; font-weight: 500; color: #262626; margin-left: 8px;">128 (82%)</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="width: 12px; height: 12px; border-radius: 2px; background: #faad14;"></span>
+                                <span style="font-size: 13px; color: #595959;">维护中</span>
+                                <span style="font-size: 13px; font-weight: 500; color: #262626; margin-left: 8px;">18 (12%)</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="width: 12px; height: 12px; border-radius: 2px; background: #ff4d4f;"></span>
+                                <span style="font-size: 13px; color: #595959;">告警中</span>
+                                <span style="font-size: 13px; font-weight: 500; color: #262626; margin-left: 8px;">5 (3%)</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="width: 12px; height: 12px; border-radius: 2px; background: #d9d9d9;"></span>
+                                <span style="font-size: 13px; color: #595959;">停用</span>
+                                <span style="font-size: 13px; font-weight: 500; color: #262626; margin-left: 8px;">5 (3%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OEE趋势 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">OEE趋势（近7天）</h3>
+                </div>
+                <div class="card-body">
+                    <div style="display: flex; align-items: flex-end; justify-content: space-between; height: 160px; padding: 20px; border-bottom: 1px solid #f0f0f0;">
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                            <div style="width: 40px; height: 120px; background: linear-gradient(to top, #1890ff 0%, #69c0ff 100%); border-radius: 4px 4px 0 0; position: relative;">
+                                <span style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #262626;">88%</span>
+                            </div>
+                            <span style="font-size: 12px; color: #8c8c8c;">02-07</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                            <div style="width: 40px; height: 130px; background: linear-gradient(to top, #1890ff 0%, #69c0ff 100%); border-radius: 4px 4px 0 0; position: relative;">
+                                <span style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #262626;">90%</span>
+                            </div>
+                            <span style="font-size: 12px; color: #8c8c8c;">02-08</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                            <div style="width: 40px; height: 115px; background: linear-gradient(to top, #1890ff 0%, #69c0ff 100%); border-radius: 4px 4px 0 0; position: relative;">
+                                <span style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #262626;">85%</span>
+                            </div>
+                            <span style="font-size: 12px; color: #8c8c8c;">02-09</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                            <div style="width: 40px; height: 125px; background: linear-gradient(to top, #1890ff 0%, #69c0ff 100%); border-radius: 4px 4px 0 0; position: relative;">
+                                <span style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #262626;">87%</span>
+                            </div>
+                            <span style="font-size: 12px; color: #8c8c8c;">02-10</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                            <div style="width: 40px; height: 135px; background: linear-gradient(to top, #1890ff 0%, #69c0ff 100%); border-radius: 4px 4px 0 0; position: relative;">
+                                <span style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #262626;">91%</span>
+                            </div>
+                            <span style="font-size: 12px; color: #8c8c8c;">02-11</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                            <div style="width: 40px; height: 128px; background: linear-gradient(to top, #1890ff 0%, #69c0ff 100%); border-radius: 4px 4px 0 0; position: relative;">
+                                <span style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #262626;">89%</span>
+                            </div>
+                            <span style="font-size: 12px; color: #8c8c8c;">02-12</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                            <div style="width: 40px; height: 140px; background: linear-gradient(to top, #52c41a 0%, #95de64 100%); border-radius: 4px 4px 0 0; position: relative;">
+                                <span style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #262626;">93%</span>
+                            </div>
+                            <span style="font-size: 12px; color: #8c8c8c;">今天</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 20px; background: #fafafa;">
+                        <div>
+                            <span style="font-size: 12px; color: #8c8c8c;">平均OEE：</span>
+                            <span style="font-size: 14px; font-weight: 500; color: #1890ff;">89.5%</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 12px; color: #8c8c8c;">环比：</span>
+                            <span style="font-size: 14px; font-weight: 500; color: #52c41a;">↑ 2.3%</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 12px; color: #8c8c8c;">目标达成率：</span>
+                            <span style="font-size: 14px; font-weight: 500; color: #52c41a;">99.4%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 维护计划提醒 -->
+        <div class="card">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 class="card-title">近期维护计划</h3>
+                <a href="pages/equipment-maintenance-plan.html" style="font-size: 13px; color: #1890ff;">查看更多 →</a>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table class="list-table-nowrap">
+                        <thead>
+                            <tr>
+                                <th>设备名称</th>
+                                <th>维护类型</th>
+                                <th>计划日期</th>
+                                <th>负责人</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>空压机A</td>
+                                <td>定期保养</td>
+                                <td>2025-02-15</td>
+                                <td>李师傅</td>
+                                <td><span class="status-badge status-warning">待执行</span></td>
+                                <td>
+                                    <a href="pages/equipment-maintenance.html" class="btn btn-sm btn-primary">执行</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>数控机床</td>
+                                <td>预防性维护</td>
+                                <td>2025-02-16</td>
+                                <td>王师傅</td>
+                                <td><span class="status-badge status-warning">待执行</span></td>
+                                <td>
+                                    <a href="pages/equipment-maintenance.html" class="btn btn-sm btn-primary">执行</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>冷却塔</td>
+                                <td>巡检</td>
+                                <td>2025-02-14</td>
+                                <td>张师傅</td>
+                                <td><span class="status-badge status-processing">执行中</span></td>
+                                <td>
+                                    <a href="pages/equipment-inspection.html" class="btn btn-sm btn-default">查看</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>生产线B</td>
+                                <td>定期保养</td>
+                                <td>2025-02-18</td>
+                                <td>刘师傅</td>
+                                <td><span class="status-badge status-draft">已计划</span></td>
+                                <td>
+                                    <a href="pages/equipment-maintenance-plan.html" class="btn btn-sm btn-default">查看</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

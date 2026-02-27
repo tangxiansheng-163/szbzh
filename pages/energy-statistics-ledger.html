@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>统计台账 - 能源管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/energy-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">能源统计分析</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">统计台账</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理能源统计台账，包括能耗台账、能效台账、成本台账等各类统计台账。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>台账类型</label>
+                    <select class="form-select">
+                        <option value="consumption">能耗台账</option>
+                        <option value="efficiency">能效台账</option>
+                        <option value="cost">成本台账</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>统计周期</label>
+                    <select class="form-select">
+                        <option value="day">日</option>
+                        <option value="week">周</option>
+                        <option value="month">月</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>时间范围</label>
+                    <input type="date" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="120">日期</th>
+                            <th width="150">区域/设备</th>
+                            <th width="100">能耗(kWh)</th>
+                            <th width="100">能效指标</th>
+                            <th width="120">成本(元)</th>
+                            <th width="100">状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2025-01-22</td>
+                            <td>生产车间A</td>
+                            <td>41,667</td>
+                            <td>0.85</td>
+                            <td>¥25,000</td>
+                            <td><span class="status-badge status-success">正常</span></td>
+                        </tr>
+                        <tr>
+                            <td>2025-01-21</td>
+                            <td>生产车间A</td>
+                            <td>42,000</td>
+                            <td>0.84</td>
+                            <td>¥25,200</td>
+                            <td><span class="status-badge status-success">正常</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 2 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('统计台账 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

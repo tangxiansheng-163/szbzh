@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设计协同系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .welcome-container {
+            text-align: center;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 32px;
+            font-size: 48px;
+            font-weight: bold;
+            color: #1890ff;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-shadow: 0 2px 16px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            font-size: 20px;
+            opacity: 0.9;
+            margin-bottom: 48px;
+        }
+
+        .btn-enter {
+            display: inline-block;
+            padding: 16px 48px;
+            background: white;
+            color: #1890ff;
+            text-decoration: none;
+            border-radius: 48px;
+            font-size: 18px;
+            font-weight: 600;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+
+        .btn-enter:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            max-width: 1200px;
+            margin: 64px auto 0;
+        }
+
+        .feature {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .feature-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .feature-desc {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <div class="logo">P</div>
+        <h1>设计协同系统</h1>
+        <p class="subtitle">PLM - BOM全生命周期管理平台</p>
+        <a href="main.html" class="btn-enter">进入系统</a>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">📋</div>
+                <div class="feature-title">技术任务管理</div>
+                <div class="feature-desc">任务创建、拆解、分配、跟踪</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">✏️</div>
+                <div class="feature-title">设计任务管理</div>
+                <div class="feature-desc">任务分配、执行、审核闭环</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <div class="feature-title">BOM全流程</div>
+                <div class="feature-desc">EBOM/MBOM/SBOM管理</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔄</div>
+                <div class="feature-title">变更管控</div>
+                <div class="feature-desc">申请、会审、执行全流程</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 自动跳转到主系统
+        setTimeout(function() {
+            window.location.href = 'main.html';
+        }, 2000);
+    </script>
+</body>
+</html>

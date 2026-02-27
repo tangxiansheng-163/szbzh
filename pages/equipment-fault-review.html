@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上报审核 - 设备管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/equipment-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">故障上报</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">上报审核</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">审核故障上报单，包括故障信息审核、处理方案审核、资源分配审核等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="上报单号、设备名称">
+                </div>
+                <div class="filter-item">
+                    <label>审核状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待审核</option>
+                        <option value="reviewing">审核中</option>
+                        <option value="approved">已通过</option>
+                        <option value="rejected">已驳回</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">批量审核</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">上报单号</th>
+                            <th width="150">设备名称</th>
+                            <th width="100">故障等级</th>
+                            <th width="200">故障描述</th>
+                            <th width="120">上报人</th>
+                            <th width="100">审核状态</th>
+                            <th width="120">上报时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="review-id" value="1"></td>
+                            <td>FAULT-2025-001</td>
+                            <td>生产设备A-001</td>
+                            <td><span class="status-badge status-error">高</span></td>
+                            <td>设备异常停机，无法启动</td>
+                            <td>操作员A</td>
+                            <td><span class="status-badge status-warning">待审核</span></td>
+                            <td>2025-01-22 10:30</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">审核</button>
+                                <button class="btn btn-sm btn-default">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 1 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('上报审核 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

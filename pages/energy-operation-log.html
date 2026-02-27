@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>操作审计日志 - 能源管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/energy-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">系统配置</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">操作审计日志</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">查看能源系统的操作审计日志，包括用户操作记录、系统操作记录、异常日志等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="操作人、操作内容">
+                </div>
+                <div class="filter-item">
+                    <label>操作类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="create">新增</option>
+                        <option value="update">修改</option>
+                        <option value="delete">删除</option>
+                        <option value="approve">审批</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>操作时间</label>
+                    <input type="date" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">导出</button>
+                <button class="btn btn-default">清空日志</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">操作时间</th>
+                            <th width="120">操作人</th>
+                            <th width="100">操作类型</th>
+                            <th width="150">操作模块</th>
+                            <th width="200">操作内容</th>
+                            <th width="120">IP地址</th>
+                            <th width="100">操作结果</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="log-id" value="1"></td>
+                            <td>2025-01-22 10:30</td>
+                            <td>能源管理员A</td>
+                            <td>新增</td>
+                            <td>能源计划</td>
+                            <td>创建能源计划 PLAN-2025-02</td>
+                            <td>192.168.1.100</td>
+                            <td><span class="status-badge status-success">成功</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 1 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('操作审计日志 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

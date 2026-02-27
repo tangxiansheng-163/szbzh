@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新建订单 - 供应链协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/supply-chain-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">订单协同</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/supply-chain-order-list.html" class="breadcrumb-item">订单管理</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">新建订单</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">在本应用内人工创建订单。订单来源固定为「人工创建」，无来源单号；<strong>需求方</strong>从客户档案中已通过准入的客户中选择，填写物料明细、交货与付款条件后提交。采购下推订单由采购协同中采购订单审批通过后自动推送，不在此页面创建。</p>
+        </div>
+
+        <form id="order-create-form" name="order-create-form">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">订单基本信息</h3>
+                </div>
+                <div class="card-body">
+                    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 24px;">
+                        <div class="form-item">
+                            <label class="form-label">订单编号</label>
+                            <input type="text" class="form-input" placeholder="保存后系统自动生成" readonly id="order-code" name="order-code" value="">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">订单来源</label>
+                            <input type="text" class="form-input" value="人工创建" readonly style="background:#f5f5f5;">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">来源单号</label>
+                            <input type="text" class="form-input" value="-" readonly style="background:#f5f5f5;">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">需求方</label>
+                            <div style="display:flex;gap:8px;">
+                                <input type="text" class="form-input" placeholder="从客户档案选择（已通过准入的客户）" readonly id="demand-party-name" name="demand-party-name">
+                                <button type="button" class="btn btn-default" onclick="openDemandPartySelector()">选择</button>
+                            </div>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">需求方联系人</label>
+                            <input type="text" class="form-input" placeholder="选择需求方后自动填充" id="demand-party-contact" name="demand-party-contact">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">联系电话</label>
+                            <input type="tel" class="form-input" placeholder="选择需求方后自动填充" id="demand-party-phone" name="demand-party-phone">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">创建人</label>
+                            <input type="text" class="form-input" placeholder="当前登录人" id="creator" name="creator" value="张协同">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">下单日期</label>
+                            <input type="date" class="form-input" required id="order-date" name="order-date">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">要求交期</label>
+                            <input type="date" class="form-input" required id="delivery-date" name="delivery-date">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">付款条件</label>
+                            <select class="form-select" id="payment-terms" name="payment-terms">
+                                <option value="prepay">预付款</option>
+                                <option value="net30" selected>货到30天</option>
+                                <option value="net60">货到60天</option>
+                                <option value="net90">货到90天</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">质保期</label>
+                            <input type="text" class="form-input" placeholder="如：12个月" id="warranty" name="warranty">
+                        </div>
+                        <div class="form-item" style="grid-column:1 / span 2;">
+                            <label class="form-label">交货地点</label>
+                            <input type="text" class="form-input" placeholder="详细地址" id="delivery-address" name="delivery-address">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">物料明细</h3>
+                    <button type="button" class="btn btn-sm btn-primary" id="btn-add-order-item" onclick="addOrderItem()">+ 添加物料</button>
+                </div>
+                <div class="card-body">
+                    <div class="table-wrapper">
+                        <table class="output-table">
+                            <thead>
+                                <tr>
+                                    <th width="50">序号</th>
+                                    <th width="150">物料编码</th>
+                                    <th width="200">物料名称</th>
+                                    <th width="150">规格型号</th>
+                                    <th width="100">数量</th>
+                                    <th width="80">单位</th>
+                                    <th width="100">单价</th>
+                                    <th width="100">金额</th>
+                                    <th width="110">要求到货日期</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="order-items-tbody">
+                                <tr class="order-item-row">
+                                    <td class="item-seq">1</td>
+                                    <td>
+                                        <div style="display:flex;gap:4px;">
+                                            <input type="text" class="form-input form-input-sm" placeholder="物料编码" style="flex:1;" id="item-code-1" name="item-code-1">
+                                            <button type="button" class="btn btn-sm btn-link" onclick="selectMaterial(1)">选择</button>
+                                        </div>
+                                    </td>
+                                    <td><input type="text" class="form-input form-input-sm" placeholder="自动填充" readonly id="item-name-1" name="item-name-1"></td>
+                                    <td><input type="text" class="form-input form-input-sm" placeholder="自动填充" readonly id="item-spec-1" name="item-spec-1"></td>
+                                    <td><input type="number" class="form-input form-input-sm" placeholder="数量" min="0.0001" step="0.0001" id="item-qty-1" name="item-qty-1" onchange="calculateAmount(1)"></td>
+                                    <td><input type="text" class="form-input form-input-sm" placeholder="单位" readonly id="item-unit-1" name="item-unit-1"></td>
+                                    <td><input type="number" class="form-input form-input-sm" placeholder="单价" min="0" step="0.01" id="item-price-1" name="item-price-1" onchange="calculateAmount(1)"></td>
+                                    <td><input type="number" class="form-input form-input-sm" placeholder="金额" readonly id="item-amount-1" name="item-amount-1"></td>
+                                    <td><input type="date" class="form-input form-input-sm" id="item-delivery-1" name="item-delivery-1"></td>
+                                    <td><button type="button" class="btn btn-sm btn-link btn-remove-item" onclick="removeOrderItem(this)">删除</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="display:flex;justify-content:flex-end;margin-top:12px;padding:12px;background:#f5f5f5;border-radius:4px;">
+                        <div style="font-size:14px;font-weight:600;">订单总金额：<span id="order-total-amount" style="color:#1890ff;font-size:16px;">¥0.00</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">备注</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-item">
+                        <label class="form-label">备注</label>
+                        <textarea class="form-textarea" rows="3" placeholder="其他补充说明" id="order-remark" name="order-remark"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-bar" style="margin-top:16px;">
+                <div class="action-left">
+                    <button type="button" class="btn btn-default" onclick="handleCancel()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        (function() {
+            var itemIndex = 1;
+            var today = new Date().toISOString().slice(0, 10);
+            var orderDate = document.getElementById('order-date');
+            if (orderDate) orderDate.value = today;
+
+            window.openDemandPartySelector = function() {
+                alert('打开需求方选择器（数据来源：客户档案中已通过准入的客户），选择后自动填充联系人、电话（原型模拟）');
+                document.getElementById('demand-party-name').value = '深圳市电子科技有限公司';
+                document.getElementById('demand-party-contact').value = '李工';
+                document.getElementById('demand-party-phone').value = '13800000001';
+            };
+
+            window.addOrderItem = function() {
+                itemIndex++;
+                var tbody = document.getElementById('order-items-tbody');
+                var newRow = document.createElement('tr');
+                newRow.className = 'order-item-row';
+                newRow.innerHTML =
+                    '<td class="item-seq">' + itemIndex + '</td>' +
+                    '<td><div style="display:flex;gap:4px;">' +
+                    '<input type="text" class="form-input form-input-sm" placeholder="物料编码" style="flex:1;" id="item-code-' + itemIndex + '" name="item-code-' + itemIndex + '">' +
+                    '<button type="button" class="btn btn-sm btn-link" onclick="selectMaterial(' + itemIndex + ')">选择</button></div></td>' +
+                    '<td><input type="text" class="form-input form-input-sm" placeholder="自动填充" readonly id="item-name-' + itemIndex + '" name="item-name-' + itemIndex + '"></td>' +
+                    '<td><input type="text" class="form-input form-input-sm" placeholder="自动填充" readonly id="item-spec-' + itemIndex + '" name="item-spec-' + itemIndex + '"></td>' +
+                    '<td><input type="number" class="form-input form-input-sm" placeholder="数量" min="0.0001" step="0.0001" id="item-qty-' + itemIndex + '" name="item-qty-' + itemIndex + '" onchange="calculateAmount(' + itemIndex + ')"></td>' +
+                    '<td><input type="text" class="form-input form-input-sm" placeholder="单位" readonly id="item-unit-' + itemIndex + '" name="item-unit-' + itemIndex + '"></td>' +
+                    '<td><input type="number" class="form-input form-input-sm" placeholder="单价" min="0" step="0.01" id="item-price-' + itemIndex + '" name="item-price-' + itemIndex + '" onchange="calculateAmount(' + itemIndex + ')"></td>' +
+                    '<td><input type="number" class="form-input form-input-sm" placeholder="金额" readonly id="item-amount-' + itemIndex + '" name="item-amount-' + itemIndex + '"></td>' +
+                    '<td><input type="date" class="form-input form-input-sm" id="item-delivery-' + itemIndex + '" name="item-delivery-' + itemIndex + '"></td>' +
+                    '<td><button type="button" class="btn btn-sm btn-link btn-remove-item" onclick="removeOrderItem(this)">删除</button></td>';
+                tbody.appendChild(newRow);
+                refreshSeq();
+            };
+
+            window.removeOrderItem = function(btn) {
+                var tbody = document.getElementById('order-items-tbody');
+                if (tbody.querySelectorAll('.order-item-row').length <= 1) {
+                    alert('至少保留一行物料明细');
+                    return;
+                }
+                btn.closest('tr').remove();
+                refreshSeq();
+                calculateTotal();
+            };
+
+            window.refreshSeq = function() {
+                var rows = document.querySelectorAll('.order-item-row');
+                rows.forEach(function(row, index) {
+                    row.querySelector('.item-seq').textContent = index + 1;
+                });
+            };
+
+            window.selectMaterial = function(index) {
+                alert('打开物料选择器，选择后自动填充物料名称、规格、单位');
+                var nameEl = document.getElementById('item-name-' + index);
+                var specEl = document.getElementById('item-spec-' + index);
+                var unitEl = document.getElementById('item-unit-' + index);
+                if (nameEl) nameEl.value = '示例物料';
+                if (specEl) specEl.value = '规格型号';
+                if (unitEl) unitEl.value = '件';
+            };
+
+            window.calculateAmount = function(index) {
+                var qty = parseFloat(document.getElementById('item-qty-' + index).value) || 0;
+                var price = parseFloat(document.getElementById('item-price-' + index).value) || 0;
+                var amountEl = document.getElementById('item-amount-' + index);
+                if (amountEl) amountEl.value = (qty * price).toFixed(2);
+                calculateTotal();
+            };
+
+            window.calculateTotal = function() {
+                var total = 0;
+                document.querySelectorAll('[id^="item-amount-"]').forEach(function(input) {
+                    total += parseFloat(input.value) || 0;
+                });
+                var el = document.getElementById('order-total-amount');
+                if (el) el.textContent = '¥' + total.toLocaleString('zh-CN', { minimumFractionDigits: 2 });
+            };
+
+            window.handleCancel = function() {
+                if (typeof PageLoader !== 'undefined' && PageLoader.loadPage) {
+                    PageLoader.loadPage('pages/supply-chain-order-list.html');
+                } else {
+                    location.href = 'pages/supply-chain-order-list.html';
+                }
+            };
+
+            document.getElementById('order-create-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                var demandParty = document.getElementById('demand-party-name').value;
+                var deliveryDate = document.getElementById('delivery-date').value;
+                if (!demandParty) {
+                    alert('请从客户档案中选择需求方（已通过准入的客户）');
+                    return;
+                }
+                if (!deliveryDate) {
+                    alert('请填写要求交期');
+                    return;
+                }
+                var hasItems = false;
+                document.querySelectorAll('[id^="item-code-"]').forEach(function(input) {
+                    if (input.value) hasItems = true;
+                });
+                if (!hasItems) {
+                    alert('请至少添加一行物料明细');
+                    return;
+                }
+                alert('订单已保存（原型模拟）。新建订单来源为「人工创建」。');
+                if (typeof PageLoader !== 'undefined' && PageLoader.loadPage) {
+                    PageLoader.loadPage('pages/supply-chain-order-list.html');
+                } else {
+                    location.href = 'pages/supply-chain-order-list.html';
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

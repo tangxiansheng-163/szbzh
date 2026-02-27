@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>到货单检验 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">采购执行</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/procurement-receipt-list.html" class="breadcrumb-item">到货单</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">检验登记</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">对到货单进行质量检验，包括外观检验、功能检验、数量核对等。可从到货单列表或详情点击「登记检验」进入本页。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>到货单号</label>
+                    <input type="text" class="form-input" id="filter-arrival-no" placeholder="到货单号">
+                </div>
+                <div class="filter-item">
+                    <label>检验状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待检验</option>
+                        <option value="inspecting">检验中</option>
+                        <option value="passed">合格</option>
+                        <option value="failed">不合格</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default" onclick="if(typeof PageLoader!=='undefined')PageLoader.loadPage('pages/procurement-receipt-list.html');else location.href='pages/procurement-receipt-list.html';">返回到货单</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="130">到货单号</th>
+                            <th width="120">关联采购订单</th>
+                            <th width="160">供应商</th>
+                            <th width="200">物料信息</th>
+                            <th width="100">检验状态</th>
+                            <th width="120">检验时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="inspection-id" value="1"></td>
+                            <td>DN-2025-001</td>
+                            <td>PO-2025-001</td>
+                            <td>深圳市电子科技有限公司</td>
+                            <td>电子元器件A 1000个；PCB板 500片</td>
+                            <td><span class="status-badge status-processing">检验中</span></td>
+                            <td>2025-01-20</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-receipt-detail.html" data-id="1">查看到货单</button>
+                                <button type="button" class="btn btn-sm btn-primary">填写检验</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="inspection-id" value="2"></td>
+                            <td>DN-2025-003</td>
+                            <td>PO-2025-003</td>
+                            <td>北京贸易有限公司</td>
+                            <td>电阻B 200个</td>
+                            <td><span class="status-badge status-draft">待检验</span></td>
+                            <td>-</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-receipt-detail.html" data-id="3">查看到货单</button>
+                                <button type="button" class="btn btn-sm btn-primary">填写检验</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 2 条记录</span>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+        <script>
+        console.log('到货单检验 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+            PageInteractions.toggleSelectAll('input[name="inspection-id"]');
+        }
+        // 从 URL 参数 ?arrival=DN-2025-001 回填到货单号筛选
+        (function() {
+            var m = /[?&]arrival=([^&]+)/.exec(window.location.search);
+            if (m && document.getElementById('filter-arrival-no')) document.getElementById('filter-arrival-no').value = decodeURIComponent(m[1]);
+        })();
+        </script>
+    </div>
+</body>
+</html>

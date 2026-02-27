@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生命周期管理 - 设备管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/equipment-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">设备台账管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">生命周期管理</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理设备的全生命周期，包括采购、安装、运行、维护、报废等各阶段的管理。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="设备编码、设备名称">
+                </div>
+                <div class="filter-item">
+                    <label>生命周期阶段</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="procurement">采购</option>
+                        <option value="installation">安装</option>
+                        <option value="running">运行</option>
+                        <option value="maintenance">维护</option>
+                        <option value="retirement">报废</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">设备编码</th>
+                            <th width="200">设备名称</th>
+                            <th width="100">当前阶段</th>
+                            <th width="120">采购日期</th>
+                            <th width="120">安装日期</th>
+                            <th width="120">预计报废日期</th>
+                            <th width="100">使用年限</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="equipment-id" value="1"></td>
+                            <td>EQ-001</td>
+                            <td>生产设备A-001</td>
+                            <td><span class="status-badge status-success">运行</span></td>
+                            <td>2024-01-15</td>
+                            <td>2024-02-01</td>
+                            <td>2034-01-15</td>
+                            <td>1年</td>
+                            <td>
+                                <button class="btn btn-sm btn-default">查看</button>
+                                <button class="btn btn-sm btn-primary">阶段变更</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 1 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('生命周期管理 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

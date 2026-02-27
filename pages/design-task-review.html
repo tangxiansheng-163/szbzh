@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>待我审核</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">待我审核</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">待审核、审核中的设计任务，可通过/驳回并填写审核意见</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="任务编号、任务名称、技术任务编号">
+                </div>
+                <div class="filter-item">
+                    <label>状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="submitted">待审核</option>
+                        <option value="reviewing">审核中</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>设计类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="electrical">电气设计</option>
+                        <option value="structural">结构设计</option>
+                        <option value="software">软件设计</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="120">任务编号</th>
+                            <th width="180">任务名称</th>
+                            <th width="110">技术任务</th>
+                            <th width="90">设计类型</th>
+                            <th width="90">设计人员</th>
+                            <th width="90">状态</th>
+                            <th width="100">提交时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>DT-2025-002</td>
+                            <td>传感器模块结构设计</td>
+                            <td>TT-2025-001</td>
+                            <td>结构设计</td>
+                            <td>李设计师</td>
+                            <td><span class="status-badge status-warning">待审核</span></td>
+                            <td>2025-03-12 16:00</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/design-task-detail.html" data-id="2">查看</button>
+                                <a href="pages/design-task-detail.html?id=2#review" class="btn btn-sm btn-primary">审核</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>DT-2025-005</td>
+                            <td>电源模块电气设计</td>
+                            <td>TT-2025-002</td>
+                            <td>电气设计</td>
+                            <td>孙设计师</td>
+                            <td><span class="status-badge status-reviewing">审核中</span></td>
+                            <td>2025-03-14 10:30</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/design-task-detail.html" data-id="5">查看</button>
+                                <a href="pages/design-task-detail.html?id=5#review" class="btn btn-sm btn-primary">审核</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 2 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('待我审核 页面已加载');
+        if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+    </script>
+</body>
+</html>

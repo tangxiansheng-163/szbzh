@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>付款管理 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">财务结算</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">付款管理</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理采购付款流程，包括付款申请、审批、付款执行、付款跟踪等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="付款单号、供应商、发票号">
+                </div>
+                <div class="filter-item">
+                    <label>付款状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待审批</option>
+                        <option value="approved">已批准</option>
+                        <option value="paid">已付款</option>
+                        <option value="cancelled">已取消</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>付款日期</label>
+                    <input type="date" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary">+ 新建付款单</button>
+                <button class="btn btn-default">批量付款</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">付款单号</th>
+                            <th width="150">供应商</th>
+                            <th width="120">发票号码</th>
+                            <th width="120">付款金额</th>
+                            <th width="100">付款方式</th>
+                            <th width="100">付款状态</th>
+                            <th width="120">申请日期</th>
+                            <th width="120">付款日期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="payment-id" value="1"></td>
+                            <td>PAY-2025-001</td>
+                            <td>深圳市电子科技</td>
+                            <td>INV-2025-008</td>
+                            <td>¥125,000.00</td>
+                            <td>银行转账</td>
+                            <td><span class="status-badge status-warning">待审批</span></td>
+                            <td>2025-01-21</td>
+                            <td>-</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-payment-detail.html" data-id="1">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-approve-payment" data-id="1">审批</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="payment-id" value="2"></td>
+                            <td>PAY-2025-002</td>
+                            <td>上海精密机械</td>
+                            <td>INV-2025-009</td>
+                            <td>¥89,500.00</td>
+                            <td>银行转账</td>
+                            <td><span class="status-badge status-success">已付款</span></td>
+                            <td>2025-01-19</td>
+                            <td>2025-01-20</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-payment-detail.html" data-id="2">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 2 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+        <script>
+        console.log('付款管理 页面已加载');
+        if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+
+        function money(n) {
+            var num = parseFloat(n || 0) || 0;
+            return '¥' + num.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        function ensureAssetLoaded(cb) {
+            if (window.FinanceCollabStore) { cb(); return; }
+            var s = document.createElement('script');
+            s.src = 'assets/finance-collab-store.js';
+            s.onload = cb;
+            s.onerror = function () { console.warn('加载 finance-collab-store.js 失败'); };
+            document.head.appendChild(s);
+        }
+        function renderList() {
+            if (!window.FinanceCollabStore) return;
+            var store = window.FinanceCollabStore.getStore();
+            var tbody = document.querySelector('.card tbody');
+            if (!tbody) return;
+
+            var list = [];
+            (store.settlements || []).forEach(function (s) {
+                (s.payments || []).forEach(function (p) {
+                    list.push({ pay: p, settlement: s });
+                });
+            });
+
+            if (!list.length) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#8c8c8c;padding:12px;">暂无付款记录</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            list.forEach(function (row) {
+                var p = row.pay;
+                var s = row.settlement;
+                var st = p.status || '-';
+                var stText = st === 'submitted' ? '待审批' : (st === 'approved' ? '已批准' : (st === 'paid' ? '已付款' : st));
+                var op = '';
+                if (p.status === 'submitted') {
+                    op = '<button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-payment-detail.html" data-id="' + p.id + '">查看</button> ' +
+                         '<button type="button" class="btn btn-sm btn-primary btn-approve-payment" data-id="' + p.id + '" data-settlement="' + s.id + '">审批</button>';
+                } else if (p.status === 'approved') {
+                    op = '<button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-payment-detail.html" data-id="' + p.id + '">查看</button> ' +
+                         '<button type="button" class="btn btn-sm btn-primary btn-do-payment" data-id="' + p.id + '" data-settlement="' + s.id + '">执行付款</button>';
+                } else {
+                    op = '<button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-payment-detail.html" data-id="' + p.id + '">查看</button>';
+                }
+
+                var tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td><input type="checkbox" name="payment-id" value="' + p.id + '"></td>' +
+                    '<td>' + p.id + '</td>' +
+                    '<td>' + ((s.partyB && s.partyB.org) ? s.partyB.org : '-') + '</td>' +
+                    '<td>' + (p.invoiceId || '-') + '</td>' +
+                    '<td>' + money(p.amount || 0) + '</td>' +
+                    '<td>' + (p.method || '银行转账') + '</td>' +
+                    '<td><span class="status-badge status-warning">' + stText + '</span></td>' +
+                    '<td>' + (p.applyDate || '-') + '</td>' +
+                    '<td>' + (p.payDate || '-') + '</td>' +
+                    '<td>' + op + '</td>';
+                tbody.appendChild(tr);
+            });
+
+            if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons(document.querySelector('.card'));
+
+            tbody.querySelectorAll('.btn-approve-payment').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var id = this.getAttribute('data-id');
+                    var sid = this.getAttribute('data-settlement');
+                    if (!id || !sid) return;
+                    if (!confirm('审批通过付款单 ' + id + '？')) return;
+                    window.FinanceCollabStore.actionA_approvePayment(sid, id);
+                    renderList();
+                });
+            });
+            tbody.querySelectorAll('.btn-do-payment').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var id = this.getAttribute('data-id');
+                    var sid = this.getAttribute('data-settlement');
+                    if (!id || !sid) return;
+                    if (!confirm('执行付款 ' + id + '？')) return;
+                    window.FinanceCollabStore.actionA_pay(sid, id);
+                    renderList();
+                });
+            });
+        }
+
+        ensureAssetLoaded(renderList);
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>组织架构</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">基础信息</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">组织架构</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">维护部门组织架构树，支持组织层级、上下级关系、负责人及组织属性配置；组织启用/停用状态控制。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>组织编码/名称</label>
+                    <input type="text" class="form-input" placeholder="组织编码、组织名称">
+                </div>
+                <div class="filter-item">
+                    <label>状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="enabled">启用</option>
+                        <option value="disabled">停用</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary" data-open-modal="org-add-modal">+ 新增</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th>组织编码</th>
+                            <th>组织名称</th>
+                            <th>上级组织</th>
+                            <th>负责人</th>
+                            <th>员工数</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ORG-001</td>
+                            <td>研发部</td>
+                            <td>—</td>
+                            <td>张经理</td>
+                            <td>12</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="org-edit-modal">编辑</button></td>
+                        </tr>
+                        <tr>
+                            <td>ORG-002</td>
+                            <td>工艺部</td>
+                            <td>—</td>
+                            <td>李经理</td>
+                            <td>8</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="org-edit-modal">编辑</button></td>
+                        </tr>
+                        <tr>
+                            <td>ORG-003</td>
+                            <td>生产部</td>
+                            <td>—</td>
+                            <td>王经理</td>
+                            <td>25</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="org-edit-modal">编辑</button></td>
+                        </tr>
+                        <tr>
+                            <td>ORG-004</td>
+                            <td>采购部</td>
+                            <td>—</td>
+                            <td>赵经理</td>
+                            <td>5</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="org-edit-modal">编辑</button></td>
+                        </tr>
+                        <tr>
+                            <td>ORG-005</td>
+                            <td>质量部</td>
+                            <td>—</td>
+                            <td>刘经理</td>
+                            <td>6</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="org-edit-modal">编辑</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 5 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+        <div id="org-add-modal" class="modal-overlay">
+            <div class="modal" style="max-width:520px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">新增组织</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <div class="form-item"><label class="form-label required">组织编码</label><input type="text" class="form-input" placeholder="如 ORG-006"></div>
+                    <div class="form-item"><label class="form-label required">组织名称</label><input type="text" class="form-input" placeholder="请输入"></div>
+                    <div class="form-item"><label class="form-label">上级组织</label><select class="form-select"><option value="">无（顶级）</option><option value="ORG-001">研发部</option><option value="ORG-002">工艺部</option></select></div>
+                    <div class="form-item"><label class="form-label">负责人</label><select class="form-select"><option value="">请选择</option><option value="张经理">张经理</option><option value="李经理">李经理</option></select></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="org-add-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="org-add-modal" onclick="alert('✅ 组织已保存')">保存</button></div>
+            </div>
+        </div>
+        <div id="org-edit-modal" class="modal-overlay">
+            <div class="modal" style="max-width:520px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">编辑组织</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <div class="form-item"><label class="form-label required">组织编码</label><input type="text" class="form-input" value="ORG-001" readonly></div>
+                    <div class="form-item"><label class="form-label required">组织名称</label><input type="text" class="form-input" value="研发部"></div>
+                    <div class="form-item"><label class="form-label">负责人</label><select class="form-select"><option value="张经理" selected>张经理</option><option value="李经理">李经理</option></select></div>
+                    <div class="form-item"><label class="form-label">状态</label><select class="form-select"><option value="enabled" selected>启用</option><option value="disabled">停用</option></select></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="org-edit-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="org-edit-modal" onclick="alert('✅ 已保存')">保存</button></div>
+            </div>
+        </div>
+        <script>
+            if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+            document.querySelectorAll('.action-left .btn-default').forEach(function(btn) {
+                if (btn.textContent.indexOf('导出') !== -1) btn.addEventListener('click', function() {
+                    if (confirm('确定导出组织架构？')) alert('导出成功，文件已下载。');
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>

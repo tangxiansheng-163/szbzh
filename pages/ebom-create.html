@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创建EBOM</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">BOM管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/ebom-list.html" class="breadcrumb-item">EBOM列表</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">创建EBOM</span>
+        </div>
+        <div class="page-header">
+            <p class="page-description">EBOM、MBOM、SBOM 本质均为 BOM；新建或下推后在对应阶段生成版本，在 BOM 树上做阶段专属编辑。本页用于<strong>人工创建</strong>或<strong>引用样品任务</strong>创建 EBOM。选择来源后<strong>生成对应阶段版本（如 V1.0）</strong>，进入 <strong>BOM 树编辑工作台</strong>，在树上维护设计结构（物料、层级、数量等）及技术要求，保存草稿或提交评审。</p>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form id="ebom-form">
+                    <div class="section-title">选择来源</div>
+                    <p class="form-tip" style="margin: 0 0 12px; color: #666; font-size: 13px;">确认后将<strong>生成 EBOM 版本（如 V1.0）</strong>，进入 BOM 树编辑工作台维护设计结构与技术要求。</p>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label required">EBOM来源</label>
+                                <select class="form-select" name="ebomSource" id="ebomSource" required>
+                                    <option value="manual">人工创建</option>
+                                    <option value="sample">引用样品任务</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="sampleTaskSection" style="display: none;">
+                        <div class="form-item">
+                            <label class="form-label required">选择样品任务</label>
+                            <select class="form-select" name="sampleTaskId" id="sampleTaskId">
+                                <option value="">请选择样品任务</option>
+                                <option value="DT-2025-002">DT-2025-002 传感器模块设计(样品)</option>
+                                <option value="DT-2025-003">DT-2025-003 执行器软件设计(样品)</option>
+                            </select>
+                            <small style="color: #999; font-size: 12px;">引用已完成的样品设计任务，转化为正式 EBOM</small>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label required">产品编码</label>
+                                <input type="text" class="form-input" name="productCode" id="ebomProductCode" placeholder="从样品带出或手动输入" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label required">产品名称</label>
+                                <input type="text" class="form-input" name="productName" id="ebomProductName" placeholder="从样品带出或手动输入" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-primary" id="ebom-goto-workbench">进入 BOM 树编辑</button>
+                        <button type="button" class="btn btn-default btn-cancel" data-url="pages/ebom-list.html">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <style>
+            .section-title { font-size: 14px; font-weight: 600; color: rgba(0,0,0,0.85); padding: 8px 0; border-bottom: 1px solid #e8e8e8; margin-bottom: 16px; }
+        </style>
+        <script>
+            (function () {
+                var src = document.getElementById('ebomSource');
+                var sampleSec = document.getElementById('sampleTaskSection');
+                var sampleSel = document.getElementById('sampleTaskId');
+                var productCode = document.getElementById('ebomProductCode');
+                var productName = document.getElementById('ebomProductName');
+
+                function toggle() {
+                    var v = src && src.value;
+                    if (sampleSec) sampleSec.style.display = (v === 'sample') ? 'block' : 'none';
+                    if (sampleSel) sampleSel.required = (v === 'sample');
+                }
+                if (src) src.addEventListener('change', toggle);
+                toggle();
+
+                var sampleProductMap = {
+                    'DT-2025-002': { code: 'P002', name: '传感器模块' },
+                    'DT-2025-003': { code: 'P003', name: '执行器' }
+                };
+                function maybePrefill() {
+                    if (src.value !== 'sample' || !sampleSel || !sampleSel.value) return;
+                    var m = sampleProductMap[sampleSel.value];
+                    if (m && productCode && productName) { productCode.value = m.code; productName.value = m.name; }
+                }
+                if (sampleSel) sampleSel.addEventListener('change', maybePrefill);
+
+                var gotoBtn = document.getElementById('ebom-goto-workbench');
+                if (gotoBtn) gotoBtn.addEventListener('click', function () {
+                    if (src.value === 'sample' && (!sampleSel || !sampleSel.value)) { alert('请选择样品任务'); return; }
+                    if (!productCode || !productCode.value.trim()) { alert('请输入产品编码'); return; }
+                    if (!productName || !productName.value.trim()) { alert('请输入产品名称'); return; }
+                    var q = 'from=' + encodeURIComponent(src.value) + '&product=' + encodeURIComponent(productName.value.trim());
+                    if (src.value === 'sample' && sampleSel && sampleSel.value) q += '&sampleId=' + encodeURIComponent(sampleSel.value);
+                    var url = 'pages/ebom-workbench.html?' + q;
+                    if (typeof PageLoader !== 'undefined') PageLoader.loadPage(url); else window.location.href = url;
+                });
+            })();
+        </script>
+    </div>
+</body>
+</html>

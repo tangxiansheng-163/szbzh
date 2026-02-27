@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>告警列表 - 能源管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/energy-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">告警协同管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">告警列表</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理能源告警信息，包括能耗异常、设备故障、计划偏差等告警；支持告警确认、处理、统计等全流程管理。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="告警编号、设备编码、ECC层级">
+                </div>
+                <div class="filter-item">
+                    <label>告警类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="consumption">能耗异常</option>
+                        <option value="equipment">设备故障</option>
+                        <option value="plan">计划偏差</option>
+                        <option value="threshold">阈值超限</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>告警级别</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="urgent">紧急</option>
+                        <option value="important">重要</option>
+                        <option value="normal">一般</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>处理状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="unconfirmed">未确认</option>
+                        <option value="confirmed">已确认</option>
+                        <option value="processing">处置中</option>
+                        <option value="completed">处置完成</option>
+                        <option value="archived">已归档</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button type="button" class="btn btn-default btn-batch-handle-energy-alert">批量处理</button>
+                <button type="button" class="btn btn-default btn-export-energy-alert">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">告警编号</th>
+                            <th width="100">告警类型</th>
+                            <th width="90">告警级别</th>
+                            <th width="120">告警对象</th>
+                            <th width="150">ECC层级</th>
+                            <th width="200">告警内容</th>
+                            <th width="120">触发时间</th>
+                            <th width="100">处理人</th>
+                            <th width="90">处理状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="alert-id" value="1"></td>
+                            <td>AL-2025-001</td>
+                            <td>能耗异常</td>
+                            <td><span class="status-badge status-error">紧急</span></td>
+                            <td>EQ-001</td>
+                            <td>车间A-产线3</td>
+                            <td>设备EQ-001能耗超出阈值20%</td>
+                            <td>2025-01-29 10:30</td>
+                            <td>张能源</td>
+                            <td><span class="status-badge status-warning">未确认</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/energy-alert-detail.html" data-id="1">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-confirm-energy-alert" data-id="1">确认</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="alert-id" value="2"></td>
+                            <td>AL-2025-002</td>
+                            <td>计划偏差</td>
+                            <td><span class="status-badge status-warning">重要</span></td>
+                            <td>EP-2025-002</td>
+                            <td>车间A</td>
+                            <td>1月用电计划执行偏差超出10%</td>
+                            <td>2025-01-28 14:20</td>
+                            <td>李能源</td>
+                            <td><span class="status-badge status-processing">处置中</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/energy-alert-detail.html" data-id="2">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-handle-energy-alert" data-id="2">处理</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="alert-id" value="3"></td>
+                            <td>AL-2025-003</td>
+                            <td>设备故障</td>
+                            <td><span class="status-badge status-warning">重要</span></td>
+                            <td>EQ-003</td>
+                            <td>车间B-产线1</td>
+                            <td>设备EQ-003运行异常，需检查</td>
+                            <td>2025-01-27 09:15</td>
+                            <td>王能源</td>
+                            <td><span class="status-badge status-success">处置完成</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/energy-alert-detail.html" data-id="3">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 3 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            console.log('告警列表 页面已加载');
+            if (typeof PageInteractions !== 'undefined') {
+                PageInteractions.initButtons();
+                PageInteractions.toggleSelectAll('input[name="alert-id"]');
+            }
+            document.querySelectorAll('.btn-confirm-energy-alert').forEach(function(btn) {
+                btn.addEventListener('click', function() { if (confirm('确定确认该告警？')) alert('已确认。'); });
+            });
+            document.querySelectorAll('.btn-handle-energy-alert').forEach(function(btn) {
+                btn.addEventListener('click', function() { if (confirm('确定处理该告警？')) alert('已进入处理流程。'); });
+            });
+            document.querySelectorAll('.action-left .btn-default').forEach(function(btn) {
+                var t = btn.textContent;
+                if (t.indexOf('批量处理') !== -1) btn.addEventListener('click', function() {
+                    var sel = document.querySelectorAll('input[name="alert-id"]:checked');
+                    if (sel.length === 0) { alert('请先勾选要处理的告警。'); return; }
+                    if (confirm('确定批量处理选中的 ' + sel.length + ' 条告警？')) alert('批量处理已提交。');
+                });
+                else if (t.indexOf('导出') !== -1) btn.addEventListener('click', function() { if (confirm('确定导出当前列表？')) alert('导出成功，文件已下载。'); });
+            });
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>计划跟踪 - 能源管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/energy-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">能源计划与单耗管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">计划跟踪</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">跟踪能源计划执行情况，包括计划完成率、实际能耗与计划对比、偏差分析等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>计划编号</label>
+                    <input type="text" class="form-input" placeholder="计划编号">
+                </div>
+                <div class="filter-item">
+                    <label>计划周期</label>
+                    <input type="month" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">计划执行情况</h3>
+            </div>
+            <div class="card-body">
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-label">计划能耗</div>
+                        <div class="stat-value">1,250,000 kWh</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">实际能耗</div>
+                        <div class="stat-value">1,180,000 kWh</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">完成率</div>
+                        <div class="stat-value" style="color: #52c41a;">94.4%</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">偏差</div>
+                        <div class="stat-value" style="color: #52c41a;">-5.6%</div>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; padding: 20px; background: #f5f5f5; border-radius: 4px; text-align: center; color: #999;">
+                    计划执行趋势图表（可集成ECharts等图表库）
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('计划跟踪 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

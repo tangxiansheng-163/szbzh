@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报表中心</title>
+</head>
+<body>
+    <div class="content-wrapper report-dashboard-page">
+        <style>
+            .report-dash-title{font-size:18px;font-weight:600;margin:0 0 8px 0;color:#262626;}
+            .report-dash-desc{font-size:13px;color:#595959;margin:0;line-height:1.6;}
+            .report-tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+            .report-tpl-card{background:#fff;border-radius:8px;padding:20px;border:1px solid #e8e8e8;box-shadow:0 1px 4px rgba(0,0,0,0.04);display:flex;flex-direction:column;gap:12px;transition:box-shadow 0.2s;}
+            .report-tpl-card:hover{box-shadow:0 4px 12px rgba(0,0,0,0.08);}
+            .report-tpl-card a{text-decoration:none;color:inherit;}
+            .report-tpl-name{font-size:16px;font-weight:600;color:#262626;}
+            .report-tpl-dims{font-size:12px;color:#8c8c8c;line-height:1.5;}
+            .report-tpl-meta{font-size:11px;color:#8c8c8c;}
+            .report-tpl-actions{display:flex;gap:8px;margin-top:auto;}
+            .report-tpl-card.custom{border-style:dashed;border-color:#1890ff;}
+            .report-sub-section{margin-top:24px;}
+            .report-sub-title{font-size:15px;font-weight:600;margin-bottom:12px;color:#262626;padding-bottom:8px;border-bottom:1px solid #e8e8e8;}
+        </style>
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">报表管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">报表中心</span>
+        </div>
+
+        <div class="page-header">
+            <h2 class="report-dash-title">报表中心</h2>
+            <p class="report-dash-desc">按《设计协同详细设计》报表管理模块：选择报表模板 → 配置参数（时间范围、统计维度）→ 生成并预览 → 导出 Excel/PDF。支持报表订阅，定时生成并发送至邮箱。</p>
+        </div>
+
+        <div class="report-sub-section">
+            <div class="report-sub-title">系统预置报表</div>
+            <div class="report-tpl-grid">
+                <div class="report-tpl-card">
+                    <a href="pages/report-bom-stats.html">
+                        <div class="report-tpl-name">BOM 统计报表</div>
+                        <div class="report-tpl-dims">统计维度：按产品、BOM 类型、状态、时间</div>
+                        <div class="report-tpl-meta">更新频率：实时 · 访问：全部用户</div>
+                    </a>
+                    <div class="report-tpl-actions">
+                        <a href="pages/report-bom-stats.html" class="btn btn-sm btn-primary">生成报表</a>
+                        <button class="btn btn-sm btn-default" data-open-modal="subscribe-modal">订阅</button>
+                    </div>
+                </div>
+                <div class="report-tpl-card">
+                    <a href="pages/report-change-stats.html">
+                        <div class="report-tpl-name">变更统计报表</div>
+                        <div class="report-tpl-dims">统计维度：按变更类型、部门、状态、时间</div>
+                        <div class="report-tpl-meta">更新频率：每日 · 访问：部门负责人及以上</div>
+                    </a>
+                    <div class="report-tpl-actions">
+                        <a href="pages/report-change-stats.html" class="btn btn-sm btn-primary">生成报表</a>
+                        <button class="btn btn-sm btn-default" data-open-modal="subscribe-modal">订阅</button>
+                    </div>
+                </div>
+                <div class="report-tpl-card">
+                    <a href="pages/performance-stats.html">
+                        <div class="report-tpl-name">考核统计报表</div>
+                        <div class="report-tpl-dims">统计维度：按部门、指标、周期</div>
+                        <div class="report-tpl-meta">更新频率：每月 · 访问：部门负责人及以上</div>
+                    </a>
+                    <div class="report-tpl-actions">
+                        <a href="pages/performance-stats.html" class="btn btn-sm btn-primary">生成报表</a>
+                        <button class="btn btn-sm btn-default" data-open-modal="subscribe-modal">订阅</button>
+                    </div>
+                </div>
+                <div class="report-tpl-card">
+                    <a href="pages/sync-log.html">
+                        <div class="report-tpl-name">同步统计报表</div>
+                        <div class="report-tpl-dims">统计维度：按系统、状态、时间</div>
+                        <div class="report-tpl-meta">更新频率：每日 · 访问：IT 部门、管理员</div>
+                    </a>
+                    <div class="report-tpl-actions">
+                        <a href="pages/sync-log.html" class="btn btn-sm btn-primary">生成报表</a>
+                        <button class="btn btn-sm btn-default" data-open-modal="subscribe-modal">订阅</button>
+                    </div>
+                </div>
+                <div class="report-tpl-card">
+                    <div class="report-tpl-name">评审统计报表</div>
+                    <div class="report-tpl-dims">统计维度：按评审类型、部门、时效</div>
+                    <div class="report-tpl-meta">更新频率：每周 · 访问：部门负责人及以上</div>
+                    <div class="report-tpl-actions">
+                        <button class="btn btn-sm btn-default" disabled>开发中</button>
+                    </div>
+                </div>
+                <a href="pages/report-custom.html" class="report-tpl-card custom">
+                    <div class="report-tpl-name" style="color:#1890ff;">+ 自定义报表</div>
+                    <div class="report-tpl-dims">创建自定义报表，选择数据源、字段、过滤条件、分组汇总</div>
+                    <div class="report-tpl-meta">支持保存、分享、订阅</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="report-sub-section">
+            <div class="report-sub-title">我的订阅</div>
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>报表名称</th>
+                                <th>发送频率</th>
+                                <th>发送时间</th>
+                                <th>下次执行</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>BOM 统计报表</td>
+                                <td>每月</td>
+                                <td>每月 1 日 09:00</td>
+                                <td>2025-02-01 09:00</td>
+                                <td><span class="status-badge status-success">启用</span></td>
+                                <td><button class="btn btn-sm btn-default">编辑</button></td>
+                            </tr>
+                            <tr>
+                                <td>变更统计报表</td>
+                                <td>每周</td>
+                                <td>每周一 09:00</td>
+                                <td>2025-02-03 09:00</td>
+                                <td><span class="status-badge status-success">启用</span></td>
+                                <td><button class="btn btn-sm btn-default">编辑</button></td>
+                            </tr>
+                            <tr><td colspan="6" style="text-align:center;color:#8c8c8c;padding:24px;">暂无更多订阅，可在上方报表卡片中点击「订阅」添加</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="subscribe-modal" class="modal-overlay">
+            <div class="modal" style="max-width:480px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">订阅报表</span><button type="button" class="modal-close" data-close-modal="subscribe-modal">×</button></div>
+                <div class="modal-body">
+                    <p class="modal-desc" style="margin-bottom:16px;">系统将按配置频率定时生成报表并发送至您的邮箱。</p>
+                    <div class="form-item"><label class="form-label required" for="sub-freq">发送频率</label><select id="sub-freq" name="freq" class="form-select"><option value="daily">每日</option><option value="weekly">每周</option><option value="monthly" selected>每月</option></select></div>
+                    <div class="form-item"><label class="form-label" for="sub-time">发送时间</label><input type="text" id="sub-time" name="time" class="form-input" value="09:00" placeholder="如：09:00"></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="subscribe-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="subscribe-modal" onclick="alert('✅ 订阅已保存')">确定</button></div>
+            </div>
+        </div>
+    </div>
+    <script>if(typeof PageInteractions!=='undefined')PageInteractions.initButtons();</script>
+</body>
+</html>

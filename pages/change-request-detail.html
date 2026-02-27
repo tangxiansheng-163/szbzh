@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>变更申请单详情</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <!-- 面包屑 -->
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">变更管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/change-request-list.html" class="breadcrumb-item">变更申请单</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">申请单详情</span>
+        </div>
+
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <p class="page-description">查看变更申请单完整信息、影响分析与审批记录；负责人可在此执行变更并更新进度。</p>
+        </div>
+
+        <!-- 操作栏 -->
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default btn-back" data-url="pages/change-request-list.html">← 返回列表</button>
+                <button class="btn btn-primary" id="btn-execute" style="display:none;">去执行</button>
+            </div>
+            <div class="action-right">
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs" id="cr-req-detail-tabs">
+            <div class="tab-list">
+                <div class="tab-item active" data-tab="0">基本信息</div>
+                <div class="tab-item" data-tab="1">影响分析</div>
+                <div class="tab-item" data-tab="2">审批记录</div>
+            </div>
+        </div>
+
+        <!-- Tab 0: 基本信息 -->
+        <div class="tab-pane active" id="tab-pane-0">
+            <div class="card">
+                <div class="card-body">
+                    <div class="section-title">基本信息</div>
+                    <div class="form-info-grid">
+                        <div class="form-info-item"><span class="form-info-label">申请单号</span><span class="form-info-value">BG-SQ-2025-001</span></div>
+                        <div class="form-info-item"><span class="form-info-label">来源会审单</span><span class="form-info-value"><a href="pages/change-review-detail.html?id=1">BG-HS-2025-001</a></span></div>
+                        <div class="form-info-item"><span class="form-info-label">变更单类型</span><span class="form-info-value">EBOM 变更</span></div>
+                        <div class="form-info-item"><span class="form-info-label">涉及产品</span><span class="form-info-value">PROD-001 智能控制器</span></div>
+                        <div class="form-info-item"><span class="form-info-label">销售订单</span><span class="form-info-value">SO-2025-001</span></div>
+                        <div class="form-info-item"><span class="form-info-label">BOM 类型及版本</span><span class="form-info-value">EBOM V1.0 → V1.1</span></div>
+                        <div class="form-info-item"><span class="form-info-label">计划执行日期</span><span class="form-info-value">2025-02-15</span></div>
+                        <div class="form-info-item"><span class="form-info-label">执行状态</span><span class="form-info-value"><span class="status-badge status-processing">执行中</span></span></div>
+                        <div class="form-info-item"><span class="form-info-label">负责人</span><span class="form-info-value">张工（研发）</span></div>
+                        <div class="form-info-item"><span class="form-info-label">创建时间</span><span class="form-info-value">2025-01-29 10:00</span></div>
+                    </div>
+                    <div class="form-info-block" style="margin-top:16px;">
+                        <span class="form-info-label">变更前内容</span>
+                        <div class="desc-box">原 EBOM V1.0 中电阻 R1 规格为 10KΩ，需调整。</div>
+                    </div>
+                    <div class="form-info-block" style="margin-top:12px;">
+                        <span class="form-info-label">变更后内容</span>
+                        <div class="desc-box">将电阻 R1 规格调整为 20KΩ。</div>
+                    </div>
+                    <div class="form-info-block" style="margin-top:12px;">
+                        <span class="form-info-label">变更原因</span>
+                        <div class="desc-box">客户要求提高精度，经会审通过需调整电阻阻值。</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 1: 影响分析 -->
+        <div class="tab-pane" id="tab-pane-1">
+            <div class="card">
+                <div class="card-body">
+                    <div class="section-title">影响分析</div>
+                    <p class="section-note" style="margin-bottom:12px;">本变更申请对以下部门及业务环节的影响。</p>
+                    <div class="table-wrapper">
+                        <table class="output-table">
+                            <thead>
+                                <tr>
+                                    <th width="50">序号</th>
+                                    <th width="120">影响部门</th>
+                                    <th width="100">影响费用</th>
+                                    <th>影响内容</th>
+                                    <th width="120">备注</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td>研发</td><td>0</td><td>设计调整、BOM 版本更新</td><td>—</td></tr>
+                                <tr><td>2</td><td>工艺</td><td>500</td><td>工艺文件同步</td><td>—</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: 审批记录 -->
+        <div class="tab-pane" id="tab-pane-2">
+            <div class="card">
+                <div class="card-body">
+                    <div class="section-title">审批记录</div>
+                    <p class="section-note" style="margin-bottom:12px;">本申请来源于会审单，会审单审批通过后自动生成；若为独立创建则显示本单审批流水。</p>
+                    <div class="table-wrapper">
+                        <table class="output-table">
+                            <thead>
+                                <tr>
+                                    <th width="50">序号</th>
+                                    <th width="100">审批节点</th>
+                                    <th width="100">审批人</th>
+                                    <th width="100">审批结果</th>
+                                    <th width="140">审批时间</th>
+                                    <th>审批意见</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td>会审单审批</td><td>研发/工艺</td><td><span class="status-badge status-success">已通过</span></td><td>2025-01-29 09:00</td><td>同意，下推变更申请</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>if(typeof PageInteractions!=='undefined')PageInteractions.initButtons();</script>
+</body>
+</html>

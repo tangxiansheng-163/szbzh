@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>需求详情 - 采购</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">采购需求单基本信息</h3></div>
+            <div class="card-body">
+                <!-- 三列栅格布局，提升横向空间利用 -->
+                <div class="form-info-grid" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 16px;">
+                    <div class="form-info-item"><span class="form-info-label">需求单号</span><span class="form-info-value">DEM-2025-001</span></div>
+                    <div class="form-info-item"><span class="form-info-label">需求状态</span><span class="form-info-value"><span class="status-badge status-warning">待审批</span></span></div>
+                    <div class="form-info-item"><span class="form-info-label">需求部门</span><span class="form-info-value">生产部</span></div>
+                    <div class="form-info-item"><span class="form-info-label">需求人</span><span class="form-info-value">张采购</span></div>
+                    <div class="form-info-item"><span class="form-info-label">需求日期</span><span class="form-info-value">2025-01-15</span></div>
+                    <div class="form-info-item"><span class="form-info-label">需求类型</span><span class="form-info-value">生产需求</span></div>
+                    <div class="form-info-item"><span class="form-info-label">紧急程度</span><span class="form-info-value"><span class="status-badge status-danger">重要</span></span></div>
+                    <div class="form-info-item"><span class="form-info-label">计划到货日期</span><span class="form-info-value">2025-02-15</span></div>
+                    <div class="form-info-item"><span class="form-info-label">生产订单号</span><span class="form-info-value">PO-2025-001</span></div>
+                    <div class="form-info-item"><span class="form-info-label">需求总金额</span><span class="form-info-value">¥125,680.00</span></div>
+                    <div class="form-info-item"><span class="form-info-label">预算科目</span><span class="form-info-value">生产物料-原料</span></div>
+                    <div class="form-info-item"><span class="form-info-label">部门主管</span><span class="form-info-value">李主管</span></div>
+                    <div class="form-info-item"><span class="form-info-label">主管审批意见</span><span class="form-info-value">同意，请采购部安排。</span></div>
+                    <div class="form-info-item"><span class="form-info-label">主管审批时间</span><span class="form-info-value">2025-01-15 14:00</span></div>
+                    <div class="form-info-item"><span class="form-info-label">采购主管</span><span class="form-info-value">-</span></div>
+                    <div class="form-info-item"><span class="form-info-label">采购审批意见</span><span class="form-info-value">-</span></div>
+                    <div class="form-info-item"><span class="form-info-label">采购审批时间</span><span class="form-info-value">-</span></div>
+                    <div class="form-info-item" style="grid-column:1/-1;"><span class="form-info-label">用途说明</span><span class="form-info-value">生产线扩产所需物料，包含原料及辅料，需在计划到货日前到位。</span></div>
+                    <div class="form-info-item" style="grid-column:1/-1;"><span class="form-info-label">备注</span><span class="form-info-value">无</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">需求明细</h3></div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>物料编码</th><th>物料名称</th><th>规格型号</th><th>需求数量</th><th>计量单位</th><th>参考价格</th><th>金额小计</th><th>建议供应商</th><th>备注</th></tr></thead>
+                        <tbody>
+                            <tr><td>M001</td><td>原料A</td><td>规格1</td><td>100</td><td>kg</td><td>120.00</td><td>12,000.00</td><td>XX供应商</td><td>-</td></tr>
+                            <tr><td>M002</td><td>辅料B</td><td>规格2</td><td>50</td><td>件</td><td>80.00</td><td>4,000.00</td><td>-</td><td>-</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">关联信息</h3></div>
+            <div class="card-body">
+                <p class="page-description">审核通过后将形成正式需求清单并同步至供应链协同系统，可关联采购计划、采购订单。当前为待审批状态，暂无关联计划/订单。</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增绩效配置 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">系统配置</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/procurement-supplier-performance-config.html" class="breadcrumb-item">绩效配置</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">新增配置</span>
+        </div>
+
+        <div class="page-header">
+            <h2 class="page-title" style="margin:0 0 8px 0;font-size:18px;">新增绩效配置</h2>
+            <p class="page-description" style="margin:0;">新建一条供应商绩效评估配置，填写配置名称、评估周期、维度权重及等级规则后保存，系统将按此配置在每周期自动生成供应商评估报表。</p>
+        </div>
+
+        <form id="form-create-config" onsubmit="return false;">
+            <div class="card">
+                <div class="section-title" style="margin-bottom:16px;">基本信息</div>
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px 32px;max-width:640px;">
+                    <div class="form-item">
+                        <label class="form-label required">配置名称</label>
+                        <input type="text" name="configName" class="form-input" placeholder="如：供应商季度绩效评估配置" required>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label required">评估周期</label>
+                        <select name="cycle" class="form-select" required>
+                            <option value="">请选择</option>
+                            <option value="monthly">月度</option>
+                            <option value="quarterly" selected>季度</option>
+                            <option value="annual">年度</option>
+                        </select>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">报表生成日</label>
+                        <input type="text" name="reportDay" class="form-input" value="周期结束后次月1日" placeholder="如：次月1日、次月5日">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">备注</label>
+                        <input type="text" name="remark" class="form-input" placeholder="选填，说明该配置用途">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top:16px;">
+                <div class="section-title" style="margin-bottom:8px;">评估维度与权重</div>
+                <p style="color:#666;font-size:13px;margin-bottom:16px;">各维度权重之和须为 100%，系统将按权重计算综合得分并用于评估报表与等级划分。</p>
+                <div class="form-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px 24px;max-width:640px;">
+                    <div class="form-item">
+                        <label class="form-label">供货（%）</label>
+                        <input type="number" name="weightSupply" class="form-input weight-input" value="25" min="0" max="100" placeholder="0">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">质量（%）</label>
+                        <input type="number" name="weightQuality" class="form-input weight-input" value="30" min="0" max="100" placeholder="0">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">价格（%）</label>
+                        <input type="number" name="weightPrice" class="form-input weight-input" value="25" min="0" max="100" placeholder="0">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">服务（%）</label>
+                        <input type="number" name="weightService" class="form-input weight-input" value="20" min="0" max="100" placeholder="0">
+                    </div>
+                </div>
+                <p style="margin-top:12px;font-size:13px;"><span style="color:#666;">当前合计：</span><strong id="weight-sum">100</strong><span style="color:#666;">%</span> <span id="weight-tip" style="margin-left:8px;font-size:12px;color:#999;"></span></p>
+            </div>
+
+            <div class="card" style="margin-top:16px;">
+                <div class="section-title" style="margin-bottom:8px;">等级划分规则</div>
+                <p style="color:#666;font-size:13px;margin-bottom:16px;">按综合得分划分供应商等级。填写各等级的最低分（含）与说明，分数区间须连续且递减（如 A≥85、B≥70、C≥60、D&lt;60）。</p>
+                <div class="table-wrapper" style="max-width:720px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="80">等级</th>
+                                <th width="140">最低分（≥）</th>
+                                <th width="200">说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>A级</td>
+                                <td><input type="number" name="gradeA" class="form-input" value="85" min="0" max="100" style="width:80px;"></td>
+                                <td><input type="text" name="gradeADesc" class="form-input" value="优秀供应商" placeholder="选填"></td>
+                            </tr>
+                            <tr>
+                                <td>B级</td>
+                                <td><input type="number" name="gradeB" class="form-input" value="70" min="0" max="100" style="width:80px;"></td>
+                                <td><input type="text" name="gradeBDesc" class="form-input" value="合格供应商" placeholder="选填"></td>
+                            </tr>
+                            <tr>
+                                <td>C级</td>
+                                <td><input type="number" name="gradeC" class="form-input" value="60" min="0" max="100" style="width:80px;"></td>
+                                <td><input type="text" name="gradeCDesc" class="form-input" value="待改进" placeholder="选填"></td>
+                            </tr>
+                            <tr>
+                                <td>D级</td>
+                                <td><input type="number" name="gradeD" class="form-input" value="0" min="0" max="100" style="width:80px;" readonly title="D级为最低档，固定为0"></td>
+                                <td><input type="text" name="gradeDDesc" class="form-input" value="不合格" placeholder="选填"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="action-bar" style="margin-top:24px;">
+                <div class="action-left">
+                    <button type="submit" class="btn btn-primary">保存</button>
+                    <button type="button" class="btn btn-default" onclick="location.href='pages/procurement-supplier-performance-config.html'">取消</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        (function () {
+            var weightInputs = document.querySelectorAll('.weight-input');
+            var sumEl = document.getElementById('weight-sum');
+            var tipEl = document.getElementById('weight-tip');
+
+            function updateWeightSum() {
+                var sum = 0;
+                weightInputs.forEach(function (el) { sum += parseInt(el.value || 0, 10); });
+                if (sumEl) sumEl.textContent = sum;
+                if (tipEl) {
+                    if (sum === 100) { tipEl.textContent = ''; tipEl.style.color = ''; }
+                    else if (sum < 100) { tipEl.textContent = '（未满100%）'; tipEl.style.color = '#c00'; }
+                    else { tipEl.textContent = '（超过100%）'; tipEl.style.color = '#c00'; }
+                }
+            }
+            weightInputs.forEach(function (el) {
+                el.addEventListener('input', updateWeightSum);
+                el.addEventListener('change', updateWeightSum);
+            });
+            updateWeightSum();
+
+            document.getElementById('form-create-config').addEventListener('submit', function () {
+                var sum = parseInt(document.getElementById('weight-sum').textContent, 10);
+                if (sum !== 100) {
+                    alert('维度权重合计须为 100%，当前为 ' + sum + '%');
+                    return;
+                }
+                alert('保存成功');
+                location.href = 'pages/procurement-supplier-performance-config.html';
+            });
+        })();
+    </script>
+</body>
+</html>

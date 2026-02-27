@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>考核指标配置</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">系统配置</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">考核指标配置</span>
+        </div>
+
+        <div class="page-header">
+            <h2 class="page-title">考核指标配置</h2>
+            <p class="page-description">按《BOM全生命周期管理体系》深度配置 KPI 指标：指标定义、计算公式、数据来源、扣分规则、部门权重、统计周期；配置后驱动 KPI 仪表盘与绩效统计的自动计算。</p>
+        </div>
+
+        <!-- Tab 导航 -->
+        <div class="tabs" id="kpi-config-tabs">
+            <div class="tab-list">
+                <div class="tab-item active" data-tab="0">指标定义</div>
+                <div class="tab-item" data-tab="1">部门权重矩阵</div>
+                <div class="tab-item" data-tab="2">计算公式说明</div>
+            </div>
+        </div>
+
+        <!-- Tab 0: 指标定义 -->
+        <div class="tab-pane active" id="tab-pane-0">
+            <div class="filter-bar">
+                <div class="filter-row">
+                    <div class="filter-item">
+                        <label>指标分类</label>
+                        <select class="form-select">
+                            <option value="">全部</option>
+                            <option value="ebom">EBOM 相关</option>
+                            <option value="mbom">MBOM 相关</option>
+                            <option value="execute">BOM 执行</option>
+                            <option value="sync">跨系统同步</option>
+                            <option value="exception">异常处理</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>考核对象</label>
+                        <select class="form-select">
+                            <option value="">全部</option>
+                            <option value="rd">研发部门</option>
+                            <option value="process">工艺部门</option>
+                            <option value="prod">采购/库存/生产</option>
+                            <option value="it">IT 部门</option>
+                            <option value="all">各业务部门</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>状态</label>
+                        <select class="form-select">
+                            <option value="">全部</option>
+                            <option value="enabled">启用</option>
+                            <option value="disabled">停用</option>
+                        </select>
+                    </div>
+                    <div class="filter-item" style="flex-direction: row; align-items: center;">
+                        <button class="btn btn-primary">查询</button>
+                        <button class="btn btn-default">重置</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <div class="action-left">
+                    <button class="btn btn-primary" data-open-modal="kpi-add-modal">+ 新增指标</button>
+                    <button class="btn btn-default">导出配置</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="50">序号</th>
+                                <th width="130">指标编码</th>
+                                <th width="140">指标名称</th>
+                                <th width="80">指标分类</th>
+                                <th width="90">考核对象</th>
+                                <th width="80">目标值</th>
+                                <th width="100">扣分单位</th>
+                                <th width="70">扣分分值</th>
+                                <th width="90">统计周期</th>
+                                <th width="60">状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>KPI-EBOM-01</td>
+                                <td>EBOM 数据准确率</td>
+                                <td>EBOM 相关</td>
+                                <td>研发部门</td>
+                                <td>≥99.5%</td>
+                                <td>0.1%</td>
+                                <td>2 分</td>
+                                <td>月/季/年</td>
+                                <td><span class="status-badge status-success">启用</span></td>
+                                <td><button class="btn btn-sm btn-default" data-open-modal="kpi-detail-modal">详情</button> <button class="btn btn-sm btn-default" data-open-modal="kpi-edit-modal">编辑</button></td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>KPI-EBOM-02</td>
+                                <td>EBOM 变更及时率</td>
+                                <td>EBOM 相关</td>
+                                <td>研发部门</td>
+                                <td>≥98%</td>
+                                <td>1%</td>
+                                <td>3 分</td>
+                                <td>月/季/年</td>
+                                <td><span class="status-badge status-success">启用</span></td>
+                                <td><button class="btn btn-sm btn-default" data-open-modal="kpi-detail-modal">详情</button> <button class="btn btn-sm btn-default" data-open-modal="kpi-edit-modal">编辑</button></td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>KPI-MBOM-01</td>
+                                <td>MBOM 转化及时率</td>
+                                <td>MBOM 相关</td>
+                                <td>工艺部门</td>
+                                <td>≥97%</td>
+                                <td>1%</td>
+                                <td>3 分</td>
+                                <td>月/季/年</td>
+                                <td><span class="status-badge status-success">启用</span></td>
+                                <td><button class="btn btn-sm btn-default" data-open-modal="kpi-detail-modal">详情</button> <button class="btn btn-sm btn-default" data-open-modal="kpi-edit-modal">编辑</button></td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>KPI-MBOM-02</td>
+                                <td>MBOM 数据完整性</td>
+                                <td>MBOM 相关</td>
+                                <td>工艺部门</td>
+                                <td>≥99%</td>
+                                <td>0.5%</td>
+                                <td>2 分</td>
+                                <td>月/季/年</td>
+                                <td><span class="status-badge status-success">启用</span></td>
+                                <td><button class="btn btn-sm btn-default" data-open-modal="kpi-detail-modal">详情</button> <button class="btn btn-sm btn-default" data-open-modal="kpi-edit-modal">编辑</button></td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>KPI-EXEC-01</td>
+                                <td>BOM 执行合规率</td>
+                                <td>BOM 执行</td>
+                                <td>采购/库存/生产</td>
+                                <td>≥99.8%</td>
+                                <td>0.1%</td>
+                                <td>2 分</td>
+                                <td>月/季/年</td>
+                                <td><span class="status-badge status-success">启用</span></td>
+                                <td><button class="btn btn-sm btn-default" data-open-modal="kpi-detail-modal">详情</button> <button class="btn btn-sm btn-default" data-open-modal="kpi-edit-modal">编辑</button></td>
+                            </tr>
+                            <tr>
+                                <td>6</td>
+                                <td>KPI-SYNC-01</td>
+                                <td>跨系统同步成功率</td>
+                                <td>跨系统同步</td>
+                                <td>IT 部门</td>
+                                <td>≥99.9%</td>
+                                <td>0.1%</td>
+                                <td>5 分</td>
+                                <td>月/季/年</td>
+                                <td><span class="status-badge status-success">启用</span></td>
+                                <td><button class="btn btn-sm btn-default" data-open-modal="kpi-detail-modal">详情</button> <button class="btn btn-sm btn-default" data-open-modal="kpi-edit-modal">编辑</button></td>
+                            </tr>
+                            <tr>
+                                <td>7</td>
+                                <td>KPI-EXCP-01</td>
+                                <td>异常处理及时率</td>
+                                <td>异常处理</td>
+                                <td>各业务部门</td>
+                                <td>≥95%</td>
+                                <td>5%</td>
+                                <td>3 分</td>
+                                <td>月/季/年</td>
+                                <td><span class="status-badge status-success">启用</span></td>
+                                <td><button class="btn btn-sm btn-default" data-open-modal="kpi-detail-modal">详情</button> <button class="btn btn-sm btn-default" data-open-modal="kpi-edit-modal">编辑</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 1: 部门权重矩阵 -->
+        <div class="tab-pane" id="tab-pane-1">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">部门 × 指标 权重配置</h3>
+                    <span class="card-extra">部门综合得分 = Σ(单项指标得分 × 指标权重)，同一部门各指标权重之和应为 100%</span>
+                </div>
+                <div class="table-wrapper">
+                    <table class="kpi-weight-matrix">
+                        <thead>
+                            <tr>
+                                <th width="100">部门</th>
+                                <th>EBOM数据准确率</th>
+                                <th>EBOM变更及时率</th>
+                                <th>MBOM转化及时率</th>
+                                <th>MBOM数据完整性</th>
+                                <th>BOM执行合规率</th>
+                                <th>跨系统同步成功率</th>
+                                <th>异常处理及时率</th>
+                                <th width="80">权重合计</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>研发部门</strong></td>
+                                <td>30%</td>
+                                <td>40%</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>20%</td>
+                                <td>—</td>
+                                <td>10%</td>
+                                <td>100%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>工艺部门</strong></td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>35%</td>
+                                <td>35%</td>
+                                <td>20%</td>
+                                <td>—</td>
+                                <td>10%</td>
+                                <td>100%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>生产/采购/库存</strong></td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>60%</td>
+                                <td>—</td>
+                                <td>40%</td>
+                                <td>100%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>IT 部门</strong></td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>70%</td>
+                                <td>30%</td>
+                                <td>100%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="section-note">「—」表示该指标不考核该部门。修改权重后点击「保存权重配置」生效。</p>
+                <div class="action-bar" style="margin-top:12px;">
+                    <button class="btn btn-primary">保存权重配置</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: 计算公式说明 -->
+        <div class="tab-pane" id="tab-pane-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">指标计算公式与数据来源</h3>
+                    <span class="card-extra">依据《设计协同详细设计》考核与改进模块；系统按此公式自动统计，月度每月1号、季度每季首月5号执行。</span>
+                </div>
+                <div class="card-body">
+                    <div class="kpi-formula-list">
+                        <div class="kpi-formula-item">
+                            <div class="kpi-formula-title">1. EBOM 数据准确率</div>
+                            <div class="kpi-formula-content">
+                                <p><strong>公式：</strong>(EBOM数据总条数 - EBOM数据错误条数) / EBOM数据总条数 × 100%</p>
+                                <p><strong>数据来源：</strong>EBOM明细表、BOM校验任务表、操作审计日志</p>
+                                <p><strong>说明：</strong>错误包括物料编码错误、数量错误、层级错误、必填字段缺失等</p>
+                            </div>
+                        </div>
+                        <div class="kpi-formula-item">
+                            <div class="kpi-formula-title">2. EBOM 变更及时率</div>
+                            <div class="kpi-formula-content">
+                                <p><strong>公式：</strong>按要求时限完成EBOM变更的数量 / EBOM变更总数 × 100%</p>
+                                <p><strong>时限：</strong>一般变更 5 个工作日；紧急变更 2 个工作日</p>
+                                <p><strong>数据来源：</strong>变更单表、变更会审单表、发布日志</p>
+                            </div>
+                        </div>
+                        <div class="kpi-formula-item">
+                            <div class="kpi-formula-title">3. MBOM 转化及时率</div>
+                            <div class="kpi-formula-content">
+                                <p><strong>公式：</strong>EBOM发布后按规定时限完成MBOM转化的数量 / MBOM转化总数 × 100%</p>
+                                <p><strong>时限：</strong>EBOM 发布后 3 个工作日内完成 MBOM 创建并提交评审</p>
+                                <p><strong>数据来源：</strong>EBOM-MBOM 关联表、BOM 基础信息表、发布日志</p>
+                            </div>
+                        </div>
+                        <div class="kpi-formula-item">
+                            <div class="kpi-formula-title">4. MBOM 数据完整性</div>
+                            <div class="kpi-formula-content">
+                                <p><strong>公式：</strong>完整包含工艺相关信息的 MBOM 数量 / MBOM 总数 × 100%</p>
+                                <p><strong>检查字段：</strong>工序号、工位号、损耗率、替代料、发料仓库（均不为空）</p>
+                                <p><strong>数据来源：</strong>BOM 明细表（MBOM 专有字段）、BOM 校验任务表</p>
+                            </div>
+                        </div>
+                        <div class="kpi-formula-item">
+                            <div class="kpi-formula-title">5. BOM 执行合规率</div>
+                            <div class="kpi-formula-content">
+                                <p><strong>公式：</strong>按已发布 BOM 开展业务数量 / 业务总数 × 100%</p>
+                                <p><strong>说明：</strong>采购订单、库存出库、生产投料时引用已发布 BOM；未合规含使用草稿 BOM、历史版本 BOM、未引用 BOM</p>
+                                <p><strong>数据来源：</strong>BOM 订单关联表、采购订单表、库存出入库记录、生产投料记录</p>
+                            </div>
+                        </div>
+                        <div class="kpi-formula-item">
+                            <div class="kpi-formula-title">6. 跨系统同步成功率</div>
+                            <div class="kpi-formula-content">
+                                <p><strong>公式：</strong>同步成功的任务数量 / 同步任务总数 × 100%</p>
+                                <p><strong>说明：</strong>按系统分别统计 PLM→ERP、PLM→MES、PLM→WMS；排除待同步、同步中</p>
+                                <p><strong>数据来源：</strong>同步日志表、数据一致性校验日志</p>
+                            </div>
+                        </div>
+                        <div class="kpi-formula-item">
+                            <div class="kpi-formula-title">7. 异常处理及时率</div>
+                            <div class="kpi-formula-content">
+                                <p><strong>公式：</strong>按规定时限完成异常处理的数量 / 异常总数 × 100%</p>
+                                <p><strong>时限：</strong>紧急 30 分钟响应 / 1 小时完成；重要 1 小时响应 / 4 小时完成；一般 1 工作日完成</p>
+                                <p><strong>数据来源：</strong>预警记录表、评审意见表、操作审计日志</p>
+                            </div>
+                        </div>
+                        <div class="kpi-formula-item kpi-formula-total">
+                            <div class="kpi-formula-title">部门综合得分</div>
+                            <div class="kpi-formula-content">
+                                <p><strong>公式：</strong>部门综合得分 = Σ(单项指标得分 × 指标权重)</p>
+                                <p><strong>单项得分：</strong>基础分 100 - 扣分；扣分 = (标准值 - 实际值) / 扣分单位 × 扣分分值；实际值≥标准值时得 100 分</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 指标详情弹窗 -->
+        <div id="kpi-detail-modal" class="modal-overlay">
+            <div class="modal" style="max-width:640px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">EBOM 变更及时率 - 指标详情</span><button type="button" class="modal-close" data-close-modal="kpi-detail-modal">×</button></div>
+                <div class="modal-body">
+                    <div class="form-section">
+                        <div class="form-section-title">基本信息</div>
+                        <div class="form-info-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                            <div class="form-info-item"><span class="form-info-label">指标编码</span><span class="form-info-value">KPI-EBOM-02</span></div>
+                            <div class="form-info-item"><span class="form-info-label">指标分类</span><span class="form-info-value">EBOM 相关</span></div>
+                            <div class="form-info-item"><span class="form-info-label">考核对象</span><span class="form-info-value">研发部门</span></div>
+                            <div class="form-info-item"><span class="form-info-label">目标值</span><span class="form-info-value">≥98%</span></div>
+                            <div class="form-info-item"><span class="form-info-label">扣分单位</span><span class="form-info-value">1%</span></div>
+                            <div class="form-info-item"><span class="form-info-label">扣分分值</span><span class="form-info-value">3 分</span></div>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <div class="form-section-title">计算公式</div>
+                        <p class="formula-text">按要求时限完成 EBOM 变更的数量 / EBOM 变更总数 × 100%</p>
+                        <p class="formula-desc">一般变更 5 个工作日；紧急变更 2 个工作日</p>
+                    </div>
+                    <div class="form-section">
+                        <div class="form-section-title">数据来源</div>
+                        <p class="formula-text">变更单表、变更会审单表、发布日志</p>
+                    </div>
+                    <div class="form-section">
+                        <div class="form-section-title">部门权重</div>
+                        <p class="formula-text">研发部门 40%</p>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="kpi-detail-modal">关闭</button><button type="button" class="btn btn-primary" data-close-modal="kpi-detail-modal" data-open-modal="kpi-edit-modal">编辑</button></div>
+            </div>
+        </div>
+
+        <!-- 新增指标弹窗 -->
+        <div id="kpi-add-modal" class="modal-overlay">
+            <div class="modal" style="max-width:620px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">新增考核指标</span><button type="button" class="modal-close" data-close-modal="kpi-add-modal">×</button></div>
+                <div class="modal-body">
+                    <div class="form-section">
+                        <div class="form-section-title">基本信息</div>
+                        <div class="form-item"><label class="form-label required">指标编码</label><input type="text" class="form-input" placeholder="如：KPI-EBOM-03"></div>
+                        <div class="form-item"><label class="form-label required">指标名称</label><input type="text" class="form-input" placeholder="如：EBOM 数据准确率"></div>
+                        <div class="form-item"><label class="form-label required">指标分类</label><select class="form-select"><option value="">请选择</option><option value="ebom">EBOM 相关</option><option value="mbom">MBOM 相关</option><option value="execute">BOM 执行</option><option value="sync">跨系统同步</option><option value="exception">异常处理</option></select></div>
+                        <div class="form-item"><label class="form-label required">考核对象</label><select class="form-select"><option value="">请选择</option><option value="rd">研发部门</option><option value="process">工艺部门</option><option value="prod">采购/库存/生产</option><option value="it">IT 部门</option><option value="all">各业务部门</option></select></div>
+                    </div>
+                    <div class="form-section">
+                        <div class="form-section-title">目标与扣分规则</div>
+                        <div class="form-item"><label class="form-label required">目标值</label><input type="text" class="form-input" placeholder="如：≥99.5%"></div>
+                        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                            <div class="form-item"><label class="form-label">扣分单位</label><input type="text" class="form-input" placeholder="如：0.1 表示每 0.1%"></div>
+                            <div class="form-item"><label class="form-label">扣分分值</label><input type="text" class="form-input" placeholder="如：2 表示扣 2 分"></div>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <div class="form-section-title">计算公式与数据来源</div>
+                        <div class="form-item"><label class="form-label">计算公式</label><textarea class="form-textarea" rows="2" placeholder="如：(总数-错误数)/总数×100%"></textarea></div>
+                        <div class="form-item"><label class="form-label">数据来源</label><input type="text" class="form-input" placeholder="如：EBOM明细表、BOM校验任务表"></div>
+                        <div class="form-item"><label class="form-label">统计周期</label><select class="form-select"><option value="all">月/季/年</option><option value="month">月度</option><option value="quarter">季度</option><option value="year">年度</option></select></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="kpi-add-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="kpi-add-modal" onclick="alert('✅ 指标已保存')">保存</button></div>
+            </div>
+        </div>
+
+        <!-- 编辑指标弹窗 -->
+        <div id="kpi-edit-modal" class="modal-overlay">
+            <div class="modal" style="max-width:620px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">编辑考核指标</span><button type="button" class="modal-close" data-close-modal="kpi-edit-modal">×</button></div>
+                <div class="modal-body">
+                    <div class="form-section">
+                        <div class="form-section-title">基本信息</div>
+                        <div class="form-item"><label class="form-label">指标编码</label><input type="text" class="form-input" value="KPI-EBOM-02" readonly></div>
+                        <div class="form-item"><label class="form-label required">目标值</label><input type="text" class="form-input" value="≥98%"></div>
+                        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                            <div class="form-item"><label class="form-label">扣分单位</label><input type="text" class="form-input" value="1"></div>
+                            <div class="form-item"><label class="form-label">扣分分值</label><input type="text" class="form-input" value="3"></div>
+                        </div>
+                        <div class="form-item"><label class="form-label">状态</label><select class="form-select"><option value="enabled" selected>启用</option><option value="disabled">停用</option></select></div>
+                    </div>
+                    <div class="form-section">
+                        <div class="form-section-title">计算公式</div>
+                        <div class="form-item"><label class="form-label">公式说明</label><textarea class="form-textarea" rows="2">按要求时限完成EBOM变更的数量 / EBOM变更总数 × 100%</textarea></div>
+                        <div class="form-item"><label class="form-label">时限说明</label><input type="text" class="form-input" value="一般5工作日；紧急2工作日"></div>
+                    </div>
+                    <div class="form-section">
+                        <div class="form-section-title">部门权重</div>
+                        <div class="form-item"><label class="form-label">研发部门权重(%)</label><input type="number" class="form-input" value="40" min="0" max="100"></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="kpi-edit-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="kpi-edit-modal" onclick="alert('✅ 已保存')">保存</button></div>
+            </div>
+        </div>
+    </div>
+    <style>
+        .page-title{font-size:18px;font-weight:600;margin:0 0 8px 0;color:#333;}
+        .page-description{font-size:13px;color:#666;margin:0;line-height:1.6;}
+        .tabs{margin-bottom:16px;}
+        .tab-list{display:flex;gap:4px;border-bottom:2px solid #e8e8e8;}
+        .tab-item{padding:10px 20px;cursor:pointer;font-size:14px;color:#595959;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s;}
+        .tab-item:hover{color:#1890ff;}
+        .tab-item.active{color:#1890ff;font-weight:600;border-bottom-color:#1890ff;}
+        .tab-pane{display:none;}
+        .tab-pane.active{display:block;}
+        .kpi-weight-matrix{font-size:13px;}
+        .kpi-weight-matrix td,.kpi-weight-matrix th{padding:10px 12px;}
+        .kpi-formula-list{display:flex;flex-direction:column;gap:16px;}
+        .kpi-formula-item{border:1px solid #e8e8e8;border-radius:6px;overflow:hidden;}
+        .kpi-formula-title{background:#fafafa;padding:12px 16px;font-weight:600;font-size:15px;color:#262626;border-bottom:1px solid #e8e8e8;}
+        .kpi-formula-content{padding:16px;font-size:13px;line-height:1.8;color:#595959;}
+        .kpi-formula-content p{margin:0 0 8px 0;}
+        .kpi-formula-content p:last-child{margin-bottom:0;}
+        .kpi-formula-total .kpi-formula-title{background:#e6f7ff;color:#1890ff;}
+        .form-section{margin-bottom:20px;}
+        .form-section:last-child{margin-bottom:0;}
+        .form-section-title{font-size:14px;font-weight:600;color:#262626;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #e8e8e8;}
+        .formula-text{font-family:monospace;background:#f5f5f5;padding:8px 12px;border-radius:4px;margin:0 0 8px 0;font-size:13px;}
+        .formula-desc{font-size:12px;color:#8c8c8c;margin:0;}
+        .section-note{font-size:12px;color:#8c8c8c;margin:12px 20px 0;line-height:1.6;}
+    </style>
+    <script>
+(function(){
+    var tabs=document.getElementById('kpi-config-tabs');
+    if(tabs){
+        tabs.setAttribute('data-tabs-init','1');
+        tabs.addEventListener('click',function(e){
+            var tab=e.target.closest('.tab-item');
+            if(!tab)return;
+            var idx=tab.getAttribute('data-tab');
+            if(idx==null)return;
+            tabs.querySelectorAll('.tab-item').forEach(function(t){t.classList.remove('active');});
+            document.querySelectorAll('#tab-pane-0, #tab-pane-1, #tab-pane-2').forEach(function(p){p.classList.remove('active');});
+            tab.classList.add('active');
+            var pane=document.getElementById('tab-pane-'+idx);
+            if(pane)pane.classList.add('active');
+        });
+    }
+})();
+if(typeof PageInteractions!=='undefined')PageInteractions.initButtons();
+    </script>
+</body>
+</html>

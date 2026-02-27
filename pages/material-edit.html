@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑物料档案</title>
+    <style>.form-input-sm,.form-select-sm{padding:4px 8px;font-size:13px;height:28px;}</style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">基础信息</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/material-list.html" class="breadcrumb-item">物料档案</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/material-detail.html" class="breadcrumb-item">物料详情</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">编辑</span>
+        </div>
+
+        <div class="page-header">
+            <div class="page-header-row">
+                <div>
+                    <h2 class="page-title">编辑物料档案 - M001</h2>
+                    <p class="page-description">修改物料档案信息，修改后需符合 BOM 创建及变更要求</p>
+                </div>
+                <div class="page-header-actions">
+                    <button class="btn btn-default btn-back" data-url="pages/material-detail.html">← 返回详情</button>
+                    <button class="btn btn-primary" id="material-edit-save">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="section-title" style="margin-bottom:12px;">基本信息</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                    <div class="form-item"><label class="form-label">物料编码</label><input type="text" class="form-input" value="M001" readonly></div>
+                    <div class="form-item"><label class="form-label required">物料名称</label><input type="text" class="form-input" value="智能控制器主控板"></div>
+                    <div class="form-item"><label class="form-label">物料简称</label><input type="text" class="form-input" value="主控板"></div>
+                    <div class="form-item"><label class="form-label required">规格型号</label><input type="text" class="form-input" value="CTRL-MAIN-V1"></div>
+                    <div class="form-item"><label class="form-label required">物料类型</label><select class="form-select"><option value="part" selected>零部件</option><option value="raw">原材料</option><option value="aux">辅料</option><option value="pack">包装材料</option><option value="equip">设备</option><option value="tool">工具</option><option value="other">其他</option></select></div>
+                    <div class="form-item"><label class="form-label required">物料等级</label><select class="form-select"><option value="A" selected>A（关键）</option><option value="B">B（重要）</option><option value="C">C（一般）</option></select></div>
+                    <div class="form-item"><label class="form-label required">计量单位</label><select class="form-select"><option value="件" selected>件</option><option value="个">个</option><option value="台">台</option><option value="套">套</option><option value="kg">千克</option><option value="m">米</option></select></div>
+                    <div class="form-item"><label class="form-label">采购单位</label><input type="text" class="form-input" value="件"></div>
+                    <div class="form-item"><label class="form-label">库存单位</label><input type="text" class="form-input" value="件"></div>
+                    <div class="form-item"><label class="form-label">状态</label><select class="form-select"><option value="enabled" selected>启用</option><option value="disabled">停用</option><option value="pending">待审核</option></select></div>
+                </div>
+
+                <div class="section-title" style="margin:24px 0 12px;">库存与采购</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                    <div class="form-item"><label class="form-label">安全库存</label><input type="number" class="form-input" value="10" min="0" step="0.01"></div>
+                    <div class="form-item"><label class="form-label">最大库存</label><input type="number" class="form-input" value="500" min="0" step="0.01"></div>
+                    <div class="form-item"><label class="form-label">采购提前期(天)</label><input type="number" class="form-input" value="7" min="0"></div>
+                    <div class="form-item"><label class="form-label">参考价格</label><input type="number" class="form-input" value="120" min="0" step="0.01"></div>
+                    <div class="form-item"><label class="form-label">价格上限</label><input type="number" class="form-input" placeholder="采购控制上限" min="0" step="0.01"></div>
+                    <div class="form-item"><label class="form-label">价格下限</label><input type="number" class="form-input" placeholder="采购控制下限" min="0" step="0.01"></div>
+                    <div class="form-item"><label class="form-label">标准损耗率</label><input type="number" class="form-input" value="0.02" min="0" max="1" step="0.01"></div>
+                </div>
+
+                <div class="section-title" style="margin:24px 0 12px;">存储与保质</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                    <div class="form-item"><label class="form-label">存储条件</label><input type="text" class="form-input" value="常温干燥"></div>
+                    <div class="form-item"><label class="form-label">保质期(天)</label><input type="number" class="form-input" value="365" min="0"></div>
+                </div>
+
+                <div class="section-title" style="margin:24px 0 12px;">属性信息</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                    <div class="form-item"><label class="form-label">图纸编号</label><input type="text" class="form-input" value="DRW-001"></div>
+                    <div class="form-item"><label class="form-label">材质</label><input type="text" class="form-input" value="PCB"></div>
+                    <div class="form-item"><label class="form-label">重量(kg)</label><input type="number" class="form-input" value="0.5" min="0" step="0.001"></div>
+                    <div class="form-item"><label class="form-label">是否关键件</label><select class="form-select"><option value="1" selected>是</option><option value="0">否</option></select></div>
+                    <div class="form-item"><label class="form-label">是否合规物料</label><select class="form-select"><option value="1" selected>是</option><option value="0">否</option></select></div>
+                </div>
+
+                <div class="section-title" style="margin:24px 0 12px;">替代物料（可多条）</div>
+                <div class="table-wrapper">
+                    <table class="output-table">
+                        <thead><tr><th width="50">序号</th><th>替代物料编码</th><th>替代物料名称</th><th width="100">替代类型</th><th width="80">优先级</th><th width="60"></th></tr></thead>
+                        <tbody id="material-edit-substitute-tbody">
+                            <tr class="mat-edit-sub-row"><td class="mat-edit-sub-seq">1</td><td><input type="text" class="form-input form-input-sm" value="M001-A" style="width:100%;"></td><td><input type="text" class="form-input form-input-sm" value="智能控制器主控板（替代型）" style="width:100%;"></td><td><select class="form-select form-select-sm" style="width:100%;"><option value="mutual" selected>互替</option><option value="prefer">优选</option></select></td><td><input type="number" class="form-input form-input-sm" value="1" min="1" style="width:60px;"></td><td><button type="button" class="btn btn-sm btn-link btn-remove-mat-edit-sub">删除</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" class="btn btn-link btn-add-mat-edit-sub" style="margin-top:8px;">+ 添加替代物料</button>
+
+                <div class="section-title" style="margin:24px 0 12px;">供应商（可多个）</div>
+                <div class="table-wrapper">
+                    <table class="output-table">
+                        <thead><tr><th width="50">序号</th><th>供应商编码</th><th>供应商名称</th><th width="80">是否主供</th><th width="60"></th></tr></thead>
+                        <tbody id="material-edit-supplier-tbody">
+                            <tr class="mat-edit-sup-row"><td class="mat-edit-sup-seq">1</td><td><input type="text" class="form-input form-input-sm" value="SUP-001" style="width:100%;"></td><td><input type="text" class="form-input form-input-sm" value="华强电子" style="width:100%;"></td><td><select class="form-select form-select-sm" style="width:100%;"><option value="0">否</option><option value="1" selected>是</option></select></td><td><button type="button" class="btn btn-sm btn-link btn-remove-mat-edit-sup">删除</button></td></tr>
+                            <tr class="mat-edit-sup-row"><td class="mat-edit-sup-seq">2</td><td><input type="text" class="form-input form-input-sm" value="SUP-002" style="width:100%;"></td><td><input type="text" class="form-input form-input-sm" value="元器件供应商" style="width:100%;"></td><td><select class="form-select form-select-sm" style="width:100%;"><option value="0" selected>否</option><option value="1">是</option></select></td><td><button type="button" class="btn btn-sm btn-link btn-remove-mat-edit-sup">删除</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" class="btn btn-link btn-add-mat-edit-sup" style="margin-top:8px;">+ 添加供应商</button>
+
+                <div class="section-title" style="margin:24px 0 12px;">技术与质量</div>
+                <div style="display:grid;grid-template-columns:1fr;gap:12px;">
+                    <div class="form-item"><label class="form-label">技术参数</label><textarea class="form-textarea" rows="2" placeholder="关键技术参数">工作电压 DC 12V，工作温度 -20°C～60°C</textarea></div>
+                    <div class="form-item"><label class="form-label">质量标准</label><textarea class="form-textarea" rows="2" placeholder="质量检验标准">符合 IPC-A-600 标准</textarea></div>
+                    <div class="form-item"><label class="form-label">备注</label><textarea class="form-textarea" rows="2" placeholder="其他补充说明"></textarea></div>
+                </div>
+
+                <div class="form-actions" style="margin-top:24px;padding-top:16px;border-top:1px solid #eee;">
+                    <button type="button" class="btn btn-primary" id="material-edit-save-2">保存</button>
+                    <button type="button" class="btn btn-default btn-back" data-url="pages/material-detail.html">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+        .page-header-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+        .page-title{font-size:18px;font-weight:600;margin:0 0 8px 0;color:#333;}
+        .page-description{font-size:13px;color:#666;margin:0;}
+        .page-header-actions{display:flex;gap:8px;align-items:center;}
+    </style>
+    <script>
+        if(typeof PageInteractions!=='undefined')PageInteractions.initButtons();
+        (function(){
+            var subTpl='<tr class="mat-edit-sub-row"><td class="mat-edit-sub-seq"></td><td><input type="text" class="form-input form-input-sm" style="width:100%;"></td><td><input type="text" class="form-input form-input-sm" style="width:100%;"></td><td><select class="form-select form-select-sm" style="width:100%;"><option value="mutual">互替</option><option value="prefer">优选</option></select></td><td><input type="number" class="form-input form-input-sm" value="1" min="1" style="width:60px;"></td><td><button type="button" class="btn btn-sm btn-link btn-remove-mat-edit-sub">删除</button></td></tr>';
+            var supTpl='<tr class="mat-edit-sup-row"><td class="mat-edit-sup-seq"></td><td><input type="text" class="form-input form-input-sm" style="width:100%;"></td><td><input type="text" class="form-input form-input-sm" style="width:100%;"></td><td><select class="form-select form-select-sm" style="width:100%;"><option value="0">否</option><option value="1">是</option></select></td><td><button type="button" class="btn btn-sm btn-link btn-remove-mat-edit-sup">删除</button></td></tr>';
+            function refreshSeq(sel,seqClass){var t=document.querySelector(sel);if(!t)return;t.querySelectorAll('tr').forEach(function(r,i){var c=r.querySelector('.'+seqClass);if(c)c.textContent=i+1;});}
+            function bindSub(e){var btn=e.querySelector('.btn-remove-mat-edit-sub');if(btn)btn.onclick=function(){var t=document.getElementById('material-edit-substitute-tbody');if(t&&t.querySelectorAll('.mat-edit-sub-row').length>1){e.remove();refreshSeq('#material-edit-substitute-tbody','mat-edit-sub-seq');}};}
+            function bindSup(e){var btn=e.querySelector('.btn-remove-mat-edit-sup');if(btn)btn.onclick=function(){var t=document.getElementById('material-edit-supplier-tbody');if(t&&t.querySelectorAll('.mat-edit-sup-row').length>1){e.remove();refreshSeq('#material-edit-supplier-tbody','mat-edit-sup-seq');}};}
+            document.addEventListener('click',function(ev){if(ev.target.classList.contains('btn-add-mat-edit-sub')){var t=document.getElementById('material-edit-substitute-tbody');if(t){t.insertAdjacentHTML('beforeend',subTpl);bindSub(t.lastElementChild);refreshSeq('#material-edit-substitute-tbody','mat-edit-sub-seq');}}});
+            document.addEventListener('click',function(ev){if(ev.target.classList.contains('btn-add-mat-edit-sup')){var t=document.getElementById('material-edit-supplier-tbody');if(t){t.insertAdjacentHTML('beforeend',supTpl);bindSup(t.lastElementChild);refreshSeq('#material-edit-supplier-tbody','mat-edit-sup-seq');}}});
+            document.querySelectorAll('#material-edit-substitute-tbody .mat-edit-sub-row').forEach(bindSub);
+            document.querySelectorAll('#material-edit-supplier-tbody .mat-edit-sup-row').forEach(bindSup);
+            function doSave(){alert('✅ 已保存');if(typeof PageLoader!=='undefined')PageLoader.loadPage('pages/material-detail.html');}
+            document.getElementById('material-edit-save')&&document.getElementById('material-edit-save').addEventListener('click',doSave);
+            document.getElementById('material-edit-save-2')&&document.getElementById('material-edit-save-2').addEventListener('click',doSave);
+        })();
+    </script>
+</body>
+</html>

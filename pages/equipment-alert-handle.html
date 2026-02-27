@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>告警处理 - 设备管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/equipment-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">告警管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">告警处理</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">处理设备告警，包括告警确认、告警分析、告警处置、告警关闭等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="告警编号、设备名称">
+                </div>
+                <div class="filter-item">
+                    <label>告警级别</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="critical">严重</option>
+                        <option value="warning">警告</option>
+                        <option value="info">信息</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>处理状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="pending">待处理</option>
+                        <option value="processing">处理中</option>
+                        <option value="resolved">已解决</option>
+                        <option value="closed">已关闭</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary">批量处理</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">告警编号</th>
+                            <th width="150">设备名称</th>
+                            <th width="100">告警级别</th>
+                            <th width="200">告警内容</th>
+                            <th width="120">告警时间</th>
+                            <th width="100">处理状态</th>
+                            <th width="120">处理人</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="alert-id" value="1"></td>
+                            <td>ALERT-2025-001</td>
+                            <td>生产设备A-001</td>
+                            <td><span class="status-badge status-error">严重</span></td>
+                            <td>温度异常，超过安全阈值</td>
+                            <td>2025-01-22 10:30</td>
+                            <td><span class="status-badge status-processing">处理中</span></td>
+                            <td>维护员A</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">处理</button>
+                                <button class="btn btn-sm btn-default">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="alert-id" value="2"></td>
+                            <td>ALERT-2025-002</td>
+                            <td>安全设备B-002</td>
+                            <td><span class="status-badge status-warning">警告</span></td>
+                            <td>压力波动，需要关注</td>
+                            <td>2025-01-22 09:15</td>
+                            <td><span class="status-badge status-success">已解决</span></td>
+                            <td>维护员B</td>
+                            <td>
+                                <button class="btn btn-sm btn-default">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 2 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('告警处理 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>消息列表</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">消息列表</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">任务分配、评审提醒、变更通知等，可按类型、阅读状态筛选，查看与标记已读</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="搜索标题或内容">
+                </div>
+                <div class="filter-item">
+                    <label>消息类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="task">任务分配</option>
+                        <option value="review">评审提醒</option>
+                        <option value="change">变更通知</option>
+                        <option value="system">系统通知</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>阅读状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="unread">未读</option>
+                        <option value="read">已读</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">全部标为已读</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card msg-list">
+            <div class="msg-list-body">
+            <div class="msg-row unread" data-id="1">
+                <span class="msg-dot"></span>
+                <div class="msg-body">
+                    <div class="msg-meta">
+                        <span class="msg-type task">任务分配</span>
+                        <span>系统</span>
+                    </div>
+                    <div class="msg-title">设计任务 DT-2025-002 已分配给您</div>
+                    <div class="msg-preview">传感器模块结构设计，计划完成 2025-03-15，请及时处理。</div>
+                </div>
+                <span class="msg-time">2025-01-28 14:20</span>
+                <div class="msg-actions" onclick="event.stopPropagation()">
+                    <button class="btn btn-sm btn-default">标记已读</button>
+                    <button class="btn btn-sm btn-default btn-view" data-url="pages/design-task-detail.html" data-id="2">查看</button>
+                </div>
+            </div>
+            <div class="msg-row unread" data-id="2">
+                <span class="msg-dot"></span>
+                <div class="msg-body">
+                    <div class="msg-meta">
+                        <span class="msg-type review">评审提醒</span>
+                        <span>张工</span>
+                    </div>
+                    <div class="msg-title">EBOM 变更会审 BG-HS-2025-001 待您评审</div>
+                    <div class="msg-preview">PROD-001 智能控制器 设计缺陷修正，请参与会审。</div>
+                </div>
+                <span class="msg-time">2025-01-28 10:15</span>
+                <div class="msg-actions" onclick="event.stopPropagation()">
+                    <button class="btn btn-sm btn-default">标记已读</button>
+                    <button class="btn btn-sm btn-default btn-view" data-url="pages/change-review-detail.html" data-id="1">查看</button>
+                </div>
+            </div>
+            <div class="msg-row read" data-id="3">
+                <span class="msg-dot"></span>
+                <div class="msg-body">
+                    <div class="msg-meta">
+                        <span class="msg-type change">变更通知</span>
+                        <span>系统</span>
+                    </div>
+                    <div class="msg-title">变更单 CO-2025-003 已执行完成</div>
+                    <div class="msg-preview">物料 M002 替换已生效，相关 BOM 已更新。</div>
+                </div>
+                <span class="msg-time">2025-01-27 16:00</span>
+                <div class="msg-actions" onclick="event.stopPropagation()">
+                    <button class="btn btn-sm btn-default btn-view" data-url="pages/change-order-detail.html" data-id="3">查看</button>
+                </div>
+            </div>
+            <div class="msg-row read" data-id="4">
+                <span class="msg-dot"></span>
+                <div class="msg-body">
+                    <div class="msg-meta">
+                        <span class="msg-type system">系统通知</span>
+                        <span>系统</span>
+                    </div>
+                    <div class="msg-title">设计任务 DT-2025-003 审核已通过</div>
+                    <div class="msg-preview">执行器软件设计 已通过审核，数据已同步至技术任务。</div>
+                </div>
+                <span class="msg-time">2025-01-27 09:30</span>
+                <div class="msg-actions" onclick="event.stopPropagation()">
+                    <button class="btn btn-sm btn-default btn-view" data-url="pages/design-task-detail.html" data-id="3">查看</button>
+                </div>
+            </div>
+            </div>
+
+            <div class="pagination">
+                <div class="pagination-info">共 4 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('消息列表 页面已加载');
+        if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+        document.querySelectorAll('.msg-row').forEach(function (row) {
+            row.addEventListener('click', function (e) {
+                if (e.target.closest('.msg-actions')) return;
+                var btn = row.querySelector('.msg-actions .btn-view');
+                if (btn) btn.click();
+            });
+        });
+    </script>
+</body>
+</html>

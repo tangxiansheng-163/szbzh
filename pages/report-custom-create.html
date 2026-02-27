@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自定义报表设计器</title>
+</head>
+<body>
+    <div class="content-wrapper report-designer-page">
+        <style>
+            .designer-page-title{font-size:18px;font-weight:600;margin:0 0 8px 0;color:#262626;}
+            .designer-page-desc{font-size:13px;color:#595959;margin:0;line-height:1.6;}
+            .designer-layout{display:flex;gap:20px;min-height:600px;margin-top:20px;}
+            .designer-left{width:280px;flex-shrink:0;background:#fff;border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.04);}
+            .designer-right{flex:1;display:flex;flex-direction:column;gap:16px;}
+            .designer-panel-title{background:#fafafa;padding:12px 16px;font-weight:600;font-size:14px;color:#262626;border-bottom:1px solid #e8e8e8;}
+            .designer-panel-body{padding:12px 16px;max-height:360px;overflow-y:auto;}
+            .field-list{display:flex;flex-direction:column;gap:6px;}
+            .field-item{padding:10px 12px;background:#f5f5f5;border-radius:4px;cursor:grab;font-size:13px;display:flex;align-items:center;justify-content:space-between;border:1px solid transparent;transition:background 0.2s,border-color 0.2s;}
+            .field-item:hover{background:#e6f7ff;border-color:#91d5ff;}
+            .field-item.dragging{opacity:0.6;}
+            .field-item .field-name{font-weight:500;}
+            .field-item .field-type{font-size:11px;color:#8c8c8c;margin-left:8px;}
+            .field-item .field-add{color:#1890ff;font-size:14px;cursor:pointer;padding:4px;user-select:none;}
+            .field-item .field-add:hover{color:#40a9ff;}
+            .design-area{border:2px dashed #d9d9d9;border-radius:8px;min-height:80px;padding:16px;background:#fafafa;transition:all 0.2s;}
+            .design-area.drag-over{background:#e6f7ff;border-color:#1890ff;}
+            .design-area-empty{color:#bfbfbf;font-size:13px;text-align:center;padding:24px;}
+            .design-area-title{font-size:13px;font-weight:600;color:#595959;margin-bottom:8px;}
+            .design-area-hint{font-size:12px;color:#bfbfbf;margin-bottom:10px;}
+            .design-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:#fff;border:1px solid #d9d9d9;border-radius:4px;font-size:13px;margin:4px 4px 4px 0;cursor:move;}
+            .design-chip .chip-remove{cursor:pointer;color:#8c8c8c;font-size:14px;line-height:1;padding:0 2px;}
+            .design-chip .chip-remove:hover{color:#ff4d4f;}
+            .designer-card{background:#fff;border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.04);}
+            .designer-card .card-body{padding:20px;}
+            .designer-tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid #e8e8e8;}
+            .designer-tab{padding:10px 20px;cursor:pointer;font-size:14px;color:#595959;transition:color 0.2s;}
+            .designer-tab:hover{color:#1890ff;}
+            .designer-tab.active{color:#1890ff;font-weight:600;border-bottom:2px solid #1890ff;margin-bottom:-1px;}
+            .designer-tab-content{display:none;}
+            .designer-tab-content.active{display:block;}
+            .group-row,.agg-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+            .group-row select,.agg-row select{min-width:140px;}
+            .filter-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+            .filter-row select,.filter-row input{min-width:110px;}
+            .filter-and-or{font-size:12px;color:#8c8c8c;width:40px;text-align:center;}
+            .designer-actions{margin-top:24px;padding-top:20px;border-top:1px solid #e8e8e8;display:flex;gap:12px;}
+            .calc-field-row{display:flex;gap:8px;align-items:center;margin-bottom:10px;}
+            .calc-field-row input{flex:1;}
+            .chart-opt-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+            .chart-opt-item{padding:16px;border:2px solid #e8e8e8;border-radius:8px;text-align:center;cursor:pointer;transition:all 0.2s;}
+            .chart-opt-item:hover,.chart-opt-item.selected{border-color:#1890ff;background:#e6f7ff;}
+            .chart-opt-item .chart-icon{font-size:24px;margin-bottom:8px;}
+            .step-indicator{display:flex;gap:8px;margin-bottom:20px;font-size:12px;}
+            .step-dot{width:24px;height:24px;border-radius:50%;background:#e8e8e8;color:#8c8c8c;display:flex;align-items:center;justify-content:center;}
+            .step-dot.done{background:#52c41a;color:#fff;}
+            .step-dot.active{background:#1890ff;color:#fff;}
+        </style>
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">报表管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/report-dashboard.html" class="breadcrumb-item">报表中心</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/report-custom.html" class="breadcrumb-item">自定义报表</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">报表设计器</span>
+        </div>
+
+        <div class="page-header">
+            <h2 class="designer-page-title">自定义报表设计器</h2>
+            <p class="designer-page-desc">由您定义报表结构：选择数据源 → 拖拽或点击添加字段到报表列 → 配置分组汇总、过滤、排序 → 可选绑定图表、计算字段、样式。设计保存后可重复运行、订阅、分享、发布。</p>
+        </div>
+
+        <div class="designer-layout">
+            <!-- 左侧：数据源与可用字段 -->
+            <div class="designer-left">
+                <div class="designer-panel-title">1. 选择数据源</div>
+                <div class="designer-panel-body">
+                    <div class="form-item">
+                        <label class="form-label" for="ds-select">数据源</label>
+                        <select id="ds-select" name="dataSource" class="form-select" style="width:100%;" aria-label="选择数据源">
+                            <option value="bom" selected>BOM 主数据</option>
+                            <option value="change">变更单</option>
+                            <option value="task">技术任务</option>
+                            <option value="alert">预警记录</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="designer-panel-title">2. 可用字段（拖拽或点击 + 添加）</div>
+                <div class="designer-panel-body field-list" id="field-list" role="list">
+                    <div class="field-item" data-field="dept" data-name="部门" draggable="true" role="listitem"><span><span class="field-name">部门</span><span class="field-type">文本</span></span><span class="field-add" role="button" tabindex="0" aria-label="添加部门到报表列">+</span></div>
+                    <div class="field-item" data-field="bomType" data-name="BOM 类型" draggable="true" role="listitem"><span><span class="field-name">BOM 类型</span><span class="field-type">文本</span></span><span class="field-add" role="button" tabindex="0" aria-label="添加BOM类型到报表列">+</span></div>
+                    <div class="field-item" data-field="productCode" data-name="产品编码" draggable="true" role="listitem"><span><span class="field-name">产品编码</span><span class="field-type">文本</span></span><span class="field-add" role="button" tabindex="0" aria-label="添加产品编码到报表列">+</span></div>
+                    <div class="field-item" data-field="createCount" data-name="创建数量" draggable="true" role="listitem"><span><span class="field-name">创建数量</span><span class="field-type">数值</span></span><span class="field-add" role="button" tabindex="0" aria-label="添加创建数量到报表列">+</span></div>
+                    <div class="field-item" data-field="publishCount" data-name="发布数量" draggable="true" role="listitem"><span><span class="field-name">发布数量</span><span class="field-type">数值</span></span><span class="field-add" role="button" tabindex="0" aria-label="添加发布数量到报表列">+</span></div>
+                    <div class="field-item" data-field="createTime" data-name="创建时间" draggable="true" role="listitem"><span><span class="field-name">创建时间</span><span class="field-type">日期</span></span><span class="field-add" role="button" tabindex="0" aria-label="添加创建时间到报表列">+</span></div>
+                    <div class="field-item" data-field="status" data-name="状态" draggable="true" role="listitem"><span><span class="field-name">状态</span><span class="field-type">文本</span></span><span class="field-add" role="button" tabindex="0" aria-label="添加状态到报表列">+</span></div>
+                </div>
+            </div>
+
+            <!-- 右侧：Tab 设计区 -->
+            <div class="designer-right">
+                <div class="designer-card">
+                    <div class="card-body">
+                        <div class="form-item" style="margin-bottom:20px;">
+                            <label class="form-label required" for="rpt-name">报表名称</label>
+                            <input type="text" id="rpt-name" name="reportName" class="form-input" value="部门 BOM 创建量统计" placeholder="请输入报表名称">
+                        </div>
+
+                        <div class="designer-tabs" role="tablist">
+                            <div class="designer-tab active" data-tab="base" role="tab" aria-selected="true">基础设计</div>
+                            <div class="designer-tab" data-tab="calc" role="tab" aria-selected="false">计算字段</div>
+                            <div class="designer-tab" data-tab="chart" role="tab" aria-selected="false">图表绑定</div>
+                            <div class="designer-tab" data-tab="style" role="tab" aria-selected="false">样式设置</div>
+                        </div>
+
+                        <!-- Tab: 基础设计 -->
+                        <div class="designer-tab-content active" id="tab-base" role="tabpanel">
+                            <div class="design-area-title">3. 报表列（已选字段，可拖拽排序）</div>
+                            <div class="design-area-hint">从左侧拖拽或点击 + 添加。决定报表显示哪些列。</div>
+                            <div class="design-area" id="report-columns-area" role="list" aria-label="已选报表列">
+                                <span class="design-chip" data-field="dept">部门 <span class="chip-remove" role="button" aria-label="移除部门">×</span></span>
+                                <span class="design-chip" data-field="bomType">BOM 类型 <span class="chip-remove" role="button" aria-label="移除BOM类型">×</span></span>
+                                <span class="design-chip" data-field="createCount">创建数量 <span class="chip-remove" role="button" aria-label="移除创建数量">×</span></span>
+                                <span class="design-chip" data-field="publishCount">发布数量 <span class="chip-remove" role="button" aria-label="移除发布数量">×</span></span>
+                            </div>
+
+                            <div class="design-area-title" style="margin-top:24px;">4. 分组汇总</div>
+                            <div class="design-area-hint">可设置多级分组；汇总字段需选择聚合方式（求和/计数/平均/最大/最小）。</div>
+                            <div class="group-row">
+                                <label class="form-label" for="group1" style="min-width:60px;">分组 1</label>
+                                <select id="group1" name="group1" class="form-select"><option value="dept" selected>部门</option><option value="bomType">BOM 类型</option></select>
+                            </div>
+                            <div class="group-row">
+                                <label class="form-label" for="group2" style="min-width:60px;">分组 2</label>
+                                <select id="group2" name="group2" class="form-select"><option value="">不分组</option><option value="bomType" selected>BOM 类型</option><option value="dept">部门</option></select>
+                            </div>
+                            <div class="agg-row" style="margin-top:12px;">
+                                <label class="form-label" for="agg-field1" style="min-width:60px;">汇总</label>
+                                <select id="agg-field1" name="aggField1" class="form-select"><option value="createCount">创建数量</option></select>
+                                <select id="agg-func1" name="aggFunc1" class="form-select"><option value="sum" selected>求和</option><option value="count">计数</option><option value="avg">平均</option><option value="max">最大</option><option value="min">最小</option></select>
+                            </div>
+                            <div class="agg-row">
+                                <span style="min-width:60px;"></span>
+                                <select id="agg-field2" name="aggField2" class="form-select"><option value="publishCount">发布数量</option></select>
+                                <select id="agg-func2" name="aggFunc2" class="form-select"><option value="sum" selected>求和</option><option value="count">计数</option></select>
+                            </div>
+
+                            <div class="design-area-title" style="margin-top:24px;">5. 过滤条件</div>
+                            <div class="design-area-hint">可添加多条，支持等于、包含、介于、大于、小于等运算符。</div>
+                            <div class="filter-row">
+                                <select id="filter-field1" name="filterField1" class="form-select"><option>创建时间</option></select>
+                                <select id="filter-op1" name="filterOp1" class="form-select"><option>介于</option><option>等于</option><option>大于</option><option>小于</option></select>
+                                <input type="date" id="filter-val1a" name="filterVal1a" class="form-input" value="2025-01-01" aria-label="过滤值起">
+                                <span>至</span>
+                                <input type="date" id="filter-val1b" name="filterVal1b" class="form-input" value="2025-01-31" aria-label="过滤值止">
+                            </div>
+                            <div class="filter-row">
+                                <span class="filter-and-or">且</span>
+                                <select id="filter-field2" name="filterField2" class="form-select"><option>状态</option></select>
+                                <select id="filter-op2" name="filterOp2" class="form-select"><option>等于</option><option>包含</option></select>
+                                <input type="text" id="filter-val2" name="filterVal2" class="form-input" value="已发布" placeholder="值">
+                            </div>
+
+                            <div class="design-area-title" style="margin-top:24px;">6. 排序</div>
+                            <div class="group-row">
+                                <label class="form-label" for="sort-field1" style="min-width:60px;">主排序</label>
+                                <select id="sort-field1" name="sortField1" class="form-select"><option value="createCount" selected>创建数量</option></select>
+                                <select id="sort-order1" name="sortOrder1" class="form-select"><option value="desc" selected>降序</option><option value="asc">升序</option></select>
+                            </div>
+                            <div class="group-row">
+                                <label class="form-label" for="sort-field2" style="min-width:60px;">次排序</label>
+                                <select id="sort-field2" name="sortField2" class="form-select"><option value="dept" selected>部门</option></select>
+                                <select id="sort-order2" name="sortOrder2" class="form-select"><option value="asc" selected>升序</option><option value="desc">降序</option></select>
+                            </div>
+                        </div>
+
+                        <!-- Tab: 计算字段 -->
+                        <div class="designer-tab-content" id="tab-calc" role="tabpanel">
+                            <div class="design-area-hint">基于已有字段创建计算列，如：发布率 = 发布数量/创建数量×100%。</div>
+                            <div class="calc-field-row" style="margin-top:16px;">
+                                <input type="text" id="calc-name" name="calcName" class="form-input" placeholder="计算字段名称，如：发布率" aria-label="计算字段名称">
+                                <input type="text" id="calc-expr" name="calcExpr" class="form-input" placeholder="表达式，如：[发布数量]/[创建数量]*100" style="flex:2;" aria-label="计算公式">
+                            </div>
+                            <div class="calc-field-row">
+                                <input type="text" id="calc-added-name" name="calcAddedName" class="form-input" value="发布率" readonly aria-label="已添加计算字段名称">
+                                <input type="text" id="calc-added-expr" name="calcAddedExpr" class="form-input" value="[发布数量]/[创建数量]*100" readonly style="flex:2;" aria-label="已添加计算公式">
+                                <span class="chip-remove" role="button" aria-label="移除计算字段">×</span>
+                            </div>
+                        </div>
+
+                        <!-- Tab: 图表绑定 -->
+                        <div class="designer-tab-content" id="tab-chart" role="tabpanel">
+                            <div class="design-area-hint">可选择将报表数据绑定为图表展示。</div>
+                            <div class="chart-opt-grid" style="margin-top:16px;" role="group" aria-label="图表类型选择">
+                                <div class="chart-opt-item" data-chart="none" role="button" tabindex="0">仅表格</div>
+                                <div class="chart-opt-item selected" data-chart="bar" role="button" tabindex="0"><div class="chart-icon">📊</div>柱状图</div>
+                                <div class="chart-opt-item" data-chart="line" role="button" tabindex="0"><div class="chart-icon">📈</div>折线图</div>
+                                <div class="chart-opt-item" data-chart="pie" role="button" tabindex="0"><div class="chart-icon">🥧</div>饼图</div>
+                            </div>
+                            <div class="form-item" style="margin-top:16px;">
+                                <label class="form-label" for="chart-x">X 轴 / 分类</label>
+                                <select id="chart-x" name="chartX" class="form-select"><option value="dept" selected>部门</option></select>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label" for="chart-y">Y 轴 / 数值</label>
+                                <select id="chart-y" name="chartY" class="form-select"><option value="createCount" selected>创建数量</option><option value="publishCount">发布数量</option></select>
+                            </div>
+                        </div>
+
+                        <!-- Tab: 样式设置 -->
+                        <div class="designer-tab-content" id="tab-style" role="tabpanel">
+                            <div class="design-area-hint">设置报表表格样式。</div>
+                            <div class="form-item" style="margin-top:16px;">
+                                <label class="form-label" for="style-header">表头背景</label>
+                                <select id="style-header" name="styleHeader" class="form-select"><option value="gray">浅灰</option><option value="blue" selected>蓝色</option></select>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label" for="style-stripe">斑马纹</label>
+                                <select id="style-stripe" name="styleStripe" class="form-select"><option value="1" selected>启用</option><option value="0">禁用</option></select>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label" for="style-colwidth">默认列宽</label>
+                                <input type="number" id="style-colwidth" name="styleColWidth" class="form-input" value="120" min="60" aria-label="默认列宽像素"> px
+                            </div>
+                        </div>
+
+                        <div class="designer-actions">
+                            <button type="button" class="btn btn-primary">保存报表</button>
+                            <button type="button" class="btn btn-default" data-open-modal="preview-modal">预览</button>
+                            <a href="pages/report-custom.html" class="btn btn-default">取消</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="preview-modal" class="modal-overlay">
+            <div class="modal" style="max-width:900px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">报表预览</span><button type="button" class="modal-close" data-close-modal="preview-modal" aria-label="关闭">×</button></div>
+                <div class="modal-body">
+                    <p class="modal-desc" style="margin-bottom:16px;font-size:13px;color:#595959;">根据当前设计生成的预览。保存后可运行、导出、订阅。</p>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr><th>部门</th><th>BOM 类型</th><th>创建数量</th><th>发布数量</th><th>发布率</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>研发部</td><td>EBOM</td><td>12</td><td>10</td><td>83.3%</td></tr>
+                                <tr><td>研发部</td><td>MBOM</td><td>8</td><td>7</td><td>87.5%</td></tr>
+                                <tr><td>工艺部</td><td>MBOM</td><td>8</td><td>8</td><td>100%</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="preview-modal">关闭</button><button type="button" class="btn btn-primary">导出 Excel</button></div>
+            </div>
+        </div>
+    </div>
+    <script>
+(function(){
+    // Tab 切换
+    var tabs=document.querySelectorAll('.designer-tab');
+    var contents=document.querySelectorAll('.designer-tab-content');
+    tabs.forEach(function(t){
+        t.addEventListener('click',function(){
+            var id=this.getAttribute('data-tab');
+            tabs.forEach(function(x){x.classList.remove('active');x.setAttribute('aria-selected','false');});
+            contents.forEach(function(c){c.classList.remove('active');});
+            this.classList.add('active');this.setAttribute('aria-selected','true');
+            var pane=document.getElementById('tab-'+id);
+            if(pane)pane.classList.add('active');
+        });
+    });
+    // 点击 + 添加字段到报表列
+    var fieldList=document.getElementById('field-list');
+    var colsArea=document.getElementById('report-columns-area');
+    var selectedFields=[];
+    function renderColumns(){
+        colsArea.innerHTML='';
+        if(selectedFields.length===0){
+            colsArea.innerHTML='<div class="design-area-empty">从左侧拖拽或点击 + 添加字段</div>';
+            return;
+        }
+        selectedFields.forEach(function(f){
+            var chip=document.createElement('span');
+            chip.className='design-chip';
+            chip.setAttribute('data-field',f.id);
+            chip.draggable=true;
+            chip.innerHTML=f.name+' <span class="chip-remove" role="button" tabindex="0" aria-label="移除'+f.name+'">×</span>';
+            colsArea.appendChild(chip);
+        });
+    }
+    function addField(id,name){
+        if(selectedFields.some(function(x){return x.id===id;}))return;
+        selectedFields.push({id:id,name:name});
+        renderColumns();
+    }
+    function removeField(id){
+        selectedFields=selectedFields.filter(function(x){return x.id!==id;});
+        renderColumns();
+    }
+    fieldList&&fieldList.querySelectorAll('.field-item').forEach(function(el){
+        var id=el.getAttribute('data-field');
+        var name=el.getAttribute('data-name');
+        el.querySelector('.field-add').addEventListener('click',function(){addField(id,name);});
+        el.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' ')addField(id,name);});
+    });
+    // 初始化已选
+    var chips=colsArea.querySelectorAll('.design-chip');
+    if(chips.length>0){selectedFields=[];chips.forEach(function(c){var f=c.getAttribute('data-field');var n=c.textContent.replace(/\s*×\s*/,'').trim();selectedFields.push({id:f,name:n});});}
+    // 删除 chip 事件（委托）
+    colsArea.addEventListener('click',function(e){
+        var rm=e.target.closest('.chip-remove');
+        if(rm){var chip=rm.closest('.design-chip');if(chip){var id=chip.getAttribute('data-field');removeField(id);}}
+    });
+    // 拖拽添加
+    fieldList&&fieldList.querySelectorAll('.field-item').forEach(function(el){
+        el.addEventListener('dragstart',function(e){e.dataTransfer.setData('text/plain',JSON.stringify({id:el.getAttribute('data-field'),name:el.getAttribute('data-name')}));el.classList.add('dragging');});
+        el.addEventListener('dragend',function(){el.classList.remove('dragging');});
+    });
+    colsArea.addEventListener('dragover',function(e){e.preventDefault();colsArea.classList.add('drag-over');});
+    colsArea.addEventListener('dragleave',function(){colsArea.classList.remove('drag-over');});
+    colsArea.addEventListener('drop',function(e){
+        e.preventDefault();colsArea.classList.remove('drag-over');
+        try{var d=JSON.parse(e.dataTransfer.getData('text/plain'));addField(d.id,d.name);}catch(err){}
+    });
+    // 图表选择
+    document.querySelectorAll('.chart-opt-item').forEach(function(el){
+        el.addEventListener('click',function(){document.querySelectorAll('.chart-opt-item').forEach(function(x){x.classList.remove('selected');});el.classList.add('selected');});
+        el.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();el.click();}});
+    });
+})();
+if(typeof PageInteractions!=='undefined')PageInteractions.initButtons();
+    </script>
+</body>
+</html>

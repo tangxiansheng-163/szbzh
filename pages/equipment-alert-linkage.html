@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>告警联动 - 设备管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/equipment-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">告警管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">告警联动</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">配置告警联动规则，包括告警触发动作、联动设备、联动流程等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="联动规则编号、设备名称">
+                </div>
+                <div class="filter-item">
+                    <label>联动类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="equipment">设备联动</option>
+                        <option value="notification">通知联动</option>
+                        <option value="workflow">流程联动</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>联动状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="active">已启用</option>
+                        <option value="disabled">已禁用</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary">+ 新建联动规则</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">规则编号</th>
+                            <th width="150">触发设备</th>
+                            <th width="100">联动类型</th>
+                            <th width="200">联动动作</th>
+                            <th width="100">联动状态</th>
+                            <th width="120">创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="linkage-id" value="1"></td>
+                            <td>LINK-001</td>
+                            <td>生产设备A-001</td>
+                            <td>设备联动</td>
+                            <td>温度超限时自动停机</td>
+                            <td><span class="status-badge status-success">已启用</span></td>
+                            <td>2025-01-15</td>
+                            <td>
+                                <button class="btn btn-sm btn-default">查看</button>
+                                <button class="btn btn-sm btn-default">编辑</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 1 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('告警联动 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

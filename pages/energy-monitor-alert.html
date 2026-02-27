@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>异常预警 - 能源管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/energy-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">能源在线监测</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">异常预警</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">监测能源异常情况，包括能耗异常、设备故障、数据异常等预警信息。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="预警编号、设备/区域">
+                </div>
+                <div class="filter-item">
+                    <label>预警类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="consumption">能耗异常</option>
+                        <option value="equipment">设备故障</option>
+                        <option value="data">数据异常</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>预警级别</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="critical">严重</option>
+                        <option value="warning">警告</option>
+                        <option value="info">信息</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">预警编号</th>
+                            <th width="150">设备/区域</th>
+                            <th width="100">预警类型</th>
+                            <th width="100">预警级别</th>
+                            <th width="200">预警内容</th>
+                            <th width="120">预警时间</th>
+                            <th width="100">处理状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="alert-id" value="1"></td>
+                            <td>ALERT-2025-001</td>
+                            <td>生产车间A</td>
+                            <td>能耗异常</td>
+                            <td><span class="status-badge status-error">严重</span></td>
+                            <td>能耗超出计划值20%</td>
+                            <td>2025-01-22 09:30</td>
+                            <td><span class="status-badge status-processing">处理中</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">处理</button>
+                                <button class="btn btn-sm btn-default">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 1 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('异常预警 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备档案 - 设备管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/equipment-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">设备台账管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">设备档案</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理设备档案信息，包括设备基本信息、技术文档、维护记录、历史记录等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="设备编码、设备名称">
+                </div>
+                <div class="filter-item">
+                    <label>设备类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="production">生产设备</option>
+                        <option value="safety">安全设备</option>
+                        <option value="energy">能源设备</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary">+ 新建档案</button>
+                <button class="btn btn-default">批量导入</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">设备编码</th>
+                            <th width="200">设备名称</th>
+                            <th width="150">设备类型</th>
+                            <th width="120">所属部门</th>
+                            <th width="120">安装日期</th>
+                            <th width="100">档案状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="archive-id" value="1"></td>
+                            <td>EQ-001</td>
+                            <td>生产设备A-001</td>
+                            <td>生产设备</td>
+                            <td>生产部</td>
+                            <td>2024-02-01</td>
+                            <td><span class="status-badge status-success">完整</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default">查看</button>
+                                <button class="btn btn-sm btn-default">编辑</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 1 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('设备档案 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

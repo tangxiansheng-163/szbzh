@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工作流配置</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">系统配置</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">工作流配置</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">配置业务流程的审批节点、流转条件、审批人规则；支持 EBOM/MBOM/SBOM 评审流程、变更会审流程、变更单审批流程等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>流程名称</label>
+                    <input type="text" class="form-input" placeholder="流程名称">
+                </div>
+                <div class="filter-item">
+                    <label>关联业务</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="ebom">EBOM 评审</option>
+                        <option value="mbom">MBOM 评审</option>
+                        <option value="sbom">SBOM 评审</option>
+                        <option value="review">变更会审</option>
+                        <option value="change">变更单审批</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="enabled">启用</option>
+                        <option value="disabled">停用</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary" data-open-modal="workflow-add-modal">+ 新增流程</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>流程名称</th>
+                            <th>关联业务</th>
+                            <th>版本</th>
+                            <th>审批节点数</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>EBOM 评审流程</td>
+                            <td>EBOM 评审</td>
+                            <td>V1.0</td>
+                            <td>4</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="workflow-design-modal">设计</button> <button class="btn btn-sm btn-default" data-open-modal="workflow-edit-modal">编辑</button></td>
+                        </tr>
+                        <tr>
+                            <td>MBOM 评审流程</td>
+                            <td>MBOM 评审</td>
+                            <td>V1.0</td>
+                            <td>5</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="workflow-design-modal">设计</button> <button class="btn btn-sm btn-default" data-open-modal="workflow-edit-modal">编辑</button></td>
+                        </tr>
+                        <tr>
+                            <td>SBOM 评审流程</td>
+                            <td>SBOM 评审</td>
+                            <td>V1.0</td>
+                            <td>4</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="workflow-design-modal">设计</button> <button class="btn btn-sm btn-default" data-open-modal="workflow-edit-modal">编辑</button></td>
+                        </tr>
+                        <tr>
+                            <td>变更会审流程</td>
+                            <td>变更会审</td>
+                            <td>V1.0</td>
+                            <td>1（多部门并行）</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="workflow-design-modal">设计</button> <button class="btn btn-sm btn-default" data-open-modal="workflow-edit-modal">编辑</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="workflow-design-modal" class="modal-overlay">
+            <div class="modal" style="max-width:640px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">流程设计 - EBOM 评审流程</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <p class="modal-desc">配置审批节点、流转条件、审批人规则（原型演示）。</p>
+                    <div style="border:1px dashed #e8e8e8;border-radius:8px;padding:40px;text-align:center;color:#999;background:#fafafa;">
+                        <div style="margin-bottom:12px;">流程设计器</div>
+                        <div style="font-size:13px;">节点：提交 → 研发审批 → 工艺审批 → 发布</div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="workflow-design-modal">关闭</button></div>
+            </div>
+        </div>
+        <div id="workflow-add-modal" class="modal-overlay">
+            <div class="modal" style="max-width:520px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">新增工作流</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <div class="form-item"><label class="form-label required">流程名称</label><input type="text" class="form-input" placeholder="请输入"></div>
+                    <div class="form-item"><label class="form-label required">关联业务</label><select class="form-select"><option value="">请选择</option><option value="ebom">EBOM 评审</option><option value="mbom">MBOM 评审</option><option value="sbom">SBOM 评审</option><option value="review">变更会审</option></select></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="workflow-add-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="workflow-add-modal" onclick="alert('✅ 流程已创建，请设计审批节点')">保存</button></div>
+            </div>
+        </div>
+        <div id="workflow-edit-modal" class="modal-overlay">
+            <div class="modal" style="max-width:520px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">编辑工作流</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <div class="form-item"><label class="form-label">流程名称</label><input type="text" class="form-input" value="EBOM 评审流程" readonly></div>
+                    <div class="form-item"><label class="form-label">状态</label><select class="form-select"><option value="enabled" selected>启用</option><option value="disabled">停用</option></select></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="workflow-edit-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="workflow-edit-modal" onclick="alert('✅ 已保存')">保存</button></div>
+            </div>
+        </div>
+    </div>
+    <script>if(typeof PageInteractions!=='undefined')PageInteractions.initButtons();</script>
+</body>
+</html>

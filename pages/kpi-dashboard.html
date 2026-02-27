@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KPI 仪表盘</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <style>
+            .kpi-wrap { max-width: 1400px; margin: 0 auto; }
+            .kpi-tb { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+            .kpi-tb-left, .kpi-tb-right { display: flex; align-items: center; gap: 12px; }
+            .kpi-tb .form-select { width: 150px; }
+            .kpi-tb-hint { font-size: 12px; color: #8c8c8c; }
+            .kpi-hero { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 28px; }
+            .kpi-hero-c { background: #fff; border-radius: 8px; padding: 24px 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e8e8e8; }
+            .kpi-hero-c.h-blue { border-left: 4px solid #1890ff; background: linear-gradient(135deg, #e6f7ff 0%, #fff 40%); }
+            .kpi-hero-c.h-green { border-left: 4px solid #52c41a; }
+            .kpi-hero-c.h-orange { border-left: 4px solid #faad14; background: linear-gradient(135deg, #fffbe6 0%, #fff 40%); }
+            .kpi-hero-l { font-size: 13px; color: #595959; margin-bottom: 10px; font-weight: 500; }
+            .kpi-hero-v { font-size: 36px; font-weight: 700; color: #262626; line-height: 1.2; letter-spacing: -1px; }
+            .kpi-hero-c.h-blue .kpi-hero-v { color: #1890ff; }
+            .kpi-hero-c.h-green .kpi-hero-v { color: #52c41a; }
+            .kpi-hero-c.h-orange .kpi-hero-v { color: #faad14; }
+            .kpi-hero-d { font-size: 12px; color: #8c8c8c; margin-top: 10px; line-height: 1.5; }
+            .kpi-hero-comp { font-size: 11px; color: #52c41a; margin-top: 4px; }
+            .kpi-hero-comp.down { color: #ff4d4f; }
+            .kpi-sec { margin-bottom: 28px; }
+            .kpi-sec-hint { font-size: 12px; color: #8c8c8c; margin: -8px 0 12px 0; line-height: 1.5; }
+            .kpi-sec-t { font-size: 17px; font-weight: 600; color: #262626; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 3px solid #1890ff; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+            .kpi-sec-link { font-size: 13px; font-weight: 400; color: #1890ff; text-decoration: none; }
+            .kpi-sec-link:hover { text-decoration: underline; }
+            .kpi-chart-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+            .kpi-chart-card { background: #fff; border-radius: 8px; padding: 20px; border: 1px solid #e8e8e8; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+            .kpi-chart-card.wide { grid-column: span 2; }
+            .kpi-chart-card.full { grid-column: span 3; }
+            .kpi-chart-card.clickable { cursor: pointer; transition: box-shadow 0.2s; }
+            .kpi-chart-card.clickable:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+            .kpi-chart-title { font-size: 15px; font-weight: 600; color: #262626; margin-bottom: 16px; }
+            .kpi-chart-title .kpi-link { font-size: 12px; color: #1890ff; font-weight: 400; margin-left: 8px; }
+            .kpi-target { font-size: 11px; color: #8c8c8c; font-weight: 400; margin-left: 6px; }
+            .kpi-chart { width: 100%; min-width: 180px; height: 220px; min-height: 180px; }
+            .kpi-chart.gauge { height: 200px; min-height: 180px; }
+            .kpi-chart.bar { height: 280px; min-height: 240px; }
+            .kpi-chart.line { height: 280px; min-height: 240px; }
+            .kpi-chart.pie { height: 280px; min-height: 240px; }
+            .kpi-alert-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #fffbf0; border: 1px solid #ffd591; border-radius: 6px; margin-bottom: 12px; }
+            .kpi-alert-row:last-child { margin-bottom: 0; }
+            .kpi-alert-info { font-size: 14px; color: #262626; }
+            .kpi-alert-link { font-size: 13px; color: #1890ff; }
+            @media (max-width:1200px) { .kpi-hero { grid-template-columns: repeat(2,1fr); } .kpi-chart-grid { grid-template-columns: 1fr; } .kpi-chart-card.wide { grid-column: span 1; } .kpi-chart-card.full { grid-column: span 1; } }
+            @media (max-width:768px) { .kpi-hero { grid-template-columns: 1fr; } }
+        </style>
+
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">考核与改进</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">KPI 仪表盘</span>
+        </div>
+
+        <div class="page-header">
+            <h2 class="page-title">BOM 管理 KPI 仪表盘</h2>
+            <p class="page-description">按《BOM全生命周期管理体系》考核目标，监控各部门 BOM 管理核心指标：EBOM 数据准确率、变更及时率、MBOM 转化及时率、MBOM 数据完整性、BOM 执行合规率、跨系统同步成功率、异常处理及时率；支撑月度统计、季度考核、年度总评。</p>
+        </div>
+
+        <div class="kpi-wrap">
+            <div class="kpi-tb">
+                <div class="kpi-tb-left">
+                    <label>考核周期</label>
+                    <select class="form-select" id="kpi-period">
+                        <option value="2025-01">2025年1月</option>
+                        <option value="2024-12">2024年12月</option>
+                        <option value="2024-Q4">2024年Q4</option>
+                        <option value="2024">2024年</option>
+                    </select>
+                    <span class="kpi-tb-hint">数据截止：2025-01-31 18:00</span>
+                </div>
+                <div class="kpi-tb-right">
+                    <button class="btn btn-default">导出报表</button>
+                </div>
+            </div>
+
+            <div class="kpi-hero">
+                <div class="kpi-hero-c h-blue"><div class="kpi-hero-l">整体达标率</div><div class="kpi-hero-v">71.4%</div><div class="kpi-hero-d">7 项核心指标中 5 项达标</div><div class="kpi-hero-comp">较上月 +2.1% 环比↑</div></div>
+                <div class="kpi-hero-c"><div class="kpi-hero-l">部门平均得分</div><div class="kpi-hero-v">91.2</div><div class="kpi-hero-d">研发部 96 分领先</div><div class="kpi-hero-comp">较上月 +1.5 同比↑</div></div>
+                <div class="kpi-hero-c h-orange"><div class="kpi-hero-l">未达标指标</div><div class="kpi-hero-v">2</div><div class="kpi-hero-d">EBOM变更及时率、ERP同步成功率</div><div class="kpi-hero-comp">较上月 -1 已制定改进计划</div></div>
+                <div class="kpi-hero-c h-green"><div class="kpi-hero-l">较上月提升</div><div class="kpi-hero-v">+3.2%</div><div class="kpi-hero-d">整体指标持续改善</div></div>
+            </div>
+
+            <!-- 未达标指标与改进计划打通 -->
+            <div class="kpi-sec">
+                <h3 class="kpi-sec-t">未达标指标 · 关联改进计划</h3>
+                <a href="pages/improvement-plan.html?source=kpi" class="kpi-sec-link">查看全部改进计划 →</a>
+            </div>
+            <div class="card" style="margin-bottom:28px;">
+                <div class="card-body">
+                    <div class="kpi-alert-row">
+                        <span class="kpi-alert-info"><strong>EBOM 变更及时率</strong> 95% / 目标 98%，研发部为主要责任部门</span>
+                        <a href="pages/improvement-plan.html?source=kpi&item=change-timeliness" class="kpi-alert-link">查看改进计划 IMP-2025-001 →</a>
+                    </div>
+                    <div class="kpi-alert-row">
+                        <span class="kpi-alert-info"><strong>跨系统同步成功率</strong> 97.5% / 目标 99.9%，PLM→ERP 共 2 次失败</span>
+                        <a href="pages/improvement-plan.html?source=kpi&item=sync" class="kpi-alert-link">查看改进计划 IMP-2025-002 →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kpi-sec">
+                <h3 class="kpi-sec-t">核心指标仪表图</h3>
+                <p class="kpi-sec-hint">考核标准：研发部门 EBOM≥99.5%/98% · 工艺部门 MBOM≥97%/99% · 采购/库存/生产 BOM执行≥99.8% · IT 跨系统同步≥99.9% · 各业务部门 异常处理≥95%</p>
+            </div>
+            <div class="kpi-chart-grid" style="margin-bottom:28px;">
+                <div class="kpi-chart-card"><div class="kpi-chart-title">EBOM 数据准确率 <span style="color:#52c41a;font-size:13px;">达标</span><span class="kpi-target" title="研发部门考核，准确条数/总条数×100%">目标≥99.5%</span></div><div id="chart-gauge1" class="kpi-chart gauge"></div></div>
+                <div class="kpi-chart-card"><div class="kpi-chart-title">EBOM 变更及时率 <span style="color:#faad14;font-size:13px;">未达标</span> <a href="pages/improvement-plan.html?source=kpi&item=change-timeliness" class="kpi-link">改进计划</a><span class="kpi-target">目标≥98%</span></div><div id="chart-gauge2" class="kpi-chart gauge"></div></div>
+                <div class="kpi-chart-card"><div class="kpi-chart-title">MBOM 转化及时率 <span style="color:#52c41a;font-size:13px;">达标</span><span class="kpi-target">目标≥97%</span></div><div id="chart-gauge3" class="kpi-chart gauge"></div></div>
+                <div class="kpi-chart-card"><div class="kpi-chart-title">MBOM 数据完整性 <span style="color:#52c41a;font-size:13px;">达标</span><span class="kpi-target">目标≥99%</span></div><div id="chart-gauge4" class="kpi-chart gauge"></div></div>
+                <div class="kpi-chart-card"><div class="kpi-chart-title">BOM 执行合规率 <span style="color:#52c41a;font-size:13px;">达标</span><span class="kpi-target">目标≥99.8%</span></div><div id="chart-gauge5" class="kpi-chart gauge"></div></div>
+                <div class="kpi-chart-card"><div class="kpi-chart-title">跨系统同步成功率 <span style="color:#faad14;font-size:13px;">未达标</span> <a href="pages/improvement-plan.html?source=kpi&item=sync" class="kpi-link">改进计划</a><span class="kpi-target">目标≥99.9%</span></div><div id="chart-gauge6" class="kpi-chart gauge"></div></div>
+                <div class="kpi-chart-card"><div class="kpi-chart-title">异常处理及时率 <span style="color:#52c41a;font-size:13px;">达标</span><span class="kpi-target">目标≥95%</span></div><div id="chart-gauge7" class="kpi-chart gauge"></div></div>
+            </div>
+
+            <div class="kpi-sec">
+                <h3 class="kpi-sec-t">未达标指标趋势分析（近 6 个月）</h3>
+                <span style="font-size:13px;color:#8c8c8c;">聚焦 EBOM 变更及时率、跨系统同步成功率，便于根因分析</span>
+            </div>
+            <div class="kpi-chart-grid" style="margin-bottom:28px;">
+                <div class="kpi-chart-card full"><div id="chart-line" class="kpi-chart line"></div></div>
+            </div>
+
+            <div class="kpi-sec">
+                <h3 class="kpi-sec-t">部门得分排名（柱状图）</h3>
+                <a href="pages/performance-stats.html?object=dept" class="kpi-sec-link">按部门下钻查看明细 →</a>
+            </div>
+            <div class="kpi-chart-grid" style="margin-bottom:28px;">
+                <div class="kpi-chart-card wide"><div id="chart-bar" class="kpi-chart bar"></div><p style="font-size:12px;color:#8c8c8c;margin:8px 0 0;">点击柱子可查看该部门 KPI 明细</p></div>
+                <div class="kpi-chart-card"><div class="kpi-chart-title">达标分布（环形图）</div><div id="chart-pie" class="kpi-chart pie"></div></div>
+            </div>
+
+            <div class="kpi-sec">
+                <h3 class="kpi-sec-t">跨系统同步成功率（饼图）</h3>
+                <a href="#" class="kpi-sec-link" data-open-modal="sync-fail-modal">同步失败 4 次 · 查看异常明细</a>
+            </div>
+            <div class="kpi-chart-grid">
+                <div class="kpi-chart-card clickable" data-open-modal="sync-fail-modal"><div id="chart-sync-pie" class="kpi-chart pie"></div><p style="font-size:12px;color:#8c8c8c;margin:8px 0 0;">点击图表查看失败记录明细</p></div>
+            </div>
+        </div>
+
+        <!-- 同步失败明细弹窗（异常下钻） -->
+        <div id="sync-fail-modal" class="modal-overlay">
+            <div class="modal" style="max-width:700px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">同步失败记录明细</span><button type="button" class="modal-close" data-close-modal="sync-fail-modal">×</button></div>
+                <div class="modal-body">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr><th>失败时间</th><th>同步方向</th><th>任务类型</th><th>失败原因</th><th>状态</th></tr></thead>
+                            <tbody>
+                                <tr><td>2025-01-28 14:32</td><td>PLM → ERP</td><td>BOM 下发</td><td>ERP 接口超时</td><td><span class="status-badge status-warning">待重试</span></td></tr>
+                                <tr><td>2025-01-27 09:15</td><td>PLM → ERP</td><td>物料同步</td><td>物料编码冲突</td><td><span class="status-badge status-success">已处理</span></td></tr>
+                                <tr><td>2025-01-25 16:20</td><td>PLM → WMS</td><td>BOM 下发</td><td>网络连接中断</td><td><span class="status-badge status-success">已处理</span></td></tr>
+                                <tr><td>2025-01-24 11:08</td><td>PLM → WMS</td><td>库存同步</td><td>数据校验失败</td><td><span class="status-badge status-processing">处理中</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="sync-fail-modal">关闭</button><a href="pages/sync-log.html?status=fail" class="btn btn-primary">查看完整同步日志</a></div>
+            </div>
+        </div>
+
+        <script>
+(function(){
+    function run(){
+    if(typeof echarts==='undefined'){console.warn('ECharts未加载');return;}
+    var wrap=document.querySelector('.kpi-wrap');if(!wrap)return;
+
+    var chartInstances=[];
+    function initChart(el,h){
+        if(!el)return null;
+        var w=el.offsetWidth||(el.parentElement&&el.parentElement.offsetWidth)||380;
+        var hi=h||el.offsetHeight||200;
+        return echarts.init(el,null,{width:Math.max(w,180),height:Math.max(hi,180)});
+    }
+    function gaugeOpt(val,target,ok){
+            var c=ok?'#52c41a':'#faad14';
+            return{series:[{type:'gauge',startAngle:200,endAngle:-20,min:0,max:100,splitNumber:5,radius:'85%',data:[{value:val}],
+                axisLine:{lineStyle:{width:12,color:[[val/100,c],[1,'#e8e8e8']]}},
+                pointer:{length:'60%',width:6,itemStyle:{color:c}},
+                detail:{valueAnimation:true,offsetCenter:[0,'70%'],fontSize:22,formatter:val+'%',fontWeight:'bold',color:c}}
+            ]};
+    }
+    var gauges=[{id:'chart-gauge1',val:99.6,target:99.5,ok:1},{id:'chart-gauge2',val:95,target:98,ok:0},{id:'chart-gauge3',val:97.2,target:97,ok:1},{id:'chart-gauge4',val:99.3,target:99,ok:1},{id:'chart-gauge5',val:99.7,target:99.8,ok:1},{id:'chart-gauge6',val:97.5,target:99.9,ok:0},{id:'chart-gauge7',val:96.2,target:95,ok:1}];
+    gauges.forEach(function(g){
+        var el=document.getElementById(g.id);if(el){
+            var c=initChart(el,200);
+            c.setOption(gaugeOpt(g.val,g.target,g.ok));
+            chartInstances.push(c);
+        }
+    });
+
+        var lineEl=document.getElementById('chart-line');
+    if(lineEl){
+        var lineChart=initChart(lineEl,280);
+        chartInstances.push(lineChart);
+        lineChart.setOption({
+            tooltip:{trigger:'axis'},
+            legend:{data:['EBOM变更及时率(未达标)','跨系统同步成功率(未达标)','目标线'],bottom:0},
+            grid:{left:'3%',right:'4%',bottom:'15%',top:'10%',containLabel:true},
+            xAxis:{type:'category',data:['8月','9月','10月','11月','12月','1月']},
+            yAxis:{type:'value',min:80,max:100,axisLabel:{formatter:'{value}%'},splitLine:{lineStyle:{type:'dashed',color:'#e8e8e8'}}},
+            series:[
+                {name:'EBOM变更及时率(未达标)',type:'line',smooth:true,data:[82,85,86,87,89,95],itemStyle:{color:'#faad14'},lineStyle:{width:3}},
+                {name:'跨系统同步成功率(未达标)',type:'line',smooth:true,data:[96,97,97.2,97.3,97.4,97.5],itemStyle:{color:'#1890ff'},lineStyle:{width:2}},
+                {name:'目标线',type:'line',data:[98,98,98,98,98,98],symbol:'none',lineStyle:{type:'dashed',color:'#ff4d4f',width:1}}
+            ]
+        });
+    }
+
+    var barEl=document.getElementById('chart-bar');
+    if(barEl){
+        var barChart=initChart(barEl,280);
+        chartInstances.push(barChart);
+        var deptData=[{dept:'rd',name:'研发部',value:96},{dept:'process',name:'工艺部',value:93},{dept:'purchase',name:'采购部',value:90},{dept:'prod',name:'生产部',value:88},{dept:'it',name:'IT部',value:85}];
+        barChart.setOption({
+            tooltip:{trigger:'axis',formatter:function(p){var i=p[0].dataIndex;return deptData[i].name+'<br/>综合得分：'+deptData[i].value+'<br/>点击柱子查看部门KPI明细';}},
+            grid:{left:'3%',right:'4%',bottom:'3%',top:'5%',containLabel:true},
+            xAxis:{type:'category',data:deptData.map(function(d){return d.name;}),axisLabel:{interval:0}},
+            yAxis:{type:'value',min:0,max:100,name:'得分'},
+            series:[{type:'bar',data:deptData.map(function(d,i){return{value:d.value,itemStyle:{color:i<3?['#fa8c16','#52c41a','#1890ff'][i]:'#bfbfbf'}};}),barWidth:'50%'}]
+        });
+        barChart.on('click',function(p){if(p.componentType==='series'&&p.dataIndex>=0){var d=deptData[p.dataIndex];if(typeof PageLoader!=='undefined')PageLoader.loadPage('pages/performance-stats.html?object=dept&dept='+d.dept);}});
+    }
+
+    var pieEl=document.getElementById('chart-pie');
+    if(pieEl){
+        var pieChart=initChart(pieEl,280);
+        chartInstances.push(pieChart);
+        pieChart.setOption({
+            tooltip:{trigger:'item'},
+            legend:{orient:'vertical',right:10,top:'center'},
+            series:[{type:'pie',radius:['45%','70%'],center:['40%','50%'],avoidLabelOverlap:false,itemStyle:{borderRadius:4},label:{show:true,formatter:'{b}\n{c}个'},data:[{value:3,name:'达标',itemStyle:{color:'#52c41a'}},{value:2,name:'待改进',itemStyle:{color:'#faad14'}}]}]
+        });
+    }
+
+    var syncPieEl=document.getElementById('chart-sync-pie');
+    if(syncPieEl){
+        var syncPie=initChart(syncPieEl,280);
+        chartInstances.push(syncPie);
+        syncPie.setOption({
+            tooltip:{trigger:'item',formatter:'{b}<br/>同步次数：{c}<br/>点击查看失败明细'},
+            legend:{bottom:10},
+            series:[{type:'pie',radius:'60%',center:['50%','45%'],data:[{value:54,name:'PLM→ERP 96.4%',itemStyle:{color:'#faad14'}},{value:48,name:'PLM→MES 100%',itemStyle:{color:'#52c41a'}},{value:118,name:'PLM→WMS 98.3%',itemStyle:{color:'#1890ff'}}],emphasis:{itemStyle:{shadowBlur:10,shadowOffsetX:0,shadowColor:'rgba(0,0,0,0.2)'}}}]
+        });
+        syncPie.getZr().on('click',function(){var m=document.getElementById('sync-fail-modal');if(m){m.classList.add('active');document.body.style.overflow='hidden';}});
+    }
+
+    function resizeAll(){chartInstances.forEach(function(c){try{if(c)c.resize();}catch(e){}});}
+    window.addEventListener('resize',resizeAll);
+    setTimeout(resizeAll,150);
+    setTimeout(resizeAll,600);
+    }
+    function doRun(){setTimeout(function(){requestAnimationFrame(run);},100);}
+    // 性能与稳定性优化：ECharts 按需加载去重（避免重复注入 script）
+    function ensureEchartsLoaded() {
+        if (typeof echarts !== 'undefined') return Promise.resolve();
+        if (window.__echartsLoadingPromise) return window.__echartsLoadingPromise;
+        // 多 CDN/本地兜底：避免某个 CDN 在企业网络下不可达导致图表不渲染
+        // 加速：本地优先，默认不再尝试外网 CDN（避免在无法联网时等待重试变慢）
+        // 如需启用 CDN，手动设置 window.__USE_ECHARTS_CDN__ = true
+        var ENABLE_CDN = (typeof window.__USE_ECHARTS_CDN__ !== 'undefined') ? !!window.__USE_ECHARTS_CDN__ : false;
+        var ECHARTS_SRC_LIST = ENABLE_CDN ? [
+            'assets/vendor/echarts.min.js',
+            'https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js',
+            'https://cdn.bootcdn.net/ajax/libs/echarts/5.4.3/echarts.min.js',
+            'https://unpkg.com/echarts@5.4.3/dist/echarts.min.js'
+        ] : [
+            'assets/vendor/echarts.min.js' // 本地优先，极快；若无该文件，直接走 SVG 备胎
+        ];
+        function waitUntilReady(resolve, reject) {
+            var tries = 0;
+            (function tick() {
+                if (typeof echarts !== 'undefined') { resolve(); return; }
+                tries++;
+                if (tries > 60) { reject(new Error('ECharts加载超时')); return; } // ~3s
+                setTimeout(tick, 50);
+            })();
+        }
+        window.__echartsLoadingPromise = new Promise(function(resolve, reject) {
+            // 已存在脚本则复用（无论 src 是哪个）
+            var existing = document.querySelector('script[data-echarts-lib="1"]');
+            if (existing) {
+                // 如果脚本已加载完成（load 不会再触发），直接 resolve
+                if (typeof echarts !== 'undefined') { resolve(); return; }
+                if (existing.getAttribute('data-echarts-loaded') === '1') { waitUntilReady(resolve, reject); return; }
+                // 某些浏览器下可以通过 readyState 判断是否已完成
+                if (existing.readyState && existing.readyState === 'complete') {
+                    waitUntilReady(resolve, reject);
+                    return;
+                }
+                existing.addEventListener('load', function(){
+                    existing.setAttribute('data-echarts-loaded', '1');
+                    waitUntilReady(resolve, reject);
+                }, { once: true });
+                existing.addEventListener('error', function(){ reject(new Error('ECharts加载失败')); }, { once: true });
+                return;
+            }
+            var idx = 0;
+            function tryLoadNext() {
+                if (idx >= ECHARTS_SRC_LIST.length) {
+                    reject(new Error('ECharts加载失败'));
+                    return;
+                }
+                var src = ECHARTS_SRC_LIST[idx++];
+                var s = document.createElement('script');
+                s.src = src;
+                s.setAttribute('data-echarts-lib', '1');
+                s.setAttribute('data-echarts-src', src);
+                s.onload = function(){
+                    s.setAttribute('data-echarts-loaded', '1');
+                    waitUntilReady(resolve, reject);
+                };
+                s.onerror = function(){
+                    try { s.remove(); } catch(e) {}
+                    tryLoadNext();
+                };
+                document.head.appendChild(s);
+            }
+            tryLoadNext();
+        }).finally(function() {
+            // 如果最终仍未加载成功，允许下次重试
+            if (typeof echarts === 'undefined') {
+                try { window.__echartsLoadingPromise = null; } catch(e) {}
+            }
+        });
+        return window.__echartsLoadingPromise;
+    }
+    // 离线/无外网预览兜底：当 ECharts 无法加载时，用轻量 SVG 渲染基础图表（原型预览足够）
+    function renderFallbackCharts() {
+        function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+        function setSvg(el, svg){ if(!el) return; el.innerHTML = svg; }
+        function gaugeSvg(val, color) {
+            var v = Math.max(0, Math.min(100, Number(val)||0));
+            var r = 70, cx = 90, cy = 95;
+            var c = 2 * Math.PI * r;
+            var dash = (v/100) * c;
+            return ''+
+              '<svg width="100%" height="200" viewBox="0 0 180 200" xmlns="http://www.w3.org/2000/svg">'+
+                '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#f0f0f0" stroke-width="12"/>'+
+                '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="12" stroke-linecap="round" '+
+                  'stroke-dasharray="'+dash+' '+(c-dash)+'" transform="rotate(-90 '+cx+' '+cy+')" />'+
+                '<text x="90" y="105" text-anchor="middle" font-size="28" font-weight="700" fill="'+color+'">'+v+'%</text>'+
+                '<text x="90" y="132" text-anchor="middle" font-size="12" fill="#8c8c8c">离线预览（SVG）</text>'+
+              '</svg>';
+        }
+        function lineSvg(seriesA, seriesB, target) {
+            var w=520,h=260,p=34;
+            var max=100,min=80;
+            function x(i,n){ return p + (w-2*p)*(i/(n-1)); }
+            function y(v){ return p + (h-2*p)*(1-((v-min)/(max-min))); }
+            function poly(arr){ return arr.map(function(v,i){return x(i,arr.length)+','+y(v);}).join(' '); }
+            var n=Math.max(seriesA.length, seriesB.length);
+            var t = new Array(n).fill(target);
+            return ''+
+              '<svg width="100%" height="280" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg">'+
+                '<rect x="0" y="0" width="'+w+'" height="'+h+'" fill="#fff"/>'+
+                '<g stroke="#e8e8e8" stroke-dasharray="4 4">'+
+                  '<line x1="'+p+'" y1="'+y(90)+'" x2="'+(w-p)+'" y2="'+y(90)+'"/>'+
+                  '<line x1="'+p+'" y1="'+y(95)+'" x2="'+(w-p)+'" y2="'+y(95)+'"/>'+
+                  '<line x1="'+p+'" y1="'+y(100)+'" x2="'+(w-p)+'" y2="'+y(100)+'"/>'+
+                '</g>'+
+                '<polyline fill="none" stroke="#faad14" stroke-width="3" points="'+poly(seriesA)+'"/>'+
+                '<polyline fill="none" stroke="#1890ff" stroke-width="2" points="'+poly(seriesB)+'"/>'+
+                '<polyline fill="none" stroke="#ff4d4f" stroke-width="1.5" stroke-dasharray="6 4" points="'+poly(t)+'"/>'+
+                '<text x="'+p+'" y="'+(h-10)+'" font-size="12" fill="#8c8c8c">近6个月趋势（SVG）</text>'+
+              '</svg>';
+        }
+        function barSvg(items) {
+            var w=520,h=260,p=34;
+            var max=100;
+            var bw = (w-2*p) / items.length;
+            var colors=['#fa8c16','#52c41a','#1890ff','#bfbfbf','#bfbfbf'];
+            var bars = items.map(function(it,i){
+                var x = p + i*bw + 10;
+                var bh = (h-2*p) * (it.value/max);
+                var y = h - p - bh;
+                return ''+
+                  '<rect x="'+x+'" y="'+y+'" width="'+(bw-20)+'" height="'+bh+'" rx="4" fill="'+colors[i]+'"/>'+
+                  '<text x="'+(x+(bw-20)/2)+'" y="'+(h-p+16)+'" text-anchor="middle" font-size="11" fill="#8c8c8c">'+escapeHtml(it.name)+'</text>'+
+                  '<text x="'+(x+(bw-20)/2)+'" y="'+(y-6)+'" text-anchor="middle" font-size="11" fill="#595959">'+it.value+'</text>';
+            }).join('');
+            return '<svg width="100%" height="280" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg">'+
+              '<rect x="0" y="0" width="'+w+'" height="'+h+'" fill="#fff"/>'+
+              bars+
+              '</svg>';
+        }
+        function pieSvg(values, colors, labels) {
+            var total = values.reduce(function(a,b){return a+b;},0) || 1;
+            var cx=140, cy=120, r=80;
+            var start= -Math.PI/2;
+            function arcPath(a0,a1){
+                var x0=cx+r*Math.cos(a0), y0=cy+r*Math.sin(a0);
+                var x1=cx+r*Math.cos(a1), y1=cy+r*Math.sin(a1);
+                var large = (a1-a0) > Math.PI ? 1 : 0;
+                return 'M '+cx+' '+cy+' L '+x0+' '+y0+' A '+r+' '+r+' 0 '+large+' 1 '+x1+' '+y1+' Z';
+            }
+            var segs='';
+            for(var i=0;i<values.length;i++){
+                var ang = (values[i]/total) * Math.PI*2;
+                var end = start + ang;
+                segs += '<path d="'+arcPath(start,end)+'" fill="'+colors[i]+'"/>';
+                start = end;
+            }
+            var leg = labels.map(function(l,i){
+                return '<div style="display:flex;align-items:center;gap:8px;margin:6px 0;"><span style="width:10px;height:10px;border-radius:2px;background:'+colors[i]+';display:inline-block;"></span><span style="font-size:12px;color:#595959;">'+escapeHtml(l)+'</span></div>';
+            }).join('');
+            return ''+
+              '<div style="display:flex;gap:12px;align-items:center;">'+
+                '<svg width="280" height="240" viewBox="0 0 280 240" xmlns="http://www.w3.org/2000/svg" style="flex:0 0 auto;">'+
+                  segs+
+                  '<circle cx="'+cx+'" cy="'+cy+'" r="42" fill="#fff"/>'+
+                  '<text x="'+cx+'" y="'+(cy+5)+'" text-anchor="middle" font-size="12" fill="#8c8c8c">SVG</text>'+
+                '</svg>'+
+                '<div style="flex:1;min-width:120px;">'+leg+'</div>'+
+              '</div>';
+        }
+
+        // gauges
+        var gauges = [
+            { id:'chart-gauge1', val:99.6, ok:true },
+            { id:'chart-gauge2', val:95.0, ok:false },
+            { id:'chart-gauge3', val:97.2, ok:true },
+            { id:'chart-gauge4', val:99.3, ok:true },
+            { id:'chart-gauge5', val:99.7, ok:true },
+            { id:'chart-gauge6', val:97.5, ok:false },
+            { id:'chart-gauge7', val:96.2, ok:true }
+        ];
+        gauges.forEach(function(g){
+            var el = document.getElementById(g.id);
+            if (!el) return;
+            var color = g.ok ? '#52c41a' : '#faad14';
+            setSvg(el, gaugeSvg(g.val, color));
+        });
+
+        // line
+        var lineEl = document.getElementById('chart-line');
+        if (lineEl) setSvg(lineEl, lineSvg([82,85,86,87,89,95],[96,97,97.2,97.3,97.4,97.5],98));
+
+        // bar
+        var barEl = document.getElementById('chart-bar');
+        if (barEl) setSvg(barEl, barSvg([{name:'研发部',value:96},{name:'工艺部',value:93},{name:'采购部',value:90},{name:'生产部',value:88},{name:'IT部',value:85}]));
+
+        // pies
+        var pieEl = document.getElementById('chart-pie');
+        if (pieEl) pieEl.innerHTML = pieSvg([3,2],['#52c41a','#faad14'],['达标 3','待改进 2']);
+        var syncEl = document.getElementById('chart-sync-pie');
+        if (syncEl) syncEl.innerHTML = pieSvg([54,48,118],['#faad14','#52c41a','#1890ff'],['PLM→ERP','PLM→MES','PLM→WMS']);
+    }
+
+    ensureEchartsLoaded().then(doRun).catch(function(err){
+        console.warn(err && err.message ? err.message : err);
+        renderFallbackCharts();
+    });
+})();
+if(typeof PageInteractions!=='undefined')PageInteractions.initButtons();
+        </script>
+    </div>
+</body>
+</html>

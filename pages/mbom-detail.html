@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBOM详情</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">BOM管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/mbom-list.html" class="breadcrumb-item">MBOM列表</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">MBOM详情</span>
+        </div>
+        <div class="page-header">
+            <p class="page-description">EBOM、MBOM、SBOM 本质均为 BOM；本页为<strong>制造 BOM</strong>详情，展示当前<strong>版本</strong>的 BOM 树及<strong>阶段专属</strong>工艺信息（工序号、工位号、加工方式、工艺流程、工装工具、损耗率、发料仓库、替代料等）、工序信息、图纸附件、版本历史与变更记录。</p>
+        </div>
+        <div class="action-bar">
+            <div class="action-left">
+                <button type="button" class="btn btn-default btn-back" data-url="pages/mbom-list.html">← 返回列表</button>
+                <button type="button" class="btn btn-primary mbom-detail-edit" id="mbom-detail-edit" style="display:none;">编辑</button>
+                <a href="pages/mbom-review.html" class="btn btn-default mbom-detail-review" id="mbom-detail-review" style="display:none;">提交评审</a>
+            </div>
+            <div class="action-right">
+                <button type="button" class="btn btn-default" id="mbom-detail-export">导出</button>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="section-title">基本信息</div>
+                <div class="form-info-grid">
+                    <div class="form-info-item">
+                        <span class="form-info-label">BOM编码</span>
+                        <span class="form-info-value" id="mbom-code">—</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">产品编码</span>
+                        <span class="form-info-value" id="mbom-product-code">—</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">产品名称</span>
+                        <span class="form-info-value" id="mbom-product-name">—</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">版本号</span>
+                        <span class="form-info-value" id="mbom-version">—</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">状态</span>
+                        <span class="form-info-value" id="mbom-status">—</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">当前版</span>
+                        <span class="form-info-value" id="mbom-current">—</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">来源EBOM</span>
+                        <span class="form-info-value" id="mbom-source-ebom">—</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">发料仓库</span>
+                        <span class="form-info-value" id="mbom-warehouse">—</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">创建人</span>
+                        <span class="form-info-value" id="mbom-creator">—</span>
+                    </div>
+                    <div class="form-info-item">
+                        <span class="form-info-label">创建时间</span>
+                        <span class="form-info-value" id="mbom-created">—</span>
+                    </div>
+                </div>
+                <div style="margin-top:12px;">
+                    <div class="form-info-label" style="margin-bottom:6px;">工序信息</div>
+                    <div class="desc-box" id="mbom-process">下料→机加工→焊接→组装→测试→包装</div>
+                </div>
+            </div>
+        </div>
+        <div class="card bom-detail-tabs-card" id="mbom-detail-tabs-card">
+            <div class="card-header card-header-with-tabs">
+                <span class="card-title">BOM 明细 / 工序信息 / 图纸附件 / 版本历史 / 变更记录</span>
+                <div class="dt-detail-tab-bar">
+                    <label class="dt-detail-tab"><input type="radio" name="mbom-tab" value="bom" checked> BOM 明细</label>
+                    <label class="dt-detail-tab"><input type="radio" name="mbom-tab" value="process"> 工序信息</label>
+                    <label class="dt-detail-tab"><input type="radio" name="mbom-tab" value="attach"> 图纸与附件</label>
+                    <label class="dt-detail-tab"><input type="radio" name="mbom-tab" value="version"> 版本历史</label>
+                    <label class="dt-detail-tab"><input type="radio" name="mbom-tab" value="change"> 变更记录</label>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="dt-detail-tab-pane" data-tab="bom">
+                    <div class="table-wrapper">
+                        <table class="bom-structure-table bom-readonly mbom-detail-bom">
+                            <thead>
+                                <tr>
+                                    <th class="col-no">序号</th>
+                                    <th class="col-level">层级号</th>
+                                    <th>物料</th>
+                                    <th>物料编码</th>
+                                    <th>规格型号</th>
+                                    <th class="col-qty">数量</th>
+                                    <th class="col-unit">单位</th>
+                                    <th class="col-key">关键件</th>
+                                    <th class="col-op">工序号</th>
+                                    <th class="col-station">工位号</th>
+                                    <th class="col-method">加工方式</th>
+                                    <th class="col-flow">工艺流程</th>
+                                    <th class="col-tool">工装工具</th>
+                                    <th class="col-loss">损耗率</th>
+                                    <th class="col-wh">发料仓库</th>
+                                    <th class="col-alt">替代料</th>
+                                    <th class="col-remark">备注</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="col-no">1</td><td class="col-level">1</td><td>智能控制器</td><td>M000</td><td>—</td><td class="col-qty">1</td><td class="col-unit">台</td><td class="col-key">是</td><td class="col-op">50</td><td class="col-station">A05</td><td class="col-method">装配</td><td class="col-flow">总装→测试→包装</td><td class="col-tool">工装、扳手</td><td class="col-loss">2.5%</td><td class="col-wh">—</td><td class="col-alt">—</td><td class="col-remark">—</td></tr>
+                                <tr><td class="col-no">2</td><td class="col-level">1.1</td><td>主控板</td><td>M001</td><td>CTRL-MAIN-V1</td><td class="col-qty">1</td><td class="col-unit">件</td><td class="col-key">是</td><td class="col-op">20</td><td class="col-station">B02</td><td class="col-method">机加工、SMT</td><td class="col-flow">贴片→回流焊→检测</td><td class="col-tool">贴片机、治具</td><td class="col-loss">1%</td><td class="col-wh">半成品仓</td><td class="col-alt">M001-A</td><td class="col-remark">—</td></tr>
+                                <tr><td class="col-no">3</td><td class="col-level">1.2</td><td>传感器模块</td><td>M003</td><td>SN-温度-01</td><td class="col-qty">1</td><td class="col-unit">个</td><td class="col-key">是</td><td class="col-op">30</td><td class="col-station">B03</td><td class="col-method">装配</td><td class="col-flow">装配→标定</td><td class="col-tool">—</td><td class="col-loss">—</td><td class="col-wh">原料仓</td><td class="col-alt">—</td><td class="col-remark">—</td></tr>
+                                <tr><td class="col-no">4</td><td class="col-level">1.3</td><td>不锈钢螺栓</td><td>M002</td><td>M8×20</td><td class="col-qty">4</td><td class="col-unit">个</td><td class="col-key">否</td><td class="col-op">10</td><td class="col-station">A01</td><td class="col-method">下料</td><td class="col-flow">下料→表面处理</td><td class="col-tool">—</td><td class="col-loss">0</td><td class="col-wh">原料仓</td><td class="col-alt">M002-B</td><td class="col-remark">辅料</td></tr>
+                                <tr><td class="col-no">5</td><td class="col-level">1.4</td><td>电源模块</td><td>M004</td><td>PSU-24V-5A</td><td class="col-qty">1</td><td class="col-unit">件</td><td class="col-key">否</td><td class="col-op">40</td><td class="col-station">B04</td><td class="col-method">装配</td><td class="col-flow">装配→老练</td><td class="col-tool">—</td><td class="col-loss">0</td><td class="col-wh">原料仓</td><td class="col-alt">—</td><td class="col-remark">—</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="dt-detail-tab-pane" data-tab="process">
+                    <div class="table-wrapper">
+                        <table class="output-table">
+                            <thead>
+                                <tr>
+                                    <th>工序号</th>
+                                    <th>工序名称</th>
+                                    <th>工序说明</th>
+                                    <th>对应物料</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>10</td><td>下料</td><td>板材/型材下料</td><td>M002</td></tr>
+                                <tr><td>20</td><td>机加工</td><td>CNC 加工</td><td>M001,M002</td></tr>
+                                <tr><td>30</td><td>焊接</td><td>装配焊接</td><td>M001,M002</td></tr>
+                                <tr><td>40</td><td>组装</td><td>总装</td><td>M000,M001,M003,M004</td></tr>
+                                <tr><td>50</td><td>测试</td><td>电性能与老化测试</td><td>M000</td></tr>
+                                <tr><td>60</td><td>包装</td><td>成品包装</td><td>M000</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="dt-detail-tab-pane" data-tab="attach">
+                    <div class="table-wrapper">
+                        <table class="output-table dt-attach-table">
+                            <thead>
+                                <tr>
+                                    <th>类型</th>
+                                    <th>物料编码</th>
+                                    <th>物料名称</th>
+                                    <th>规格型号</th>
+                                    <th>文件名称</th>
+                                    <th>版本</th>
+                                    <th>格式</th>
+                                    <th>上传时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>工艺卡片</td><td>M000</td><td>智能控制器</td><td>—</td>
+                                    <td>装配工艺卡</td><td>V1.0</td><td>PDF</td><td>2025-01-19 10:00</td>
+                                    <td><div class="cell-actions"><button type="button" class="btn btn-sm btn-default">预览</button><button type="button" class="btn btn-sm btn-default">下载</button></div></td>
+                                </tr>
+                                <tr>
+                                    <td>图纸</td><td>M001</td><td>主控板</td><td>CTRL-MAIN-V1</td>
+                                    <td>PCB 布局图</td><td>V1.0</td><td>DWG</td><td>2025-01-18 14:00</td>
+                                    <td><div class="cell-actions"><button type="button" class="btn btn-sm btn-default">预览</button><button type="button" class="btn btn-sm btn-default">下载</button></div></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="dt-detail-tab-pane" data-tab="version">
+                    <div class="table-wrapper">
+                        <table class="output-table">
+                            <thead>
+                                <tr>
+                                    <th>版本号</th>
+                                    <th>生效时间</th>
+                                    <th>失效时间</th>
+                                    <th>变更单号</th>
+                                    <th>说明</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>V1.0</td><td>2025-01-20</td><td>—</td><td>—</td><td>初始发布</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="dt-detail-tab-pane" data-tab="change">
+                    <div class="table-wrapper">
+                        <table class="output-table">
+                            <thead>
+                                <tr>
+                                    <th>变更单号</th>
+                                    <th>变更类型</th>
+                                    <th>变更原因</th>
+                                    <th>申请人</th>
+                                    <th>申请时间</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>暂无变更记录</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            (function () {
+                if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+                var id = (function () {
+                    var q = window.location.search || '';
+                    var m = /[?&]id=(\d+)/.exec(q);
+                    if (m && m[1]) return m[1];
+                    try { var p = new URLSearchParams(q).get('page') || ''; m = /id=(\d+)/.exec(p); return (m && m[1]) ? m[1] : '1'; } catch (e) { return '1'; }
+                })();
+                var MOCK = {
+                    '1': { code: '01-02-1001-02-V1', productCode: 'PROD-001', productName: '智能控制器', version: 'V1.0', status: 'published', statusText: '已发布', isCurrent: true, sourceEbom: '01-02-1001-01-V1', warehouse: '原料仓', creator: '张工', created: '2025-01-20 10:30', showEdit: false, showReview: false, showChange: true },
+                    '2': { code: '01-02-1002-02-V1', productCode: 'PROD-002', productName: '传感器模块', version: 'V1.1', status: 'published', statusText: '已发布', isCurrent: true, sourceEbom: '01-02-1002-01-V2', warehouse: '半成品仓', creator: '李工', created: '2025-01-25 14:20', showEdit: false, showReview: false, showChange: true },
+                    '3': { code: '01-02-1003-02-V1', productCode: 'PROD-003', productName: '执行器', version: 'V0.8', status: 'draft', statusText: '草稿', isCurrent: false, sourceEbom: '01-02-1003-01-V1', warehouse: '原料仓', creator: '王工', created: '2025-01-28 09:15', showEdit: true, showReview: true, showChange: false },
+                    '4': { code: '01-02-1004-02-V1', productCode: 'PROD-004', productName: '电源模块', version: 'V0.5', status: 'reviewing', statusText: '评审中', isCurrent: false, sourceEbom: '01-02-1004-01-V1', warehouse: '—', creator: '赵工', created: '2025-01-29 11:00', showEdit: false, showReview: false, showChange: false }
+                };
+                var d = MOCK[id] || MOCK['1'];
+                function byId(x) { return document.getElementById(x); }
+                byId('mbom-code').textContent = d.code;
+                byId('mbom-product-code').textContent = d.productCode;
+                byId('mbom-product-name').textContent = d.productName;
+                byId('mbom-version').textContent = d.version;
+                byId('mbom-current').textContent = d.isCurrent ? '是' : '否';
+                byId('mbom-source-ebom').textContent = d.sourceEbom || '—';
+                byId('mbom-warehouse').textContent = d.warehouse || '—';
+                byId('mbom-creator').textContent = d.creator;
+                byId('mbom-created').textContent = d.created;
+                var statusClass = { draft: 'status-draft', reviewing: 'status-reviewing', published: 'status-published', changing: 'status-processing', archived: 'status-archived' }[d.status] || '';
+                byId('mbom-status').innerHTML = '<span class="status-badge ' + statusClass + '">' + d.statusText + '</span>';
+                var editBtn = byId('mbom-detail-edit');
+                var reviewBtn = byId('mbom-detail-review');
+                if (editBtn) editBtn.style.display = d.showEdit ? '' : 'none';
+                if (reviewBtn) { reviewBtn.style.display = d.showReview ? '' : 'none'; reviewBtn.href = 'pages/mbom-review.html?id=' + id; }
+                var exportBtn = byId('mbom-detail-export');
+                if (exportBtn) exportBtn.addEventListener('click', function () { alert('导出（原型演示）'); });
+                if (editBtn && d.showEdit) editBtn.addEventListener('click', function () { PageInteractions && PageInteractions.navigateToEdit && PageInteractions.navigateToEdit('pages/mbom-create.html', id); });
+            })();
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>直接测试</title>
+</head>
+<body>
+    <h1>直接加载 finance-collab-store.js</h1>
+    <div id="result"></div>
+    
+    <script>
+        console.log('页面开始加载');
+        
+        // 直接加载脚本
+        var script = document.createElement('script');
+        script.src = 'assets/finance-collab-store.js?v=' + Date.now();
+        script.onload = function() {
+            console.log('脚本加载完成');
+            console.log('FinanceCollabStore 存在:', !!window.FinanceCollabStore);
+            
+            if (window.FinanceCollabStore) {
+                var store = window.FinanceCollabStore.getStore();
+                console.log('store:', store);
+                
+                document.getElementById('result').innerHTML = 
+                    '<p>脚本加载成功</p>' +
+                    '<p>FinanceCollabStore: ' + (window.FinanceCollabStore ? '存在' : '不存在') + '</p>' +
+                    '<p>store: ' + (store ? '存在' : 'null') + '</p>' +
+                    '<p>settlements: ' + (store && store.settlements ? store.settlements.length : 0) + '</p>';
+            } else {
+                document.getElementById('result').innerHTML = '<p style="color:red">FinanceCollabStore 不存在</p>';
+            }
+        };
+        script.onerror = function(e) {
+            console.error('脚本加载失败', e);
+            document.getElementById('result').innerHTML = '<p style="color:red">脚本加载失败</p>';
+        };
+        document.head.appendChild(script);
+    </script>
+</body>
+</html>

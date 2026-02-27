@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成本分析 - 能源管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/energy-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">能源预算管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">成本分析</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">分析能源成本，包括成本结构、成本趋势、成本对比、成本优化建议等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>分析类型</label>
+                    <select class="form-select">
+                        <option value="structure">成本结构</option>
+                        <option value="trend">成本趋势</option>
+                        <option value="compare">成本对比</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>统计周期</label>
+                    <select class="form-select">
+                        <option value="month">月度</option>
+                        <option value="quarter">季度</option>
+                        <option value="year">年度</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>周期</label>
+                    <input type="month" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">导出</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">能源成本分析</h3>
+            </div>
+            <div class="card-body">
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-label">总成本</div>
+                        <div class="stat-value">¥1,180,000</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">电力成本</div>
+                        <div class="stat-value">¥850,000</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">天然气成本</div>
+                        <div class="stat-value">¥280,000</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">其他成本</div>
+                        <div class="stat-value">¥50,000</div>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; padding: 20px; background: #f5f5f5; border-radius: 4px; text-align: center; color: #999;">
+                    成本分析和趋势图表展示区域（可集成ECharts等图表库）
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('成本分析 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

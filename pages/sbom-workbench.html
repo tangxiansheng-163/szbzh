@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SBOM 设计工作台</title>
+</head>
+<body>
+    <div class="content-wrapper workbench-page">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">BOM管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/sbom-list.html" class="breadcrumb-item">SBOM列表</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">SBOM 设计工作台</span>
+        </div>
+        <div class="page-header">
+            <p class="page-description">EBOM、MBOM、SBOM 本质均为 BOM。本页为<strong>SBOM 设计工作台</strong>：上游 MBOM 发布后 BOM 树下推至此，需在树上对每物料补充<strong>维修要求、配件替代</strong>等，可简化层级、增删节点；并填写全局维修说明。全部完成后保存草稿或提交评审。</p>
+        </div>
+
+        <div id="sbom-wb-fullscreen-wrap" class="workbench-fullscreen-wrap">
+            <div class="workbench-task-bar">
+                <div class="task-meta">
+                    <span><strong>来源</strong> <span id="sbom-wb-source">—</span></span>
+                    <span>产品 <strong id="sbom-wb-product">—</strong></span>
+                    <span>版本 <strong>V1.0</strong></span>
+                    <span class="status-badge status-draft">草稿</span>
+                </div>
+                <div class="task-actions">
+                    <button type="button" class="btn btn-default" id="sbom-wb-fullscreen" title="全屏">全屏</button>
+                    <button type="button" class="btn btn-default" data-open-modal="sbom-save-draft-modal">保存草稿</button>
+                    <button type="button" class="btn btn-primary" data-open-modal="sbom-submit-review-modal">提交评审</button>
+                    <button type="button" class="btn btn-default btn-back" data-url="pages/sbom-list.html">返回</button>
+                </div>
+            </div>
+
+            <div class="workbench-layout">
+                <div class="workbench-material-panel" id="sbom-mat-panel">
+                    <div class="panel-header">物料库（新增物料）</div>
+                    <div class="panel-toolbar">
+                        <input type="text" class="material-search" id="sbom-mat-search" placeholder="检索物料编码、名称、规格">
+                        <div class="panel-hint">从 MBOM 筛选后可增补维修常用物料；拖拽到右侧树添加。</div>
+                    </div>
+                    <div class="workbench-material-list" id="sbom-mat-list">
+                        <div class="material-item" draggable="true" data-code="M006" data-name="散热器" data-spec="HS-40x40" data-unit="个"><span class="mat-code">M006</span><span class="mat-name">散热器</span><span class="mat-unit">个</span></div>
+                        <div class="material-item" draggable="true" data-code="M007" data-name="电容 100uF" data-spec="CAP-100U-25V" data-unit="个"><span class="mat-code">M007</span><span class="mat-name">电容 100uF</span><span class="mat-unit">个</span></div>
+                        <div class="material-item" draggable="true" data-code="M010" data-name="扎带" data-spec="—" data-unit="根"><span class="mat-code">M010</span><span class="mat-name">扎带</span><span class="mat-unit">根</span></div>
+                    </div>
+                </div>
+                <div class="workbench-tree-wrap">
+                    <div class="workbench-tree-toolbar">
+                        <div class="tree-actions">
+                            <button type="button" class="btn btn-sm btn-primary" data-open-modal="sbom-add-root-modal">新增根节点</button>
+                            <button type="button" class="btn btn-sm btn-default" data-open-modal="sbom-add-child-modal">新增子节点</button>
+                            <span class="tree-toolbar-sep">|</span>
+                            <button type="button" class="btn btn-sm btn-default" data-open-modal="sbom-ref-bom-modal">引用 BOM</button>
+                            <button type="button" class="btn btn-sm btn-default" data-open-modal="sbom-copy-bom-modal">复制 BOM</button>
+                            <span class="tree-batch-bar" id="sbom-batch-bar" style="display:none;">
+                                <span class="tree-toolbar-sep">|</span>
+                                <span class="batch-info">已选 <strong id="sbom-batch-count">0</strong> 项</span>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="sbom-batch-key-modal">批量关键件</button>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="sbom-batch-replace-modal">批量可替换件</button>
+                                <button type="button" class="btn btn-sm btn-default" data-open-modal="sbom-batch-loss-modal">批量损耗率</button>
+                                <span class="tree-toolbar-sep">|</span>
+                            </span>
+                            <button type="button" class="btn btn-sm btn-default" data-open-modal="sbom-import-modal">导入</button>
+                            <span class="tree-toolbar-sep">|</span>
+                            <button type="button" class="btn btn-sm btn-default" id="sbom-expand-all">展开全部</button>
+                            <button type="button" class="btn btn-sm btn-default" id="sbom-collapse-all">折叠全部</button>
+                        </div>
+                    </div>
+                    <div class="workbench-tree-body droppable" id="sbom-tree-body">
+                        <table class="bom-tree sbom-tree">
+                            <thead>
+                                <tr>
+                                    <th class="col-check" width="36"><input type="checkbox" class="bom-tree-select-all" id="sbom-bom-select-all" aria-label="全选" title="全选"></th>
+                                    <th class="col-no">序号</th>
+                                    <th class="col-level">层级号</th>
+                                    <th>物料</th>
+                                    <th>物料编码</th>
+                                    <th>规格型号</th>
+                                    <th class="col-qty">数量</th>
+                                    <th class="col-unit">单位</th>
+                                    <th class="col-key">关键件</th>
+                                    <th class="col-replace">可替换件</th>
+                                    <th class="col-loss">损耗率</th>
+                                    <th class="col-repair">维修要求</th>
+                                    <th class="col-alt">配件替代</th>
+                                    <th class="col-remark">备注</th>
+                                    <th class="col-actions">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sbom-tree-tbody">
+                                <tr class="bom-tree-row" data-node-id="1" data-level="1" data-expanded="1" draggable="true">
+                                    <td class="col-check" onclick="event.stopPropagation()"><input type="checkbox" class="bom-tree-row-check" name="sbom-tree-check"></td>
+                                    <td class="col-no">1</td>
+                                    <td class="col-level">1</td>
+                                    <td><div class="tree-cell"><span class="tree-drag-handle" title="拖动调整层级">⋮⋮</span><span class="tree-toggle expanded">▸</span><span class="tree-indent"></span><span>智能控制器</span></div></td>
+                                    <td>M000</td>
+                                    <td>—</td>
+                                    <td class="col-qty"><input type="number" class="bom-qty-input" value="1" min="0" step="0.01"></td>
+                                    <td class="col-unit"><select class="bom-unit-select"><option selected>台</option><option>件</option><option>个</option><option>套</option></select></td>
+                                    <td class="col-key"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-key-check" checked> 是</label></td>
+                                    <td class="col-replace"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-replace-check"> 是</label></td>
+                                    <td class="col-loss"><input type="number" class="bom-input-sm" value="0" min="0" max="100" step="0.01" placeholder="%"></td>
+                                    <td class="col-repair"><input type="text" class="bom-input-sm" placeholder="更换周期、备件建议"></td>
+                                    <td class="col-alt"><input type="text" class="bom-input-sm" placeholder="可替代编码"></td>
+                                    <td class="col-remark"><input type="text" class="bom-input-sm" placeholder="选填"></td>
+                                    <td class="col-actions"><div class="cell-act"><button type="button" class="btn btn-sm btn-default btn-add-child">子</button><button type="button" class="btn btn-sm btn-default btn-delete-node">删</button></div></td>
+                                </tr>
+                                <tr class="bom-tree-row" data-node-id="2" data-level="2" draggable="true">
+                                    <td class="col-check" onclick="event.stopPropagation()"><input type="checkbox" class="bom-tree-row-check" name="sbom-tree-check"></td>
+                                    <td class="col-no">2</td>
+                                    <td class="col-level">1.1</td>
+                                    <td><div class="tree-cell"><span class="tree-drag-handle" title="拖动调整层级">⋮⋮</span><span class="tree-toggle empty">▸</span><span class="tree-indent tree-indent-l2"></span><span>主控板</span></div></td>
+                                    <td>M001</td>
+                                    <td>CTRL-MAIN-V1</td>
+                                    <td class="col-qty"><input type="number" class="bom-qty-input" value="1" min="0" step="0.01"></td>
+                                    <td class="col-unit"><select class="bom-unit-select"><option>台</option><option selected>件</option><option>个</option><option>套</option></select></td>
+                                    <td class="col-key"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-key-check" checked> 是</label></td>
+                                    <td class="col-replace"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-replace-check" checked> 是</label></td>
+                                    <td class="col-loss"><input type="number" class="bom-input-sm" value="0" min="0" max="100" step="0.01" placeholder="%"></td>
+                                    <td class="col-repair"><input type="text" class="bom-input-sm" placeholder="3年，常备1件" value="3年，常备1件"></td>
+                                    <td class="col-alt"><input type="text" class="bom-input-sm" placeholder="M001-A"></td>
+                                    <td class="col-remark"><input type="text" class="bom-input-sm" placeholder="易损"></td>
+                                    <td class="col-actions"><div class="cell-act"><button type="button" class="btn btn-sm btn-default btn-add-child">子</button><button type="button" class="btn btn-sm btn-default btn-delete-node">删</button></div></td>
+                                </tr>
+                                <tr class="bom-tree-row" data-node-id="3" data-level="2" draggable="true">
+                                    <td class="col-check" onclick="event.stopPropagation()"><input type="checkbox" class="bom-tree-row-check" name="sbom-tree-check"></td>
+                                    <td class="col-no">3</td>
+                                    <td class="col-level">1.2</td>
+                                    <td><div class="tree-cell"><span class="tree-drag-handle" title="拖动调整层级">⋮⋮</span><span class="tree-toggle empty">▸</span><span class="tree-indent tree-indent-l2"></span><span>传感器模块</span></div></td>
+                                    <td>M003</td>
+                                    <td>SN-温度-01</td>
+                                    <td class="col-qty"><input type="number" class="bom-qty-input" value="1" min="0" step="0.01"></td>
+                                    <td class="col-unit"><select class="bom-unit-select"><option>台</option><option>件</option><option selected>个</option><option>套</option></select></td>
+                                    <td class="col-key"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-key-check" checked> 是</label></td>
+                                    <td class="col-replace"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-replace-check"> 是</label></td>
+                                    <td class="col-loss"><input type="number" class="bom-input-sm" value="0" min="0" max="100" step="0.01" placeholder="%"></td>
+                                    <td class="col-repair"><input type="text" class="bom-input-sm" placeholder="2年，按需"></td>
+                                    <td class="col-alt"><input type="text" class="bom-input-sm" placeholder=""></td>
+                                    <td class="col-remark"><input type="text" class="bom-input-sm" placeholder="选填"></td>
+                                    <td class="col-actions"><div class="cell-act"><button type="button" class="btn btn-sm btn-default btn-add-child">子</button><button type="button" class="btn btn-sm btn-default btn-delete-node">删</button></div></td>
+                                </tr>
+                                <tr class="bom-tree-row" data-node-id="4" data-level="2" draggable="true">
+                                    <td class="col-check" onclick="event.stopPropagation()"><input type="checkbox" class="bom-tree-row-check" name="sbom-tree-check"></td>
+                                    <td class="col-no">4</td>
+                                    <td class="col-level">1.3</td>
+                                    <td><div class="tree-cell"><span class="tree-drag-handle" title="拖动调整层级">⋮⋮</span><span class="tree-toggle empty">▸</span><span class="tree-indent tree-indent-l2"></span><span>不锈钢螺栓</span></div></td>
+                                    <td>M002</td>
+                                    <td>M8×20</td>
+                                    <td class="col-qty"><input type="number" class="bom-qty-input" value="4" min="0" step="0.01"></td>
+                                    <td class="col-unit"><select class="bom-unit-select"><option>台</option><option>件</option><option selected>个</option><option>套</option></select></td>
+                                    <td class="col-key"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-key-check"> 是</label></td>
+                                    <td class="col-replace"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-replace-check" checked> 是</label></td>
+                                    <td class="col-loss"><input type="number" class="bom-input-sm" value="0" min="0" max="100" step="0.01" placeholder="%"></td>
+                                    <td class="col-repair"><input type="text" class="bom-input-sm" placeholder="—"></td>
+                                    <td class="col-alt"><input type="text" class="bom-input-sm" placeholder="M002-B"></td>
+                                    <td class="col-remark"><input type="text" class="bom-input-sm" placeholder="选填"></td>
+                                    <td class="col-actions"><div class="cell-act"><button type="button" class="btn btn-sm btn-default btn-add-child">子</button><button type="button" class="btn btn-sm btn-default btn-delete-node">删</button></div></td>
+                                </tr>
+                                <tr class="bom-tree-row" data-node-id="5" data-level="2" draggable="true">
+                                    <td class="col-check" onclick="event.stopPropagation()"><input type="checkbox" class="bom-tree-row-check" name="sbom-tree-check"></td>
+                                    <td class="col-no">5</td>
+                                    <td class="col-level">1.4</td>
+                                    <td><div class="tree-cell"><span class="tree-drag-handle" title="拖动调整层级">⋮⋮</span><span class="tree-toggle empty">▸</span><span class="tree-indent tree-indent-l2"></span><span>电源模块</span></div></td>
+                                    <td>M004</td>
+                                    <td>PSU-24V-5A</td>
+                                    <td class="col-qty"><input type="number" class="bom-qty-input" value="1" min="0" step="0.01"></td>
+                                    <td class="col-unit"><select class="bom-unit-select"><option>台</option><option selected>件</option><option>个</option><option>套</option></select></td>
+                                    <td class="col-key"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-key-check"> 是</label></td>
+                                    <td class="col-replace"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-replace-check"> 是</label></td>
+                                    <td class="col-loss"><input type="number" class="bom-input-sm" value="0" min="0" max="100" step="0.01" placeholder="%"></td>
+                                    <td class="col-repair"><input type="text" class="bom-input-sm" placeholder="5年"></td>
+                                    <td class="col-alt"><input type="text" class="bom-input-sm" placeholder=""></td>
+                                    <td class="col-remark"><input type="text" class="bom-input-sm" placeholder="选填"></td>
+                                    <td class="col-actions"><div class="cell-act"><button type="button" class="btn btn-sm btn-default btn-add-child">子</button><button type="button" class="btn btn-sm btn-default btn-delete-node">删</button></div></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modals -->
+            <div id="sbom-save-draft-modal" class="modal-overlay" data-wb-modal>
+                <div class="modal" style="max-width: 420px;" onclick="event.stopPropagation()">
+                    <div class="modal-header"><span class="modal-title">保存草稿</span><div class="modal-close" data-close-modal="sbom-save-draft-modal">×</div></div>
+                    <div class="modal-body"><p class="modal-desc">确定保存当前 SBOM 草稿？保存后可继续编辑，后续再提交评审。</p></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-close-modal="sbom-save-draft-modal">取消</button>
+                        <button type="button" class="btn btn-primary" id="sbom-save-draft-ok">确定</button>
+                    </div>
+                </div>
+            </div>
+            <div id="sbom-submit-review-modal" class="modal-overlay" data-wb-modal>
+                <div class="modal" style="max-width: 520px;" onclick="event.stopPropagation()">
+                    <div class="modal-header"><span class="modal-title">提交评审</span><div class="modal-close" data-close-modal="sbom-submit-review-modal">×</div></div>
+                    <div class="modal-body">
+                        <p class="modal-desc">提交后进入售后、研发、库存（涉及采购时加采购）评审，重点核查维修可行性、物料适配性；全部通过后可发布。</p>
+                        <div class="form-item">
+                            <label class="form-label">审核说明</label>
+                            <textarea class="form-textarea" id="sbom-submit-remark" placeholder="选填"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-close-modal="sbom-submit-review-modal">取消</button>
+                        <button type="button" class="btn btn-primary" id="sbom-submit-review-ok">确定提交</button>
+                    </div>
+                </div>
+            </div>
+            <div id="sbom-add-root-modal" class="modal-overlay" data-wb-modal>
+                <div class="modal" style="max-width: 520px;" onclick="event.stopPropagation()">
+                    <div class="modal-header"><span class="modal-title">新增根节点</span><div class="modal-close" data-close-modal="sbom-add-root-modal">×</div></div>
+                    <div class="modal-body">
+                        <p class="modal-desc">在 BOM 树顶层添加根节点。</p>
+                        <div class="form-item"><label class="form-label">物料编码</label><input type="text" class="form-input" id="sbom-root-code" placeholder="如 M001"></div>
+                        <div class="form-item"><label class="form-label">物料名称</label><input type="text" class="form-input" id="sbom-root-name" placeholder="必填"></div>
+                        <div class="form-item"><label class="form-label">规格型号</label><input type="text" class="form-input" id="sbom-root-spec" placeholder="选填"></div>
+                        <div class="form-item"><label class="form-label">数量</label><input type="number" class="form-input" id="sbom-root-qty" min="0" step="0.01" value="1"></div>
+                        <div class="form-item"><label class="form-label">单位</label><select class="form-input form-select" id="sbom-root-unit"><option>台</option><option selected>件</option><option>个</option><option>套</option></select></div>
+                        <div class="form-item"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" id="sbom-root-key"> 关键件</label></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-close-modal="sbom-add-root-modal">取消</button>
+                        <button type="button" class="btn btn-primary" id="sbom-add-root-ok">确定</button>
+                    </div>
+                </div>
+            </div>
+            <div id="sbom-add-child-modal" class="modal-overlay" data-wb-modal>
+                <div class="modal" style="max-width: 520px;" onclick="event.stopPropagation()">
+                    <div class="modal-header"><span class="modal-title">新增子节点</span><div class="modal-close" data-close-modal="sbom-add-child-modal">×</div></div>
+                    <div class="modal-body">
+                        <p class="modal-desc" id="sbom-add-child-desc">在当前节点下添加子节点。</p>
+                        <div class="form-item"><label class="form-label">物料编码</label><input type="text" class="form-input" id="sbom-child-code" placeholder="如 M001"></div>
+                        <div class="form-item"><label class="form-label">物料名称</label><input type="text" class="form-input" id="sbom-child-name" placeholder="必填"></div>
+                        <div class="form-item"><label class="form-label">规格型号</label><input type="text" class="form-input" id="sbom-child-spec" placeholder="选填"></div>
+                        <div class="form-item"><label class="form-label">数量</label><input type="number" class="form-input" id="sbom-child-qty" min="0" step="0.01" value="1"></div>
+                        <div class="form-item"><label class="form-label">单位</label><select class="form-input form-select" id="sbom-child-unit"><option>台</option><option selected>件</option><option>个</option><option>套</option></select></div>
+                        <div class="form-item"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" id="sbom-child-key"> 关键件</label></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-close-modal="sbom-add-child-modal">取消</button>
+                        <button type="button" class="btn btn-primary" id="sbom-add-child-ok">确定</button>
+                    </div>
+                </div>
+            </div>
+            <div id="sbom-delete-modal" class="modal-overlay" data-wb-modal>
+                <div class="modal" style="max-width: 420px;" onclick="event.stopPropagation()">
+                    <div class="modal-header"><span class="modal-title">删除节点</span><div class="modal-close" data-close-modal="sbom-delete-modal">×</div></div>
+                    <div class="modal-body"><p class="modal-desc">确定删除节点「<strong id="sbom-delete-name"></strong>」及其所有子节点？</p></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-close-modal="sbom-delete-modal">取消</button>
+                        <button type="button" class="btn btn-primary btn-danger" id="sbom-delete-ok">确定删除</button>
+                    </div>
+                </div>
+            </div>
+            <div id="sbom-ref-bom-modal" class="modal-overlay" data-wb-modal>
+                <div class="modal" style="max-width: 520px;" onclick="event.stopPropagation()">
+                    <div class="modal-header"><span class="modal-title">引用 BOM</span><div class="modal-close" data-close-modal="sbom-ref-bom-modal">×</div></div>
+                    <div class="modal-body">
+                        <p class="modal-desc">从已发布 MBOM/SBOM 借用结构，追加到当前树。</p>
+                        <div class="form-item"><label class="form-label">源 BOM</label><select class="form-input form-select"><option value="">请选择</option><option>MBOM-智能控制器 V1.0</option><option>SBOM-主控板 V1.0</option></select></div>
+                    </div>
+                    <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="sbom-ref-bom-modal">取消</button><button type="button" class="btn btn-primary">确定</button></div>
+                </div>
+            </div>
+            <div id="sbom-copy-bom-modal" class="modal-overlay" data-wb-modal>
+                <div class="modal" style="max-width: 520px;" onclick="event.stopPropagation()">
+                    <div class="modal-header"><span class="modal-title">复制 BOM</span><div class="modal-close" data-close-modal="sbom-copy-bom-modal">×</div></div>
+                    <div class="modal-body">
+                        <p class="modal-desc">从已发布 MBOM/SBOM 复制结构到当前树。</p>
+                        <div class="form-item"><label class="form-label">源 BOM</label><select class="form-input form-select"><option value="">请选择</option><option>MBOM-智能控制器 V1.0</option><option>SBOM-主控板 V1.0</option></select></div>
+                    </div>
+                    <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="sbom-copy-bom-modal">取消</button><button type="button" class="btn btn-primary">确定</button></div>
+                </div>
+            </div>
+            <div id="sbom-import-modal" class="modal-overlay" data-wb-modal>
+                <div class="modal" style="max-width: 520px;" onclick="event.stopPropagation()">
+                    <div class="modal-header"><span class="modal-title">导入 BOM</span><div class="modal-close" data-close-modal="sbom-import-modal">×</div></div>
+                    <div class="modal-body">
+                        <p class="modal-desc">使用 Excel 模板填写 BOM 明细（含维修要求、配件替代）后上传。</p>
+                        <div class="form-item"><label class="form-label">选择文件</label><input type="file" class="form-input" accept=".xlsx,.xls"></div>
+                    </div>
+                    <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="sbom-import-modal">取消</button><button type="button" class="btn btn-primary">确定</button></div>
+                </div>
+            </div>
+            <div id="sbom-batch-key-modal" class="modal-overlay" data-wb-modal>
+                <div class="modal" style="max-width: 400px;" onclick="event.stopPropagation()">
+                    <div class="modal-header"><span class="modal-title">批量设置关键件</span><div class="modal-close" data-close-modal="sbom-batch-key-modal">×</div></div>
+                    <div class="modal-body">
+                        <p class="modal-desc">将所选 <strong id="sbom-batch-key-count">0</strong> 个节点的关键件设为：</p>
+                        <div class="form-item"><label class="form-label">关键件</label><select class="form-input form-select" id="sbom-batch-key-value"><option value="1">是</option><option value="0">否</option></select></div>
+                    </div>
+                    <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="sbom-batch-key-modal">取消</button><button type="button" class="btn btn-primary" id="sbom-batch-key-submit">确定</button></div>
+                </div>
+            </div>
+            <div id="sbom-batch-replace-modal" class="modal-overlay" data-wb-modal>
+                <div class="modal" style="max-width: 400px;" onclick="event.stopPropagation()">
+                    <div class="modal-header"><span class="modal-title">批量设置可替换件</span><div class="modal-close" data-close-modal="sbom-batch-replace-modal">×</div></div>
+                    <div class="modal-body">
+                        <p class="modal-desc">将所选 <strong id="sbom-batch-replace-count">0</strong> 个节点的可替换件设为：</p>
+                        <div class="form-item"><label class="form-label">可替换件</label><select class="form-input form-select" id="sbom-batch-replace-value"><option value="1">是</option><option value="0">否</option></select></div>
+                    </div>
+                    <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="sbom-batch-replace-modal">取消</button><button type="button" class="btn btn-primary" id="sbom-batch-replace-submit">确定</button></div>
+                </div>
+            </div>
+            <div id="sbom-batch-loss-modal" class="modal-overlay" data-wb-modal>
+                <div class="modal" style="max-width: 400px;" onclick="event.stopPropagation()">
+                    <div class="modal-header"><span class="modal-title">批量设置损耗率</span><div class="modal-close" data-close-modal="sbom-batch-loss-modal">×</div></div>
+                    <div class="modal-body">
+                        <p class="modal-desc">将所选 <strong id="sbom-batch-loss-count">0</strong> 个节点的损耗率设为：</p>
+                        <div class="form-item"><label class="form-label">损耗率（%）</label><input type="number" class="form-input" id="sbom-batch-loss-value" min="0" max="100" step="0.01" value="0" placeholder="0"></div>
+                    </div>
+                    <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="sbom-batch-loss-modal">取消</button><button type="button" class="btn btn-primary" id="sbom-batch-loss-submit">确定</button></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card workbench-extra-card">
+            <div class="card-body">
+                <div class="section-title">维修要求（SBOM 专有）</div>
+                <div class="form-item">
+                    <label class="form-label">常用易损件、更换周期、备件建议、维修注意事项</label>
+                    <textarea class="form-textarea" id="sbom-repair-global" rows="4" placeholder="常用易损件：主控板、传感器模块；更换周期与备件建议见明细。维修时注意断电、防静电等。"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .section-title { font-size: 14px; font-weight: 600; color: rgba(0,0,0,0.85); padding: 8px 0; border-bottom: 1px solid #e8e8e8; margin-bottom: 16px; }
+            .bom-tree.sbom-tree .col-repair { width: 120px; min-width: 100px; }
+            .bom-tree.sbom-tree .col-alt { width: 90px; }
+            .bom-tree.sbom-tree .col-remark { width: 90px; }
+        </style>
+        <script>
+        (function () {
+            if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+
+            function openModal(id) { var el = document.getElementById(id); if (el) el.classList.add('active'); }
+            function closeModal(id) { var el = document.getElementById(id); if (el) el.classList.remove('active'); }
+            document.querySelectorAll('[data-open-modal]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var id = btn.getAttribute('data-open-modal');
+                    if (id && (id === 'sbom-batch-key-modal' || id === 'sbom-batch-replace-modal' || id === 'sbom-batch-loss-modal')) {
+                        var n = document.querySelectorAll('.bom-tree-row-check:checked').length;
+                        if (n === 0) { alert('请先勾选要批量设置的节点'); return; }
+                        var countEl = document.getElementById(id.replace('-modal', '-count'));
+                        if (countEl) countEl.textContent = n;
+                        if (id === 'sbom-batch-loss-modal') { var inp = document.getElementById('sbom-batch-loss-value'); if (inp) inp.value = '0'; }
+                    }
+                    if (id) openModal(id);
+                });
+            });
+            document.querySelectorAll('[data-close-modal]').forEach(function (btn) {
+                btn.addEventListener('click', function () { var id = btn.getAttribute('data-close-modal'); if (id) closeModal(id); });
+            });
+            document.querySelectorAll('.modal-overlay[data-wb-modal]').forEach(function (ov) {
+                ov.addEventListener('click', function (e) { if (e.target === ov) closeModal(ov.id); });
+            });
+
+            var params = new URLSearchParams(window.location.search || '');
+            var from = params.get('from') || 'mbom';
+            var product = params.get('product') || '';
+            var mbom = params.get('mbomId') || params.get('mbom') || '';
+            var srcEl = document.getElementById('sbom-wb-source');
+            var prodEl = document.getElementById('sbom-wb-product');
+            if (srcEl) srcEl.textContent = from === 'manual' ? '手动创建' : (mbom ? 'MBOM ' + mbom : '从 MBOM 筛选');
+            if (prodEl) prodEl.textContent = product || '—';
+
+            var tbody = document.getElementById('sbom-tree-tbody');
+            var bodyWrap = document.getElementById('sbom-tree-body');
+            var expandBtn = document.getElementById('sbom-expand-all');
+            var collapseBtn = document.getElementById('sbom-collapse-all');
+            var fullscreenWrap = document.getElementById('sbom-wb-fullscreen-wrap');
+            var fullscreenBtn = document.getElementById('sbom-wb-fullscreen');
+
+            function toggleRow(row) {
+                var toggle = row.querySelector('.tree-toggle');
+                if (!toggle || toggle.classList.contains('empty')) return;
+                var expanded = row.getAttribute('data-expanded') === '1';
+                var lv = parseInt(row.getAttribute('data-level') || '1', 10);
+                row.setAttribute('data-expanded', expanded ? '0' : '1');
+                toggle.classList.toggle('expanded', !expanded);
+                var next = row.nextElementSibling;
+                while (next && next.classList && next.classList.contains('bom-tree-row')) {
+                    if (parseInt(next.getAttribute('data-level') || '1', 10) <= lv) break;
+                    next.classList.toggle('row-hidden', expanded);
+                    next = next.nextElementSibling;
+                }
+            }
+            bodyWrap.addEventListener('click', function (e) {
+                if (e.target.closest('.col-check')) return;
+                var t = e.target.closest('.tree-toggle');
+                if (t) { var row = e.target.closest('.bom-tree-row'); if (row) toggleRow(row); return; }
+                var del = e.target.closest('.btn-delete-node');
+                if (del) {
+                    var row = e.target.closest('.bom-tree-row');
+                    if (!row) return;
+                    var nameEl = row.querySelector('.tree-cell span:last-child');
+                    document.getElementById('sbom-delete-name').textContent = (nameEl && nameEl.textContent) || '未命名';
+                    openModal('sbom-delete-modal');
+                    document.getElementById('sbom-delete-ok').onclick = function () { row.remove(); closeModal('sbom-delete-modal'); };
+                    return;
+                }
+                if (e.target.closest('.btn-add-child')) openModal('sbom-add-child-modal');
+            });
+
+            function updateBatchBar() {
+                var checked = document.querySelectorAll('.bom-tree-row-check:checked');
+                var n = checked.length;
+                var bar = document.getElementById('sbom-batch-bar');
+                var countEl = document.getElementById('sbom-batch-count');
+                var selectAll = document.getElementById('sbom-bom-select-all');
+                if (bar) bar.style.display = n > 0 ? 'inline-flex' : 'none';
+                if (countEl) countEl.textContent = n;
+                if (selectAll) { var allChecks = document.querySelectorAll('.bom-tree-row-check'); selectAll.checked = allChecks.length > 0 && n === allChecks.length; }
+            }
+            var selectAllEl = document.getElementById('sbom-bom-select-all');
+            if (selectAllEl) selectAllEl.addEventListener('change', function () {
+                tbody.querySelectorAll('.bom-tree-row-check').forEach(function (cb) { cb.checked = selectAllEl.checked; });
+                updateBatchBar();
+            });
+            if (tbody) tbody.addEventListener('change', function (e) { if (e.target.classList && e.target.classList.contains('bom-tree-row-check')) updateBatchBar(); });
+            function getCheckedRows() { var rows = []; document.querySelectorAll('.bom-tree-row-check:checked').forEach(function (cb) { var row = cb.closest('.bom-tree-row'); if (row) rows.push(row); }); return rows; }
+            var sbomBatchKeySubmit = document.getElementById('sbom-batch-key-submit');
+            if (sbomBatchKeySubmit) sbomBatchKeySubmit.addEventListener('click', function () { var rows = getCheckedRows(); var sel = document.getElementById('sbom-batch-key-value'); var isYes = sel && sel.value === '1'; rows.forEach(function (r) { var cb = r.querySelector('.col-key .bom-key-check'); if (cb) cb.checked = isYes; }); closeModal('sbom-batch-key-modal'); updateBatchBar(); });
+            var sbomBatchReplaceSubmit = document.getElementById('sbom-batch-replace-submit');
+            if (sbomBatchReplaceSubmit) sbomBatchReplaceSubmit.addEventListener('click', function () { var rows = getCheckedRows(); var sel = document.getElementById('sbom-batch-replace-value'); var isYes = sel && sel.value === '1'; rows.forEach(function (r) { var cb = r.querySelector('.col-replace .bom-replace-check'); if (cb) cb.checked = isYes; }); closeModal('sbom-batch-replace-modal'); updateBatchBar(); });
+            var sbomBatchLossSubmit = document.getElementById('sbom-batch-loss-submit');
+            if (sbomBatchLossSubmit) sbomBatchLossSubmit.addEventListener('click', function () { var rows = getCheckedRows(); var input = document.getElementById('sbom-batch-loss-value'); var val = input ? input.value : '0'; rows.forEach(function (r) { var inp = r.querySelector('.col-loss .bom-input-sm'); if (inp) inp.value = val; }); closeModal('sbom-batch-loss-modal'); updateBatchBar(); });
+
+            function getLevelIndent(level) { var n = Math.max(1, level || 1); if (n === 1) return ''; if (n === 2) return ' tree-indent-l2'; if (n === 3) return ' tree-indent-l3'; return ' tree-indent-l4'; }
+            function renumberNo() { tbody.querySelectorAll('.bom-tree-row').forEach(function (r, i) { var td = r.querySelector('.col-no'); if (td) td.textContent = String(i + 1); }); }
+            function updateLevelNumbers() {
+                var rows = tbody.querySelectorAll('.bom-tree-row');
+                if (!rows.length) return;
+                var maxL = 10, c = []; for (var i = 0; i <= maxL; i++) c[i] = 0;
+                for (var i = 0; i < rows.length; i++) {
+                    var L = parseInt(rows[i].getAttribute('data-level'), 10) || 1; if (L < 1) L = 1; if (L > maxL) L = maxL;
+                    c[L]++; for (var j = L + 1; j <= maxL; j++) c[j] = 0;
+                    var parts = []; for (var k = 1; k <= L; k++) parts.push(c[k]);
+                    var td = rows[i].querySelector('.col-level'); if (td) td.textContent = parts.join('.');
+                }
+            }
+            function refreshTreeVisibility() {
+                tbody.querySelectorAll('.bom-tree-row').forEach(function (r) {
+                    var lv = parseInt(r.getAttribute('data-level') || '1', 10);
+                    var exp = r.getAttribute('data-expanded') === '1';
+                    var toggle = r.querySelector('.tree-toggle'); if (toggle && !toggle.classList.contains('empty')) toggle.classList.toggle('expanded', exp);
+                    var next = r.nextElementSibling;
+                    while (next && next.classList && next.classList.contains('bom-tree-row')) {
+                        if (parseInt(next.getAttribute('data-level') || '1', 10) <= lv) break;
+                        next.classList.toggle('row-hidden', !exp); next = next.nextElementSibling;
+                    }
+                });
+            }
+            function moveTreeNode(srcRow, targetRow) {
+                if (!srcRow || !targetRow || srcRow === targetRow) return;
+                var rows = tbody.querySelectorAll('.bom-tree-row');
+                var srcIdx = -1, targetIdx = -1;
+                for (var i = 0; i < rows.length; i++) { if (rows[i] === srcRow) srcIdx = i; if (rows[i] === targetRow) targetIdx = i; }
+                if (srcIdx < 0 || targetIdx < 0) return;
+                var srcLevel = parseInt(srcRow.getAttribute('data-level'), 10) || 1;
+                var targetLevel = parseInt(targetRow.getAttribute('data-level'), 10) || 1;
+                var toMove = [srcRow];
+                for (var j = srcIdx + 1; j < rows.length; j++) { var l = parseInt(rows[j].getAttribute('data-level'), 10) || 1; if (l <= srcLevel) break; toMove.push(rows[j]); }
+                for (var k = 0; k < toMove.length; k++) { if (toMove[k] === targetRow) return; }
+                var delta = (targetLevel + 1) - srcLevel;
+                var movedRows = [];
+                for (var m = 0; m < toMove.length; m++) {
+                    var r = toMove[m]; var oldL = parseInt(r.getAttribute('data-level'), 10) || 1;
+                    var newL = Math.max(1, oldL + delta); r.setAttribute('data-level', String(newL));
+                    var cell = r.querySelector('.tree-cell'); if (cell) { var ind = cell.querySelector('.tree-indent'); if (ind) ind.className = 'tree-indent' + getLevelIndent(newL); }
+                    movedRows.push(r); r.parentNode.removeChild(r);
+                }
+                var insertAfter = targetRow;
+                for (var n = 0; n < movedRows.length; n++) {
+                    if (insertAfter.nextElementSibling) tbody.insertBefore(movedRows[n], insertAfter.nextElementSibling);
+                    else tbody.appendChild(movedRows[n]); insertAfter = movedRows[n];
+                }
+                targetRow.setAttribute('data-expanded', '1'); renumberNo(); updateLevelNumbers(); refreshTreeVisibility();
+            }
+            function addNodeToTree(parentRow, data) {
+                if (!data) return;
+                var level = parentRow ? (parseInt(parentRow.getAttribute('data-level'), 10) || 1) + 1 : 1;
+                var indent = getLevelIndent(level);
+                var tr = document.createElement('tr');
+                tr.className = 'bom-tree-row'; tr.setAttribute('data-node-id', 'new-' + Date.now()); tr.setAttribute('data-level', String(level)); tr.setAttribute('draggable', 'true');
+                var name_ = (data.name || data.code || '').toString().replace(/</g, '&lt;'); var code_ = (data.code || '').toString().replace(/</g, '&lt;'); var spec_ = (data.spec || '—').toString().replace(/</g, '&lt;'); var unit = (data.unit || '件').replace(/</g, '&lt;');
+                var opts = ['台','件','个','套']; var selOpts = opts.map(function (o) { return '<option' + (o === unit ? ' selected' : '') + '>' + o + '</option>'; }).join('');
+                tr.innerHTML = '<td class="col-check" onclick="event.stopPropagation()"><input type="checkbox" class="bom-tree-row-check" name="sbom-tree-check"></td><td class="col-no">0</td><td class="col-level">—</td><td><div class="tree-cell"><span class="tree-drag-handle" title="拖动调整层级">⋮⋮</span><span class="tree-toggle empty">▸</span><span class="tree-indent' + indent + '"></span><span>' + name_ + '</span></div></td><td>' + code_ + '</td><td>' + spec_ + '</td><td class="col-qty"><input type="number" class="bom-qty-input" value="1" min="0" step="0.01"></td><td class="col-unit"><select class="bom-unit-select">' + selOpts + '</select></td><td class="col-key"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-key-check"> 是</label></td><td class="col-replace"><label class="filter-checkbox" style="margin:0;"><input type="checkbox" class="bom-replace-check"> 是</label></td><td class="col-loss"><input type="number" class="bom-input-sm" value="0" min="0" max="100" step="0.01" placeholder="%"></td><td class="col-repair"><input type="text" class="bom-input-sm" placeholder=""></td><td class="col-alt"><input type="text" class="bom-input-sm" placeholder=""></td><td class="col-remark"><input type="text" class="bom-input-sm" placeholder=""></td><td class="col-actions"><div class="cell-act"><button type="button" class="btn btn-sm btn-default btn-add-child">子</button><button type="button" class="btn btn-sm btn-default btn-delete-node">删</button></div></td>';
+                if (parentRow && parentRow.nextElementSibling) tbody.insertBefore(tr, parentRow.nextElementSibling); else tbody.appendChild(tr);
+                renumberNo(); updateLevelNumbers(); refreshTreeVisibility();
+            }
+            var dragOverRow = null;
+            if (tbody) {
+                tbody.addEventListener('dragstart', function (e) {
+                    var row = e.target.closest('.bom-tree-row');
+                    if (row && row.draggable) {
+                        e.dataTransfer.setData('application/json', JSON.stringify({ type: 'bom-tree-node', nodeId: row.getAttribute('data-node-id') }));
+                        e.dataTransfer.effectAllowed = 'move'; e.target.closest('tr').classList.add('bom-tree-dragging');
+                    }
+                });
+                tbody.addEventListener('dragend', function (e) {
+                    var row = e.target.closest('.bom-tree-row'); if (row) row.classList.remove('bom-tree-dragging');
+                    if (dragOverRow) { dragOverRow.classList.remove('drag-over'); dragOverRow = null; }
+                });
+                tbody.addEventListener('dragover', function (e) { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; var row = e.target.closest('.bom-tree-row'); if (row) { if (dragOverRow && dragOverRow !== row) dragOverRow.classList.remove('drag-over'); dragOverRow = row; row.classList.add('drag-over'); } });
+                tbody.addEventListener('dragleave', function (e) { var rel = e.relatedTarget; if (rel && tbody.contains(rel)) return; if (dragOverRow) { dragOverRow.classList.remove('drag-over'); dragOverRow = null; } });
+                tbody.addEventListener('drop', function (e) {
+                    e.preventDefault(); if (dragOverRow) dragOverRow.classList.remove('drag-over'); dragOverRow = null;
+                    var targetRow = e.target.closest('.bom-tree-row'); if (!targetRow) return;
+                    try {
+                        var data = JSON.parse(e.dataTransfer.getData('application/json') || '{}');
+                        if (data.type === 'bom-tree-node') { var srcRow = tbody.querySelector('.bom-tree-row[data-node-id="' + data.nodeId + '"]'); if (srcRow && srcRow !== targetRow) moveTreeNode(srcRow, targetRow); }
+                        else if (data.type === 'material' || data.code !== undefined) addNodeToTree(targetRow, data);
+                    } catch (_) {}
+                });
+            }
+            var matList = document.getElementById('sbom-mat-list');
+            if (matList) matList.querySelectorAll('.material-item').forEach(function (el) {
+                el.addEventListener('dragstart', function (e) {
+                    e.dataTransfer.setData('application/json', JSON.stringify({ type: 'material', code: el.getAttribute('data-code'), name: el.getAttribute('data-name'), spec: el.getAttribute('data-spec'), unit: el.getAttribute('data-unit') || '件' }));
+                    e.dataTransfer.effectAllowed = 'copy';
+                });
+            });
+
+            if (expandBtn) expandBtn.addEventListener('click', function () {
+                tbody.querySelectorAll('.bom-tree-row').forEach(function (r) {
+                    r.setAttribute('data-expanded', '1');
+                    var t = r.querySelector('.tree-toggle'); if (t && !t.classList.contains('empty')) t.classList.add('expanded');
+                });
+                tbody.querySelectorAll('.bom-tree-row.row-hidden').forEach(function (r) { r.classList.remove('row-hidden'); });
+            });
+            if (collapseBtn) collapseBtn.addEventListener('click', function () {
+                tbody.querySelectorAll('.bom-tree-row').forEach(function (r) {
+                    r.setAttribute('data-expanded', '0');
+                    var t = r.querySelector('.tree-toggle'); if (t && !t.classList.contains('empty')) t.classList.remove('expanded');
+                });
+                var first = true;
+                tbody.querySelectorAll('.bom-tree-row').forEach(function (r) {
+                    var lv = parseInt(r.getAttribute('data-level') || '1', 10);
+                    if (lv === 1 && !first) return;
+                    if (lv === 1) first = false;
+                    if (lv > 1) r.classList.add('row-hidden');
+                });
+            });
+
+            var sbomSaveOk = document.getElementById('sbom-save-draft-ok');
+            if (sbomSaveOk) sbomSaveOk.addEventListener('click', function () {
+                alert('草稿已保存（原型演示）');
+                closeModal('sbom-save-draft-modal');
+            });
+            var sbomSubmitOk = document.getElementById('sbom-submit-review-ok');
+            if (sbomSubmitOk) sbomSubmitOk.addEventListener('click', function () {
+                alert('已提交评审（原型演示）');
+                closeModal('sbom-submit-review-modal');
+                if (typeof PageLoader !== 'undefined') PageLoader.loadPage('pages/sbom-list.html');
+            });
+
+            function isWorkbenchFullscreen() {
+                var el = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
+                return el === fullscreenWrap;
+            }
+            function updateFullscreenBtnText() {
+                if (!fullscreenBtn) return;
+                fullscreenBtn.textContent = isWorkbenchFullscreen() ? '退出全屏' : '全屏';
+                fullscreenBtn.title = isWorkbenchFullscreen() ? '退出全屏' : '全屏';
+            }
+            function toggleFullscreenClass() {
+                if (!fullscreenWrap) return;
+                if (isWorkbenchFullscreen()) fullscreenWrap.classList.add('wb-fullscreen-active');
+                else fullscreenWrap.classList.remove('wb-fullscreen-active');
+            }
+            if (fullscreenWrap && fullscreenBtn) {
+                fullscreenBtn.addEventListener('click', function () {
+                    if (isWorkbenchFullscreen()) {
+                        var fn = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen;
+                        if (fn) fn.call(document);
+                    } else {
+                        var req = fullscreenWrap.requestFullscreen || fullscreenWrap.webkitRequestFullscreen || fullscreenWrap.mozRequestFullScreen;
+                        if (req) req.call(fullscreenWrap);
+                    }
+                });
+                document.addEventListener('fullscreenchange', function () { updateFullscreenBtnText(); toggleFullscreenClass(); });
+                document.addEventListener('webkitfullscreenchange', function () { updateFullscreenBtnText(); toggleFullscreenClass(); });
+                document.addEventListener('mozfullscreenchange', function () { updateFullscreenBtnText(); toggleFullscreenClass(); });
+                updateFullscreenBtnText();
+                toggleFullscreenClass();
+            }
+
+            var search = document.getElementById('sbom-mat-search');
+            var list = document.getElementById('sbom-mat-list');
+            if (search && list) {
+                search.addEventListener('input', function () {
+                    var q = (search.value || '').trim().toLowerCase();
+                    list.querySelectorAll('.material-item').forEach(function (el) {
+                        var code = (el.getAttribute('data-code') || '').toLowerCase();
+                        var name = (el.getAttribute('data-name') || '').toLowerCase();
+                        var spec = (el.getAttribute('data-spec') || '').toLowerCase();
+                        el.style.display = !q || code.indexOf(q) >= 0 || name.indexOf(q) >= 0 || spec.indexOf(q) >= 0 ? '' : 'none';
+                    });
+                });
+            }
+        })();
+        </script>
+    </div>
+</body>
+</html>

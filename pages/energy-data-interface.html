@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>接口配置 - 能源管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/energy-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">数据接收与整合</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">接口配置</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">配置外部系统数据接口，包括智能物联系统、设备管理系统、生产系统等；支持接口连通性测试与数据接收监控。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="接口编码、接口名称、系统名称">
+                </div>
+                <div class="filter-item">
+                    <label>接口状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="enabled">启用</option>
+                        <option value="disabled">停用</option>
+                        <option value="testing">测试中</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>系统类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="iot">智能物联系统</option>
+                        <option value="equipment">设备管理系统</option>
+                        <option value="production">生产系统</option>
+                        <option value="erp">ERP系统</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary" data-open-modal="interface-add-modal">+ 新增接口</button>
+                <button class="btn btn-default">批量测试</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">接口编码</th>
+                            <th width="180">接口名称</th>
+                            <th width="120">系统类型</th>
+                            <th width="200">接口地址</th>
+                            <th width="100">请求方式</th>
+                            <th width="100">接收频率</th>
+                            <th width="90">接口状态</th>
+                            <th width="120">最后测试时间</th>
+                            <th width="90">测试结果</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="interface-id" value="1"></td>
+                            <td>IF-001</td>
+                            <td>智能物联系统-能耗数据接口</td>
+                            <td>智能物联系统</td>
+                            <td>http://iot.example.com/api/energy</td>
+                            <td>POST</td>
+                            <td>实时</td>
+                            <td><span class="status-badge status-published">启用</span></td>
+                            <td>2025-01-29 10:30</td>
+                            <td><span class="status-badge status-success">成功</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/energy-interface-detail.html" data-id="1">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/energy-interface-edit.html" data-id="1">编辑</button>
+                                <button class="btn btn-sm btn-primary">测试</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="interface-id" value="2"></td>
+                            <td>IF-002</td>
+                            <td>设备管理系统-设备状态接口</td>
+                            <td>设备管理系统</td>
+                            <td>http://ems.example.com/api/equipment</td>
+                            <td>POST</td>
+                            <td>分钟</td>
+                            <td><span class="status-badge status-published">启用</span></td>
+                            <td>2025-01-29 09:15</td>
+                            <td><span class="status-badge status-success">成功</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/energy-interface-detail.html" data-id="2">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/energy-interface-edit.html" data-id="2">编辑</button>
+                                <button class="btn btn-sm btn-primary">测试</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="interface-id" value="3"></td>
+                            <td>IF-003</td>
+                            <td>生产系统-产量数据接口</td>
+                            <td>生产系统</td>
+                            <td>http://mes.example.com/api/production</td>
+                            <td>GET</td>
+                            <td>小时</td>
+                            <td><span class="status-badge status-warning">停用</span></td>
+                            <td>2025-01-28 16:45</td>
+                            <td><span class="status-badge status-error">失败</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/energy-interface-detail.html" data-id="3">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/energy-interface-edit.html" data-id="3">编辑</button>
+                                <button class="btn btn-sm btn-primary">测试</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 3 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="interface-add-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:800px;max-height:90vh;overflow-y:auto;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">新增接口配置</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <div class="section-title" style="margin-bottom:12px;">基本信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label required">接口编码</label><input type="text" class="form-input" placeholder="系统自动生成"></div>
+                        <div class="form-item"><label class="form-label required">接口名称</label><input type="text" class="form-input" placeholder="接口名称"></div>
+                        <div class="form-item"><label class="form-label required">系统类型</label><select class="form-select"><option value="">请选择</option><option value="iot">智能物联系统</option><option value="equipment">设备管理系统</option><option value="production">生产系统</option><option value="erp">ERP系统</option></select></div>
+                        <div class="form-item"><label class="form-label required">接口地址</label><input type="url" class="form-input" placeholder="http://example.com/api/xxx"></div>
+                        <div class="form-item"><label class="form-label required">请求方式</label><select class="form-select"><option value="POST">POST</option><option value="GET">GET</option></select></div>
+                        <div class="form-item"><label class="form-label required">认证方式</label><select class="form-select"><option value="token">Token</option><option value="apikey">API Key</option><option value="oauth2">OAuth2.0</option></select></div>
+                        <div class="form-item"><label class="form-label required">认证Token</label><input type="text" class="form-input" placeholder="认证令牌"></div>
+                        <div class="form-item"><label class="form-label required">数据格式</label><select class="form-select"><option value="json">JSON</option><option value="xml">XML</option></select></div>
+                        <div class="form-item"><label class="form-label required">接收频率</label><select class="form-select"><option value="realtime">实时</option><option value="minute">分钟</option><option value="hour">小时</option><option value="day">天</option></select></div>
+                        <div class="form-item"><label class="form-label required">接口状态</label><select class="form-select"><option value="disabled">停用</option><option value="testing">测试中</option><option value="enabled">启用</option></select></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="interface-add-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="interface-add-modal" onclick="alert('✅ 接口配置已保存')">保存</button></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('接口配置列表 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+            PageInteractions.toggleSelectAll('input[name="interface-id"]');
+        }
+    </script>
+</body>
+</html>

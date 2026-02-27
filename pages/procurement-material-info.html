@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物料档案 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">系统配置</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">物料档案</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理采购相关的物料档案，包括物料编码、名称、规格、供应商、价格、库存等信息。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="物料编码、物料名称">
+                </div>
+                <div class="filter-item">
+                    <label>物料类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="raw">原材料</option>
+                        <option value="semi">半成品</option>
+                        <option value="finished">成品</option>
+                        <option value="auxiliary">辅料</option>
+                        <option value="packaging">包装材料</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>物料等级</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="A">A级</option>
+                        <option value="B">B级</option>
+                        <option value="C">C级</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>供应商</label>
+                    <input type="text" class="form-input" placeholder="供应商名称">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary btn-create-modal"
+                        data-modal="material-create-modal"
+                        data-title="新建物料"
+                        data-url="pages/procurement-material-create.html">
+                    + 新建物料
+                </button>
+                <button class="btn btn-default">批量导入</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">物料编码</th>
+                            <th width="200">物料名称</th>
+                            <th width="150">规格型号</th>
+                            <th width="100">物料类型</th>
+                            <th width="80">物料等级</th>
+                            <th width="100">计量单位</th>
+                            <th width="120">参考价格</th>
+                            <th width="150">主要供应商</th>
+                            <th width="100">采购提前期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="material-id" value="1"></td>
+                            <td>MAT-001</td>
+                            <td>电子元器件A</td>
+                            <td>10KΩ ±5%</td>
+                            <td>原材料</td>
+                            <td>A级</td>
+                            <td>个</td>
+                            <td>¥2.50</td>
+                            <td>深圳市电子科技有限公司</td>
+                            <td>7天</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-material-detail.html" data-id="2">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/procurement-material-edit.html" data-id="2">编辑</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="material-id" value="2"></td>
+                            <td>MAT-002</td>
+                            <td>PCB板</td>
+                            <td>100x80mm 4层</td>
+                            <td>半成品</td>
+                            <td>B级</td>
+                            <td>片</td>
+                            <td>¥15.00</td>
+                            <td>东莞电路板制造厂</td>
+                            <td>10天</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-material-detail.html" data-id="3">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/procurement-material-edit.html" data-id="3">编辑</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="material-id" value="3"></td>
+                            <td>MAT-003</td>
+                            <td>不锈钢螺丝</td>
+                            <td>M3x10mm</td>
+                            <td>辅料</td>
+                            <td>C级</td>
+                            <td>个</td>
+                            <td>¥0.15</td>
+                            <td>上海紧固件有限公司</td>
+                            <td>5天</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-material-detail.html" data-id="1">查看</button>
+                                <button class="btn btn-sm btn-default btn-edit" data-url="pages/procurement-material-edit.html" data-id="1">编辑</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 3 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+        <script>
+        console.log('物料档案 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+        </script>
+    </div>
+</body>
+</html>

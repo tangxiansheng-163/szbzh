@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我发起的</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">我发起的</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">变更申请、技术任务、BOM 等发起记录，可按类型、状态筛选，查看进度并跳转详情</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="change">变更申请</option>
+                        <option value="tech">技术任务</option>
+                        <option value="bom">BOM</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="draft">草稿/待处理</option>
+                        <option value="running">进行中</option>
+                        <option value="done">已完成</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="100">类型</th>
+                            <th width="140">编号</th>
+                            <th width="200">名称/摘要</th>
+                            <th width="90">状态</th>
+                            <th width="100">发起时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>变更申请</td>
+                            <td>BG-HS-2025-001</td>
+                            <td>PROD-001 设计缺陷修正</td>
+                            <td><span class="status-badge status-reviewing">评审中</span></td>
+                            <td>2025-01-18</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/change-request-detail.html" data-id="1">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>技术任务</td>
+                            <td>TT-2025-001</td>
+                            <td>新产品研发</td>
+                            <td><span class="status-badge status-processing">执行中</span></td>
+                            <td>2025-01-15</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/tech-task-detail.html" data-id="1">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>变更申请</td>
+                            <td>BG-HS-2025-003</td>
+                            <td>PROD-002 物料替换</td>
+                            <td><span class="status-badge status-success">已通过</span></td>
+                            <td>2025-01-10</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/change-request-detail.html" data-id="3">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 3 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('我发起的 页面已加载');
+        if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+    </script>
+</body>
+</html>

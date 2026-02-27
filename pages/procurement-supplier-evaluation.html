@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>供应商评估 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">供应商绩效</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">供应商评估</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">根据绩效配置参数及供应商供货情况、质量、价格、服务等维度，按评估周期定期自动生成的供应商评估报表记录。报表由系统自动生成，不支持手工新建或修改；支持按评估周期、供应商、生成时间筛选查看与导出。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="供应商名称、评估编号">
+                </div>
+                <div class="filter-item">
+                    <label>评估周期</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="monthly">月度</option>
+                        <option value="quarterly">季度</option>
+                        <option value="annual">年度</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>生成时间</label>
+                    <input type="text" class="form-input" placeholder="如：2025年Q1">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">评估编号</th>
+                            <th width="150">供应商</th>
+                            <th width="100">评估周期</th>
+                            <th width="120">生成时间</th>
+                            <th width="80">供货得分</th>
+                            <th width="80">质量得分</th>
+                            <th width="80">价格得分</th>
+                            <th width="80">服务得分</th>
+                            <th width="80">综合得分</th>
+                            <th width="90">评估等级</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="evaluation-id" value="1"></td>
+                            <td>EV-2025-001</td>
+                            <td>深圳市电子科技有限公司</td>
+                            <td>季度</td>
+                            <td>2025-04-01</td>
+                            <td>92</td>
+                            <td>95</td>
+                            <td>88</td>
+                            <td>90</td>
+                            <td>91.3</td>
+                            <td><span class="status-badge status-success">A级</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-evaluation-detail.html" data-id="1">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="evaluation-id" value="2"></td>
+                            <td>EV-2025-002</td>
+                            <td>上海精密机械制造有限公司</td>
+                            <td>季度</td>
+                            <td>2025-04-01</td>
+                            <td>85</td>
+                            <td>88</td>
+                            <td>90</td>
+                            <td>87</td>
+                            <td>87.5</td>
+                            <td><span class="status-badge status-success">A级</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-evaluation-detail.html" data-id="2">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="evaluation-id" value="3"></td>
+                            <td>EV-2025-003</td>
+                            <td>北京贸易有限公司</td>
+                            <td>季度</td>
+                            <td>2025-04-01</td>
+                            <td>70</td>
+                            <td>75</td>
+                            <td>82</td>
+                            <td>78</td>
+                            <td>76.2</td>
+                            <td><span class="status-badge status-warning">B级</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-evaluation-detail.html" data-id="3">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 3 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            console.log('供应商评估（自动生成报表）页面已加载');
+            if (typeof PageInteractions !== 'undefined') {
+                PageInteractions.initButtons();
+                PageInteractions.toggleSelectAll('input[name="evaluation-id"]');
+            }
+        </script>
+    </div>
+</body>
+</html>

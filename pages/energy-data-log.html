@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>同步日志 - 能源管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/energy-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">数据接收与整合</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">同步日志</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">查看能源数据同步日志，包括同步记录、错误日志、同步统计等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="任务编号、数据源">
+                </div>
+                <div class="filter-item">
+                    <label>同步状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="success">成功</option>
+                        <option value="failed">失败</option>
+                        <option value="syncing">同步中</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>同步时间</label>
+                    <input type="date" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">导出</button>
+                <button class="btn btn-default">清空日志</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">任务编号</th>
+                            <th width="100">数据源</th>
+                            <th width="150">同步对象</th>
+                            <th width="100">同步状态</th>
+                            <th width="200">错误信息</th>
+                            <th width="120">同步时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="log-id" value="1"></td>
+                            <td>SYNC-2025-001</td>
+                            <td>SCADA系统</td>
+                            <td>生产车间能耗数据</td>
+                            <td><span class="status-badge status-success">成功</span></td>
+                            <td>-</td>
+                            <td>2025-01-22 10:00</td>
+                            <td>
+                                <button class="btn btn-sm btn-default">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 1 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('同步日志 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

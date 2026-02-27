@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOM 统计报表</title>
+</head>
+<body>
+    <div class="content-wrapper report-stats-page">
+        <style>
+            .report-stats-title{font-size:18px;font-weight:600;margin:0 0 8px 0;color:#262626;}
+            .report-stats-desc{font-size:13px;color:#595959;margin:0;line-height:1.6;}
+            .report-param-bar{background:#fff;padding:14px 20px;border-radius:8px;border:1px solid #e8e8e8;margin-bottom:16px;display:flex;flex-wrap:wrap;align-items:center;gap:16px;}
+            .report-param-bar label{font-size:13px;color:#595959;}
+            .report-param-bar .form-select,.report-param-bar .form-input{min-width:120px;}
+            .report-param-bar .param-hint{font-size:12px;color:#8c8c8c;}
+            .report-section{margin-bottom:20px;}
+            .report-section-title{font-size:15px;font-weight:600;margin-bottom:12px;color:#262626;display:flex;align-items:center;justify-content:space-between;}
+            .report-section-title .export-actions{display:flex;gap:8px;}
+            .report-section-title .export-actions .btn-sm{font-size:12px;}
+        </style>
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">报表管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/report-dashboard.html" class="breadcrumb-item">报表中心</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">BOM 统计报表</span>
+        </div>
+
+        <div class="page-header">
+            <h2 class="report-stats-title">BOM 统计报表</h2>
+            <p class="report-stats-desc">按产品、BOM 类型、状态、时间等维度统计；支持实时生成、在线预览、导出 Excel/PDF。数据更新频率：实时。</p>
+        </div>
+
+        <!-- 报表参数配置 -->
+        <div class="report-param-bar">
+            <div class="filter-item" style="display:flex;align-items:center;gap:8px;">
+                <label for="rpt-bom-period">时间范围</label>
+                <select id="rpt-bom-period" name="period" class="form-select">
+                    <option value="month">本月</option>
+                    <option value="quarter">本季度</option>
+                    <option value="year">本年</option>
+                </select>
+            </div>
+            <div class="filter-item" style="display:flex;align-items:center;gap:8px;">
+                <label for="rpt-bom-type">BOM 类型</label>
+                <select id="rpt-bom-type" name="bomType" class="form-select">
+                    <option value="">全部</option>
+                    <option value="ebom">EBOM</option>
+                    <option value="mbom">MBOM</option>
+                    <option value="sbom">SBOM</option>
+                </select>
+            </div>
+            <div class="filter-item" style="display:flex;align-items:center;gap:8px;">
+                <label for="rpt-bom-status">状态</label>
+                <select id="rpt-bom-status" name="status" class="form-select">
+                    <option value="">全部</option>
+                    <option value="draft">草稿</option>
+                    <option value="published">已发布</option>
+                </select>
+            </div>
+            <button class="btn btn-primary">生成报表</button>
+            <span class="param-hint">统计维度：产品、BOM 类型、状态、时间</span>
+        </div>
+
+        <div class="report-section">
+            <div class="report-section-title">
+                <span>BOM 数量统计</span>
+                <div class="export-actions">
+                    <button class="btn btn-sm btn-default">导出 Excel</button>
+                    <button class="btn btn-sm btn-default">导出 PDF</button>
+                    <button class="btn btn-sm btn-default" data-open-modal="rpt-subscribe-modal">订阅此报表</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>BOM 类型</th>
+                                <th>产品数</th>
+                                <th>BOM 单数</th>
+                                <th>版本总数</th>
+                                <th>本月新增</th>
+                                <th>本月发布</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>EBOM</td><td>12</td><td>12</td><td>28</td><td>3</td><td>2</td></tr>
+                            <tr><td>MBOM</td><td>10</td><td>10</td><td>24</td><td>2</td><td>2</td></tr>
+                            <tr><td>SBOM</td><td>8</td><td>8</td><td>18</td><td>1</td><td>1</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-section">
+            <div class="report-section-title">
+                <span>按产品统计</span>
+                <div class="export-actions">
+                    <button class="btn btn-sm btn-default">导出 Excel</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>产品编码</th>
+                                <th>产品名称</th>
+                                <th>EBOM 版本数</th>
+                                <th>MBOM 版本数</th>
+                                <th>SBOM 版本数</th>
+                                <th>当前有效版本</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>PROD-001</td><td>智能控制器</td><td>4</td><td>4</td><td>3</td><td>EBOM V1.1 / MBOM V2.1 / SBOM V1.2</td></tr>
+                            <tr><td>PROD-002</td><td>传感器模块</td><td>3</td><td>3</td><td>2</td><td>EBOM V1.0 / MBOM V1.0 / SBOM V1.0</td></tr>
+                            <tr><td>PROD-003</td><td>执行器</td><td>2</td><td>2</td><td>2</td><td>EBOM V1.0 / MBOM V1.0 / SBOM V1.0</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="rpt-subscribe-modal" class="modal-overlay">
+            <div class="modal" style="max-width:480px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">订阅 BOM 统计报表</span><button type="button" class="modal-close" data-close-modal="rpt-subscribe-modal">×</button></div>
+                <div class="modal-body">
+                    <div class="form-item"><label class="form-label required" for="sub-rpt-freq">发送频率</label><select id="sub-rpt-freq" name="freq" class="form-select"><option value="daily">每日</option><option value="weekly">每周</option><option value="monthly" selected>每月</option></select></div>
+                    <div class="form-item"><label class="form-label" for="sub-rpt-time">发送时间</label><input type="text" id="sub-rpt-time" name="time" class="form-input" value="09:00" placeholder="如：09:00"></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="rpt-subscribe-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="rpt-subscribe-modal" onclick="alert('✅ 订阅已保存')">确定</button></div>
+            </div>
+        </div>
+    </div>
+    <script>if(typeof PageInteractions!=='undefined')PageInteractions.initButtons();</script>
+</body>
+</html>

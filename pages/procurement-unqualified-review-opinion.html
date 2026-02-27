@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>填写会审意见 - 采购协同系统</title>
+    <link rel="stylesheet" href="../assets/system.css">
+    <style>
+        /* 页面特定样式 - 增强交互效果 */
+        .opinion-page {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 按钮增强样式 */
+        .btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:not(:disabled):hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+        }
+        
+        .btn:not(:disabled):active {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(24, 144, 255, 0.2);
+        }
+        
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        
+        .btn-primary:not(:disabled) {
+            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+            border: none;
+        }
+        
+        .btn-primary:not(:disabled):hover {
+            background: linear-gradient(135deg, #40a9ff 0%, #1890ff 100%);
+        }
+        
+        /* 按钮加载状态 */
+        .btn-loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin-left: -8px;
+            margin-top: -8px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 按钮成功状态 */
+        .btn-success {
+            background: #52c41a;
+            border-color: #52c41a;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #73d13d;
+            border-color: #73d13d;
+        }
+        
+        /* 操作栏增强 */
+        .action-bar {
+            background: white;
+            padding: 16px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: box-shadow 0.3s;
+        }
+        
+        .action-bar:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        /* 表格行交互效果 */
+        .list-table-nowrap tbody tr {
+            transition: all 0.2s ease;
+        }
+        
+        .list-table-nowrap tbody tr:hover {
+            background-color: #f5f7fa;
+            transform: scale(1.001);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* 表单控件增强 */
+        .form-select, .form-input {
+            transition: all 0.3s ease;
+        }
+        
+        .form-select:focus, .form-input:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+            outline: none;
+        }
+        
+        .form-select:disabled, .form-input:disabled {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        /* 状态徽章动画 */
+        .status-badge {
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+        
+        .status-badge:hover {
+            transform: scale(1.05);
+        }
+        
+        /* 复选框增强 */
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        input[type="checkbox"]:hover {
+            transform: scale(1.1);
+        }
+        
+        /* 行状态指示 */
+        .row-status-indicator {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: transparent;
+            transition: background 0.3s ease;
+        }
+        
+        .row-status-indicator.submitted {
+            background: #52c41a;
+        }
+        
+        .row-status-indicator.pending {
+            background: #faad14;
+        }
+        
+        /* 提交按钮状态 */
+        .btn-submit-opinion {
+            min-width: 80px;
+            position: relative;
+        }
+        
+        .btn-submit-opinion.submitted {
+            background: #f0f0f0;
+            color: #8c8c8c;
+            border-color: #d9d9d9;
+        }
+        
+        /* 批量操作提示 */
+        .batch-action-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #e6f7ff;
+            border: 1px solid #91d5ff;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #1890ff;
+            margin-left: 12px;
+            animation: slideInRight 0.3s ease;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* 弹窗增强 */
+        .modal-overlay {
+            animation: fadeInOverlay 0.2s ease;
+        }
+        
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal {
+            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        /* 表单验证提示 */
+        .form-error {
+            border-color: #ff4d4f !important;
+            box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.1) !important;
+        }
+        
+        .error-message {
+            color: #ff4d4f;
+            font-size: 12px;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            animation: shake 0.3s ease;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        /* 成功提示动画 */
+        .success-feedback {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: #52c41a;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(82, 196, 26, 0.3);
+            z-index: 2000;
+            animation: slideInRight 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* 选中行高亮 */
+        .row-selected {
+            background-color: #e6f7ff !important;
+            border-left: 3px solid #1890ff;
+        }
+        
+        /* 操作按钮组 */
+        .action-buttons-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 1200px) {
+            .action-bar {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+            }
+            
+            .action-left, .action-right {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper opinion-page">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/procurement-todo.html" class="breadcrumb-item">待办事项</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">填写会审意见</span>
+        </div>
+
+        <div class="page-header">
+            <h2 class="page-title">填写会审意见</h2>
+            <p class="page-description">查看发起人初步定义的处理方式分配（每个物料的不合格数量可能被拆分为多个处理方式），如果同意则确认，如果不同意则填写处理意见。您的反馈将供发起人参考，最终处理方式由发起人确定。</p>
+        </div>
+
+        <!-- 基本信息 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">基本信息</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+                    <div class="form-item">
+                        <label class="form-label">处理单号</label>
+                        <div class="form-value">UH-2025-001</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">关联采购订单</label>
+                        <div class="form-value">
+                            <a href="pages/procurement-order-detail.html?id=1" style="color:#1890ff;">PO-2025-001</a>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">供应商</label>
+                        <div class="form-value">深圳市电子科技有限公司</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">会审发起时间</label>
+                        <div class="form-value">2025-01-22 14:00</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">会审发起人</label>
+                        <div class="form-value">采购-张采购</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">当前处理人</label>
+                        <div class="form-value">质量-李质检</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 批量操作栏 -->
+        <div class="action-bar">
+            <div class="action-left">
+                <span id="selected-count" style="font-size:13px;color:#8c8c8c;margin-right:12px;">已选择 <strong style="color:#1890ff;">0</strong> 项</span>
+                <div class="action-buttons-group">
+                    <button class="btn btn-sm btn-primary" id="btn-batch-agree" disabled>
+                        <span>✓</span> 批量同意
+                    </button>
+                    <button class="btn btn-sm btn-primary" id="btn-batch-disagree" disabled>
+                        <span>✗</span> 批量不同意
+                    </button>
+                    <button class="btn btn-sm btn-primary" id="btn-batch-fill-opinion" disabled>
+                        <span>📝</span> 批量填写意见
+                    </button>
+                    <button class="btn btn-sm btn-primary" id="btn-submit-all">
+                        <span>🚀</span> 提交意见
+                    </button>
+                </div>
+                <span id="batch-action-hint" class="batch-action-hint" style="display:none;"></span>
+            </div>
+            <div class="action-right">
+                <button class="btn btn-sm btn-default" id="btn-back">返回</button>
+            </div>
+        </div>
+
+        <!-- 不合格物料明细 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">不合格物料明细</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table class="list-table-nowrap">
+                        <thead>
+                            <tr>
+                                <th width="50" style="text-align:center;"><input type="checkbox" class="select-all-checkbox" id="select-all-allocations" title="全选/取消全选"></th>
+                                <th width="60">序号</th>
+                                <th width="120">物料编码</th>
+                                <th width="200">物料名称</th>
+                                <th width="100">规格型号</th>
+                                <th width="100">不合格数量</th>
+                                <th width="80">单位</th>
+                                <th width="200">初步处理方式分配</th>
+                                <th width="120">是否同意</th>
+                                <th width="300">处理意见</th>
+                                <th width="200">建议处理方式</th>
+                                <th width="100">处理方案</th>
+                                <th width="90">原等级</th>
+                                <th width="90">降级后等级</th>
+                            </tr>
+                        </thead>
+                        <tbody id="material-opinion-tbody">
+                            <!-- MAT-001: 50个不合格，拆分为退货30个、换货15个、让步接收5个 -->
+                            <tr data-material-code="MAT-001" data-allocation-key="MAT-001-RETURN-1" style="position:relative;">
+                                <td style="text-align:center;"><input type="checkbox" class="allocation-checkbox" data-allocation-key="MAT-001-RETURN-1"></td>
+                                <td rowspan="3" style="vertical-align:middle;text-align:center;">1</td>
+                                <td rowspan="3" style="vertical-align:middle;">MAT-001</td>
+                                <td rowspan="3" style="vertical-align:middle;">电子元件A</td>
+                                <td rowspan="3" style="vertical-align:middle;">规格A</td>
+                                <td rowspan="3" style="vertical-align:middle;text-align:right;">50</td>
+                                <td rowspan="3" style="vertical-align:middle;">个</td>
+                                <td>
+                                    <span class="status-badge" style="background:#fff1f0;color:#cf1322;">退货 30个</span>
+                                </td>
+                                <td>
+                                    <select class="form-select material-agree-select" data-material-code="MAT-001" data-allocation-type="return" data-allocation-qty="30" style="width:100%;">
+                                        <option value="">请选择</option>
+                                        <option value="agree">同意</option>
+                                        <option value="disagree">不同意</option>
+                                    </select>
+                                    <div class="error-message" style="display:none;"></div>
+                                </td>
+                                <td>
+                                    <textarea class="form-input material-opinion-content" rows="2" placeholder="不同意时请填写处理意见" style="width:100%;resize:vertical;" disabled></textarea>
+                                    <div class="error-message" style="display:none;"></div>
+                                </td>
+                                <td>
+                                    <select class="form-select material-opinion-suggestion" style="width:100%;" disabled>
+                                        <option value="">无建议</option>
+                                        <option value="return">建议退货</option>
+                                        <option value="exchange">建议换货</option>
+                                        <option value="concession">建议让步接收</option>
+                                    </select>
+                                </td>
+                                <td style="vertical-align:middle;"><select class="form-select opinion-concession-plan" data-allocation-key="MAT-001-RETURN-1" style="width:100%;padding:4px 8px;font-size:12px;" disabled><option value="">请选择</option><option value="downgrade">降级接收</option><option value="discount">让步使用(折价)</option><option value="as-is">让步使用(原价)</option></select></td>
+                                <td style="vertical-align:middle;"><input type="text" class="form-input opinion-concession-orig-grade" data-allocation-key="MAT-001-RETURN-1" placeholder="如一级品" style="width:100%;padding:4px 8px;font-size:12px;" disabled></td>
+                                <td style="vertical-align:middle;"><input type="text" class="form-input opinion-concession-downgrade-grade" data-allocation-key="MAT-001-RETURN-1" placeholder="如二级品" style="width:100%;padding:4px 8px;font-size:12px;" disabled></td>
+                            </tr>
+                            <tr data-material-code="MAT-001" data-allocation-key="MAT-001-EXCHANGE-1" style="position:relative;">
+                                <td style="text-align:center;"><input type="checkbox" class="allocation-checkbox" data-allocation-key="MAT-001-EXCHANGE-1"></td>
+                                <td>
+                                    <span class="status-badge" style="background:#fff7e6;color:#d46b08;">换货 15个</span>
+                                </td>
+                                <td>
+                                    <select class="form-select material-agree-select" data-material-code="MAT-001" data-allocation-type="exchange" data-allocation-qty="15" style="width:100%;">
+                                        <option value="">请选择</option>
+                                        <option value="agree">同意</option>
+                                        <option value="disagree">不同意</option>
+                                    </select>
+                                    <div class="error-message" style="display:none;"></div>
+                                </td>
+                                <td>
+                                    <textarea class="form-input material-opinion-content" rows="2" placeholder="不同意时请填写处理意见" style="width:100%;resize:vertical;" disabled></textarea>
+                                    <div class="error-message" style="display:none;"></div>
+                                </td>
+                                <td>
+                                    <select class="form-select material-opinion-suggestion" style="width:100%;" disabled>
+                                        <option value="">无建议</option>
+                                        <option value="return">建议退货</option>
+                                        <option value="exchange">建议换货</option>
+                                        <option value="concession">建议让步接收</option>
+                                    </select>
+                                </td>
+                                <td style="vertical-align:middle;"><select class="form-select opinion-concession-plan" data-allocation-key="MAT-001-EXCHANGE-1" style="width:100%;padding:4px 8px;font-size:12px;" disabled><option value="">请选择</option><option value="downgrade">降级接收</option><option value="discount">让步使用(折价)</option><option value="as-is">让步使用(原价)</option></select></td>
+                                <td style="vertical-align:middle;"><input type="text" class="form-input opinion-concession-orig-grade" data-allocation-key="MAT-001-EXCHANGE-1" placeholder="如一级品" style="width:100%;padding:4px 8px;font-size:12px;" disabled></td>
+                                <td style="vertical-align:middle;"><input type="text" class="form-input opinion-concession-downgrade-grade" data-allocation-key="MAT-001-EXCHANGE-1" placeholder="如二级品" style="width:100%;padding:4px 8px;font-size:12px;" disabled></td>
+                            </tr>
+                            <tr data-material-code="MAT-001" data-allocation-key="MAT-001-CONCESSION-1" data-allocation-type="concession" style="position:relative;">
+                                <td style="text-align:center;"><input type="checkbox" class="allocation-checkbox" data-allocation-key="MAT-001-CONCESSION-1"></td>
+                                <td>
+                                    <span class="status-badge" style="background:#f6ffed;color:#52c41a;">让步接收 5个</span>
+                                </td>
+                                <td>
+                                    <select class="form-select material-agree-select" data-material-code="MAT-001" data-allocation-type="concession" data-allocation-qty="5" style="width:100%;">
+                                        <option value="">请选择</option>
+                                        <option value="agree">同意</option>
+                                        <option value="disagree">不同意</option>
+                                    </select>
+                                    <div class="error-message" style="display:none;"></div>
+                                </td>
+                                <td>
+                                    <textarea class="form-input material-opinion-content" rows="2" placeholder="不同意时请填写处理意见" style="width:100%;resize:vertical;" disabled></textarea>
+                                    <div class="error-message" style="display:none;"></div>
+                                </td>
+                                <td>
+                                    <select class="form-select material-opinion-suggestion" style="width:100%;" disabled>
+                                        <option value="">无建议</option>
+                                        <option value="return">建议退货</option>
+                                        <option value="exchange">建议换货</option>
+                                        <option value="concession">建议让步接收</option>
+                                    </select>
+                                </td>
+                                <td style="vertical-align:middle;"><select class="form-select opinion-concession-plan" data-allocation-key="MAT-001-CONCESSION-1" style="width:100%;padding:4px 8px;font-size:12px;"><option value="">请选择</option><option value="downgrade">降级接收</option><option value="discount">让步使用(折价)</option><option value="as-is">让步使用(原价)</option></select></td>
+                                <td style="vertical-align:middle;"><input type="text" class="form-input opinion-concession-orig-grade" data-allocation-key="MAT-001-CONCESSION-1" placeholder="如一级品" style="width:100%;padding:4px 8px;font-size:12px;"></td>
+                                <td style="vertical-align:middle;"><input type="text" class="form-input opinion-concession-downgrade-grade" data-allocation-key="MAT-001-CONCESSION-1" placeholder="如二级品" style="width:100%;padding:4px 8px;font-size:12px;"></td>
+                            </tr>
+                            <!-- MAT-002: 30个不合格，全部换货 -->
+                            <tr data-material-code="MAT-002" data-allocation-key="MAT-002-EXCHANGE-1" style="position:relative;">
+                                <td style="text-align:center;"><input type="checkbox" class="allocation-checkbox" data-allocation-key="MAT-002-EXCHANGE-1"></td>
+                                <td>2</td>
+                                <td>MAT-002</td>
+                                <td>电子元件B</td>
+                                <td>规格B</td>
+                                <td style="text-align:right;">30</td>
+                                <td>个</td>
+                                <td>
+                                    <span class="status-badge" style="background:#fff7e6;color:#d46b08;">换货 30个</span>
+                                </td>
+                                <td>
+                                    <select class="form-select material-agree-select" data-material-code="MAT-002" data-allocation-type="exchange" data-allocation-qty="30" style="width:100%;">
+                                        <option value="">请选择</option>
+                                        <option value="agree">同意</option>
+                                        <option value="disagree">不同意</option>
+                                    </select>
+                                    <div class="error-message" style="display:none;"></div>
+                                </td>
+                                <td>
+                                    <textarea class="form-input material-opinion-content" rows="2" placeholder="不同意时请填写处理意见" style="width:100%;resize:vertical;" disabled></textarea>
+                                    <div class="error-message" style="display:none;"></div>
+                                </td>
+                                <td>
+                                    <select class="form-select material-opinion-suggestion" style="width:100%;" disabled>
+                                        <option value="">无建议</option>
+                                        <option value="return">建议退货</option>
+                                        <option value="exchange">建议换货</option>
+                                        <option value="concession">建议让步接收</option>
+                                    </select>
+                                </td>
+                                <td style="vertical-align:middle;"><select class="form-select opinion-concession-plan" data-allocation-key="MAT-002-EXCHANGE-1" style="width:100%;padding:4px 8px;font-size:12px;" disabled><option value="">请选择</option><option value="downgrade">降级接收</option><option value="discount">让步使用(折价)</option><option value="as-is">让步使用(原价)</option></select></td>
+                                <td style="vertical-align:middle;"><input type="text" class="form-input opinion-concession-orig-grade" data-allocation-key="MAT-002-EXCHANGE-1" placeholder="如一级品" style="width:100%;padding:4px 8px;font-size:12px;" disabled></td>
+                                <td style="vertical-align:middle;"><input type="text" class="form-input opinion-concession-downgrade-grade" data-allocation-key="MAT-002-EXCHANGE-1" placeholder="如二级品" style="width:100%;padding:4px 8px;font-size:12px;" disabled></td>
+                            </tr>
+                            <!-- MAT-003: 10个不合格，全部退货 -->
+                            <tr data-material-code="MAT-003" data-allocation-key="MAT-003-RETURN-1" style="position:relative;">
+                                <td style="text-align:center;"><input type="checkbox" class="allocation-checkbox" data-allocation-key="MAT-003-RETURN-1"></td>
+                                <td>3</td>
+                                <td>MAT-003</td>
+                                <td>电路板</td>
+                                <td>PCB-001</td>
+                                <td style="text-align:right;">10</td>
+                                <td>块</td>
+                                <td>
+                                    <span class="status-badge" style="background:#fff1f0;color:#cf1322;">退货 10个</span>
+                                </td>
+                                <td>
+                                    <select class="form-select material-agree-select" data-material-code="MAT-003" data-allocation-type="return" data-allocation-qty="10" style="width:100%;">
+                                        <option value="">请选择</option>
+                                        <option value="agree">同意</option>
+                                        <option value="disagree">不同意</option>
+                                    </select>
+                                    <div class="error-message" style="display:none;"></div>
+                                </td>
+                                <td>
+                                    <textarea class="form-input material-opinion-content" rows="2" placeholder="不同意时请填写处理意见" style="width:100%;resize:vertical;" disabled></textarea>
+                                    <div class="error-message" style="display:none;"></div>
+                                </td>
+                                <td>
+                                    <select class="form-select material-opinion-suggestion" style="width:100%;" disabled>
+                                        <option value="">无建议</option>
+                                        <option value="return">建议退货</option>
+                                        <option value="exchange">建议换货</option>
+                                        <option value="concession">建议让步接收</option>
+                                    </select>
+                                </td>
+                                <td style="vertical-align:middle;"><select class="form-select opinion-concession-plan" data-allocation-key="MAT-003-RETURN-1" style="width:100%;padding:4px 8px;font-size:12px;" disabled><option value="">请选择</option><option value="downgrade">降级接收</option><option value="discount">让步使用(折价)</option><option value="as-is">让步使用(原价)</option></select></td>
+                                <td style="vertical-align:middle;"><input type="text" class="form-input opinion-concession-orig-grade" data-allocation-key="MAT-003-RETURN-1" placeholder="如一级品" style="width:100%;padding:4px 8px;font-size:12px;" disabled></td>
+                                <td style="vertical-align:middle;"><input type="text" class="form-input opinion-concession-downgrade-grade" data-allocation-key="MAT-003-RETURN-1" placeholder="如二级品" style="width:100%;padding:4px 8px;font-size:12px;" disabled></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p style="margin-top:12px;font-size:12px;color:#8c8c8c;line-height:1.6;">
+                    <strong>操作说明：</strong><br>
+                    1. 查看发起人初步定义的处理方式分配（每个物料的不合格数量可能被拆分为多个处理方式）；<br>
+                    2. 针对每个分配项，如果同意初步处理方式，选择"同意"并提交；<strong>让步接收</strong>项同意时需填写处理方案、原等级、降级后等级；<br>
+                    3. 如果不同意，选择"不同意"，填写处理意见和建议处理方式，然后提交；<br>
+                    4. 您的反馈将供发起人参考，最终处理方式由发起人确定。
+                </p>
+            </div>
+        </div>
+
+        <!-- 批量填写意见弹窗 -->
+        <div id="batch-fill-opinion-modal" class="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1001;">
+            <div class="modal" style="background:#fff;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);max-width:600px;width:90%;max-height:90vh;display:flex;flex-direction:column;">
+                <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #f0f0f0;flex-shrink:0;">
+                    <div class="modal-title" style="font-size:16px;font-weight:600;">批量填写意见</div>
+                    <div class="modal-close" id="batch-fill-opinion-modal-close" style="cursor:pointer;font-size:20px;color:#8c8c8c;transition:color 0.2s;">×</div>
+                </div>
+                <div class="modal-body" style="padding:20px;flex:1;overflow-y:auto;">
+                    <div class="form-item" style="margin-bottom:20px;">
+                        <label class="form-label" style="display:block;margin-bottom:8px;font-weight:500;">处理意见 <span style="color:#ff4d4f;">*</span></label>
+                        <textarea id="batch-opinion-content" class="form-input" rows="4" placeholder="请填写处理意见" style="width:100%;resize:vertical;padding:8px 12px;border:1px solid #d9d9d9;border-radius:4px;"></textarea>
+                        <div id="batch-opinion-content-error" class="error-message" style="display:none;"></div>
+                    </div>
+                    <div class="form-item" style="margin-bottom:20px;">
+                        <label class="form-label" style="display:block;margin-bottom:8px;font-weight:500;">建议处理方式</label>
+                        <select id="batch-opinion-suggestion" class="form-select" style="width:100%;padding:8px 12px;border:1px solid #d9d9d9;border-radius:4px;">
+                            <option value="">无建议</option>
+                            <option value="return">建议退货</option>
+                            <option value="exchange">建议换货</option>
+                            <option value="concession">建议让步接收</option>
+                        </select>
+                    </div>
+                    <div style="font-size:12px;color:#8c8c8c;line-height:1.6;">
+                        <strong>说明：</strong>填写后，将为所有选中的分配项批量设置相同的处理意见和建议处理方式。
+                    </div>
+                </div>
+                <div class="modal-footer" style="display:flex;justify-content:flex-end;gap:8px;padding:16px 20px;border-top:1px solid #f0f0f0;flex-shrink:0;">
+                    <button class="btn btn-default" id="batch-fill-opinion-cancel">取消</button>
+                    <button class="btn btn-primary" id="batch-fill-opinion-confirm">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        console.log('填写会审意见 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+        
+        // 模拟初步处理方式数据（实际应从后端获取）
+        var INITIAL_HANDLE_TYPES = {
+            'MAT-001': { type: 'return', typeText: '退货' },
+            'MAT-002': { type: 'exchange', typeText: '换货' },
+            'MAT-003': { type: 'return', typeText: '退货' }
+        };
+        
+        // 模拟初步处理方式分配数据（实际应从后端获取）
+        var INITIAL_ALLOCATIONS = {
+            'MAT-001': [
+                { type: 'return', typeText: '退货', qty: 30, unit: '个' },
+                { type: 'exchange', typeText: '换货', qty: 15, unit: '个' },
+                { type: 'concession', typeText: '让步接收', qty: 5, unit: '个' }
+            ],
+            'MAT-002': [
+                { type: 'exchange', typeText: '换货', qty: 30, unit: '个' }
+            ],
+            'MAT-003': [
+                { type: 'return', typeText: '退货', qty: 10, unit: '块' }
+            ]
+        };
+        
+        // 显示成功提示
+        function showSuccessMessage(message) {
+            var successEl = document.createElement('div');
+            successEl.className = 'success-feedback';
+            successEl.innerHTML = '<span>✓</span> ' + message;
+            document.body.appendChild(successEl);
+            
+            setTimeout(function() {
+                successEl.style.animation = 'slideInRight 0.3s ease reverse';
+                setTimeout(function() {
+                    document.body.removeChild(successEl);
+                }, 300);
+            }, 3000);
+        }
+        
+        // 显示错误提示
+        function showError(element, message) {
+            var errorEl = element.nextElementSibling;
+            if (errorEl && errorEl.classList.contains('error-message')) {
+                errorEl.textContent = message;
+                errorEl.style.display = 'flex';
+                element.classList.add('form-error');
+                
+                // 3秒后自动清除错误
+                setTimeout(function() {
+                    errorEl.style.display = 'none';
+                    element.classList.remove('form-error');
+                }, 3000);
+            }
+        }
+        
+        // 清除错误提示
+        function clearError(element) {
+            var errorEl = element.nextElementSibling;
+            if (errorEl && errorEl.classList.contains('error-message')) {
+                errorEl.style.display = 'none';
+                element.classList.remove('form-error');
+            }
+        }
+        
+        // 更新选中数量和按钮状态
+        function updateSelectionState() {
+            var checkedBoxes = document.querySelectorAll('.allocation-checkbox:checked');
+            var checkedCount = checkedBoxes.length;
+            var selectedCountEl = document.getElementById('selected-count');
+            var btnBatchAgree = document.getElementById('btn-batch-agree');
+            var btnBatchDisagree = document.getElementById('btn-batch-disagree');
+            var btnBatchFillOpinion = document.getElementById('btn-batch-fill-opinion');
+            var hintEl = document.getElementById('batch-action-hint');
+            
+            // 更新选中数量显示
+            if (selectedCountEl) {
+                selectedCountEl.innerHTML = '已选择 <strong style="color:#1890ff;">' + checkedCount + '</strong> 项';
+            }
+            
+            // 更新按钮启用状态（只有选中未提交的项时才启用）
+            var hasUnsubmittedSelected = false;
+            var unsubmittedSelectedCount = 0;
+            
+            checkedBoxes.forEach(function(cb) {
+                var row = cb.closest('tr');
+                if (!row) return;
+                
+                var submitBtn = row.querySelector('.btn-submit-opinion');
+                // 判断是否已提交：提交按钮文本是"已提交"，或者按钮被禁用且文本是"已提交"，或者行有submitted类
+                var isSubmitted = false;
+                if (submitBtn) {
+                    // 检查按钮文本是否为"已提交"
+                    if (submitBtn.textContent.trim() === '已提交' || submitBtn.textContent.trim() === '已提交') {
+                        isSubmitted = true;
+                    }
+                    // 检查按钮是否有submitted类
+                    if (submitBtn.classList.contains('submitted')) {
+                        isSubmitted = true;
+                    }
+                    // 检查行是否有submitted类
+                    if (row.classList.contains('submitted')) {
+                        isSubmitted = true;
+                    }
+                }
+                
+                // 如果未提交，则启用批量操作按钮
+                if (!isSubmitted) {
+                    hasUnsubmittedSelected = true;
+                    unsubmittedSelectedCount++;
+                }
+            });
+            
+            if (btnBatchAgree) {
+                btnBatchAgree.disabled = !hasUnsubmittedSelected;
+            }
+            if (btnBatchDisagree) {
+                btnBatchDisagree.disabled = !hasUnsubmittedSelected;
+            }
+            if (btnBatchFillOpinion) {
+                btnBatchFillOpinion.disabled = !hasUnsubmittedSelected;
+            }
+            
+            // 显示/隐藏提示
+            if (hintEl) {
+                if (checkedCount > 0 && hasUnsubmittedSelected) {
+                    hintEl.textContent = '已选中 ' + unsubmittedSelectedCount + ' 个未提交的分配项';
+                    hintEl.style.display = 'inline-flex';
+                } else {
+                    hintEl.style.display = 'none';
+                }
+            }
+            
+            // 更新行选中状态
+            checkedBoxes.forEach(function(cb) {
+                var row = cb.closest('tr');
+                if (row) {
+                    if (cb.checked) {
+                        row.classList.add('row-selected');
+                    } else {
+                        row.classList.remove('row-selected');
+                    }
+                }
+            });
+        }
+        
+        // 获取所有复选框（使用函数动态获取，确保获取到最新的）
+        function getAllCheckboxes() {
+            return document.querySelectorAll('.allocation-checkbox');
+        }
+        
+        function getSelectAllCheckbox() {
+            return document.getElementById('select-all-allocations');
+        }
+        
+        // 获取未提交的复选框数量
+        function getUnsubmittedCheckboxCount() {
+            var count = 0;
+            var checkboxes = getAllCheckboxes();
+            checkboxes.forEach(function(checkbox) {
+                var row = checkbox.closest('tr');
+                if (!row) return;
+                
+                var submitBtn = row.querySelector('.btn-submit-opinion');
+                // 判断是否已提交
+                var isSubmitted = false;
+                if (submitBtn) {
+                    if (submitBtn.textContent.trim() === '已提交') {
+                        isSubmitted = true;
+                    }
+                    if (submitBtn.classList.contains('submitted')) {
+                        isSubmitted = true;
+                    }
+                    if (row.classList.contains('submitted')) {
+                        isSubmitted = true;
+                    }
+                }
+                
+                if (!isSubmitted) {
+                    count++;
+                }
+            });
+            return count;
+        }
+        
+        // 更新全选复选框状态
+        function updateSelectAllState() {
+            var selectAllCheckbox = getSelectAllCheckbox();
+            if (!selectAllCheckbox) return;
+            
+            var checkedCount = document.querySelectorAll('.allocation-checkbox:checked').length;
+            var totalUnsubmittedCount = getUnsubmittedCheckboxCount();
+            
+            // 如果所有未提交的项都被选中，则全选复选框应该被勾选
+            if (totalUnsubmittedCount > 0) {
+                // 检查选中的项是否都是未提交的
+                var checkedUnsubmittedCount = 0;
+                document.querySelectorAll('.allocation-checkbox:checked').forEach(function(cb) {
+                    var row = cb.closest('tr');
+                    if (!row) return;
+                    
+                    var submitBtn = row.querySelector('.btn-submit-opinion');
+                    // 判断是否已提交
+                    var isSubmitted = false;
+                    if (submitBtn) {
+                        if (submitBtn.textContent.trim() === '已提交') {
+                            isSubmitted = true;
+                        }
+                        if (submitBtn.classList.contains('submitted')) {
+                            isSubmitted = true;
+                        }
+                        if (row.classList.contains('submitted')) {
+                            isSubmitted = true;
+                        }
+                    }
+                    
+                    if (!isSubmitted) {
+                        checkedUnsubmittedCount++;
+                    }
+                });
+                
+                // 如果所有未提交的项都被选中，则全选复选框应该被勾选
+                selectAllCheckbox.checked = checkedUnsubmittedCount === totalUnsubmittedCount && totalUnsubmittedCount > 0;
+                // 设置indeterminate状态（部分选中）
+                selectAllCheckbox.indeterminate = checkedUnsubmittedCount > 0 && checkedUnsubmittedCount < totalUnsubmittedCount;
+            } else {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            }
+        }
+        
+        // 全选/取消全选事件（使用事件委托，避免重复绑定）
+        var selectAllInitialized = false;
+        function initSelectAll() {
+            var selectAllCheckbox = getSelectAllCheckbox();
+            if (selectAllCheckbox && !selectAllInitialized) {
+                selectAllCheckbox.addEventListener('change', function() {
+                    var isChecked = this.checked;
+                    var allocationCheckboxes = getAllCheckboxes();
+                    var updatedCount = 0;
+                    
+                    allocationCheckboxes.forEach(function(cb) {
+                        var row = cb.closest('tr');
+                        if (!row) return;
+                        
+                        var submitBtn = row.querySelector('.btn-submit-opinion');
+                        // 判断是否已提交
+                        var isSubmitted = false;
+                        if (submitBtn) {
+                            if (submitBtn.textContent.trim() === '已提交') {
+                                isSubmitted = true;
+                            }
+                            if (submitBtn.classList.contains('submitted')) {
+                                isSubmitted = true;
+                            }
+                            if (row.classList.contains('submitted')) {
+                                isSubmitted = true;
+                            }
+                        }
+                        
+                        // 只操作未提交的行
+                        if (!isSubmitted) {
+                            cb.checked = isChecked;
+                            updatedCount++;
+                            // 更新行选中状态
+                            if (isChecked) {
+                                row.classList.add('row-selected');
+                            } else {
+                                row.classList.remove('row-selected');
+                            }
+                        }
+                    });
+                    
+                    updateSelectAllState();
+                    updateSelectionState();
+                });
+                selectAllInitialized = true;
+            }
+        }
+        
+        // 初始化单个复选框事件（使用事件委托）
+        var checkboxesInitialized = false;
+        function initCheckboxes() {
+            if (checkboxesInitialized) return;
+            
+            // 使用事件委托，在tbody上监听所有复选框的变化
+            var tbody = document.getElementById('material-opinion-tbody');
+            if (tbody) {
+                tbody.addEventListener('change', function(e) {
+                    if (e.target && e.target.classList.contains('allocation-checkbox')) {
+                        var cb = e.target;
+                        var row = cb.closest('tr');
+                        if (row) {
+                            if (cb.checked) {
+                                row.classList.add('row-selected');
+                            } else {
+                                row.classList.remove('row-selected');
+                            }
+                            updateSelectAllState();
+                            updateSelectionState();
+                        }
+                    }
+                });
+                checkboxesInitialized = true;
+            }
+        }
+        
+        // 初始化批量操作按钮事件
+        function initBatchButtons() {
+            // 先初始化弹窗变量，因为批量填写意见按钮需要用到
+            initBatchModalVars();
+            // 批量同意按钮事件绑定（确保只绑定一次）
+            var batchAgreeBtn = document.getElementById('btn-batch-agree');
+            if (batchAgreeBtn && !batchAgreeBtn.hasAttribute('data-listener-bound')) {
+                batchAgreeBtn.setAttribute('data-listener-bound', 'true');
+                batchAgreeBtn.addEventListener('click', function() {
+                    var selectedRows = [];
+                    
+                    // 获取选中的复选框对应的行
+                    document.querySelectorAll('.allocation-checkbox:checked').forEach(function(cb) {
+                        var row = cb.closest('tr');
+                        if (!row) return;
+                        
+                        var submitBtn = row.querySelector('.btn-submit-opinion');
+                        // 判断是否已提交
+                        var isSubmitted = false;
+                        if (submitBtn) {
+                            if (submitBtn.textContent.trim() === '已提交') {
+                                isSubmitted = true;
+                            }
+                            if (submitBtn.classList.contains('submitted')) {
+                                isSubmitted = true;
+                            }
+                            if (row.classList.contains('submitted')) {
+                                isSubmitted = true;
+                            }
+                        }
+                        
+                        // 只处理未提交的行
+                        if (!isSubmitted) {
+                            selectedRows.push(row);
+                        }
+                    });
+                    
+                    if (selectedRows.length === 0) {
+                        alert('请先选择要操作的分配项（只能选择未提交的项）');
+                        return;
+                    }
+                    
+                    if (confirm('确定批量同意选中的 ' + selectedRows.length + ' 个分配项的初步处理方式？')) {
+                        selectedRows.forEach(function(row) {
+                            var agreeSelect = row.querySelector('.material-agree-select');
+                            
+                            if (agreeSelect && !agreeSelect.disabled) {
+                                // 设置值
+                                agreeSelect.value = 'agree';
+                                // 触发change事件以更新UI状态（启用/禁用相关输入框）
+                                var changeEvent = new Event('change', { bubbles: true });
+                                agreeSelect.dispatchEvent(changeEvent);
+                            }
+                        });
+                        
+                        // 取消选中
+                        document.querySelectorAll('.allocation-checkbox:checked').forEach(function(cb) {
+                            cb.checked = false;
+                            var row = cb.closest('tr');
+                            if (row) {
+                                row.classList.remove('row-selected');
+                            }
+                        });
+                        var selectAllCheckbox = getSelectAllCheckbox();
+                        if (selectAllCheckbox) selectAllCheckbox.checked = false;
+                        
+                        updateSelectAllState();
+                        updateSelectionState();
+                        showSuccessMessage('已批量设置为同意，共 ' + selectedRows.length + ' 个分配项');
+                    }
+                });
+            }
+            
+            // 批量不同意按钮事件绑定（确保只绑定一次）
+            var batchDisagreeBtn = document.getElementById('btn-batch-disagree');
+            if (batchDisagreeBtn && !batchDisagreeBtn.hasAttribute('data-listener-bound')) {
+                batchDisagreeBtn.setAttribute('data-listener-bound', 'true');
+                batchDisagreeBtn.addEventListener('click', function() {
+                    var selectedRows = [];
+                    
+                    // 获取选中的复选框对应的行
+                    document.querySelectorAll('.allocation-checkbox:checked').forEach(function(cb) {
+                        var row = cb.closest('tr');
+                        if (!row) return;
+                        
+                        var submitBtn = row.querySelector('.btn-submit-opinion');
+                        // 判断是否已提交
+                        var isSubmitted = false;
+                        if (submitBtn) {
+                            if (submitBtn.textContent.trim() === '已提交') {
+                                isSubmitted = true;
+                            }
+                            if (submitBtn.classList.contains('submitted')) {
+                                isSubmitted = true;
+                            }
+                            if (row.classList.contains('submitted')) {
+                                isSubmitted = true;
+                            }
+                        }
+                        
+                        // 只处理未提交的行
+                        if (!isSubmitted) {
+                            selectedRows.push(row);
+                        }
+                    });
+                    
+                    if (selectedRows.length === 0) {
+                        alert('请先选择要操作的分配项（只能选择未提交的项）');
+                        return;
+                    }
+                    
+                    if (confirm('确定批量设置为不同意？设置后需要填写处理意见才能提交。')) {
+                        selectedRows.forEach(function(row) {
+                            var agreeSelect = row.querySelector('.material-agree-select');
+                            
+                            if (agreeSelect && !agreeSelect.disabled) {
+                                // 设置值
+                                agreeSelect.value = 'disagree';
+                                // 触发change事件以更新UI状态（启用意见输入框）
+                                var changeEvent = new Event('change', { bubbles: true });
+                                agreeSelect.dispatchEvent(changeEvent);
+                            }
+                        });
+                        
+                        // 取消选中
+                        document.querySelectorAll('.allocation-checkbox:checked').forEach(function(cb) {
+                            cb.checked = false;
+                            var row = cb.closest('tr');
+                            if (row) {
+                                row.classList.remove('row-selected');
+                            }
+                        });
+                        var selectAllCheckbox = getSelectAllCheckbox();
+                        if (selectAllCheckbox) selectAllCheckbox.checked = false;
+                        
+                        updateSelectAllState();
+                        updateSelectionState();
+                        showSuccessMessage('已批量设置为不同意，共 ' + selectedRows.length + ' 个分配项，请填写处理意见');
+                    }
+                });
+            }
+            
+            // 批量填写意见按钮事件绑定（确保只绑定一次）
+            var batchFillOpinionBtn = document.getElementById('btn-batch-fill-opinion');
+            if (batchFillOpinionBtn && !batchFillOpinionBtn.hasAttribute('data-listener-bound')) {
+                batchFillOpinionBtn.setAttribute('data-listener-bound', 'true');
+                batchFillOpinionBtn.addEventListener('click', function() {
+                    // 确保弹窗变量已初始化
+                    initBatchModalVars();
+                    
+                    if (!batchFillOpinionModal || !batchOpinionContent) {
+                        alert('页面初始化未完成，请刷新页面重试');
+                        return;
+                    }
+                    
+                    savedSelectedRows = []; // 清空之前保存的
+                    
+                    // 获取选中的复选框对应的行
+                    document.querySelectorAll('.allocation-checkbox:checked').forEach(function(cb) {
+                        var row = cb.closest('tr');
+                        if (!row) return;
+                        
+                        var submitBtn = row.querySelector('.btn-submit-opinion');
+                        // 判断是否已提交
+                        var isSubmitted = false;
+                        if (submitBtn) {
+                            if (submitBtn.textContent.trim() === '已提交') {
+                                isSubmitted = true;
+                            }
+                            if (submitBtn.classList.contains('submitted')) {
+                                isSubmitted = true;
+                            }
+                            if (row.classList.contains('submitted')) {
+                                isSubmitted = true;
+                            }
+                        }
+                        
+                        // 只处理未提交的行
+                        if (!isSubmitted) {
+                            savedSelectedRows.push(row);
+                        }
+                    });
+                    
+                    if (savedSelectedRows.length === 0) {
+                        alert('请先选择要操作的分配项');
+                        return;
+                    }
+                    
+                    // 清空表单和错误
+                    if (batchOpinionContent) batchOpinionContent.value = '';
+                    if (batchOpinionSuggestion) batchOpinionSuggestion.value = '';
+                    if (batchOpinionContentError) {
+                        batchOpinionContentError.style.display = 'none';
+                    }
+                    if (batchOpinionContent) {
+                        batchOpinionContent.classList.remove('form-error');
+                    }
+                    
+                    // 显示弹窗
+                    batchFillOpinionModal.style.display = 'flex';
+                    batchFillOpinionModal.style.alignItems = 'center';
+                    batchFillOpinionModal.style.justifyContent = 'center';
+                    document.body.style.overflow = 'hidden';
+                    
+                    // 聚焦到输入框
+                    setTimeout(function() {
+                        if (batchOpinionContent) batchOpinionContent.focus();
+                    }, 100);
+                });
+            }
+        }
+        
+        // 初始化返回按钮
+        function initBackButton() {
+            var backBtn = document.getElementById('btn-back');
+            if (backBtn) {
+                backBtn.addEventListener('click', function() {
+                    // 优先尝试返回上一页
+                    if (window.history.length > 1) {
+                        window.history.back();
+                    } else {
+                        // 如果没有历史记录，跳转到待办事项页面
+                        window.location.href = 'procurement-todo.html';
+                    }
+                });
+            }
+        }
+        
+        // 初始化选中状态
+        function initSelection() {
+            initSelectAll();
+            initCheckboxes();
+            initBatchButtons(); // 初始化批量操作按钮
+            initBatchModalEvents(); // 初始化批量填写意见弹窗事件
+            initBackButton(); // 初始化返回按钮
+            updateSelectAllState();
+            updateSelectionState();
+        }
+        
+        // 页面加载完成后初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initSelection);
+        } else {
+            // 延迟一点确保DOM完全加载
+            setTimeout(initSelection, 100);
+        }
+        
+        // 是否同意选择变化
+        document.querySelectorAll('.material-agree-select').forEach(function(select) {
+            select.addEventListener('change', function() {
+                var materialCode = this.getAttribute('data-material-code');
+                var allocationType = this.getAttribute('data-allocation-type');
+                var allocationQty = this.getAttribute('data-allocation-qty');
+                var row = this.closest('tr');
+                var contentTextarea = row.querySelector('.material-opinion-content');
+                var suggestionSelect = row.querySelector('.material-opinion-suggestion');
+                var submitBtn = row.querySelector('.btn-submit-opinion');
+                
+                // 清除之前的错误提示
+                clearError(this);
+                if (contentTextarea) clearError(contentTextarea);
+                
+                // 获取初步处理方式文本
+                var allocations = INITIAL_ALLOCATIONS[materialCode] || [];
+                var currentAlloc = allocations.find(function(a) { return a.type === allocationType && a.qty == allocationQty; });
+                var initialHandleText = currentAlloc ? currentAlloc.typeText + ' ' + currentAlloc.qty + currentAlloc.unit : '';
+                
+                if (this.value === 'agree') {
+                    // 同意：禁用意见输入、建议处理方式，启用提交按钮；让步接收行保留处理方案/等级可编辑
+                    if (contentTextarea) {
+                        contentTextarea.disabled = true;
+                        contentTextarea.value = '';
+                        contentTextarea.placeholder = '已同意初步处理方式（' + initialHandleText + '）';
+                    }
+                    if (suggestionSelect) {
+                        suggestionSelect.disabled = true;
+                        suggestionSelect.value = '';
+                    }
+                    toggleConcessionFieldsBySuggestion(row, '');
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                    }
+                } else if (this.value === 'disagree') {
+                    // 不同意：启用意见输入、建议处理方式，必填
+                    if (contentTextarea) {
+                        contentTextarea.disabled = false;
+                        contentTextarea.placeholder = '请填写处理意见（必填）';
+                        contentTextarea.required = true;
+                        contentTextarea.focus();
+                    }
+                    if (suggestionSelect) {
+                        suggestionSelect.disabled = false;
+                        toggleConcessionFieldsBySuggestion(row, suggestionSelect.value);
+                    }
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                    }
+                } else {
+                    // 未选择：禁用所有输入
+                    if (contentTextarea) {
+                        contentTextarea.disabled = true;
+                        contentTextarea.value = '';
+                        contentTextarea.placeholder = '不同意时请填写处理意见';
+                    }
+                    if (suggestionSelect) {
+                        suggestionSelect.disabled = true;
+                        suggestionSelect.value = '';
+                    }
+                    toggleConcessionFieldsBySuggestion(row, '');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                    }
+                }
+                
+                // 更新选中状态（因为提交按钮状态变化可能影响批量操作按钮的启用状态）
+                updateSelectionState();
+            });
+        });
+        
+        // 根据“建议处理方式”或“初步处理方式=让步接收”控制本行 处理方案/原等级/降级后等级 是否可编辑
+        function toggleConcessionFieldsBySuggestion(row, suggestionValue) {
+            if (!row) return;
+            var planSelect = row.querySelector('.opinion-concession-plan');
+            var origGrade = row.querySelector('.opinion-concession-orig-grade');
+            var downgradeGrade = row.querySelector('.opinion-concession-downgrade-grade');
+            var isInitialConcession = row.getAttribute('data-allocation-type') === 'concession';
+            var shouldEnable = isInitialConcession || suggestionValue === 'concession';
+            if (planSelect) {
+                planSelect.disabled = !shouldEnable;
+                if (!shouldEnable) planSelect.value = '';
+            }
+            if (origGrade) {
+                origGrade.disabled = !shouldEnable;
+                if (!shouldEnable) origGrade.value = '';
+            }
+            if (downgradeGrade) {
+                downgradeGrade.disabled = !shouldEnable;
+                if (!shouldEnable) downgradeGrade.value = '';
+            }
+        }
+        
+        // 建议处理方式变更时：选“让步接收”则本行处理方案、原等级、降级后等级可编辑
+        document.querySelectorAll('.material-opinion-suggestion').forEach(function(suggestionSelect) {
+            suggestionSelect.addEventListener('change', function() {
+                var row = this.closest('tr');
+                toggleConcessionFieldsBySuggestion(row, this.value);
+            });
+        });
+        
+        // 提交单个分配项的意见
+        document.querySelectorAll('.btn-submit-opinion').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var materialCode = this.getAttribute('data-material-code');
+                var allocationType = this.getAttribute('data-allocation-type');
+                var allocationQty = this.getAttribute('data-allocation-qty');
+                var row = this.closest('tr');
+                var agreeSelect = row.querySelector('.material-agree-select');
+                var contentTextarea = row.querySelector('.material-opinion-content');
+                var suggestionSelect = row.querySelector('.material-opinion-suggestion');
+                
+                // 清除之前的错误
+                if (agreeSelect) clearError(agreeSelect);
+                if (contentTextarea) clearError(contentTextarea);
+                
+                if (!agreeSelect || !agreeSelect.value) {
+                    showError(agreeSelect, '请先选择是否同意初步处理方式');
+                    agreeSelect.focus();
+                    return;
+                }
+                
+                var isAgree = agreeSelect.value === 'agree';
+                
+                // 获取初步处理方式文本
+                var allocations = INITIAL_ALLOCATIONS[materialCode] || [];
+                var currentAlloc = allocations.find(function(a) { return a.type === allocationType && a.qty == allocationQty; });
+                var initialHandleText = currentAlloc ? currentAlloc.typeText + ' ' + currentAlloc.qty + currentAlloc.unit : '';
+                
+                if (!isAgree) {
+                    // 不同意时必须填写意见
+                    if (!contentTextarea || !contentTextarea.value.trim()) {
+                        showError(contentTextarea, '不同意时请填写处理意见');
+                        contentTextarea.focus();
+                        return;
+                    }
+                } else if (row.getAttribute('data-allocation-type') === 'concession') {
+                    // 让步接收且同意时，需填写处理方案、原等级、降级后等级（本页不体现价格）
+                    var planSelect = row.querySelector('.opinion-concession-plan');
+                    var downgradeGradeInput = row.querySelector('.opinion-concession-downgrade-grade');
+                    if (!planSelect || !planSelect.value) {
+                        showError(planSelect || row, '让步接收项需选择处理方案');
+                        if (planSelect) planSelect.focus();
+                        return;
+                    }
+                    if (!downgradeGradeInput || !downgradeGradeInput.value.trim()) {
+                        showError(downgradeGradeInput || row, '让步接收项需填写降级后等级');
+                        if (downgradeGradeInput) downgradeGradeInput.focus();
+                        return;
+                    }
+                }
+                
+                var suggestion = suggestionSelect && !suggestionSelect.disabled ? suggestionSelect.value : '';
+                var suggestionText = {
+                    'return': '建议退货',
+                    'exchange': '建议换货',
+                    'concession': '建议让步接收'
+                }[suggestion] || (isAgree ? '同意初步处理方式' : '无建议');
+                
+                var confirmMsg = '确定提交此分配项的反馈意见？\n\n';
+                confirmMsg += '物料：' + materialCode + '\n';
+                confirmMsg += '初步处理方式：' + initialHandleText + '\n';
+                confirmMsg += '您的反馈：' + (isAgree ? '同意' : '不同意') + '\n';
+                if (!isAgree) {
+                    confirmMsg += '处理意见：' + contentTextarea.value.trim() + '\n';
+                    if (suggestion) {
+                        confirmMsg += '建议处理方式：' + suggestionText + '\n';
+                    }
+                }
+                
+                if (confirm(confirmMsg)) {
+                    // 添加加载状态
+                    this.classList.add('btn-loading');
+                    this.disabled = true;
+                    
+                    // 模拟提交延迟
+                    setTimeout(function() {
+                        // 移除加载状态
+                        btn.classList.remove('btn-loading');
+                        
+                        // 更新按钮状态
+                        btn.textContent = '已提交';
+                        btn.disabled = true;
+                        btn.classList.remove('btn-primary');
+                        btn.classList.add('btn-default', 'submitted');
+                        
+                        // 禁用所有输入框
+                        if (agreeSelect) agreeSelect.disabled = true;
+                        if (contentTextarea) contentTextarea.disabled = true;
+                        if (suggestionSelect) suggestionSelect.disabled = true;
+                        
+                        // 更新行状态
+                        row.classList.add('submitted');
+                        
+                        // 取消选中
+                        var checkbox = row.querySelector('.allocation-checkbox');
+                        if (checkbox) {
+                            checkbox.checked = false;
+                            row.classList.remove('row-selected');
+                        }
+                        
+                        // 更新状态
+                        updateSelectAllState();
+                        updateSelectionState();
+                        
+                        // 显示成功提示
+                        showSuccessMessage('反馈意见已提交，发起人可在不合格处理单详情页查看');
+                        
+                        // 实际应用中这里应该提交到后端
+                    }, 800);
+                }
+            });
+        });
+        
+        // 批量填写意见弹窗变量（延迟初始化，确保DOM加载完成）
+        var batchFillOpinionModal, batchOpinionContent, batchOpinionSuggestion, batchOpinionContentError;
+        var savedSelectedRows = []; // 保存选中的行，防止弹窗打开后取消选中
+        
+        // 初始化批量填写意见弹窗变量
+        function initBatchModalVars() {
+            if (!batchFillOpinionModal) {
+                batchFillOpinionModal = document.getElementById('batch-fill-opinion-modal');
+                batchOpinionContent = document.getElementById('batch-opinion-content');
+                batchOpinionSuggestion = document.getElementById('batch-opinion-suggestion');
+                batchOpinionContentError = document.getElementById('batch-opinion-content-error');
+            }
+        }
+        
+        // 确定批量填写意见（延迟初始化）
+        function initBatchFillConfirm() {
+            initBatchModalVars();
+            var confirmBtn = document.getElementById('batch-fill-opinion-confirm');
+            if (confirmBtn && !confirmBtn.hasAttribute('data-listener-bound')) {
+                confirmBtn.setAttribute('data-listener-bound', 'true');
+                confirmBtn.addEventListener('click', function() {
+                    // 确保变量已初始化
+                    if (!batchOpinionContent || !batchOpinionSuggestion || !batchOpinionContentError) {
+                        alert('页面初始化未完成，请刷新页面重试');
+                        return;
+                    }
+                    
+                    var opinionContent = batchOpinionContent.value.trim();
+                    var suggestion = batchOpinionSuggestion.value;
+            
+            // 清除错误
+            batchOpinionContentError.style.display = 'none';
+            batchOpinionContent.classList.remove('form-error');
+            
+            if (!opinionContent) {
+                batchOpinionContentError.textContent = '请填写处理意见';
+                batchOpinionContentError.style.display = 'flex';
+                batchOpinionContent.classList.add('form-error');
+                batchOpinionContent.focus();
+                return;
+            }
+            
+            // 使用保存的选中行，而不是重新获取（防止弹窗打开后用户取消选中）
+            if (savedSelectedRows.length === 0) {
+                alert('没有可操作的分配项');
+                return;
+            }
+            
+            var rowCount = savedSelectedRows.length; // 保存数量，因为后面会清空数组
+            
+            if (confirm('确定批量填写意见？将为 ' + rowCount + ' 个分配项设置相同的处理意见和建议处理方式。')) {
+                savedSelectedRows.forEach(function(row) {
+                    var agreeSelect = row.querySelector('.material-agree-select');
+                    var contentTextarea = row.querySelector('.material-opinion-content');
+                    var suggestionSelect = row.querySelector('.material-opinion-suggestion');
+                    
+                    // 设置为不同意（因为填写了意见）
+                    if (agreeSelect && !agreeSelect.disabled) {
+                        agreeSelect.value = 'disagree';
+                        agreeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                    
+                    // 填写意见
+                    if (contentTextarea) {
+                        contentTextarea.value = opinionContent;
+                    }
+                    
+                    // 设置建议处理方式
+                    if (suggestionSelect) {
+                        suggestionSelect.value = suggestion;
+                    }
+                });
+                
+                // 关闭弹窗
+                batchFillOpinionModal.style.display = 'none';
+                document.body.style.overflow = '';
+                
+                // 取消选中
+                document.querySelectorAll('.allocation-checkbox:checked').forEach(function(cb) {
+                    cb.checked = false;
+                    var row = cb.closest('tr');
+                    if (row) {
+                        row.classList.remove('row-selected');
+                    }
+                });
+                var selectAllCheckbox = getSelectAllCheckbox();
+                if (selectAllCheckbox) selectAllCheckbox.checked = false;
+                
+                // 清空保存的选中行
+                savedSelectedRows = [];
+                
+                updateSelectAllState();
+                updateSelectionState();
+                showSuccessMessage('已批量填写意见，共 ' + rowCount + ' 个分配项');
+            }
+                });
+            }
+        }
+        
+        // 在initBatchModalEvents中调用
+        function initBatchModalEvents() {
+            initBatchModalVars();
+            if (!batchFillOpinionModal) return;
+            
+            // 关闭弹窗
+            var closeBtn = document.getElementById('batch-fill-opinion-modal-close');
+            if (closeBtn && !closeBtn.hasAttribute('data-listener-bound')) {
+                closeBtn.setAttribute('data-listener-bound', 'true');
+                closeBtn.addEventListener('click', function() {
+                    batchFillOpinionModal.style.display = 'none';
+                    document.body.style.overflow = '';
+                });
+            }
+            
+            var cancelBtn = document.getElementById('batch-fill-opinion-cancel');
+            if (cancelBtn && !cancelBtn.hasAttribute('data-listener-bound')) {
+                cancelBtn.setAttribute('data-listener-bound', 'true');
+                cancelBtn.addEventListener('click', function() {
+                    batchFillOpinionModal.style.display = 'none';
+                    document.body.style.overflow = '';
+                });
+            }
+            
+            // 点击弹窗背景关闭
+            if (!batchFillOpinionModal.hasAttribute('data-listener-bound')) {
+                batchFillOpinionModal.setAttribute('data-listener-bound', 'true');
+                batchFillOpinionModal.addEventListener('click', function(e) {
+                    if (e.target === batchFillOpinionModal) {
+                        batchFillOpinionModal.style.display = 'none';
+                        document.body.style.overflow = '';
+                    }
+                });
+            }
+            
+            // 弹窗关闭按钮hover效果
+            if (closeBtn && !closeBtn.hasAttribute('data-hover-bound')) {
+                closeBtn.setAttribute('data-hover-bound', 'true');
+                closeBtn.addEventListener('mouseenter', function() {
+                    this.style.color = '#262626';
+                });
+                closeBtn.addEventListener('mouseleave', function() {
+                    this.style.color = '#8c8c8c';
+                });
+            }
+            
+            // 初始化确定按钮
+            initBatchFillConfirm();
+        }
+        
+        // 批量提交所有意见
+        document.getElementById('btn-submit-all').addEventListener('click', function() {
+            var rows = document.querySelectorAll('#material-opinion-tbody tr');
+            var submittedCount = 0;
+            var unsubmittedRows = [];
+            
+            rows.forEach(function(row) {
+                var agreeSelect = row.querySelector('.material-agree-select');
+                var submitBtn = row.querySelector('.btn-submit-opinion');
+                
+                if (agreeSelect && agreeSelect.value && !submitBtn.disabled) {
+                    unsubmittedRows.push(row);
+                } else if (submitBtn && submitBtn.disabled) {
+                    submittedCount++;
+                }
+            });
+            
+            if (unsubmittedRows.length === 0) {
+                alert('所有分配项已提交反馈意见');
+                return;
+            }
+            
+            // 验证未提交的行是否都选择了同意/不同意
+            var hasInvalid = false;
+            var invalidRows = [];
+            unsubmittedRows.forEach(function(row) {
+                var agreeSelect = row.querySelector('.material-agree-select');
+                var contentTextarea = row.querySelector('.material-opinion-content');
+                
+                if (!agreeSelect || !agreeSelect.value) {
+                    hasInvalid = true;
+                    invalidRows.push(row);
+                } else if (agreeSelect.value === 'disagree' && (!contentTextarea || !contentTextarea.value.trim())) {
+                    hasInvalid = true;
+                    invalidRows.push(row);
+                }
+            });
+            
+            if (hasInvalid) {
+                // 高亮显示无效行
+                invalidRows.forEach(function(row) {
+                    row.style.animation = 'shake 0.5s ease';
+                    setTimeout(function() {
+                        row.style.animation = '';
+                    }, 500);
+                });
+                alert('请为所有分配项选择是否同意，如果不同意则必须填写处理意见');
+                return;
+            }
+            
+            // 让步接收项同意时需填写处理方案、降级后等级（本页不体现价格）
+            var concessionIncomplete = false;
+            unsubmittedRows.forEach(function(row) {
+                if (row.getAttribute('data-allocation-type') !== 'concession') return;
+                var agreeSelect = row.querySelector('.material-agree-select');
+                if (!agreeSelect || agreeSelect.value !== 'agree') return;
+                var planSelect = row.querySelector('.opinion-concession-plan');
+                var downgradeGradeInput = row.querySelector('.opinion-concession-downgrade-grade');
+                if (!planSelect || !planSelect.value || !downgradeGradeInput || !downgradeGradeInput.value.trim()) {
+                    concessionIncomplete = true;
+                }
+            });
+            if (concessionIncomplete) {
+                alert('让步接收项同意时需填写处理方案及降级后等级。');
+                return;
+            }
+            
+            if (confirm('确定提交所有分配项的反馈意见？\n\n已提交：' + submittedCount + ' 个\n待提交：' + unsubmittedRows.length + ' 个')) {
+                // 添加加载状态
+                this.classList.add('btn-loading');
+                this.disabled = true;
+                
+                // 模拟批量提交延迟
+                setTimeout(function() {
+                    // 移除加载状态
+                    var btn = document.getElementById('btn-submit-all');
+                    btn.classList.remove('btn-loading');
+                    btn.disabled = false;
+                    
+                    // 更新所有未提交的行
+                    unsubmittedRows.forEach(function(row) {
+                        var agreeSelect = row.querySelector('.material-agree-select');
+                        var contentTextarea = row.querySelector('.material-opinion-content');
+                        var suggestionSelect = row.querySelector('.material-opinion-suggestion');
+                        var submitBtn = row.querySelector('.btn-submit-opinion');
+                        
+                        if (agreeSelect) agreeSelect.disabled = true;
+                        if (contentTextarea) contentTextarea.disabled = true;
+                        if (suggestionSelect) suggestionSelect.disabled = true;
+                        if (submitBtn) {
+                            submitBtn.textContent = '已提交';
+                            submitBtn.disabled = true;
+                            submitBtn.classList.remove('btn-primary');
+                            submitBtn.classList.add('btn-default', 'submitted');
+                        }
+                        
+                        row.classList.add('submitted');
+                    });
+                    
+                    // 更新状态
+                    updateSelectAllState();
+                    updateSelectionState();
+                    
+                    // 显示成功提示
+                    showSuccessMessage('所有反馈意见已提交，发起人可在不合格处理单详情页查看');
+                    
+                    // 实际应用中这里应该提交到后端
+                }, 1000);
+            }
+        });
+        </script>
+    </div>
+</body>
+</html>

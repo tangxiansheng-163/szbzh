@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合同模板 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">系统配置</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">合同模板</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理采购合同模板，用于新建合同、生成合同订单时选择。支持模板的创建、编辑、预览与使用统计；模板类型包括框架合同、单次合同、物料采购、服务合同等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="模板编号、模板名称">
+                </div>
+                <div class="filter-item">
+                    <label>模板类型</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="framework">框架合同</option>
+                        <option value="single">单次合同</option>
+                        <option value="material">物料采购</option>
+                        <option value="service">服务合同</option>
+                        <option value="custom">自定义</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="enabled">启用</option>
+                        <option value="disabled">停用</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary" id="btn-template-create">+ 新建模板</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">模板编号</th>
+                            <th width="200">模板名称</th>
+                            <th width="100">模板类型</th>
+                            <th width="80">状态</th>
+                            <th width="90">使用次数</th>
+                            <th width="120">创建时间</th>
+                            <th width="120">更新时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-template-id="1">
+                            <td><input type="checkbox" name="template-id" value="1"></td>
+                            <td>TEMP-2025-001</td>
+                            <td>采购框架合同模板</td>
+                            <td>框架合同</td>
+                            <td class="template-status-cell"><span class="status-badge status-success">启用</span></td>
+                            <td>128</td>
+                            <td>2024-06-01</td>
+                            <td>2025-01-10</td>
+                            <td class="template-ops-cell">
+                                <button class="btn btn-sm btn-default btn-template-view" data-id="1">查看</button>
+                                <button class="btn btn-sm btn-default btn-template-disable" data-id="1">停用</button>
+                            </td>
+                        </tr>
+                        <tr data-template-id="2">
+                            <td><input type="checkbox" name="template-id" value="2"></td>
+                            <td>TEMP-2025-002</td>
+                            <td>单次采购合同模板</td>
+                            <td>单次合同</td>
+                            <td class="template-status-cell"><span class="status-badge status-success">启用</span></td>
+                            <td>86</td>
+                            <td>2024-06-01</td>
+                            <td>2025-01-08</td>
+                            <td class="template-ops-cell">
+                                <button class="btn btn-sm btn-default btn-template-view" data-id="2">查看</button>
+                                <button class="btn btn-sm btn-default btn-template-disable" data-id="2">停用</button>
+                            </td>
+                        </tr>
+                        <tr data-template-id="3">
+                            <td><input type="checkbox" name="template-id" value="3"></td>
+                            <td>TEMP-2025-003</td>
+                            <td>物料采购合同模板</td>
+                            <td>物料采购</td>
+                            <td class="template-status-cell"><span class="status-badge status-success">启用</span></td>
+                            <td>52</td>
+                            <td>2024-07-15</td>
+                            <td>2024-12-20</td>
+                            <td class="template-ops-cell">
+                                <button class="btn btn-sm btn-default btn-template-view" data-id="3">查看</button>
+                                <button class="btn btn-sm btn-default btn-template-disable" data-id="3">停用</button>
+                            </td>
+                        </tr>
+                        <tr data-template-id="4">
+                            <td><input type="checkbox" name="template-id" value="4"></td>
+                            <td>TEMP-2025-004</td>
+                            <td>自定义服务合同模板</td>
+                            <td>自定义</td>
+                            <td class="template-status-cell"><span class="status-badge status-disabled">停用</span></td>
+                            <td>18</td>
+                            <td>2025-01-05</td>
+                            <td>2025-01-05</td>
+                            <td class="template-ops-cell">
+                                <button class="btn btn-sm btn-default btn-template-view" data-id="4">查看</button>
+                                <button class="btn btn-sm btn-default btn-template-edit" data-id="4">编辑</button>
+                                <button class="btn btn-sm btn-default btn-template-enable" data-id="4">启用</button>
+                                <button class="btn btn-sm btn-default btn-template-delete" data-id="4">删除</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 4 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 新建/编辑模板弹窗（须在 content-wrapper 内，否则 SPA 加载时不会注入） -->
+    <div id="template-form-modal" class="modal-overlay" style="display:none;">
+        <div class="modal modal--wide" style="max-width:640px;">
+            <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #f0f0f0;">
+                <div class="modal-title" id="template-form-modal-title">新建模板</div>
+                <div class="modal-close" id="template-form-modal-close" style="cursor:pointer;font-size:18px;">×</div>
+            </div>
+            <div class="modal-body" style="padding:16px;">
+                <form id="template-form">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;margin-bottom:16px;">
+                        <div class="form-item">
+                            <label class="form-label">模板名称 <span style="color:#ff4d4f;">*</span></label>
+                            <input type="text" class="form-input" id="template-form-name" required placeholder="如：采购框架合同模板">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">模板类型 <span style="color:#ff4d4f;">*</span></label>
+                            <select class="form-select" id="template-form-type" required>
+                                <option value="">请选择</option>
+                                <option value="framework">框架合同</option>
+                                <option value="single">单次合同</option>
+                                <option value="material">物料采购</option>
+                                <option value="service">服务合同</option>
+                                <option value="custom">自定义</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">状态</label>
+                            <select class="form-select" id="template-form-status">
+                                <option value="enabled">启用</option>
+                                <option value="disabled">停用</option>
+                            </select>
+                        </div>
+                        <div class="form-item"></div>
+                        <div class="form-item" style="grid-column:1 / -1;">
+                            <label class="form-label">模板说明</label>
+                            <input type="text" class="form-input" id="template-form-desc" placeholder="简要说明模板用途、适用场景">
+                        </div>
+                        <div class="form-item" style="grid-column:1 / -1;">
+                            <label class="form-label">正文内容</label>
+                            <textarea class="form-input" id="template-form-content" rows="10" placeholder="合同正文条款，可包含占位符如 {合同编号}、{甲方}、{乙方}、{金额} 等" style="resize:vertical;min-height:120px;"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="padding:12px 16px;border-top:1px solid #f0f0f0;text-align:right;">
+                <button type="button" class="btn btn-default" id="template-form-cancel">取消</button>
+                <button type="button" class="btn btn-primary" id="template-form-save">保存</button>
+            </div>
+        </div>
+    </div>
+
+        <!-- 查看模板弹窗 -->
+    <div id="template-view-modal" class="modal-overlay" style="display:none;">
+        <div class="modal modal--wide" style="max-width:640px;">
+            <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #f0f0f0;">
+                <div class="modal-title">查看模板</div>
+                <div class="modal-close" id="template-view-modal-close" style="cursor:pointer;font-size:18px;">×</div>
+            </div>
+            <div class="modal-body" style="padding:16px;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;margin-bottom:16px;">
+                    <div class="form-item">
+                        <label class="form-label">模板编号</label>
+                        <div class="form-static" id="template-view-no">—</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">模板名称</label>
+                        <div class="form-static" id="template-view-name">—</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">模板类型</label>
+                        <div class="form-static" id="template-view-type">—</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">状态</label>
+                        <div class="form-static" id="template-view-status">—</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">使用次数</label>
+                        <div class="form-static" id="template-view-useCount">—</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">创建时间</label>
+                        <div class="form-static" id="template-view-createTime">—</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">更新时间</label>
+                        <div class="form-static" id="template-view-updateTime">—</div>
+                    </div>
+                    <div class="form-item" style="grid-column:1 / -1;">
+                        <label class="form-label">模板说明</label>
+                        <div class="form-static" id="template-view-desc">—</div>
+                    </div>
+                    <div class="form-item" style="grid-column:1 / -1;">
+                        <label class="form-label">正文内容</label>
+                        <div id="template-view-content" style="padding:12px;border:1px solid #f0f0f0;border-radius:4px;background:#fafafa;font-size:13px;line-height:1.6;max-height:240px;overflow:auto;white-space:pre-wrap;">—</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding:12px 16px;border-top:1px solid #f0f0f0;text-align:right;">
+                <button type="button" class="btn btn-default" id="template-view-close">关闭</button>
+            </div>
+        </div>
+    </div>
+
+        <style>
+    #template-form-modal,#template-view-modal{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;display:flex;align-items:center;justify-content:center;}
+    #template-form-modal .modal,#template-view-modal .modal{background:#fff;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);max-height:90vh;overflow:hidden;display:flex;flex-direction:column;}
+    #template-form-modal .modal-body,#template-view-modal .modal-body{overflow:auto;}
+    .form-static{padding:6px 0;color:rgba(0,0,0,0.85);font-size:13px;}
+    .status-badge.status-disabled{background:#f5f5f5;color:#8c8c8c;}
+        </style>
+        <script>
+        (function() {
+            var TEMPLATE_DATA = {
+                '1': { no: 'TEMP-2025-001', name: '采购框架合同模板', type: '框架合同', typeVal: 'framework', status: '启用', statusVal: 'enabled', useCount: '128', createTime: '2024-06-01', updateTime: '2025-01-10', desc: '适用于年度框架采购，约定总金额与执行周期。', content: '甲方：{甲方}\n乙方：{乙方}\n合同编号：{合同编号}\n\n一、总则\n本框架合同约定双方在合同有效期内采购合作的总则。\n\n二、采购范围与金额\n合同总金额：{金额} 元（含税）。\n\n三、执行方式\n具体订单以双方后续签订的订单为准。\n\n四、其他条款\n……' },
+                '2': { no: 'TEMP-2025-002', name: '单次采购合同模板', type: '单次合同', typeVal: 'single', status: '启用', statusVal: 'enabled', useCount: '86', createTime: '2024-06-01', updateTime: '2025-01-08', desc: '适用于单笔采购业务。', content: '甲方：{甲方}\n乙方：{乙方}\n合同编号：{合同编号}\n\n一、标的与金额\n本次采购金额：{金额} 元（含税）。\n\n二、交付与验收\n……' },
+                '3': { no: 'TEMP-2025-003', name: '物料采购合同模板', type: '物料采购', typeVal: 'material', status: '启用', statusVal: 'enabled', useCount: '52', createTime: '2024-07-15', updateTime: '2024-12-20', desc: '适用于物料类采购，含明细表。', content: '甲方：{甲方}\n乙方：{乙方}\n合同编号：{合同编号}\n\n一、物料明细\n以附件明细表为准。\n\n二、金额与付款\n……' },
+                '4': { no: 'TEMP-2025-004', name: '自定义服务合同模板', type: '自定义', typeVal: 'custom', status: '停用', statusVal: 'disabled', useCount: '18', createTime: '2025-01-05', updateTime: '2025-01-05', desc: '服务类合同，可自定义条款。', content: '甲方：{甲方}\n乙方：{乙方}\n合同编号：{合同编号}\n\n服务内容与金额由双方另行约定。\n……' }
+            };
+
+            var formModal = document.getElementById('template-form-modal');
+            var formModalTitle = document.getElementById('template-form-modal-title');
+            var formName = document.getElementById('template-form-name');
+            var formType = document.getElementById('template-form-type');
+            var formStatus = document.getElementById('template-form-status');
+            var formDesc = document.getElementById('template-form-desc');
+            var formContent = document.getElementById('template-form-content');
+            var currentEditId = null;
+
+            var viewModal = document.getElementById('template-view-modal');
+
+            function openFormModal(isEdit, id) {
+                currentEditId = isEdit ? id : null;
+                formModalTitle.textContent = isEdit ? '编辑模板' : '新建模板';
+                if (isEdit && TEMPLATE_DATA[id]) {
+                    var d = TEMPLATE_DATA[id];
+                    formName.value = d.name;
+                    formType.value = d.typeVal;
+                    formStatus.value = d.statusVal;
+                    formDesc.value = d.desc || '';
+                    formContent.value = d.content || '';
+                } else {
+                    formName.value = '';
+                    formType.value = '';
+                    formStatus.value = 'enabled';
+                    formDesc.value = '';
+                    formContent.value = '';
+                }
+                formModal.style.display = 'flex';
+            }
+            function closeFormModal() {
+                formModal.style.display = 'none';
+                currentEditId = null;
+            }
+            function openViewModal(id) {
+                if (!TEMPLATE_DATA[id]) return;
+                var d = TEMPLATE_DATA[id];
+                document.getElementById('template-view-no').textContent = d.no;
+                document.getElementById('template-view-name').textContent = d.name;
+                document.getElementById('template-view-type').textContent = d.type;
+                document.getElementById('template-view-status').textContent = d.status;
+                document.getElementById('template-view-useCount').textContent = d.useCount + ' 次';
+                document.getElementById('template-view-createTime').textContent = d.createTime;
+                document.getElementById('template-view-updateTime').textContent = d.updateTime;
+                document.getElementById('template-view-desc').textContent = d.desc || '—';
+                document.getElementById('template-view-content').textContent = d.content || '—';
+                viewModal.style.display = 'flex';
+            }
+            function closeViewModal() {
+                viewModal.style.display = 'none';
+            }
+
+            // 使用命名函数，避免重复绑定（SPA 加载时可能多次执行）
+            function handleFormModalClose() { closeFormModal(); }
+            function handleFormModalSave() {
+                if (!formName.value.trim()) { alert('请填写模板名称'); return; }
+                if (!formType.value) { alert('请选择模板类型'); return; }
+                if (currentEditId && TEMPLATE_DATA[currentEditId]) {
+                    TEMPLATE_DATA[currentEditId].name = formName.value.trim();
+                    TEMPLATE_DATA[currentEditId].typeVal = formType.value;
+                    TEMPLATE_DATA[currentEditId].type = formType.options[formType.selectedIndex].text;
+                    TEMPLATE_DATA[currentEditId].statusVal = formStatus.value;
+                    TEMPLATE_DATA[currentEditId].status = formStatus.value === 'enabled' ? '启用' : '停用';
+                    TEMPLATE_DATA[currentEditId].desc = formDesc.value.trim();
+                    TEMPLATE_DATA[currentEditId].content = formContent.value;
+                }
+                closeFormModal();
+                alert(currentEditId ? '模板已更新（原型模拟）。' : '模板已保存（原型模拟）。');
+            }
+            function handleViewModalClose() { closeViewModal(); }
+            function handleCreateClick() { openFormModal(false); }
+
+            var formModalCloseEl = document.getElementById('template-form-modal-close');
+            var formCancelEl = document.getElementById('template-form-cancel');
+            var formSaveEl = document.getElementById('template-form-save');
+            var viewModalCloseEl = document.getElementById('template-view-modal-close');
+            var viewCloseEl = document.getElementById('template-view-close');
+            var createBtnEl = document.getElementById('btn-template-create');
+
+            // 先移除可能存在的旧监听器，再绑定新的
+            if (formModalCloseEl) {
+                formModalCloseEl.removeEventListener('click', handleFormModalClose);
+                formModalCloseEl.addEventListener('click', handleFormModalClose);
+            }
+            if (formCancelEl) {
+                formCancelEl.removeEventListener('click', handleFormModalClose);
+                formCancelEl.addEventListener('click', handleFormModalClose);
+            }
+            if (formSaveEl) {
+                formSaveEl.removeEventListener('click', handleFormModalSave);
+                formSaveEl.addEventListener('click', handleFormModalSave);
+            }
+            if (viewModalCloseEl) {
+                viewModalCloseEl.removeEventListener('click', handleViewModalClose);
+                viewModalCloseEl.addEventListener('click', handleViewModalClose);
+            }
+            if (viewCloseEl) {
+                viewCloseEl.removeEventListener('click', handleViewModalClose);
+                viewCloseEl.addEventListener('click', handleViewModalClose);
+            }
+            if (createBtnEl) {
+                createBtnEl.removeEventListener('click', handleCreateClick);
+                createBtnEl.addEventListener('click', handleCreateClick);
+            }
+
+            function renderOpsCell(id, enabled) {
+                var idStr = String(id);
+                if (enabled) {
+                    return '<button class="btn btn-sm btn-default btn-template-view" data-id="' + idStr + '">查看</button>' +
+                        '<button class="btn btn-sm btn-default btn-template-disable" data-id="' + idStr + '">停用</button>';
+                } else {
+                    return '<button class="btn btn-sm btn-default btn-template-view" data-id="' + idStr + '">查看</button>' +
+                        '<button class="btn btn-sm btn-default btn-template-edit" data-id="' + idStr + '">编辑</button>' +
+                        '<button class="btn btn-sm btn-default btn-template-enable" data-id="' + idStr + '">启用</button>' +
+                        '<button class="btn btn-sm btn-default btn-template-delete" data-id="' + idStr + '">删除</button>';
+                }
+            }
+
+            // 使用命名函数，避免重复绑定事件监听器（SPA 加载时可能多次执行）
+            function handleTemplateOpsClick(e) {
+                var target = e.target;
+                if (!target || !target.classList) return;
+                var id = target.getAttribute('data-id');
+                if (!id) return;
+                var tr = target.closest('tr');
+                var statusTd = tr && tr.querySelector('.template-status-cell');
+                var opsTd = tr && tr.querySelector('.template-ops-cell');
+                if (target.classList.contains('btn-template-view')) {
+                    e.preventDefault();
+                    openViewModal(id);
+                } else if (target.classList.contains('btn-template-edit')) {
+                    e.preventDefault();
+                    openFormModal(true, id);
+                } else if (target.classList.contains('btn-template-disable')) {
+                    e.preventDefault();
+                    if (!confirm('确定停用该模板？停用后新建合同时将不可选。')) return;
+                    if (statusTd) statusTd.innerHTML = '<span class="status-badge status-disabled">停用</span>';
+                    if (opsTd) opsTd.innerHTML = renderOpsCell(id, false);
+                    if (TEMPLATE_DATA[id]) {
+                        TEMPLATE_DATA[id].status = '停用';
+                        TEMPLATE_DATA[id].statusVal = 'disabled';
+                    }
+                } else if (target.classList.contains('btn-template-enable')) {
+                    e.preventDefault();
+                    if (!confirm('确定启用该模板？')) return;
+                    if (statusTd) statusTd.innerHTML = '<span class="status-badge status-success">启用</span>';
+                    if (opsTd) opsTd.innerHTML = renderOpsCell(id, true);
+                    if (TEMPLATE_DATA[id]) {
+                        TEMPLATE_DATA[id].status = '启用';
+                        TEMPLATE_DATA[id].statusVal = 'enabled';
+                    }
+                } else if (target.classList.contains('btn-template-delete')) {
+                    e.preventDefault();
+                    if (!confirm('确定删除该模板？')) return;
+                    if (tr) tr.remove();
+                }
+            }
+            // 先移除可能存在的旧监听器，再绑定新的（避免 SPA 重复加载时重复绑定）
+            document.body.removeEventListener('click', handleTemplateOpsClick);
+            document.body.addEventListener('click', handleTemplateOpsClick);
+        })();
+        console.log('合同模板 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+            PageInteractions.toggleSelectAll('input[name="template-id"]');
+        }
+        </script>
+    </div>
+</body>
+</html>

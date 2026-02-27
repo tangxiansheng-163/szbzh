@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报价对比 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">采购管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">询价比价</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">报价对比</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">对比不同供应商的报价，包括价格对比、质量对比、交付能力对比等。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>询价单号</label>
+                    <input type="text" class="form-input" placeholder="询价单号">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">报价对比分析</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="150">供应商</th>
+                                <th width="120">报价金额</th>
+                                <th width="100">交付周期</th>
+                                <th width="100">质量等级</th>
+                                <th width="100">综合评分</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>深圳市电子科技</td>
+                                <td>¥125,000</td>
+                                <td>15天</td>
+                                <td>A级</td>
+                                <td>92分</td>
+                                <td>
+                                    <button class="btn btn-sm btn-default">查看</button>
+                                    <button class="btn btn-sm btn-primary">选择</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>广州电子设备</td>
+                                <td>¥128,000</td>
+                                <td>12天</td>
+                                <td>A级</td>
+                                <td>90分</td>
+                                <td>
+                                    <button class="btn btn-sm btn-default">查看</button>
+                                    <button class="btn btn-sm btn-primary">选择</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('报价对比 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

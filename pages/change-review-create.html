@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创建变更会审单</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">变更管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/change-review-list.html" class="breadcrumb-item">变更会审单</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">创建变更会审单</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">BOM 变更需先在<strong>变更管理</strong>中新建会审单，确定涉及的产品、BOM 类型及版本号。会审通过后下推生成对应类型 BOM 的变更单，基于变更单完成 BOM 调整，申请通过后对应 BOM 列表自动增加新版本。新版本执行日期、执行类型和范围由本会审单限定。</p>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form id="change-review-form">
+                    <div class="section-title">基本信息</div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label required">涉及产品</label>
+                                <select class="form-select" id="review-product" required>
+                                    <option value="">请选择产品</option>
+                                    <option value="PROD-001">PROD-001 智能控制器</option>
+                                    <option value="PROD-002">PROD-002 传感器模块</option>
+                                    <option value="PROD-003">PROD-003 执行器</option>
+                                    <option value="PROD-004">PROD-004 电源模块</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label required">变更主题</label>
+                                <input type="text" class="form-input" id="review-title" placeholder="如：设计缺陷修正、工艺优化" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">变更原因</label>
+                        <textarea class="form-textarea" id="review-reason" rows="3" placeholder="简述变更原因及背景"></textarea>
+                    </div>
+
+                    <div class="section-title">涉及 BOM 变更</div>
+                    <p class="form-tip" style="margin: 0 0 12px; color: #666; font-size: 13px;">EBOM 变更可能联动 MBOM、SBOM；需变更哪种类型就添加哪种，每种需指定要变更的版本号。会审通过后将为每种类型下推生成变更单。</p>
+                    <div class="table-wrapper" style="margin-bottom: 12px;">
+                        <table class="output-table" id="bom-change-table">
+                            <thead>
+                                <tr>
+                                    <th width="140">BOM 类型</th>
+                                    <th width="100">当前版本号</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bom-change-tbody">
+                                <tr>
+                                    <td>
+                                        <select class="form-select form-select-sm" name="bomType">
+                                            <option value="EBOM">EBOM</option>
+                                            <option value="MBOM">MBOM</option>
+                                            <option value="SBOM">SBOM</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-input form-input-sm" name="version" placeholder="如 V1.0">
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-default btn-remove-row">删除</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-default" id="btn-add-bom-row">+ 添加 BOM 类型</button>
+
+                    <div class="section-title">新版本执行控制</div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label required">新版本生效日期</label>
+                                <input type="date" class="form-input" id="review-eff-date" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label">执行类型</label>
+                                <select class="form-select" id="review-exec-type">
+                                    <option value="">请选择</option>
+                                    <option value="full">全量切换</option>
+                                    <option value="incremental">增量执行</option>
+                                    <option value="batch">批次切换</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">执行范围</label>
+                        <textarea class="form-textarea" id="review-scope" rows="2" placeholder="如：仅新订单、指定产线、全公司"></textarea>
+                    </div>
+
+                    <div class="section-title">会审安排</div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label">计划会审时间</label>
+                                <input type="datetime-local" class="form-input" id="review-time">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label">发起部门</label>
+                                <input type="text" class="form-input" id="review-dept" placeholder="如：研发部" value="研发部">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions" style="margin-top: 24px;">
+                        <button type="button" class="btn btn-primary" id="review-submit">提交会审</button>
+                        <button type="button" class="btn btn-default btn-cancel" data-url="pages/change-review-list.html">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .section-title { font-size: 14px; font-weight: 600; color: rgba(0,0,0,0.85); padding: 8px 0; border-bottom: 1px solid #e8e8e8; margin-bottom: 16px; margin-top: 20px; }
+        .section-title:first-child { margin-top: 0; }
+        .form-select-sm, .form-input-sm { padding: 4px 8px; font-size: 13px; }
+    </style>
+    <script>
+        (function () {
+            if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+
+            var tbody = document.getElementById('bom-change-tbody');
+            var addBtn = document.getElementById('btn-add-bom-row');
+            var rowTemplate = '<tr><td><select class="form-select form-select-sm" name="bomType"><option value="EBOM">EBOM</option><option value="MBOM">MBOM</option><option value="SBOM">SBOM</option></select></td><td><input type="text" class="form-input form-input-sm" name="version" placeholder="如 V1.0"></td><td><button type="button" class="btn btn-sm btn-default btn-remove-row">删除</button></td></tr>';
+
+            function bindRemove() {
+                tbody.querySelectorAll('.btn-remove-row').forEach(function (btn) {
+                    if (btn.dataset.bound) return;
+                    btn.dataset.bound = '1';
+                    btn.addEventListener('click', function () {
+                        var row = btn.closest('tr');
+                        if (tbody.querySelectorAll('tr').length > 1) row.remove();
+                        else alert('至少保留一行 BOM 类型');
+                    });
+                });
+            }
+            bindRemove();
+
+            if (addBtn) addBtn.addEventListener('click', function () {
+                tbody.insertAdjacentHTML('beforeend', rowTemplate);
+                bindRemove();
+            });
+
+            var submitBtn = document.getElementById('review-submit');
+            if (submitBtn) submitBtn.addEventListener('click', function () {
+                var product = document.getElementById('review-product');
+                var title = document.getElementById('review-title');
+                var effDate = document.getElementById('review-eff-date');
+                if (!product || !product.value) { alert('请选择涉及产品'); return; }
+                if (!title || !title.value.trim()) { alert('请填写变更主题'); return; }
+                if (!effDate || !effDate.value) { alert('请选择新版本生效日期'); return; }
+                var rows = tbody.querySelectorAll('tr');
+                var ok = false;
+                rows.forEach(function (r) {
+                    var v = r.querySelector('input[name="version"]');
+                    if (v && v.value.trim()) ok = true;
+                });
+                if (!ok) { alert('请至少为一种 BOM 类型填写要变更的版本号'); return; }
+                alert('会审单已提交（原型演示）。会审通过后将下推生成对应类型 BOM 的变更单。');
+                if (typeof PageLoader !== 'undefined') PageLoader.loadPage('pages/change-review-list.html');
+                else window.location.href = 'pages/change-review-list.html';
+            });
+        })();
+    </script>
+</body>
+</html>

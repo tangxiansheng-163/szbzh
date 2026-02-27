@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用途分类 - 设备管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/equipment-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">设备台账管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">用途分类</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理设备用途分类体系，包括生产类、能源类、安环类、辅助类等维度的配置与管理。</p>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary" data-open-modal="category-add-modal">+ 新增分类</button>
+                <button type="button" class="btn btn-default">批量导入</button>
+                <button type="button" class="btn btn-default">导出</button>
+            </div>
+            <div class="action-right">
+                <button type="button" class="btn btn-default" onclick="alert('✅ 已启用选中的分类')">批量启用</button>
+                <button type="button" class="btn btn-default" onclick="alert('✅ 已停用选中的分类')">批量停用</button>
+                <button type="button" class="btn btn-danger" data-open-modal="category-batch-delete-modal">批量删除</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">分类编码</th>
+                            <th width="150">分类名称</th>
+                            <th width="100">上级分类</th>
+                            <th width="80">分类层级</th>
+                            <th width="100">设备数量</th>
+                            <th width="80">状态</th>
+                            <th>分类说明</th>
+                            <th width="120">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="category-id" value="CAT-001"></td>
+                            <td>CAT-001</td>
+                            <td>生产类设备</td>
+                            <td>按用途分类</td>
+                            <td>二级</td>
+                            <td>86 台</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td>生产类设备是指直接参与产品制造过程的设备</td>
+                            <td>
+                                <a href="#" style="color: #1890ff; margin-right: 8px;" data-open-modal="category-edit-modal">编辑</a>
+                                <a href="javascript:void(0)" style="color: #faad14; margin-right: 8px;" onclick="disableCategory(this)">停用</a>
+                                <a href="#" style="color: #ff4d4f;" data-open-modal="category-delete-modal">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="category-id" value="CAT-002"></td>
+                            <td>CAT-002</td>
+                            <td>能源类设备</td>
+                            <td>按用途分类</td>
+                            <td>二级</td>
+                            <td>45 台</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td>能源类设备包括供电设备、供热设备、供气设备、供水设备等</td>
+                            <td>
+                                <a href="#" style="color: #1890ff; margin-right: 8px;" data-open-modal="category-edit-modal">编辑</a>
+                                <a href="javascript:void(0)" style="color: #faad14; margin-right: 8px;" onclick="disableCategory(this)">停用</a>
+                                <a href="#" style="color: #ff4d4f;" data-open-modal="category-delete-modal">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="category-id" value="CAT-003"></td>
+                            <td>CAT-003</td>
+                            <td>安环类设备</td>
+                            <td>按用途分类</td>
+                            <td>二级</td>
+                            <td>32 台</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td>安环类设备包括视频监控、火灾报警、气体检测、环境监测等</td>
+                            <td>
+                                <a href="#" style="color: #1890ff; margin-right: 8px;" data-open-modal="category-edit-modal">编辑</a>
+                                <a href="javascript:void(0)" style="color: #faad14; margin-right: 8px;" onclick="disableCategory(this)">停用</a>
+                                <a href="#" style="color: #ff4d4f;" data-open-modal="category-delete-modal">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="category-id" value="CAT-004"></td>
+                            <td>CAT-004</td>
+                            <td>辅助类设备</td>
+                            <td>按用途分类</td>
+                            <td>二级</td>
+                            <td>93 台</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td>辅助类设备包括通风空调、照明设备、电梯起重、办公设备等</td>
+                            <td>
+                                <a href="#" style="color: #1890ff; margin-right: 8px;" data-open-modal="category-edit-modal">编辑</a>
+                                <a href="javascript:void(0)" style="color: #faad14; margin-right: 8px;" onclick="disableCategory(this)">停用</a>
+                                <a href="#" style="color: #ff4d4f;" data-open-modal="category-delete-modal">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="category-id" value="CAT-A"></td>
+                            <td>CAT-A</td>
+                            <td>A类（关键）</td>
+                            <td>按关键等级</td>
+                            <td>二级</td>
+                            <td>52 台</td>
+                            <td><span class="status-badge status-default">停用</span></td>
+                            <td>A类设备是关键设备，故障将直接导致生产线停产或重大安全事故</td>
+                            <td>
+                                <a href="#" style="color: #1890ff; margin-right: 8px;" data-open-modal="category-edit-modal">编辑</a>
+                                <a href="javascript:void(0)" style="color: #52c41a; margin-right: 8px;" onclick="enableCategory(this)">启用</a>
+                                <a href="#" style="color: #ff4d4f;" data-open-modal="category-delete-modal">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="category-id" value="CAT-B"></td>
+                            <td>CAT-B</td>
+                            <td>B类（重要）</td>
+                            <td>按关键等级</td>
+                            <td>二级</td>
+                            <td>128 台</td>
+                            <td><span class="status-badge status-default">停用</span></td>
+                            <td>B类设备是重要设备，故障会影响生产效率或产品质量</td>
+                            <td>
+                                <a href="#" style="color: #1890ff; margin-right: 8px;" data-open-modal="category-edit-modal">编辑</a>
+                                <a href="javascript:void(0)" style="color: #52c41a; margin-right: 8px;" onclick="enableCategory(this)">启用</a>
+                                <a href="#" style="color: #ff4d4f;" data-open-modal="category-delete-modal">删除</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="category-id" value="CAT-C"></td>
+                            <td>CAT-C</td>
+                            <td>C类（一般）</td>
+                            <td>按关键等级</td>
+                            <td>二级</td>
+                            <td>76 台</td>
+                            <td><span class="status-badge status-default">停用</span></td>
+                            <td>C类设备是一般设备，故障对生产影响较小</td>
+                            <td>
+                                <a href="#" style="color: #1890ff; margin-right: 8px;" data-open-modal="category-edit-modal">编辑</a>
+                                <a href="javascript:void(0)" style="color: #52c41a; margin-right: 8px;" onclick="enableCategory(this)">启用</a>
+                                <a href="#" style="color: #ff4d4f;" data-open-modal="category-delete-modal">删除</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 7 条记录</span>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 新增分类弹窗 -->
+        <div id="category-add-modal" class="modal-overlay">
+            <div class="modal" style="max-width: 600px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">新增分类</span>
+                    <button type="button" class="modal-close">×</button>
+                </div>
+                <div class="modal-body">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-item">
+                            <label class="form-label required">分类编码</label>
+                            <input type="text" class="form-input" placeholder="请输入分类编码，如：CAT-005">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">分类名称</label>
+                            <input type="text" class="form-input" placeholder="请输入分类名称">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">上级分类</label>
+                            <select class="form-select">
+                                <option value="">请选择</option>
+                                <option value="root">根分类</option>
+                                <option value="usage">按用途分类</option>
+                                <option value="level">按关键等级</option>
+                                <option value="type">按设备类型</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">排序号</label>
+                            <input type="number" class="form-input" placeholder="数字越小排序越靠前" min="0">
+                        </div>
+                        <div class="form-item" style="grid-column: 1 / -1;">
+                            <label class="form-label">分类说明</label>
+                            <textarea class="form-textarea" rows="3" placeholder="请输入分类说明"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="category-add-modal">取消</button>
+                    <button type="button" class="btn btn-primary" data-close-modal="category-add-modal" onclick="alert('✅ 分类新增成功')">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 编辑分类弹窗 -->
+        <div id="category-edit-modal" class="modal-overlay">
+            <div class="modal" style="max-width: 600px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">编辑分类</span>
+                    <button type="button" class="modal-close">×</button>
+                </div>
+                <div class="modal-body">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-item">
+                            <label class="form-label required">分类编码</label>
+                            <input type="text" class="form-input" value="CAT-001" readonly style="background: #f5f5f5;">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">分类名称</label>
+                            <input type="text" class="form-input" value="生产类设备">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">上级分类</label>
+                            <select class="form-select">
+                                <option value="">请选择</option>
+                                <option value="root">根分类</option>
+                                <option value="usage" selected>按用途分类</option>
+                                <option value="level">按关键等级</option>
+                                <option value="type">按设备类型</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">状态</label>
+                            <select class="form-select">
+                                <option value="enabled" selected>启用</option>
+                                <option value="disabled">停用</option>
+                            </select>
+                        </div>
+                        <div class="form-item" style="grid-column: 1 / -1;">
+                            <label class="form-label">分类说明</label>
+                            <textarea class="form-textarea" rows="3">生产类设备是指直接参与产品制造过程的设备，包括加工设备、成型设备、焊接设备、装配设备等。</textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-close-modal="category-edit-modal">取消</button>
+                    <button type="button" class="btn btn-primary" data-close-modal="category-edit-modal" onclick="alert('✅ 分类信息已保存')">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 删除分类弹窗 -->
+        <div id="category-delete-modal" class="modal-overlay">
+            <div class="modal" style="max-width: 400px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">确认删除</span>
+                    <button type="button" class="modal-close">×</button>
+                </div>
+                <div class="modal-body" style="text-align: center; padding: 32px;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">确定要删除该分类吗？</div>
+                    <div style="color: #8c8c8c; font-size: 13px;">删除后，该分类下的设备将自动移至"未分类"</div>
+                </div>
+                <div class="modal-footer" style="justify-content: center;">
+                    <button type="button" class="btn btn-default" data-close-modal="category-delete-modal">取消</button>
+                    <button type="button" class="btn btn-danger" data-close-modal="category-delete-modal" onclick="alert('✅ 分类已删除')">确认删除</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 批量删除分类弹窗 -->
+        <div id="category-batch-delete-modal" class="modal-overlay">
+            <div class="modal" style="max-width: 400px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">确认批量删除</span>
+                    <button type="button" class="modal-close">×</button>
+                </div>
+                <div class="modal-body" style="text-align: center; padding: 32px;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">确定要删除选中的分类吗？</div>
+                    <div style="color: #8c8c8c; font-size: 13px;">删除后，这些分类下的设备将自动移至"未分类"</div>
+                </div>
+                <div class="modal-footer" style="justify-content: center;">
+                    <button type="button" class="btn btn-default" data-close-modal="category-batch-delete-modal">取消</button>
+                    <button type="button" class="btn btn-danger" data-close-modal="category-batch-delete-modal" onclick="alert('✅ 选中的分类已删除')">确认删除</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            console.log('用途分类页面已加载');
+            if (typeof PageInteractions !== 'undefined') {
+                PageInteractions.initButtons();
+                PageInteractions.toggleSelectAll('input[name="category-id"]');
+            }
+
+            // 启用分类
+            function enableCategory(link) {
+                var row = link.closest('tr');
+                var statusCell = row.querySelector('td:nth-child(7)');
+                var actionCell = row.querySelector('td:nth-child(9)');
+                
+                // 更新状态标签
+                statusCell.innerHTML = '<span class="status-badge status-success">启用</span>';
+                
+                // 更新操作按钮
+                actionCell.innerHTML = '<a href="#" style="color: #1890ff; margin-right: 8px;" data-open-modal="category-edit-modal">编辑</a>' +
+                    '<a href="javascript:void(0)" style="color: #faad14; margin-right: 8px;" onclick="disableCategory(this)">停用</a>' +
+                    '<a href="#" style="color: #ff4d4f;" data-open-modal="category-delete-modal">删除</a>';
+                
+                // 重新初始化按钮事件
+                if (typeof PageInteractions !== 'undefined') {
+                    PageInteractions.initButtons(actionCell);
+                }
+                
+                alert('✅ 分类已启用');
+            }
+
+            // 停用分类
+            function disableCategory(link) {
+                var row = link.closest('tr');
+                var statusCell = row.querySelector('td:nth-child(7)');
+                var actionCell = row.querySelector('td:nth-child(9)');
+                
+                // 更新状态标签
+                statusCell.innerHTML = '<span class="status-badge status-default">停用</span>';
+                
+                // 更新操作按钮
+                actionCell.innerHTML = '<a href="#" style="color: #1890ff; margin-right: 8px;" data-open-modal="category-edit-modal">编辑</a>' +
+                    '<a href="javascript:void(0)" style="color: #52c41a; margin-right: 8px;" onclick="enableCategory(this)">启用</a>' +
+                    '<a href="#" style="color: #ff4d4f;" data-open-modal="category-delete-modal">删除</a>';
+                
+                // 重新初始化按钮事件
+                if (typeof PageInteractions !== 'undefined') {
+                    PageInteractions.initButtons(actionCell);
+                }
+                
+                alert('✅ 分类已停用');
+            }
+        </script>
+    </div>
+</body>
+</html>

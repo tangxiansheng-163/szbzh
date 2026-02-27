@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合同详情 - 供应链协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/supply-chain-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">合同协同</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/supply-chain-contract-list.html" class="breadcrumb-item">合同管理</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">合同详情</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">合同由采购协同审批通过后推送至本系统；本侧负责接收、验证、电子签章、分发、到期提醒。<strong>上传合同附件并点击「确认」后，采购协同应用中该合同状态将同步为「已签署」</strong>，届时可在采购协同-采购合同中点击「生成采购订单」下推订单并同步至本系统订单管理。合同执行跟踪、合同评审由采购协同负责。</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">合同基本信息</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-info-grid" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 24px;">
+                    <div class="form-item">
+                        <label class="form-label">合同编号</label>
+                        <div class="form-static">CT-2025-020</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">关联报价单号</label>
+                        <div class="form-static">QT-2025-018</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">采购需求单号</label>
+                        <div class="form-static">REQ-2025-012</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">合同状态</label>
+                        <div class="form-static"><span class="status-badge status-processing">执行中</span></div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">供应商</label>
+                        <div class="form-static">深圳市电子科技有限公司</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">合同金额</label>
+                        <div class="form-static">¥1,500,000.00</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">合同期限</label>
+                        <div class="form-static">2025-01-01 ~ 2025-12-31</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">到期时间</label>
+                        <div class="form-static">2025-12-31</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">电子签章状态</label>
+                        <div class="form-static"><span class="status-badge status-success">签章完成</span></div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">签章人</label>
+                        <div class="form-static">张协同、李供应商</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">签章时间</label>
+                        <div class="form-static">2025-01-05 14:30</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">到期提前提醒</label>
+                        <div class="form-static">30 天</div>
+                    </div>
+                    <div class="form-item" style="grid-column:1 / span 2;">
+                        <label class="form-label">付款条款</label>
+                        <div class="form-static">货到30天付款，质保金10%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">合同附件</h3>
+            </div>
+            <div class="card-body">
+                <p class="page-description" style="margin-bottom:12px;">待确认合同须先上传附件（如已签章扫描件），确认后附件将同步至采购协同-采购合同页面；采购侧可查看、下载并补充资料后点击确认，合同状态变更为已签署，采购侧上传的附件将同步回本系统。</p>
+                <div id="sc-detail-attach-list" style="min-height:36px;margin-bottom:12px;padding:8px;border:1px solid #f0f0f0;border-radius:4px;background:#fafafa;"></div>
+                <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-default" id="sc-detail-upload-btn">上传合同附件</button>
+                    <button type="button" class="btn btn-primary" id="sc-detail-confirm-btn">确认</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="sc-detail-from-pc-card">
+            <div class="card-header">
+                <h3 class="card-title">采购协同同步的附件</h3>
+            </div>
+            <div class="card-body">
+                <p class="page-description" style="margin-bottom:12px;">采购协同在合同详情页补充资料并点击确认后，附件将同步至此，可下载。</p>
+                <div id="sc-detail-from-pc-list" style="min-height:40px;padding:8px;border:1px solid #f0f0f0;border-radius:4px;background:#fafafa;"></div>
+            </div>
+        </div>
+
+        <!-- 上传合同附件弹窗（与列表页一致） -->
+        <div id="sc-detail-upload-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center;">
+            <div class="modal" style="background:#fff;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);min-width:400px;max-width:520px;">
+                <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #f0f0f0;">
+                    <div class="modal-title">上传合同附件</div>
+                    <div class="modal-close" id="sc-detail-modal-close" style="cursor:pointer;">×</div>
+                </div>
+                <div class="modal-body" style="padding:16px;">
+                    <p class="page-description" style="margin-bottom:12px;">选择文件后点击「添加」，确定后附件将随「确认」同步至采购协同。</p>
+                    <div style="margin-bottom:12px;">
+                        <input type="file" id="sc-detail-file-input" multiple style="font-size:13px;">
+                        <button type="button" class="btn btn-default btn-sm" id="sc-detail-add-btn" style="margin-left:8px;">添加</button>
+                    </div>
+                    <div class="form-label" style="margin-bottom:6px;">已选文件</div>
+                    <div id="sc-detail-attach-modal-list" style="min-height:60px;max-height:200px;overflow:auto;border:1px solid #d9d9d9;border-radius:4px;padding:8px;background:#fafafa;"></div>
+                </div>
+                <div class="modal-footer" style="padding:12px 16px;border-top:1px solid #f0f0f0;text-align:right;">
+                    <button type="button" class="btn btn-default" id="sc-detail-modal-cancel">取消</button>
+                    <button type="button" class="btn btn-primary" id="sc-detail-modal-ok">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">物料明细</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper" style="max-height:320px;overflow:auto;">
+                    <table class="output-table">
+                        <thead>
+                            <tr>
+                                <th width="50">序号</th>
+                                <th width="140">物料编码</th>
+                                <th width="200">物料名称</th>
+                                <th width="120">规格型号</th>
+                                <th width="90">数量</th>
+                                <th width="70">单位</th>
+                                <th width="100">单价</th>
+                                <th width="110">金额</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td>MAT-1001</td><td>控制器</td><td>型号 A1</td><td>100</td><td>台</td><td>¥5,680.00</td><td>¥568,000.00</td></tr>
+                            <tr><td>2</td><td>MAT-1002</td><td>传感器</td><td>φ10</td><td>500</td><td>只</td><td>¥1,380.00</td><td>¥690,000.00</td></tr>
+                            <tr><td>3</td><td>MAT-1003</td><td>安装辅材包</td><td>标准套装</td><td>50</td><td>套</td><td>¥1,576.00</td><td>¥78,800.00</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top:12px;text-align:right;font-size:13px;">合计金额：<strong>¥1,336,800.00</strong>（示例，与合同金额可一致或按条款拆分）</div>
+            </div>
+        </div>
+
+        <div class="action-bar" style="margin-top:16px;">
+            <div class="action-left">
+                <button type="button" class="btn btn-default" onclick="if(typeof PageLoader!=='undefined')PageLoader.loadPage('pages/supply-chain-contract-list.html');else location.href='pages/supply-chain-contract-list.html';">返回列表</button>
+                <button type="button" class="btn btn-default" onclick="alert('合同到期前按配置（如30天）自动提醒责任人。')">到期提醒说明</button>
+            </div>
+        </div>
+    </div>
+    <script>
+    (function() {
+        var STORAGE_SC_ATTACH = 'sc_contract_3_attachments';
+        var STORAGE_PC_FROM_SC = 'pc_contract_7_attachments_from_sc';
+        var STORAGE_SC_FROM_PC = 'sc_contract_3_attachments_from_pc';
+
+        function formatSize(bytes) {
+            if (!bytes) return '0 B';
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function renderDetailAttachList() {
+            var listEl = document.getElementById('sc-detail-attach-list');
+            if (!listEl) return;
+            try {
+                var raw = localStorage.getItem(STORAGE_SC_ATTACH);
+                var arr = raw ? JSON.parse(raw) : [];
+                if (arr.length === 0) {
+                    listEl.innerHTML = '<span style="color:#999;font-size:13px;">暂未上传附件，请先上传后再确认</span>';
+                    return;
+                }
+                listEl.innerHTML = arr.map(function(f) {
+                    return '<div style="display:flex;align-items:center;padding:4px 0;font-size:13px;"><span style="flex:1;">' + (f.name || '未命名') + '</span><span style="color:#8c8c8c;">' + formatSize(f.size) + '</span></div>';
+                }).join('');
+            } catch (e) {
+                listEl.innerHTML = '<span style="color:#999;">暂未上传</span>';
+            }
+        }
+
+        function renderFromPcList() {
+            var card = document.getElementById('sc-detail-from-pc-card');
+            var listEl = document.getElementById('sc-detail-from-pc-list');
+            if (!listEl) return;
+            try {
+                var raw = localStorage.getItem(STORAGE_SC_FROM_PC);
+                var arr = raw ? JSON.parse(raw) : [];
+                if (card) card.style.display = arr.length > 0 ? 'block' : 'none';
+                if (arr.length === 0) {
+                    listEl.innerHTML = '<span style="color:#999;font-size:13px;">暂无采购协同同步的附件</span>';
+                    return;
+                }
+                listEl.innerHTML = arr.map(function(f, i) {
+                    return '<div class="sc-from-pc-row" style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:13px;">' +
+                        '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;">' + (f.name || '未命名') + '</span>' +
+                        '<span style="color:#8c8c8c;margin-left:8px;">' + formatSize(f.size) + '</span>' +
+                        '<a href="#" class="sc-download-pc-link" data-i="' + i + '" style="margin-left:8px;">下载</a></div>';
+                }).join('');
+                listEl.querySelectorAll('.sc-download-pc-link').forEach(function(a) {
+                    a.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        var i = parseInt(this.getAttribute('data-i'), 10);
+                        var raw = localStorage.getItem(STORAGE_SC_FROM_PC);
+                        var arr = raw ? JSON.parse(raw) : [];
+                        var f = arr[i];
+                        if (f) alert('下载：' + (f.name || '未命名') + '（原型模拟，实际为文件下载）');
+                    });
+                });
+            } catch (e) {
+                if (card) card.style.display = 'none';
+                listEl.innerHTML = '<span style="color:#999;">暂无</span>';
+            }
+        }
+
+        renderDetailAttachList();
+        renderFromPcList();
+
+        var modal = document.getElementById('sc-detail-upload-modal');
+        var fileInput = document.getElementById('sc-detail-file-input');
+        var modalListEl = document.getElementById('sc-detail-attach-modal-list');
+        var detailPending = [];
+
+        function renderModalList() {
+            if (!modalListEl) return;
+            modalListEl.innerHTML = detailPending.map(function(f, i) {
+                return '<div class="sc-detail-attach-item" style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:#fff;border-radius:4px;margin-bottom:6px;font-size:13px;">' +
+                    '<span>' + (f.name || '未命名') + '</span><span style="color:#8c8c8c;">' + formatSize(f.size) + '</span>' +
+                    '<span class="sc-detail-del" data-i="' + i + '" style="color:#ff4d4f;cursor:pointer;margin-left:8px;">删除</span></div>';
+            }).join('');
+            modalListEl.querySelectorAll('.sc-detail-del').forEach(function(el) {
+                el.addEventListener('click', function() {
+                    detailPending.splice(parseInt(this.getAttribute('data-i'), 10), 1);
+                    renderModalList();
+                });
+            });
+        }
+        function openDetailModal() {
+            try {
+                var raw = localStorage.getItem(STORAGE_SC_ATTACH);
+                detailPending = raw ? JSON.parse(raw) : [];
+            } catch (e) { detailPending = []; }
+            renderModalList();
+            if (modal) { modal.style.display = 'flex'; modal.style.position = 'fixed'; }
+            if (fileInput) fileInput.value = '';
+        }
+        function closeDetailModal() {
+            if (modal) modal.style.display = 'none';
+            if (fileInput) fileInput.value = '';
+        }
+
+        document.getElementById('sc-detail-upload-btn').addEventListener('click', openDetailModal);
+        document.getElementById('sc-detail-add-btn').addEventListener('click', function() {
+            if (!fileInput || !fileInput.files.length) { alert('请先选择文件'); return; }
+            for (var i = 0; i < fileInput.files.length; i++) {
+                var f = fileInput.files[i];
+                detailPending.push({ name: f.name, size: f.size });
+            }
+            fileInput.value = '';
+            renderModalList();
+        });
+        document.getElementById('sc-detail-modal-ok').addEventListener('click', function() {
+            if (detailPending.length === 0) { alert('请至少添加一个附件'); return; }
+            try {
+                localStorage.setItem(STORAGE_SC_ATTACH, JSON.stringify(detailPending));
+            } catch (e) {}
+            renderDetailAttachList();
+            closeDetailModal();
+        });
+        document.getElementById('sc-detail-modal-close').addEventListener('click', closeDetailModal);
+        document.getElementById('sc-detail-modal-cancel').addEventListener('click', closeDetailModal);
+
+        document.getElementById('sc-detail-confirm-btn').addEventListener('click', function() {
+            try {
+                var raw = localStorage.getItem(STORAGE_SC_ATTACH);
+                var arr = raw ? JSON.parse(raw) : [];
+                if (arr.length === 0) {
+                    alert('请先上传附件后再确认。');
+                    return;
+                }
+                localStorage.setItem(STORAGE_PC_FROM_SC, JSON.stringify(arr));
+            } catch (e) {}
+            if (!confirm('确认已上传合同附件并完成签章？确认后附件将同步至采购协同-采购合同页面，采购侧可查看、下载并补充资料后点击确认，合同状态将变更为已签署。')) return;
+            alert('确认成功。附件已同步至采购协同-采购合同页面。请在采购协同中查看附件、可下载、可补充资料上传后点击确认，合同状态将变更为已签署，采购侧上传的附件将同步回本系统。');
+        });
+    })();
+    </script>
+</body>
+</html>

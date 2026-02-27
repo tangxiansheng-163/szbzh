@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>结算单详情 - 采购协同</title>
+    <style>
+        /* 在弹窗中展示时，收紧留白，隐藏返回类按钮 */
+        .modal-body .content-wrapper {
+            padding: 12px 16px;
+        }
+        .modal-body .content-wrapper > .breadcrumb {
+            display: none;
+        }
+        .modal-body .content-wrapper > .page-header {
+            margin-bottom: 8px;
+        }
+        .modal-body .content-wrapper > .page-header h2 {
+            font-size: 16px;
+        }
+        .modal-body .content-wrapper > .page-header .page-subtitle {
+            font-size: 12px;
+        }
+        .modal-body .content-wrapper > .page-header button {
+            display: none;
+        }
+        .modal-body .card {
+            margin-bottom: 12px !important;
+        }
+    </style>
+</head>
+<body>
+<div class="content-wrapper">
+    <div class="breadcrumb">
+        <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+        <a href="pages/procurement-finance-settlement.html" class="breadcrumb-item">财务结算</a>
+        <span class="breadcrumb-separator">/</span>
+        <span class="breadcrumb-item active">结算单详情</span>
+    </div>
+
+    <div class="page-header">
+        <div class="page-title">
+            <h2>结算单详情</h2>
+            <p id="st-subtitle" class="page-subtitle">-</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        </div>
+    </div>
+
+    <!-- 基本信息 -->
+    <div class="card" style="margin-bottom:16px;">
+        <div class="card-body">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px 16px;">
+                <div>
+                    <div style="font-size:12px;color:#8c8c8c;">结算单号</div>
+                    <div id="st-id" style="font-size:14px;font-weight:600;color:#1890ff;">SET-2025-001</div>
+                </div>
+                <div>
+                    <div style="font-size:12px;color:#8c8c8c;">供应商（乙方）</div>
+                    <div id="st-supplier" style="font-size:13px;font-weight:600;color:#262626;">深圳市电子科技</div>
+                </div>
+                <div>
+                    <div style="font-size:12px;color:#8c8c8c;">结算周期</div>
+                    <div id="st-period" style="font-size:13px;color:#262626;">2025-01</div>
+                </div>
+                <div>
+                    <div style="font-size:12px;color:#8c8c8c;">应付日期 / 账期</div>
+                    <div id="st-due" style="font-size:13px;color:#262626;">2025-01-25 / 月结30天</div>
+                </div>
+                <div>
+                    <div style="font-size:12px;color:#8c8c8c;">合同编号</div>
+                    <div id="st-contract" style="font-size:13px;color:#262626;">CT-2025-008</div>
+                </div>
+                <div>
+                    <div style="font-size:12px;color:#8c8c8c;">当前状态</div>
+                    <div id="st-state" style="font-size:13px;font-weight:600;color:#faad14;">对账中</div>
+                </div>
+                <div>
+                    <div style="font-size:12px;color:#8c8c8c;">最新对账状态</div>
+                    <div id="st-recon" style="font-size:13px;color:#262626;">对账中（待乙方确认）</div>
+                </div>
+                <div>
+                    <div style="font-size:12px;color:#8c8c8c;">最近更新时间</div>
+                    <div id="st-updated" style="font-size:13px;color:#262626;">2025-01-22 10:15:00</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 金额卡片 -->
+    <div class="settlement-amount-cards">
+        <div class="amount-card orders-card">
+            <div class="amount-icon">📦</div>
+            <div class="amount-content">
+                <div class="amount-label">订单总额</div>
+                <div class="amount-value" id="amt-orders">¥485,000.00</div>
+                <div class="amount-sub" id="amt-orders-count">订单 3 笔</div>
+            </div>
+        </div>
+        <div class="amount-card adjustments-card">
+            <div class="amount-icon">📉</div>
+            <div class="amount-content">
+                <div class="amount-label">退货 / 换货 / 让步</div>
+                <div class="amount-value" id="amt-adjust">- ¥35,000.00</div>
+                <div class="amount-sub" id="amt-adjust-detail">退货 1 笔，换貨 0 笔，让步 1 笔</div>
+            </div>
+        </div>
+        <div class="amount-card total-card">
+            <div class="amount-icon">💰</div>
+            <div class="amount-content">
+                <div class="amount-label">结算金额（应付）</div>
+                <div class="amount-value total-value" id="amt-total">¥450,000.00</div>
+                <div class="amount-sub">按「订单 - 退货 - 换货差价 - 让步折让」自动计算</div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .settlement-amount-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .amount-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            border: 1px solid #e8e8e8;
+            transition: box-shadow 0.3s ease, transform 0.2s ease;
+        }
+        .amount-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-1px);
+        }
+        .amount-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .orders-card .amount-icon {
+            background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);
+        }
+        .adjustments-card .amount-icon {
+            background: linear-gradient(135deg, #fff2f0 0%, #ffccc7 100%);
+        }
+        .total-card {
+            background: linear-gradient(135deg, #e6f7ff 0%, #1890ff 0.1);
+            border-color: #91d5ff;
+        }
+        .total-card .amount-icon {
+            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+        }
+        .total-card .amount-icon::after {
+            content: '';
+            font-size: 20px;
+        }
+        .total-card .amount-label,
+        .total-card .amount-sub {
+            color: #262626;
+        }
+        .amount-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .amount-label {
+            font-size: 12px;
+            color: #8c8c8c;
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+        .amount-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #262626;
+            line-height: 1.3;
+        }
+        .total-value {
+            font-size: 24px;
+            color: #1890ff;
+        }
+        .amount-sub {
+            font-size: 12px;
+            color: #8c8c8c;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+        @media (max-width: 768px) {
+            .settlement-amount-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <!-- 依据摘要 + 入口 -->
+    <div class="basis-summary-section">
+        <div class="summary-header">
+            <div class="summary-title">
+                <span class="summary-icon">📋</span>
+                <span>结算依据摘要</span>
+            </div>
+        </div>
+        <div class="summary-content">
+            <div class="summary-grid">
+                <div class="summary-item orders-item">
+                    <div class="item-badge orders-badge">
+                        <span class="badge-icon">📦</span>
+                        <span class="badge-text">采购订单</span>
+                    </div>
+                    <div class="item-value" id="sum-orders">PO-2025-001、PO-2025-002、PO-2025-003 等 3 笔</div>
+                </div>
+                <div class="summary-item returns-item">
+                    <div class="item-badge returns-badge">
+                        <span class="badge-icon">📦</span>
+                        <span class="badge-text">退货单</span>
+                    </div>
+                    <div class="item-value" id="sum-returns">RT-2025-001</div>
+                </div>
+                <div class="summary-item exchanges-item">
+                    <div class="item-badge exchanges-badge">
+                        <span class="badge-icon">🔄</span>
+                        <span class="badge-text">换货单</span>
+                    </div>
+                    <div class="item-value" id="sum-exchanges">0 笔</div>
+                </div>
+                <div class="summary-item concessions-item">
+                    <div class="item-badge concessions-badge">
+                        <span class="badge-icon">🤝</span>
+                        <span class="badge-text">让步接收单</span>
+                    </div>
+                    <div class="item-value" id="sum-concessions">CN-2025-001</div>
+                </div>
+            </div>
+            <div class="summary-tip">
+                <span class="tip-icon">💡</span>
+                <span class="tip-text">明细不在本页平铺展示，可通过下方入口在对应台账中查看</span>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .basis-summary-section {
+            background: #fff;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #e8e8e8;
+            overflow: hidden;
+        }
+        .summary-header {
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .summary-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #262626;
+        }
+        .summary-icon {
+            font-size: 16px;
+        }
+        .summary-content {
+            padding: 16px;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .summary-item {
+            padding: 12px;
+            border-radius: 6px;
+            background: #fafafa;
+            border: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+        .summary-item:hover {
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .item-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        .badge-icon {
+            font-size: 12px;
+        }
+        .badge-text {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .orders-badge {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+        .returns-badge {
+            background: #fff2f0;
+            color: #ff4d4f;
+        }
+        .exchanges-badge {
+            background: #fff7e6;
+            color: #fa8c16;
+        }
+        .concessions-badge {
+            background: #f6ffed;
+            color: #52c41a;
+        }
+        .item-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: #262626;
+            line-height: 1.4;
+            word-break: break-all;
+        }
+        .summary-tip {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 10px 12px;
+            background: #f6ffed;
+            border-radius: 6px;
+            border: 1px solid #b7eb8f;
+        }
+        .tip-icon {
+            font-size: 14px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .tip-text {
+            font-size: 12px;
+            color: #52c41a;
+            line-height: 1.5;
+        }
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+
+    <!-- 结算依据明细（在弹窗内提供完整可滚动列表） -->
+    <div class="basis-detail-section">
+        <div class="detail-header">
+            <div class="detail-title">
+                <span class="detail-icon">📑</span>
+                <span>结算依据明细</span>
+            </div>
+            <div class="detail-tip">
+                按「订单 → 退货 → 换货 → 让步」列出本结算单计算金额所用到的<strong>全部单据</strong>，仅为原始单据的引用，不在此修改业务数据
+            </div>
+        </div>
+        <div class="detail-table-wrap">
+            <table class="basis-table">
+                <thead>
+                    <tr>
+                        <th width="130" class="th-type-order">订单</th>
+                        <th width="100">单据类型</th>
+                        <th width="130">金额</th>
+                        <th>说明</th>
+                        <th width="90">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="basis-tbody">
+                    <tr>
+                        <td><a href="javascript:void(0)">PO-2025-001</a></td>
+                        <td><span class="type-badge order">订单</span></td>
+                        <td class="amount-cell positive">¥5,000.00</td>
+                        <td class="remark-cell">已收货</td>
+                        <td class="action-cell"><button class="btn btn-primary">详情</button></td>
+                    </tr>
+                    <tr>
+                        <td><a href="javascript:void(0)">PO-2025-002</a></td>
+                        <td><span class="type-badge order">订单</span></td>
+                        <td class="amount-cell positive">¥6,000.00</td>
+                        <td class="remark-cell">已收货</td>
+                        <td class="action-cell"><button class="btn btn-primary">详情</button></td>
+                    </tr>
+                    <tr>
+                        <td><a href="javascript:void(0)">PO-2025-003</a></td>
+                        <td><span class="type-badge order">订单</span></td>
+                        <td class="amount-cell positive">¥6,400.00</td>
+                        <td class="remark-cell">已收货</td>
+                        <td class="action-cell"><button class="btn btn-primary">详情</button></td>
+                    </tr>
+                    <tr>
+                        <td><a href="javascript:void(0)">RT-2025-001</a></td>
+                        <td><span class="type-badge return">退货</span></td>
+                        <td class="amount-cell negative">- ¥1,000.00</td>
+                        <td class="remark-cell">质量问题</td>
+                        <td class="action-cell"><button class="btn btn-primary">详情</button></td>
+                    </tr>
+                    <tr>
+                        <td><a href="javascript:void(0)">CN-2025-001</a></td>
+                        <td><span class="type-badge concession">让步</span></td>
+                        <td class="amount-cell negative">- ¥200.00</td>
+                        <td class="remark-cell">外观轻微瑕疵</td>
+                        <td class="action-cell"><button class="btn btn-primary">详情</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <style>
+        .basis-detail-section {
+            background: #fff;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #e8e8e8;
+            overflow: hidden;
+        }
+        .detail-header {
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .detail-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+        .detail-icon {
+            font-size: 16px;
+        }
+        .detail-tip {
+            font-size: 12px;
+            color: #8c8c8c;
+            line-height: 1.5;
+        }
+        .detail-tip strong {
+            color: #595959;
+            font-weight: 600;
+        }
+        .detail-table-wrap {
+            max-height: 280px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .basis-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .basis-table thead {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%);
+        }
+        .basis-table th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #595959;
+            font-size: 12px;
+            border-bottom: 1px solid #e8e8e8;
+            white-space: nowrap;
+            background: #fafafa;
+        }
+        .basis-table th.th-type-order {
+            color: #1890ff;
+        }
+        .basis-table th:first-child {
+            border-left: 3px solid #1890ff;
+        }
+        .basis-table tbody tr {
+            transition: background 0.2s ease, box-shadow 0.2s ease;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .basis-table tbody tr:hover {
+            background: #fafafa;
+            box-shadow: inset 0 0 0 1px #e8e8e8;
+        }
+        .basis-table td {
+            padding: 12px 16px;
+            color: #262626;
+            line-height: 1.5;
+            vertical-align: middle;
+        }
+        .basis-table td:nth-child(4) {
+            max-width: 80px;
+            width: 80px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .basis-table td:first-child {
+            font-weight: 600;
+            color: #1890ff;
+        }
+        .basis-table td:first-child a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .basis-table td:first-child a:hover {
+            color: #40a9ff;
+            text-decoration: underline;
+        }
+        .basis-table .type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .type-badge.order {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+        .type-badge.return {
+            background: #fff2f0;
+            color: #ff4d4f;
+        }
+        .type-badge.exchange {
+            background: #fff7e6;
+            color: #fa8c16;
+        }
+        .type-badge.concession {
+            background: #f6ffed;
+            color: #52c41a;
+        }
+        .amount-cell {
+            font-weight: 600;
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+        }
+        .amount-cell.positive {
+            color: #52c41a;
+        }
+        .amount-cell.negative {
+            color: #ff4d4f;
+        }
+        .remark-cell {
+            color: #8c8c8c;
+            font-size: 12px;
+            max-width: 120px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .action-cell {
+            white-space: nowrap;
+        }
+        .basis-table .btn {
+            padding: 4px 12px;
+            font-size: 12px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        .basis-table .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(24,144,255,0.2);
+        }
+        .basis-table .btn:active {
+            transform: translateY(0);
+        }
+        .basis-table tbody tr:last-child {
+            border-bottom: none;
+        }
+        @media (max-width: 768px) {
+            .detail-table-wrap {
+                max-height: none;
+                overflow: visible;
+            }
+            .basis-table {
+                font-size: 12px;
+            }
+            .basis-table th,
+            .basis-table td {
+                padding: 10px 12px;
+            }
+        }
+    </style>
+
+    <!-- 单据明细弹窗 -->
+    <div id="doc-detail-modal" class="modal-overlay">
+        <div class="modal modal-doc-detail" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <span class="modal-title" id="doc-detail-title">单据明细</span>
+                <button type="button" class="modal-close" data-close-modal="doc-detail-modal" aria-label="关闭">×</button>
+            </div>
+            <div class="modal-body doc-detail-body">
+                <div id="doc-detail-content" class="doc-detail-content">
+                    <!-- 动态加载单据明细 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .modal-doc-detail {
+            max-width: 900px !important;
+            width: 90%;
+        }
+        .doc-detail-body {
+            padding: 20px 24px !important;
+        }
+        .doc-detail-content {
+            max-height: 60vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        /* 订单详情样式 */
+        .order-detail-section {
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #e8e8e8;
+            overflow: hidden;
+        }
+        .order-detail-header {
+            background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid #91d5ff;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .order-detail-header .order-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        .order-header-info {
+            flex: 1;
+        }
+        .order-header-info .order-no {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 4px;
+        }
+        .order-header-info .order-meta {
+            font-size: 13px;
+            color: #595959;
+        }
+        .order-detail-body {
+            padding: 16px 20px;
+        }
+        .order-info-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .order-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .order-info-item .info-label {
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+        .order-info-item .info-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #262626;
+        }
+        
+        /* 订单明细表格 */
+        .order-items-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            table-layout: auto;
+        }
+        .order-items-table thead {
+            background: #fafafa;
+        }
+        .order-items-table th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #595959;
+            font-size: 12px;
+            border-bottom: 1px solid #e8e8e8;
+            white-space: nowrap;
+        }
+        .order-items-table th:first-child {
+            border-left: 3px solid #1890ff;
+        }
+        .order-items-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f5f5f5;
+            color: #262626;
+            word-wrap: break-word;
+            max-width: 200px;
+        }
+        .order-items-table tbody tr:hover {
+            background: #fafafa;
+        }
+        .order-items-table .material-code {
+            color: #1890ff;
+            font-weight: 600;
+        }
+        .order-items-table .unit-price,
+        .order-items-table .subtotal {
+            font-weight: 600;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+        .order-items-table .subtotal {
+            color: #52c41a;
+        }
+        .order-items-table tfoot td {
+            padding: 16px;
+            background: #fafafa;
+            border-top: 2px solid #e8e8e8;
+        }
+        .order-total-row {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 16px;
+        }
+        .order-total-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #595959;
+        }
+        .order-total-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1890ff;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+        
+        /* 退货单样式 */
+        .return-detail-section {
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #e8e8e8;
+            overflow: hidden;
+        }
+        .return-detail-header {
+            background: linear-gradient(135deg, #fff2f0 0%, #ffccc7 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid #ffa39e;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .return-detail-header .return-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        .return-header-info {
+            flex: 1;
+        }
+        .return-header-info .return-no {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 4px;
+        }
+        .return-header-info .return-meta {
+            font-size: 13px;
+            color: #595959;
+        }
+        .return-items-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            table-layout: auto;
+        }
+        .return-items-table thead {
+            background: #fff5f5;
+        }
+        .return-items-table th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #cf1322;
+            font-size: 12px;
+            border-bottom: 1px solid #ffccc7;
+            white-space: nowrap;
+        }
+        .return-items-table th:first-child {
+            border-left: 3px solid #ff4d4f;
+        }
+        .return-items-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f5f5f5;
+            color: #262626;
+            word-wrap: break-word;
+            max-width: 200px;
+        }
+        .return-items-table tbody tr:hover {
+            background: #fffafa;
+        }
+        .return-items-table .subtotal {
+            color: #ff4d4f;
+            font-weight: 600;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+        .return-total-row .order-total-value {
+            color: #ff4d4f !important;
+        }
+        
+        /* 换货单样式 */
+        .exchange-detail-section {
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #e8e8e8;
+            overflow: hidden;
+        }
+        .exchange-detail-header {
+            background: linear-gradient(135deg, #fff7e6 0%, #ffd591 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid #ffc53d;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .exchange-detail-header .exchange-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #fa8c16 0%, #d46b08 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        .exchange-header-info {
+            flex: 1;
+        }
+        .exchange-header-info .exchange-no {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 4px;
+        }
+        .exchange-header-info .exchange-meta {
+            font-size: 13px;
+            color: #595959;
+        }
+        .exchange-info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            padding: 20px;
+            background: #fffbe6;
+            border-bottom: 1px solid #ffe58f;
+        }
+        .exchange-info-item {
+            text-align: center;
+            padding: 12px;
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #ffe58f;
+        }
+        .exchange-info-item .info-label {
+            font-size: 12px;
+            color: #8c8c8c;
+            margin-bottom: 8px;
+        }
+        .exchange-info-item .info-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fa8c16;
+        }
+        .exchange-remark {
+            padding: 16px 20px;
+            background: #fff;
+        }
+        .exchange-remark .remark-label {
+            font-size: 12px;
+            color: #8c8c8c;
+            margin-bottom: 8px;
+        }
+        .exchange-remark .remark-content {
+            font-size: 14px;
+            color: #595959;
+            line-height: 1.6;
+            padding: 12px;
+            background: #fafafa;
+            border-radius: 6px;
+            border: 1px solid #f0f0f0;
+        }
+        
+        /* 让步单样式 */
+        .concession-detail-section {
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #e8e8e8;
+            overflow: hidden;
+        }
+        .concession-detail-header {
+            background: linear-gradient(135deg, #f6ffed 0%, #b7eb8f 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid #95de64;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .concession-detail-header .concession-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        .concession-header-info {
+            flex: 1;
+        }
+        .concession-header-info .concession-no {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 4px;
+        }
+        .concession-header-info .concession-meta {
+            font-size: 13px;
+            color: #595959;
+        }
+        .concession-info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            padding: 20px;
+            background: #f6ffed;
+            border-bottom: 1px solid #b7eb8f;
+        }
+        .concession-info-item {
+            text-align: center;
+            padding: 12px;
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #b7eb8f;
+        }
+        .concession-info-item .info-label {
+            font-size: 12px;
+            color: #8c8c8c;
+            margin-bottom: 8px;
+        }
+        .concession-info-item .info-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #52c41a;
+        }
+        .concession-remark {
+            padding: 16px 20px;
+            background: #fff;
+        }
+        .concession-remark .remark-label {
+            font-size: 12px;
+            color: #8c8c8c;
+            margin-bottom: 8px;
+        }
+        .concession-remark .remark-content {
+            font-size: 14px;
+            color: #595959;
+            line-height: 1.6;
+            padding: 12px;
+            background: #fafafa;
+            border-radius: 6px;
+            border: 1px solid #f0f0f0;
+        }
+        
+        /* 空状态 */
+        .empty-detail-state {
+            text-align: center;
+            padding: 60px 40px;
+            color: #8c8c8c;
+        }
+        .empty-detail-state .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        .empty-detail-state .empty-text {
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .order-info-grid,
+            .exchange-info-grid,
+            .concession-info-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .modal-doc-detail {
+                width: 95%;
+            }
+        }
+    </style>
+
+    <!-- 操作与历史 -->
+    <div style="display:grid;grid-template-columns:1fr;gap:16px;align-items:flex-start;">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title" style="margin:0;font-size:14px;">结算单流水</h3>
+            </div>
+            <div class="card-body">
+                <div id="st-logs" style="font-size:13px;color:#595959;">
+                    <div style="border-bottom:1px solid #f0f0f0;padding:6px 0;">
+                        <div style="font-size:12px;color:#8c8c8c;">2025-01-22 10:15:00</div>
+                        <div style="font-size:13px;font-weight:600;color:#262626;">甲方财务 · 发起对账</div>
+                        <div style="font-size:12px;color:#595959;margin-top:2px;">发送对账确认函给供应商</div>
+                    </div>
+                    <div style="border-bottom:1px solid #f0f0f0;padding:6px 0;">
+                        <div style="font-size:12px;color:#8c8c8c;">2025-01-20 16:30:00</div>
+                        <div style="font-size:13px;font-weight:600;color:#262626;">系统自动 · 生成结算单</div>
+                        <div style="font-size:12px;color:#595959;margin-top:2px;">根据本月订单-退货-让步数据自动汇总</div>
+                    </div>
+                    <div style="border-bottom:1px solid #f0f0f0;padding:6px 0;">
+                        <div style="font-size:12px;color:#8c8c8c;">2025-01-15 14:20:00</div>
+                        <div style="font-size:13px;font-weight:600;color:#262626;">采购员 · 订单完成</div>
+                        <div style="font-size:12px;color:#595959;margin-top:2px;">PO-2025-003 确认收货</div>
+                    </div>
+                    <div style="padding:6px 0;">
+                        <div style="font-size:12px;color:#8c8c8c;">2025-01-10 09:00:00</div>
+                        <div style="font-size:13px;font-weight:600;color:#262626;">采购员 · 订单完成</div>
+                        <div style="font-size:12px;color:#595959;margin-top:2px;">PO-2025-001、PO-2025-002 确认收货</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('结算单详情页面已加载');
+        if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+
+        function money(n) {
+            var num = parseFloat(n || 0) || 0;
+            return '¥' + num.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        function getId() {
+            try { return new URLSearchParams(window.location.search).get('id') || ''; } catch (e) { return ''; }
+        }
+        function ensureAssetLoaded(cb) {
+            if (window.FinanceCollabStore) { cb(); return; }
+            var s = document.createElement('script');
+            s.src = 'assets/finance-collab-store.js';
+            s.onload = cb;
+            s.onerror = function () { alert('加载 assets/finance-collab-store.js 失败'); };
+            document.head.appendChild(s);
+        }
+
+        function render() {
+            var store = window.FinanceCollabStore.getStore();
+            var id = getId() || window.FinanceCollabStore.getActiveSettlementId();
+            if (!id) return;
+            window.FinanceCollabStore.setActiveSettlement(id);
+            var s = (store.settlements || []).find(function (x) { return x.id === id; });
+            if (!s) return;
+
+            document.getElementById('st-subtitle').textContent =
+                (s.partyA && s.partyA.org ? s.partyA.org : '甲方') + ' · ' +
+                (s.partyB && s.partyB.org ? s.partyB.org : '乙方') + ' · ' + s.id;
+
+            document.getElementById('st-id').textContent = s.id;
+            document.getElementById('st-supplier').textContent = (s.partyB && s.partyB.org) || '-';
+            document.getElementById('st-period').textContent = s.period || '-';
+            document.getElementById('st-due').textContent = (s.dueDate || '-') + ' / ' + (s.paymentTerm || '-');
+            document.getElementById('st-contract').textContent = (s.contract && s.contract.id) || '-';
+            document.getElementById('st-state').textContent = s.state || '-';
+            document.getElementById('st-updated').textContent = store.updatedAt || '-';
+
+            var recon = (s.reconciliation && s.reconciliation.status) || 'not_started';
+            var reconText =
+                recon === 'b_confirmed' ? '对账完成（乙方已确认）' :
+                recon === 'sent' ? '对账中（待乙方确认）' :
+                recon === 'disputed' ? '对账中（乙方有异议）' :
+                '未发起对账';
+            document.getElementById('st-recon').textContent = reconText;
+
+            var amt = s.amount || {};
+            var orders = (s.basis && s.basis.orders) || [];
+            var returns = (s.basis && s.basis.returns) || [];
+            var exchanges = (s.basis && s.basis.exchanges) || [];
+            var concessions = (s.basis && s.basis.concessions) || [];
+
+            document.getElementById('amt-orders').textContent = money(amt.ordersTotal || 0);
+            document.getElementById('amt-orders-count').textContent = '订单 ' + orders.length + ' 笔';
+
+            var adjust = (amt.returnsTotal || 0) + (amt.exchangeDiffTotal || 0) + (amt.concessionDiscountTotal || 0);
+            document.getElementById('amt-adjust').textContent = adjust ? ('- ' + money(adjust)) : money(0);
+            document.getElementById('amt-adjust-detail').textContent =
+                '退货 ' + returns.length + ' 笔，换货 ' + exchanges.length + ' 笔，让步 ' + concessions.length + ' 笔';
+
+            document.getElementById('amt-total').textContent = money(amt.settlementAmount || 0);
+
+            function summarize(list, key) {
+                if (!list.length) return '0 笔';
+                var names = list.map(function (x) { return x.id || x[key] || ''; }).filter(Boolean);
+                var head = names.slice(0, 3).join('、');
+                if (names.length > 3) head += ' 等 ' + names.length + ' 笔';
+                return head || (list.length + ' 笔');
+            }
+            document.getElementById('sum-orders').textContent = summarize(orders, 'orderId');
+            document.getElementById('sum-returns').textContent = summarize(returns, 'returnId');
+            document.getElementById('sum-exchanges').textContent = summarize(exchanges, 'exchangeId');
+            document.getElementById('sum-concessions').textContent = summarize(concessions, 'concessionId');
+
+            // 结算依据明细表
+            var basisBody = document.getElementById('basis-tbody');
+            var rows = [];
+            orders.forEach(function (o) {
+                rows.push({
+                    id: o.id || '',
+                    type: '订单',
+                    typeClass: 'order',
+                    amount: o.amount || 0,
+                    remark: (o.delivered ? '已收货' : '未完全收货'),
+                    originalData: o
+                });
+            });
+            returns.forEach(function (r) {
+                rows.push({
+                    id: r.id || '',
+                    type: '退货',
+                    typeClass: 'return',
+                    amount: -(r.amount || 0),
+                    remark: r.reason || '',
+                    originalData: r
+                });
+            });
+            exchanges.forEach(function (e) {
+                rows.push({
+                    id: e.id || '',
+                    type: '换货',
+                    typeClass: 'exchange',
+                    amount: e.amount || 0,
+                    remark: '差价',
+                    originalData: e
+                });
+            });
+            concessions.forEach(function (c) {
+                rows.push({
+                    id: c.id || '',
+                    type: '让步',
+                    typeClass: 'concession',
+                    amount: -(c.amount || 0),
+                    remark: c.reason || '',
+                    originalData: c
+                });
+            });
+
+            if (!rows.length) {
+                basisBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#8c8c8c;padding:24px;">当前结算单未关联任何依据单据</td></tr>';
+            } else {
+                basisBody.innerHTML = '';
+                rows.forEach(function (r) {
+                    var tr = document.createElement('tr');
+                    var amountClass = r.amount >= 0 ? 'positive' : 'negative';
+                    var amountPrefix = r.amount < 0 ? '- ' : '';
+                    tr.innerHTML =
+                        '<td><a href="javascript:void(0)">' + (r.id || '-') + '</a></td>' +
+                        '<td><span class="type-badge ' + r.typeClass + '">' + r.type + '</span></td>' +
+                        '<td class="amount-cell ' + amountClass + '">' + amountPrefix + money(Math.abs(r.amount || 0)) + '</td>' +
+                        '<td class="remark-cell">' + (r.remark || '') + '</td>' +
+                        '<td class="action-cell"><button class="btn btn-primary" data-doc-id="' + (r.id || '') + '" data-doc-type="' + r.type + '">详情</button></td>';
+                    
+                    var detailBtn = tr.querySelector('button');
+                    detailBtn.onclick = function() {
+                        showDocDetail(r.id, r.type, r.originalData);
+                    };
+                    
+                    basisBody.appendChild(tr);
+                });
+            }
+
+            // var actions = document.getElementById('st-actions');
+            // var btns = [];
+            // if (recon === 'not_started') {
+            //     btns.push('<button class="btn btn-primary" id="btn-start-recon">发起对账</button>');
+            // } else if (recon === 'b_confirmed') {
+            //     btns.push('<button class="btn btn-default" id="btn-view-invoice">查看发票</button>');
+            // }
+            // btns.push('<button class="btn btn-default" id="btn-open-center">在结算中心查看</button>');
+            // actions.innerHTML = btns.join(' ');
+
+            var logsWrap = document.getElementById('st-logs');
+            var logs = (s.logs || []).slice(0, 15);
+            if (!logs.length) {
+                logsWrap.innerHTML = '<div style="font-size:12px;color:#8c8c8c;">暂无流水记录</div>';
+            } else {
+                logsWrap.innerHTML = '';
+                logs.forEach(function (it) {
+                    var div = document.createElement('div');
+                    div.style.borderBottom = '1px solid #f0f0f0';
+                    div.style.padding = '6px 0';
+                    div.innerHTML =
+                        '<div style="font-size:12px;color:#8c8c8c;">' + (it.time || '-') + '</div>' +
+                        '<div style="font-size:13px;font-weight:600;color:#262626;">' + (it.role || '-') + ' · ' + (it.action || '-') + '</div>' +
+                        '<div style="font-size:12px;color:#595959;margin-top:2px;">' + (it.detail || '-') + '</div>';
+                    logsWrap.appendChild(div);
+                });
+            }
+
+            // document.getElementById('btn-open-center').onclick = function () {
+            //     if (typeof PageLoader !== 'undefined' && PageLoader.loadPage) {
+            //         PageLoader.loadPage('pages/procurement-finance-settlement.html?id=' + encodeURIComponent(s.id));
+            //     } else {
+            //         window.location.href = 'pages/procurement-finance-settlement.html?id=' + encodeURIComponent(s.id);
+            //     }
+            // };
+            // document.getElementById('btn-back').onclick = document.getElementById('btn-open-center').onclick;
+            // document.getElementById('btn-open-recon').onclick = function () {
+            //     if (typeof PageLoader !== 'undefined' && PageLoader.loadPage) {
+            //         PageLoader.loadPage('pages/procurement-settlement-reconciliation.html?id=' + encodeURIComponent(s.id));
+            //     } else {
+            //         window.location.href = 'pages/procurement-settlement-reconciliation.html?id=' + encodeURIComponent(s.id);
+            //     }
+            // };
+            // var btnStart = document.getElementById('btn-start-recon');
+            // if (btnStart) btnStart.onclick = function () {
+            //     if (!confirm('发起对账并推送乙方确认？')) return;
+            //     window.FinanceCollabStore.actionA_startReconciliation(s.id);
+            //     render();
+            //     alert('已发起对账。');
+            // };
+            // var btnInv = document.getElementById('btn-view-invoice');
+            // if (btnInv) btnInv.onclick = function () {
+            //     if (!s.invoices || !s.invoices.length) {
+            //         alert('当前结算单尚无发票。');
+            //         return;
+            //     }
+            //     var inv = s.invoices[0];
+            //     if (typeof PageLoader !== 'undefined' && PageLoader.loadPage) {
+            //         PageLoader.loadPage('pages/procurement-invoice-detail.html?id=' + encodeURIComponent(inv.id));
+            //     } else {
+            //         window.location.href = 'pages/procurement-invoice-detail.html?id=' + encodeURIComponent(inv.id);
+            //     }
+            // };
+        }
+
+        // 显示单据明细弹窗 - 使用静态数据
+        function showDocDetail(docId, docType, originalData) {
+            var modal = document.getElementById('doc-detail-modal');
+            var titleEl = document.getElementById('doc-detail-title');
+            var contentEl = document.getElementById('doc-detail-content');
+            
+            titleEl.textContent = docType + '明细 · ' + docId;
+            
+            var html = '';
+            
+            // 静态数据映射
+            var staticData = {
+                'PO-2025-001': {
+                    supplierName: '深圳市电子科技',
+                    orderDate: '2025-01-10',
+                    deliveryDate: '2025-01-20',
+                    status: '已完成',
+                    items: [
+                        { materialCode: 'MAT-001', materialName: '电子元器件A', specification: '规格A-001', quantity: 100, receivedQuantity: 100, unitPrice: 30 },
+                        { materialCode: 'MAT-002', materialName: '电子元器件B', specification: '规格B-002', quantity: 50, receivedQuantity: 50, unitPrice: 40 }
+                    ]
+                },
+                'PO-2025-002': {
+                    supplierName: '深圳市电子科技',
+                    orderDate: '2025-01-12',
+                    deliveryDate: '2025-01-22',
+                    status: '已完成',
+                    items: [
+                        { materialCode: 'MAT-003', materialName: '电子元器件C', specification: '规格C-003', quantity: 80, receivedQuantity: 80, unitPrice: 50 },
+                        { materialCode: 'MAT-004', materialName: '电子元器件D', specification: '规格D-004', quantity: 60, receivedQuantity: 60, unitPrice: 50 }
+                    ]
+                },
+                'PO-2025-003': {
+                    supplierName: '深圳市电子科技',
+                    orderDate: '2025-01-15',
+                    deliveryDate: '2025-01-25',
+                    status: '已完成',
+                    items: [
+                        { materialCode: 'MAT-005', materialName: '电子元器件E', specification: '规格E-005', quantity: 120, receivedQuantity: 120, unitPrice: 40 },
+                        { materialCode: 'MAT-006', materialName: '电子元器件F', specification: '规格F-006', quantity: 40, receivedQuantity: 40, unitPrice: 40 }
+                    ]
+                },
+                'RT-2025-001': {
+                    supplierName: '深圳市电子科技',
+                    returnDate: '2025-01-18',
+                    reason: '质量问题',
+                    status: '已处理',
+                    items: [
+                        { materialCode: 'MAT-001', materialName: '电子元器件A', specification: '规格A-001', quantity: 20, unitPrice: 30 },
+                        { materialCode: 'MAT-003', materialName: '电子元器件C', specification: '规格C-003', quantity: 10, unitPrice: 40 }
+                    ]
+                },
+                'CN-2025-001': {
+                    supplierName: '深圳市电子科技',
+                    concessionDate: '2025-01-19',
+                    reason: '外观轻微瑕疵',
+                    status: '已确认',
+                    amount: 200,
+                    originalOrderId: 'PO-2025-001'
+                }
+            };
+            
+            var data = staticData[docId] || {};
+            
+            if (docType === '订单') {
+                var orderItems = data.items || [];
+                var orderTotal = 0;
+                
+                var itemsHtml = '';
+                orderItems.forEach(function(item) {
+                    var qty = parseFloat(item.quantity) || 0;
+                    var receivedQty = parseFloat(item.receivedQuantity) || 0;
+                    var price = parseFloat(item.unitPrice) || 0;
+                    var subtotal = qty * price;
+                    orderTotal += subtotal;
+                    
+                    itemsHtml += '<tr>' +
+                        '<td><span class="material-code">' + (item.materialCode || '-') + '</span></td>' +
+                        '<td>' + (item.materialName || '-') + '</td>' +
+                        '<td>' + (item.specification || '-') + '</td>' +
+                        '<td>' + qty + '</td>' +
+                        '<td>' + receivedQty + '</td>' +
+                        '<td class="unit-price">' + money(price) + '</td>' +
+                        '<td class="subtotal">' + money(subtotal) + '</td>' +
+                        '</tr>';
+                });
+                
+                html = '<div class="order-detail-section">' +
+                    '<div class="order-detail-header">' +
+                        '<div class="order-icon">📦</div>' +
+                        '<div class="order-header-info">' +
+                            '<div class="order-no">' + (docId || '-') + '</div>' +
+                            '<div class="order-meta">' +
+                                '供应商：' + (data.supplierName || '-') + ' · ' +
+                                '下单日期：' + (data.orderDate || '-') + ' · ' +
+                                '状态：' + (data.status || '-') +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="order-detail-body">' +
+                        '<div class="order-info-grid">' +
+                            '<div class="order-info-item">' +
+                                '<span class="info-label">供应商</span>' +
+                                '<span class="info-value">' + (data.supplierName || '-') + '</span>' +
+                            '</div>' +
+                            '<div class="order-info-item">' +
+                                '<span class="info-label">下单日期</span>' +
+                                '<span class="info-value">' + (data.orderDate || '-') + '</span>' +
+                            '</div>' +
+                            '<div class="order-info-item">' +
+                                '<span class="info-label">要求交期</span>' +
+                                '<span class="info-value">' + (data.deliveryDate || '-') + '</span>' +
+                            '</div>' +
+                            '<div class="order-info-item">' +
+                                '<span class="info-label">订单状态</span>' +
+                                '<span class="info-value">' + (data.status || '-') + '</span>' +
+                            '</div>' +
+                        '</div>' +
+                        '<table class="order-items-table">' +
+                            '<thead>' +
+                                '<tr>' +
+                                    '<th>物料编码</th>' +
+                                    '<th>物料名称</th>' +
+                                    '<th>规格型号</th>' +
+                                    '<th>需求量</th>' +
+                                    '<th>入库量</th>' +
+                                    '<th>单价</th>' +
+                                    '<th>小计</th>' +
+                                '</tr>' +
+                            '</thead>' +
+                            '<tbody>' + itemsHtml + '</tbody>' +
+                            '<tfoot>' +
+                                '<tr>' +
+                                    '<td colspan="6">' +
+                                        '<div class="order-total-row">' +
+                                            '<span class="order-total-label">该订单合计：</span>' +
+                                            '<span class="order-total-value">' + money(orderTotal) + '</span>' +
+                                        '</div>' +
+                                    '</td>' +
+                                '</tr>' +
+                            '</tfoot>' +
+                        '</table>' +
+                    '</div>' +
+                '</div>';
+                
+            } else if (docType === '退货') {
+                var returnItems = data.items || [];
+                var returnTotal = 0;
+                
+                var returnItemsHtml = '';
+                returnItems.forEach(function(item) {
+                    var qty = parseFloat(item.quantity) || 0;
+                    var price = parseFloat(item.unitPrice) || 0;
+                    var subtotal = qty * price;
+                    returnTotal += subtotal;
+                    
+                    returnItemsHtml += '<tr>' +
+                        '<td><span class="material-code">' + (item.materialCode || '-') + '</span></td>' +
+                        '<td>' + (item.materialName || '-') + '</td>' +
+                        '<td>' + (item.specification || '-') + '</td>' +
+                        '<td>' + qty + '</td>' +
+                        '<td class="unit-price">' + money(price) + '</td>' +
+                        '<td class="subtotal">' + money(subtotal) + '</td>' +
+                        '</tr>';
+                });
+                
+                html = '<div class="return-detail-section">' +
+                    '<div class="return-detail-header">' +
+                        '<div class="return-icon">↩️</div>' +
+                        '<div class="return-header-info">' +
+                            '<div class="return-no">' + (docId || '-') + '</div>' +
+                            '<div class="return-meta">' +
+                                '供应商：' + (data.supplierName || '-') + ' · ' +
+                                '退货日期：' + (data.returnDate || '-') + ' · ' +
+                                '状态：' + (data.status || '-') +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="order-detail-body">' +
+                        '<div class="order-info-grid">' +
+                            '<div class="order-info-item">' +
+                                '<span class="info-label">供应商</span>' +
+                                '<span class="info-value">' + (data.supplierName || '-') + '</span>' +
+                            '</div>' +
+                            '<div class="order-info-item">' +
+                                '<span class="info-label">退货日期</span>' +
+                                '<span class="info-value">' + (data.returnDate || '-') + '</span>' +
+                            '</div>' +
+                            '<div class="order-info-item">' +
+                                '<span class="info-label">退货原因</span>' +
+                                '<span class="info-value">' + (data.reason || '-') + '</span>' +
+                            '</div>' +
+                            '<div class="order-info-item">' +
+                                '<span class="info-label">退货状态</span>' +
+                                '<span class="info-value">' + (data.status || '-') + '</span>' +
+                            '</div>' +
+                        '</div>' +
+                        '<table class="return-items-table">' +
+                            '<thead>' +
+                                '<tr>' +
+                                    '<th>物料编码</th>' +
+                                    '<th>物料名称</th>' +
+                                    '<th>规格型号</th>' +
+                                    '<th>退货数量</th>' +
+                                    '<th>单价</th>' +
+                                    '<th>退货金额</th>' +
+                                '</tr>' +
+                            '</thead>' +
+                            '<tbody>' + returnItemsHtml + '</tbody>' +
+                            '<tfoot>' +
+                                '<tr>' +
+                                    '<td colspan="5">' +
+                                        '<div class="order-total-row return-total-row">' +
+                                            '<span class="order-total-label">该退货单合计：</span>' +
+                                            '<span class="order-total-value">' + money(returnTotal) + '</span>' +
+                                        '</div>' +
+                                    '</td>' +
+                                '</tr>' +
+                            '</tfoot>' +
+                        '</table>' +
+                    '</div>' +
+                '</div>';
+                
+            } else if (docType === '让步') {
+                html = '<div class="concession-detail-section">' +
+                    '<div class="concession-detail-header">' +
+                        '<div class="concession-icon">🤝</div>' +
+                        '<div class="concession-header-info">' +
+                            '<div class="concession-no">' + (docId || '-') + '</div>' +
+                            '<div class="concession-meta">' +
+                                '供应商：' + (data.supplierName || '-') + ' · ' +
+                                '让步日期：' + (data.concessionDate || '-') +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="concession-info-grid">' +
+                        '<div class="concession-info-item">' +
+                            '<div class="info-label">让步金额</div>' +
+                            '<div class="info-value">' + money(-(data.amount || 0)) + '</div>' +
+                        '</div>' +
+                        '<div class="concession-info-item">' +
+                            '<div class="info-label">原订单号</div>' +
+                            '<div class="info-value">' + (data.originalOrderId || '-') + '</div>' +
+                        '</div>' +
+                        '<div class="concession-info-item">' +
+                            '<div class="info-label">让步状态</div>' +
+                            '<div class="info-value">' + (data.status || '-') + '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="concession-remark">' +
+                        '<div class="remark-label">让步原因</div>' +
+                        '<div class="remark-content">' + (data.reason || '暂无原因说明') + '</div>' +
+                    '</div>' +
+                '</div>';
+                
+            } else {
+                html = '<div class="empty-detail-state">' +
+                    '<div class="empty-icon">📋</div>' +
+                    '<div class="empty-text">暂无明细数据</div>' +
+                '</div>';
+            }
+            
+            contentEl.innerHTML = html;
+            
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // 弹窗内初始化函数 - 供父页面调用
+        window.initSettlementDetailModal = function() {
+            console.log('初始化结算详情弹窗...');
+            waitForDomAndRender();
+        };
+
+        function waitForDomAndRender() {
+            var checkCount = 0;
+            var maxChecks = 100;
+            
+            function checkAndRender() {
+                checkCount++;
+                // 检测关键元素是否存在
+                var contentWrapper = document.querySelector('.content-wrapper');
+                var amtOrders = document.getElementById('amt-orders');
+                
+                if (contentWrapper && amtOrders) {
+                    console.log('DOM已就绪，开始渲染数据');
+                    ensureAssetLoaded(function() {
+                        render();
+                        console.log('结算详情数据加载完成');
+                    });
+                } else if (checkCount < maxChecks) {
+                    setTimeout(checkAndRender, 50);
+                } else {
+                    console.warn('等待DOM超时，尝试直接渲染');
+                    ensureAssetLoaded(function() {
+                        render();
+                    });
+                }
+            }
+            
+            checkAndRender();
+        }
+
+        // 监听DOM变化，当内容被添加到文档时自动初始化
+        if (typeof MutationObserver !== 'undefined') {
+            var observer = new MutationObserver(function(mutations) {
+                var contentWrapper = document.querySelector('.content-wrapper');
+                var amtOrders = document.getElementById('amt-orders');
+                
+                if (contentWrapper && amtOrders) {
+                    observer.disconnect();
+                    console.log('检测到DOM变化，开始渲染');
+                    ensureAssetLoaded(function() {
+                        render();
+                        console.log('结算详情数据加载完成');
+                    });
+                }
+            });
+            
+            observer.observe(document.body, { childList: true, subtree: true });
+        }
+
+        // 页面加载完成后自动初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(waitForDomAndRender, 100);
+        });
+
+        // 如果是直接访问，也执行初始化
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            setTimeout(waitForDomAndRender, 100);
+        }
+    </script>
+</div>
+</body>
+</html>
+

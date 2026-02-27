@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>换货单 - 采购协同系统</title>
+</head>
+<body>
+    <style>
+        /* 换货跟踪弹窗底部按钮（仅本页，不改全局） */
+        #exchange-track-modal .modal-footer .btn {
+            min-height: 36px;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 6px;
+        }
+        #exchange-track-modal .modal-footer .btn-default {
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            color: rgba(0,0,0,0.85);
+        }
+        #exchange-track-modal .modal-footer .btn-default:hover:not(:disabled) {
+            border-color: #1890ff;
+            color: #1890ff;
+            background: #fff;
+        }
+        #exchange-track-modal .modal-footer .btn-primary {
+            background: #1890ff;
+            border: 1px solid #1890ff;
+            color: #fff;
+        }
+        #exchange-track-modal .modal-footer .btn-primary:hover:not(:disabled) {
+            background: #40a9ff;
+            border-color: #40a9ff;
+            color: #fff;
+        }
+    </style>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">采购执行</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">换货单</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">管理采购换货流程，包括换货申请、审批、换货执行等。换货单由不合格处理会审确定后自动创建，或手工创建，并同步至供应链协同应用。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="换货单号、订单编号、供应商">
+                </div>
+                <div class="filter-item">
+                    <label>换货状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="draft">草稿</option>
+                        <option value="pending">待审批</option>
+                        <option value="approved">已批准</option>
+                        <option value="exchanging">换货中</option>
+                        <option value="completed">已完成</option>
+                        <option value="cancelled">已取消</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>来源</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="review">会审创建</option>
+                        <option value="manual">手工创建</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>申请日期</label>
+                    <input type="date" class="form-input">
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary">+ 新建换货单</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">换货单号</th>
+                            <th width="120">关联订单</th>
+                            <th width="120">处理单号</th>
+                            <th width="150">供应商</th>
+                            <th width="150">物料名称</th>
+                            <th width="100">换货数量</th>
+                            <th width="100">换货状态</th>
+                            <th width="100">来源</th>
+                            <th width="120">申请日期</th>
+                            <th width="100">申请人</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="exchange-id" value="1"></td>
+                            <td>EXC-2025-001</td>
+                            <td>PO-2025-001</td>
+                            <td>
+                                <a href="pages/procurement-unqualified-handle-detail.html?id=1" style="color:#1890ff;">UH-2025-001</a>
+                            </td>
+                            <td>深圳市电子科技有限公司</td>
+                            <td>电子元件B</td>
+                            <td>30个</td>
+                            <td><span class="status-badge status-warning">待审批</span></td>
+                            <td><span class="status-badge" style="background:#e6f7ff;color:#1890ff;">会审创建</span></td>
+                            <td>2025-01-22</td>
+                            <td>采购-张采购</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-exchange-detail.html" data-id="1">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="exchange-id" value="2"></td>
+                            <td>EXC-2025-002</td>
+                            <td>PO-2025-002</td>
+                            <td>
+                                <a href="pages/procurement-unqualified-handle-detail.html?id=2" style="color:#1890ff;">UH-2025-002</a>
+                            </td>
+                            <td>上海精密机械制造有限公司</td>
+                            <td>精密零件A</td>
+                            <td>20件</td>
+                            <td><span class="status-badge status-processing">换货中</span></td>
+                            <td><span class="status-badge" style="background:#e6f7ff;color:#1890ff;">会审创建</span></td>
+                            <td>2025-01-20</td>
+                            <td>采购-李采购</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-exchange-detail.html" data-id="2">查看</button>
+                                <button type="button" class="btn btn-sm btn-default btn-track-exchange">跟踪</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="exchange-id" value="3"></td>
+                            <td>EXC-2025-003</td>
+                            <td>PO-2025-003</td>
+                            <td>-</td>
+                            <td>北京贸易有限公司</td>
+                            <td>原材料A</td>
+                            <td>100kg</td>
+                            <td><span class="status-badge status-success">已完成</span></td>
+                            <td><span class="status-badge" style="background:#f5f5f5;color:#8c8c8c;">手工创建</span></td>
+                            <td>2025-01-18</td>
+                            <td>采购-王采购</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-exchange-detail.html" data-id="3">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="exchange-id" value="4"></td>
+                            <td>EXC-2025-004</td>
+                            <td>PO-2025-004</td>
+                            <td>-</td>
+                            <td>广州配件有限公司</td>
+                            <td>配件C</td>
+                            <td>50个</td>
+                            <td><span class="status-badge status-warning">待审批</span></td>
+                            <td><span class="status-badge" style="background:#f5f5f5;color:#8c8c8c;">手工创建</span></td>
+                            <td>2025-01-25</td>
+                            <td>采购-赵采购</td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-exchange-detail.html" data-id="4">查看</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-submit-exchange" data-id="4">提审</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="pagination-info">共 4 条记录</span>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm btn-default" disabled>上一页</button>
+                    <span class="pagination-page">第 1 页 / 共 1 页</span>
+                    <button class="btn btn-sm btn-default" disabled>下一页</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 换货跟踪弹窗（与项目其他弹窗一致：modal + modal-header + modal-body + modal-footer） -->
+        <div id="exchange-track-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:800px;max-height:90vh;overflow:auto;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">换货进度跟踪</span>
+                    <button type="button" class="modal-close" data-close-modal="exchange-track-modal" aria-label="关闭">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="section-title" style="margin-bottom:12px;">单头信息</div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px 24px;font-size:13px;margin-bottom:20px;">
+                        <div><span style="color:#666;">换货单号：</span><span id="track-exchange-no">-</span></div>
+                        <div><span style="color:#666;">关联订单：</span><span id="track-exchange-order">-</span></div>
+                        <div><span style="color:#666;">供应商：</span><span id="track-exchange-supplier">-</span></div>
+                        <div><span style="color:#666;">当前状态：</span><span id="track-exchange-status">-</span></div>
+                    </div>
+
+                    <div class="section-title" style="margin-bottom:8px;">问题件退回（寄给供应商）</div>
+                    <div style="border:1px solid var(--border-color,#e8e8e8);border-radius:6px;margin-bottom:20px;overflow:hidden;">
+                        <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid #f0f0f0;font-size:13px;">
+                            <span style="width:8px;height:8px;border-radius:50%;background:#52c41a;flex-shrink:0;margin-top:5px;"></span>
+                            <div style="flex:1;">
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span>问题件寄出</span><span class="status-badge status-success">已完成</span></div>
+                                <div style="font-size:12px;color:#8c8c8c;">2025-01-22 10:00</div>
+                                <div style="font-size:12px;color:#8c8c8c;margin-top:4px;">物流单号：SF1234567890，承运方：顺丰速运</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;font-size:13px;">
+                            <span style="width:8px;height:8px;border-radius:50%;background:#52c41a;flex-shrink:0;margin-top:5px;"></span>
+                            <div style="flex:1;">
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span>供应商签收</span><span class="status-badge status-success">已完成</span></div>
+                                <div style="font-size:12px;color:#8c8c8c;">2025-01-24 14:30</div>
+                                <div style="font-size:12px;color:#8c8c8c;margin-top:4px;">供应商已签收问题件，可进行换货发货</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-title" style="margin-bottom:8px;">换货件到货（供应商发来的良品）</div>
+                    <div style="border:1px solid var(--border-color,#e8e8e8);border-radius:6px;overflow:hidden;">
+                        <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid #f0f0f0;font-size:13px;">
+                            <span style="width:8px;height:8px;border-radius:50%;background:#52c41a;flex-shrink:0;margin-top:5px;"></span>
+                            <div style="flex:1;">
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span>供应商发货</span><span class="status-badge status-success">已完成</span></div>
+                                <div style="font-size:12px;color:#8c8c8c;">2025-01-25 09:00</div>
+                                <div style="font-size:12px;color:#8c8c8c;margin-top:4px;">物流单号：YT9876543210，承运方：圆通速递</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid #f0f0f0;font-size:13px;background:#e6f7ff;">
+                            <span style="width:8px;height:8px;border-radius:50%;background:#1890ff;flex-shrink:0;margin-top:5px;"></span>
+                            <div style="flex:1;">
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span>在途 / 到货接收</span><span class="status-badge status-processing">换货中</span></div>
+                                <div style="font-size:12px;color:#8c8c8c;">进行中</div>
+                                <div style="font-size:12px;color:#8c8c8c;margin-top:4px;">物流在途，预计 2025-01-27 送达</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid #f0f0f0;font-size:13px;">
+                            <span style="width:8px;height:8px;border-radius:50%;background:#fff;border:1px solid #d9d9d9;flex-shrink:0;margin-top:5px;"></span>
+                            <div style="flex:1;">
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span>检验</span><span class="status-badge" style="background:#f5f5f5;color:#8c8c8c;">待进行</span></div>
+                                <div style="font-size:12px;color:#8c8c8c;">待进行</div>
+                                <div style="font-size:12px;color:#8c8c8c;margin-top:4px;">到货后执行检验，检验结果待填写</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;font-size:13px;">
+                            <span style="width:8px;height:8px;border-radius:50%;background:#fff;border:1px solid #d9d9d9;flex-shrink:0;margin-top:5px;"></span>
+                            <div style="flex:1;">
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span>入库</span><span class="status-badge" style="background:#f5f5f5;color:#8c8c8c;">待进行</span></div>
+                                <div style="font-size:12px;color:#8c8c8c;">待进行</div>
+                                <div style="font-size:12px;color:#8c8c8c;margin-top:4px;">检验通过后办理入库，入库单待生成</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 提审：选择审批人弹窗（手工创建） -->
+        <div id="exchange-submit-review-modal" class="modal-overlay">
+            <div class="modal" style="max-width:440px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="modal-title">提审</span>
+                    <button type="button" class="modal-close" data-close-modal="exchange-submit-review-modal" aria-label="关闭">×</button>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-desc" style="margin-bottom:16px;">选择审批人后提交，审批人将在工作台待办事项中收到该换货单，可进行查看与审批；审批通过后将自动同步至对应供应商的供应链协同应用（换货单）。</p>
+                    <div class="form-item">
+                        <label class="form-label required">审批人</label>
+                        <select id="exchange-submit-approver" class="form-select">
+                            <option value="">请选择审批人</option>
+                            <option value="zhang">张经理</option>
+                            <option value="li">李主管</option>
+                            <option value="wang">王审批</option>
+                            <option value="zhao">赵工</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default modal-close" data-close-modal="exchange-submit-review-modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="exchange-submit-review-ok">确定提审</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        console.log('换货单列表 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+            PageInteractions.toggleSelectAll('input[name="exchange-id"]');
+        }
+        (function() {
+            var submitModal = document.getElementById('exchange-submit-review-modal');
+            var approverSelect = document.getElementById('exchange-submit-approver');
+            var okBtn = document.getElementById('exchange-submit-review-ok');
+            var currentRow = null;
+
+            document.addEventListener('click', function(e) {
+                var btn = e.target && e.target.closest('.btn-submit-exchange');
+                if (btn) {
+                    currentRow = btn.closest('tr');
+                    if (approverSelect) approverSelect.value = '';
+                    if (submitModal) {
+                        submitModal.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    }
+                    return;
+                }
+            });
+
+            if (okBtn) okBtn.addEventListener('click', function() {
+                var v = approverSelect && approverSelect.value;
+                if (!v) {
+                    alert('请选择审批人。');
+                    return;
+                }
+                if (typeof PageInteractions !== 'undefined' && PageInteractions.closeModal) PageInteractions.closeModal('exchange-submit-review-modal');
+                document.body.style.overflow = '';
+                if (currentRow) {
+                    var statusTd = currentRow.querySelector('td:nth-child(8)');
+                    if (statusTd) statusTd.innerHTML = '<span class="status-badge status-processing">已提交</span>';
+                    var opTd = currentRow.querySelector('td:last-child');
+                    var submitBtn = currentRow.querySelector('.btn-submit-exchange');
+                    var id = submitBtn ? (submitBtn.getAttribute('data-id') || '') : '';
+                    if (opTd) opTd.innerHTML = '<button class="btn btn-sm btn-default btn-view" data-url="pages/procurement-exchange-detail.html" data-id="' + id + '">查看</button>';
+                }
+                alert('已提交审批，审批人可在工作台待办事项中查看并审批；审批通过后将自动同步至对应供应商的供应链协同应用（换货单）。');
+            });
+        })();
+        document.addEventListener('click', function(e) {
+            var trackBtn = e.target && e.target.closest('.btn-track-exchange');
+            if (trackBtn) {
+                var row = trackBtn.closest('tr');
+                if (!row) return;
+                var cells = row.querySelectorAll('td');
+                var set = function(id, html) { var el = document.getElementById(id); if (el) el.innerHTML = html; };
+                set('track-exchange-no', cells.length > 1 ? cells[1].textContent.trim() : '-');
+                set('track-exchange-order', cells.length > 2 ? cells[2].textContent.trim() : '-');
+                set('track-exchange-supplier', cells.length > 4 ? cells[4].textContent.trim() : '-');
+                set('track-exchange-status', cells.length > 7 ? cells[7].innerHTML : '-');
+                var overlay = document.getElementById('exchange-track-modal');
+                if (overlay) {
+                    overlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+                return;
+            }
+        });
+        </script>
+    </div>
+</body>
+</html>

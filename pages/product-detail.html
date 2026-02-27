@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品档案详情</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">基础信息</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/product-structure.html" class="breadcrumb-item">产品档案</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">产品详情</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">查看产品档案完整信息；产品档案是 BOM 的归属对象，维护后可基于产品创建 EBOM、MBOM、SBOM。</p>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-default btn-back" data-url="pages/product-structure.html">← 返回列表</button>
+                <button class="btn btn-primary" data-open-modal="product-edit-modal">编辑</button>
+            </div>
+            <div class="action-right">
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="section-title">基本信息</div>
+                <div class="form-info-grid">
+                    <div class="form-info-item"><span class="form-info-label">产品编码</span><span class="form-info-value">PROD-001</span></div>
+                    <div class="form-info-item"><span class="form-info-label">产品名称</span><span class="form-info-value">智能控制器</span></div>
+                    <div class="form-info-item"><span class="form-info-label">产品简称</span><span class="form-info-value">智能控</span></div>
+                    <div class="form-info-item"><span class="form-info-label">产品类型</span><span class="form-info-value">标准产品</span></div>
+                    <div class="form-info-item"><span class="form-info-label">产品大类</span><span class="form-info-value">01</span></div>
+                    <div class="form-info-item"><span class="form-info-label">产品系列</span><span class="form-info-value">02</span></div>
+                    <div class="form-info-item"><span class="form-info-label">产品型号</span><span class="form-info-value">1234</span></div>
+                    <div class="form-info-item"><span class="form-info-label">规格型号</span><span class="form-info-value">CTRL-100</span></div>
+                    <div class="form-info-item"><span class="form-info-label">生命周期阶段</span><span class="form-info-value"><span class="status-badge status-processing">量产</span></span></div>
+                    <div class="form-info-item"><span class="form-info-label">状态</span><span class="form-info-value"><span class="status-badge status-success">启用</span></span></div>
+                    <div class="form-info-item"><span class="form-info-label">项目负责人</span><span class="form-info-value">张经理</span></div>
+                    <div class="form-info-item"><span class="form-info-label">技术负责人</span><span class="form-info-value">张工</span></div>
+                    <div class="form-info-item"><span class="form-info-label">创建人</span><span class="form-info-value">张工</span></div>
+                    <div class="form-info-item"><span class="form-info-label">创建时间</span><span class="form-info-value">2025-01-10 09:00</span></div>
+                    <div class="form-info-item"><span class="form-info-label">修改人</span><span class="form-info-value">张工</span></div>
+                    <div class="form-info-item"><span class="form-info-label">修改时间</span><span class="form-info-value">2025-01-28 14:30</span></div>
+                    <div class="form-info-item" style="grid-column:1/-1;"><span class="form-info-label">备注</span><span class="form-info-value">—</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">关联 BOM</h3>
+                <a href="pages/ebom-list.html" class="btn btn-sm btn-default">查看 EBOM</a>
+            </div>
+            <div class="card-body">
+                <p class="section-note">基于本产品创建的 BOM 列表；产品档案维护完成后可创建 EBOM、MBOM、SBOM。</p>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>BOM 编码</th><th>BOM 类型</th><th>版本号</th><th>状态</th><th>操作</th></tr></thead>
+                        <tbody>
+                            <tr><td>01-02-1234-01-V1</td><td>EBOM</td><td>V1.0</td><td><span class="status-badge status-published">已发布</span></td><td><button class="btn btn-sm btn-default btn-view" data-url="pages/ebom-detail.html">查看</button></td></tr>
+                            <tr><td>01-02-1234-02-V1</td><td>MBOM</td><td>V1.0</td><td><span class="status-badge status-published">已发布</span></td><td><button class="btn btn-sm btn-default btn-view" data-url="pages/mbom-detail.html">查看</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="product-edit-modal" class="modal-overlay">
+            <div class="modal" style="max-width:620px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">编辑产品档案</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                        <div class="form-item"><label class="form-label">产品编码</label><input type="text" class="form-input" value="PROD-001" readonly></div>
+                        <div class="form-item"><label class="form-label required">产品名称</label><input type="text" class="form-input" value="智能控制器"></div>
+                        <div class="form-item"><label class="form-label">产品简称</label><input type="text" class="form-input" value="智能控"></div>
+                        <div class="form-item"><label class="form-label required">产品类型</label><select class="form-select"><option value="standard" selected>标准产品</option><option value="custom">定制产品</option><option value="trial">试制产品</option></select></div>
+                        <div class="form-item"><label class="form-label required">产品大类</label><input type="text" class="form-input" value="01"></div>
+                        <div class="form-item"><label class="form-label required">产品系列</label><input type="text" class="form-input" value="02"></div>
+                        <div class="form-item"><label class="form-label required">产品型号</label><input type="text" class="form-input" value="1234"></div>
+                        <div class="form-item"><label class="form-label required">规格型号</label><input type="text" class="form-input" value="CTRL-100"></div>
+                        <div class="form-item"><label class="form-label required">生命周期阶段</label><select class="form-select"><option value="rd">研发</option><option value="trial">试产</option><option value="mass" selected>量产</option><option value="stop">停产</option></select></div>
+                        <div class="form-item"><label class="form-label">状态</label><select class="form-select"><option value="enabled" selected>启用</option><option value="disabled">停用</option></select></div>
+                        <div class="form-item"><label class="form-label required">项目负责人</label><select class="form-select"><option value="张经理" selected>张经理</option><option value="李经理">李经理</option></select></div>
+                        <div class="form-item"><label class="form-label required">技术负责人</label><select class="form-select"><option value="张工" selected>张工</option><option value="李工">李工</option></select></div>
+                    </div>
+                    <div class="form-item" style="margin-top:16px;"><label class="form-label">备注</label><textarea class="form-textarea" rows="2"></textarea></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="product-edit-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="product-edit-modal" onclick="alert('✅ 已保存')">保存</button></div>
+            </div>
+        </div>
+    </div>
+    <script>if(typeof PageInteractions!=='undefined')PageInteractions.initButtons();</script>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBOM列表</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">BOM管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">MBOM列表</span>
+        </div>
+        <div class="page-header">
+            <p class="page-description">一个产品对应一个 MBOM，以版本演进；BOM 不可删除。<strong>性质</strong>（样品/正式）从设计任务流转至 EBOM 再流转至 MBOM，不流转至 SBOM。本列表为<strong>制造 BOM</strong>：在 EBOM 基础上维护工序、加工方式、工艺流程等工艺信息。状态：<strong>未使用</strong>、<strong>使用中</strong>、<strong>已归档</strong>。</p>
+        </div>
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item filter-item--wide">
+                    <label>BOM编码/产品</label>
+                    <input type="text" class="form-input" placeholder="BOM编码、产品编码、产品名称，支持模糊">
+                </div>
+                <div class="filter-item">
+                    <label>状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="unused">未使用</option>
+                        <option value="using">使用中</option>
+                        <option value="archived">已归档</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>性质</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="formal">正式</option>
+                        <option value="sample">样品</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>来源</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="ebom">EBOM转化</option>
+                        <option value="manual">手动创建</option>
+                        <option value="copy">复制</option>
+                        <option value="import">导入</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>来源EBOM</label>
+                    <input type="text" class="form-input" placeholder="EBOM编码">
+                </div>
+                <div class="filter-actions">
+                    <button type="button" class="btn btn-primary">查询</button>
+                    <button type="button" class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+        <div class="action-bar">
+            <div class="action-left">
+                <button type="button" class="btn btn-primary btn-create-modal" data-modal="create-modal" data-title="新建MBOM" data-url="pages/mbom-create.html">+ 新建</button>
+                <button type="button" class="btn btn-default" id="mbom-list-import">导入</button>
+                <div class="batch-action-group">
+                    <span class="selection-count hidden">已选 <span class="count">0</span> 项</span>
+                    <button type="button" class="btn btn-default batch-action-btn" data-action="batch-export">批量导出</button>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox" aria-label="全选"></th>
+                            <th width="130">BOM编码</th>
+                            <th width="100">产品编码</th>
+                            <th width="130">产品名称</th>
+                            <th width="80">状态</th>
+                            <th width="70">性质</th>
+                            <th width="100">来源</th>
+                            <th width="70">创建人</th>
+                            <th width="130">创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mbom-tbody">
+                        <tr>
+                            <td colspan="10" style="text-align:center;padding:40px;color:#999;">
+                                <div class="empty-state">
+                                    <div class="empty-icon">📋</div>
+                                    <div class="empty-text">暂无MBOM数据</div>
+                                    <div class="empty-description">在 BOM 树上维护工序、加工方式、工艺流程等工艺信息；从 EBOM 转化、手动创建或复制成熟产品 BOM。点击「新建」创建</div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 0 条记录</div>
+                <div class="pagination-controls">
+                    <button type="button" class="page-btn" disabled>&lt;</button>
+                    <button type="button" class="page-btn active">1</button>
+                    <button type="button" class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" id="mbom-version-panel" style="display:none;">
+            <div class="card-header">
+                <span class="card-title">BOM 版本列表</span>
+                <span id="mbom-version-product-info" style="color:#666;font-size:13px;margin-left:12px;">—</span>
+                <a href="#" id="mbom-version-design-link" class="btn btn-sm btn-default" style="margin-left:auto;">新版本设计</a>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table>
+                        <thead id="mbom-version-thead">
+                            <tr><th width="70">版本号</th><th width="85">EBOM版本号</th><th width="85">SBOM版本号</th><th width="80">状态</th><th width="85">执行状态</th><th width="80">使用状态</th><th width="55">层级</th><th width="60">物料数</th><th width="70">创建人</th><th width="130">创建时间</th><th>操作</th></tr>
+                        </thead>
+                        <tbody id="mbom-version-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card bom-detail-tabs-card" id="mbom-detail-panel" style="display:none;">
+            <div class="card-header card-header-with-tabs">
+                <span class="card-title" id="mbom-detail-title">—</span>
+                <div class="dt-detail-tab-bar">
+                    <label class="dt-detail-tab"><input type="radio" name="mbom-detail-tab" value="bom" checked> BOM 层级明细</label>
+                    <label class="dt-detail-tab"><input type="radio" name="mbom-detail-tab" value="attach"> 图纸与附件</label>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="dt-detail-tab-pane" data-tab="bom">
+                    <div class="table-wrapper">
+                        <table class="bom-structure-table bom-readonly mbom-detail-bom" id="mbom-detail-bom-table">
+                            <thead id="mbom-detail-thead"></thead>
+                            <tbody id="mbom-detail-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="dt-detail-tab-pane" data-tab="attach">
+                    <div class="table-wrapper">
+                        <table class="output-table dt-attach-table">
+                            <thead><tr><th>类型</th><th>物料编码</th><th>物料名称</th><th>规格型号</th><th>文件名称</th><th>版本</th><th>格式</th><th>上传时间</th><th>操作</th></tr></thead>
+                            <tbody id="mbom-detail-attach-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="mbom-list-msg-modal" class="modal-overlay">
+            <div class="modal" style="max-width: 360px;" onclick="event.stopPropagation()">
+                <div class="modal-body" style="text-align: center; padding: 24px;">
+                    <p id="mbom-list-msg-text" style="margin: 0 0 20px; font-size: 15px;">导出成功（原型演示）</p>
+                    <button type="button" class="btn btn-primary" id="mbom-list-msg-ok">确定</button>
+                </div>
+            </div>
+        </div>
+        <div id="mbom-list-import-modal" class="modal-overlay">
+            <div class="modal" style="max-width: 480px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">导入 MBOM</span><button type="button" class="modal-close" id="mbom-list-import-close">×</button></div>
+                <div class="modal-body">
+                    <p class="modal-desc">使用 Excel 模板填写 BOM 列表或明细（含工序号、工位号、加工方式等）后上传，可批量创建 MBOM（原型演示）。</p>
+                    <div class="form-item"><label class="form-label">选择文件</label><input type="file" class="form-input" id="mbom-list-import-file" accept=".xlsx,.xls"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" id="mbom-list-import-cancel">取消</button>
+                    <button type="button" class="btn btn-primary" id="mbom-list-import-ok">确定</button>
+            </div>
+        </div>
+    </div>
+    <script>
+            (function () {
+        console.log('MBOM列表页已加载');
+                var tbody = document.getElementById('mbom-tbody');
+                var paginationInfo = document.querySelector('.pagination-info');
+                var batchGroup = document.querySelector('.batch-action-group');
+                var countSpan = batchGroup && batchGroup.querySelector('.count');
+                var selectionCount = batchGroup && batchGroup.querySelector('.selection-count');
+
+                var MOCK = [
+                    { id: '1', code: '01-02-1001-02', productCode: 'PROD-001', productName: '智能控制器', status: 'using', statusText: '使用中', statusClass: 'status-using', taskNature: 'formal', taskNatureText: '正式', creator: '张工', createdAt: '2025-01-20 10:30', sourceType: 'ebom', sourceLabel: 'EBOM转化' },
+                    { id: '2', code: '01-02-1002-02', productCode: 'PROD-002', productName: '传感器模块', status: 'using', statusText: '使用中', statusClass: 'status-using', taskNature: 'formal', taskNatureText: '正式', creator: '李工', createdAt: '2025-01-25 14:20', sourceType: 'ebom', sourceLabel: 'EBOM转化' },
+                    { id: '3', code: '01-02-1003-02', productCode: 'PROD-003', productName: '执行器', status: 'unused', statusText: '未使用', statusClass: 'status-unused', taskNature: 'sample', taskNatureText: '样品', creator: '王工', createdAt: '2025-01-28 09:15', sourceType: 'ebom', sourceLabel: 'EBOM转化' },
+                    { id: '4', code: '01-02-1004-02', productCode: 'PROD-004', productName: '电源模块', status: 'archived', statusText: '已归档', statusClass: 'status-archived', taskNature: 'formal', taskNatureText: '正式', creator: '赵工', createdAt: '2025-01-29 11:00', sourceType: 'copy', sourceLabel: '复制' }
+                ];
+
+                function renderActions(r) {
+                    var buf = [];
+                    buf.push('<a href="pages/bom-version-history.html?type=mbom&product=' + encodeURIComponent(r.productCode || '') + '&productName=' + encodeURIComponent(r.productName || '') + '" class="btn btn-sm btn-default">版本管理</a>');
+                    return buf.join('');
+                }
+
+                function updateBatchUI() {
+                    var checked = document.querySelectorAll('input[name="bom-id"]:checked');
+                    var n = checked.length;
+                    if (countSpan) countSpan.textContent = n;
+                    if (selectionCount) selectionCount.classList.toggle('hidden', n === 0);
+                    document.querySelectorAll('.batch-action-btn').forEach(function (b) { b.classList.toggle('enabled', n > 0); });
+                }
+
+                var VERSION_MOCK = { '1': [{ id: '1', ebomVersion: 'V2.0', mbomVersion: 'V2.0', sbomVersion: 'V1.0', status: 'published', statusText: '已发布', statusClass: 'status-published', execStatus: 'approved', execStatusText: '已通过', execStatusClass: 'status-exec-approved', usageStatus: 'using', usageStatusText: '使用中', usageStatusClass: 'status-using', level: 3, materialCount: 18, creator: '张工', createdAt: '2025-01-20 10:00' }, { id: '2', ebomVersion: 'V1.0', mbomVersion: 'V1.0', sbomVersion: 'V1.0', status: 'published', statusText: '已发布', statusClass: 'status-published', execStatus: 'approved', execStatusText: '已通过', execStatusClass: 'status-exec-approved', usageStatus: 'archived', usageStatusText: '已归档', usageStatusClass: 'status-archived', level: 3, materialCount: 15, creator: '张工', createdAt: '2025-01-15 10:30' }, { id: '3', ebomVersion: 'V3.0', mbomVersion: 'V3.0', sbomVersion: '—', status: 'pending-publish', statusText: '待发布', statusClass: 'status-pending-publish', execStatus: 'draft', execStatusText: '草稿', execStatusClass: 'status-exec-draft', usageStatus: 'unused', usageStatusText: '未使用', usageStatusClass: 'status-unused', level: 2, materialCount: 10, creator: '李工', createdAt: '2025-01-28 14:00' }, { id: '4', ebomVersion: 'V4.0', mbomVersion: 'V4.0', sbomVersion: '—', status: 'pending-publish', statusText: '待发布', statusClass: 'status-pending-publish', execStatus: 'approved', execStatusText: '已通过', execStatusClass: 'status-exec-approved', usageStatus: 'unused', usageStatusText: '未使用', usageStatusClass: 'status-unused', level: 2, materialCount: 8, creator: '王工', createdAt: '2025-01-29 11:00' }], '2': [{ id: '1', ebomVersion: 'V1.0', mbomVersion: 'V1.0', sbomVersion: 'V1.0', status: 'published', statusText: '已发布', statusClass: 'status-published', execStatus: 'approved', execStatusText: '已通过', execStatusClass: 'status-exec-approved', usageStatus: 'using', usageStatusText: '使用中', usageStatusClass: 'status-using', level: 2, materialCount: 8, creator: '李工', createdAt: '2025-01-25 14:00' }], '3': [], '4': [] };
+                var BOM_MOCK = {
+                    '1_1': [{ no: 1, level: '1', material: '智能控制器', code: 'M000', spec: '—', qty: 1, unit: '台', key: '是', op: '50', station: 'A05', method: '装配', flow: '总装→测试→包装', tool: '工装、扳手', loss: '2.5%', wh: '—', alt: '—', remark: '—' }, { no: 2, level: '1.1', material: '主控板', code: 'M001', spec: 'CTRL-MAIN-V1', qty: 1, unit: '件', key: '是', op: '20', station: 'B02', method: 'SMT', flow: '贴片→回流焊', tool: '贴片机', loss: '1%', wh: '半成品仓', alt: 'M001-A', remark: '—' }],
+                    '1_2': [{ no: 1, level: '1', material: '智能控制器', code: 'M000', spec: '—', qty: 1, unit: '台', key: '是', op: '50', station: 'A05', method: '装配', flow: '总装→测试', tool: '工装', loss: '2%', wh: '—', alt: '—', remark: '—' }],
+                    '1_3': [{ no: 1, level: '1', material: '智能控制器', code: 'M000', spec: '—', qty: 1, unit: '台', key: '是', op: '—', station: '—', method: '待设计', flow: '—', tool: '—', loss: '—', wh: '—', alt: '—', remark: '草稿' }],
+                    '1_4': [{ no: 1, level: '1', material: '智能控制器', code: 'M000', spec: '—', qty: 1, unit: '台', key: '是', op: '50', station: 'A05', method: '装配', flow: '总装→测试', tool: '工装', loss: '2%', wh: '—', alt: '—', remark: '—' }],
+                    '2_1': [{ no: 1, level: '1', material: '传感器模块', code: 'M003', spec: 'SN-温度-01', qty: 1, unit: '个', key: '是', op: '30', station: 'B03', method: '装配', flow: '装配→标定', tool: '—', loss: '—', wh: '原料仓', alt: '—', remark: '—' }]
+                };
+                var ATTACH_MOCK = {
+                    '1_1': [{ type: '工艺文档', materialCode: 'M000', materialName: '智能控制器', spec: '—', fileName: '装配工艺卡', fileVersion: 'V1.0', format: 'PDF', uploadTime: '2025-01-20 16:00' }],
+                    '1_2': [], '1_3': [], '1_4': [],
+                    '2_1': [{ type: '工艺文档', materialCode: 'M003', materialName: '传感器模块', spec: 'SN-温度-01', fileName: '传感器装配工艺', fileVersion: 'V1.0', format: 'PDF', uploadTime: '2025-01-25 16:00' }]
+                };
+                var mbomVersionPanel = document.getElementById('mbom-version-panel');
+                var mbomDetailPanel = document.getElementById('mbom-detail-panel');
+                function loadVersionList(bomId, productCode, productName) {
+                    var versions = VERSION_MOCK[bomId] || [];
+                    var vTbody = document.getElementById('mbom-version-tbody');
+                    var vProductInfo = document.getElementById('mbom-version-product-info');
+                    var vDesignLink = document.getElementById('mbom-version-design-link');
+                    if (vProductInfo) vProductInfo.textContent = productCode + ' ' + productName;
+                    if (vDesignLink) { vDesignLink.href = 'pages/mbom-workbench.html?id=' + encodeURIComponent(bomId || ''); }
+                    if (!vTbody) return;
+                    if (!versions.length) {
+                        vTbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:24px;color:#999;">暂无版本</td></tr>';
+                    } else {
+                        vTbody.innerHTML = versions.map(function (r) {
+                            var canDesign = (r.execStatus === 'not-executed' || r.execStatus === 'draft' || r.execStatus === 'rejected' || r.execStatusText === '未执行' || r.execStatusText === '草稿' || r.execStatusText === '已驳回');
+                            var acts = canDesign ? '<a href="pages/mbom-workbench.html?id=' + encodeURIComponent(bomId || '') + '&versionId=' + encodeURIComponent(r.id || '') + '" class="btn btn-sm btn-default">设计</a>' : '';
+                            var canSubmitReview = (r.execStatus === 'draft' || r.execStatusText === '草稿');
+                            if (canSubmitReview) acts += '<button type="button" class="btn btn-sm btn-default btn-submit-review">提审</button>';
+                            var canPublish = (r.execStatus === 'approved' || r.execStatusText === '已通过') && (r.status === 'pending-publish' || r.statusText === '待发布');
+                            if (canPublish) acts = '<button type="button" class="btn btn-sm btn-default btn-publish">发布</button>' + acts;
+                            var canArchive = (r.usageStatus === 'using' || r.usageStatus === 'unused' || r.usageStatusText === '使用中' || r.usageStatusText === '未使用');
+                            if (canArchive) acts += '<button type="button" class="btn btn-sm btn-default btn-archive">归档</button>';
+                            return '<tr class="mbom-version-row" data-id="' + r.id + '" data-version="' + (r.mbomVersion || '') + '" style="cursor:pointer;">' +
+                                '<td>' + (r.mbomVersion || '—') + '</td><td>' + (r.ebomVersion || '—') + '</td><td>' + (r.sbomVersion || '—') + '</td>' +
+                                '<td><span class="status-badge ' + (r.statusClass || '') + '">' + (r.statusText || '—') + '</span></td>' +
+                                '<td><span class="status-badge ' + (r.execStatusClass || 'status-not-executed') + '">' + (r.execStatusText || '未执行') + '</span></td>' +
+                                '<td><span class="status-badge ' + (r.usageStatusClass || '') + '">' + (r.usageStatusText || '—') + '</span></td>' +
+                                '<td>' + (r.level || '—') + '</td><td>' + (r.materialCount || '—') + '</td><td>' + (r.creator || '—') + '</td><td>' + (r.createdAt || '—') + '</td>' +
+                                '<td>' + acts + '</td></tr>';
+                        }).join('');
+                    }
+                    if (mbomVersionPanel) { mbomVersionPanel.style.display = 'block'; mbomVersionPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+                    if (mbomDetailPanel && !versions.length) mbomDetailPanel.style.display = 'none';
+                    document.querySelectorAll('.bom-list-row').forEach(function (tr) { tr.classList.remove('selected'); });
+                    var sel = document.querySelector('.bom-list-row[data-id="' + bomId + '"]');
+                    if (sel) sel.classList.add('selected');
+                    if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+                    if (versions.length > 0) {
+                        var firstVer = versions[0];
+                        showBomDetail(bomId, firstVer.id, firstVer.mbomVersion || firstVer.version);
+                    }
+                }
+                function showBomDetail(bomId, versionId, version) {
+                    var key = bomId + '_' + versionId;
+                    var rows = BOM_MOCK[key] || BOM_MOCK['1_1'] || [];
+                    var attachRows = ATTACH_MOCK[key] || ATTACH_MOCK['1_1'] || [];
+                    var thead = document.getElementById('mbom-detail-thead');
+                    var tbody = document.getElementById('mbom-detail-tbody');
+                    var attachTbody = document.getElementById('mbom-detail-attach-tbody');
+                    var titleEl = document.getElementById('mbom-detail-title');
+                    var baseCols = '<th class="col-no">序号</th><th class="col-level">层级号</th><th>物料</th><th>物料编码</th><th>规格型号</th><th class="col-qty">数量</th><th class="col-unit">单位</th><th class="col-key">关键件</th>';
+                    if (thead) thead.innerHTML = '<tr>' + baseCols + '<th class="col-op">工序号</th><th class="col-station">工位号</th><th class="col-method">加工方式</th><th class="col-flow">工艺流程</th><th class="col-tool">工装工具</th><th class="col-loss">损耗率</th><th class="col-wh">发料仓库</th><th class="col-alt">替代料</th><th class="col-remark">备注</th></tr>';
+                    if (tbody) tbody.innerHTML = rows.map(function (r) { return '<tr><td class="col-no">' + r.no + '</td><td class="col-level">' + r.level + '</td><td>' + r.material + '</td><td>' + r.code + '</td><td>' + r.spec + '</td><td class="col-qty">' + r.qty + '</td><td class="col-unit">' + r.unit + '</td><td class="col-key">' + r.key + '</td><td class="col-op">' + (r.op || '—') + '</td><td class="col-station">' + (r.station || '—') + '</td><td class="col-method">' + (r.method || '—') + '</td><td class="col-flow">' + (r.flow || '—') + '</td><td class="col-tool">' + (r.tool || '—') + '</td><td class="col-loss">' + (r.loss || '—') + '</td><td class="col-wh">' + (r.wh || '—') + '</td><td class="col-alt">' + (r.alt || '—') + '</td><td class="col-remark">' + (r.remark || '—') + '</td></tr>'; }).join('');
+                    if (attachTbody) attachTbody.innerHTML = attachRows.length ? attachRows.map(function (a) { return '<tr><td>' + (a.type || '—') + '</td><td>' + (a.materialCode || '—') + '</td><td>' + (a.materialName || '—') + '</td><td>' + (a.spec || '—') + '</td><td>' + (a.fileName || '—') + '</td><td>' + (a.fileVersion || '—') + '</td><td>' + (a.format || '—') + '</td><td>' + (a.uploadTime || '—') + '</td><td><button type="button" class="btn btn-sm btn-default">预览</button><button type="button" class="btn btn-sm btn-default">下载</button></td></tr>'; }).join('') : '<tr><td colspan="9" style="text-align:center;padding:24px;color:#999;">暂无图纸与附件</td></tr>';
+                    if (titleEl) titleEl.textContent = 'MBOM 版本 ' + (version || '');
+                    if (mbomDetailPanel) { mbomDetailPanel.style.display = 'block'; mbomDetailPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+                    var tabBom = mbomDetailPanel && mbomDetailPanel.querySelector('.dt-detail-tab input[value="bom"]');
+                    if (tabBom) tabBom.checked = true;
+                    document.querySelectorAll('.mbom-version-row').forEach(function (tr) { tr.classList.remove('selected'); });
+                    var vSel = document.querySelector('.mbom-version-row[data-id="' + versionId + '"]');
+                    if (vSel) vSel.classList.add('selected');
+                }
+
+                function render() {
+                    if (!tbody) return;
+                    if (!MOCK.length) {
+                        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:#999;"><div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">暂无MBOM数据</div><div class="empty-description">在 BOM 树上维护工序、加工方式、工艺流程等工艺信息；从 EBOM 转化、手动创建、复制或导入。点击「新建」或「导入」创建</div></div></td></tr>';
+                        if (paginationInfo) paginationInfo.textContent = '共 0 条记录';
+                        return;
+                    }
+                    var html = MOCK.map(function (r) {
+                        return '<tr class="bom-list-row" data-id="' + r.id + '" data-product-code="' + (r.productCode || '') + '" data-product-name="' + (r.productName || '') + '" style="cursor:pointer;">' +
+                            '<td onclick="event.stopPropagation()"><input type="checkbox" name="bom-id" value="' + r.id + '"></td>' +
+                            '<td>' + (r.code || '—') + '</td><td>' + (r.productCode || '—') + '</td><td>' + (r.productName || '—') + '</td>' +
+                            '<td><span class="status-badge ' + (r.statusClass || '') + '">' + (r.statusText || '—') + '</span></td>' +
+                            '<td>' + (r.taskNatureText || '—') + '</td>' +
+                            '<td><span class="source-tag source-' + (r.sourceType || 'manual') + '">' + (r.sourceLabel || '—') + '</span></td>' +
+                            '<td>' + (r.creator || '—') + '</td><td>' + (r.createdAt || '—') + '</td>' +
+                            '<td onclick="event.stopPropagation()">' + renderActions(r) + '</td></tr>';
+                    }).join('');
+                    tbody.innerHTML = html;
+                    if (paginationInfo) paginationInfo.textContent = '共 ' + MOCK.length + ' 条记录';
+                    if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+                    if (typeof PageInteractions !== 'undefined' && PageInteractions.toggleSelectAll) PageInteractions.toggleSelectAll('input[name="bom-id"]');
+                    document.querySelectorAll('input[name="bom-id"], .select-all-checkbox').forEach(function (el) {
+                        el.addEventListener('change', updateBatchUI);
+                    });
+                    updateBatchUI();
+                    if (MOCK.length > 0) {
+                        var first = MOCK[0];
+                        loadVersionList(first.id, first.productCode, first.productName);
+                    }
+                    tbody.addEventListener('click', function (e) {
+                        var row = e.target.closest('.bom-list-row');
+                        if (!row || e.target.closest('a') || e.target.closest('button') || e.target.closest('input[type="checkbox"]')) return;
+                        var id = row.getAttribute('data-id');
+                        var productCode = row.getAttribute('data-product-code');
+                        var productName = row.getAttribute('data-product-name');
+                        loadVersionList(id, productCode, productName);
+                    });
+                    var vTbody = document.getElementById('mbom-version-tbody');
+                    if (vTbody) vTbody.addEventListener('click', function (e) {
+                        var row = e.target.closest('.mbom-version-row');
+                        if (!row || e.target.closest('a') || e.target.closest('button')) return;
+                        var versionId = row.getAttribute('data-id');
+                        var ver = row.getAttribute('data-version');
+                        var selectedBom = document.querySelector('.bom-list-row.selected');
+                        var bomId = selectedBom ? selectedBom.getAttribute('data-id') : '';
+                        showBomDetail(bomId, versionId, ver);
+                    });
+                }
+
+                var msgModal = document.getElementById('mbom-list-msg-modal');
+                var msgOk = document.getElementById('mbom-list-msg-ok');
+                var msgText = document.getElementById('mbom-list-msg-text');
+                function closeMsgModal() {
+                    if (msgModal) msgModal.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+                if (msgOk) msgOk.addEventListener('click', closeMsgModal);
+                if (msgModal) msgModal.addEventListener('click', function (ev) { if (ev.target === msgModal) closeMsgModal(); });
+
+                document.addEventListener('click', function (e) {
+                    var vSrb = e.target && e.target.closest && e.target.closest('.btn-submit-review');
+                    if (vSrb && msgModal && msgText) { msgText.textContent = '提审成功（原型演示）'; msgModal.classList.add('active'); document.body.style.overflow = 'hidden'; return; }
+                    var vPb = e.target && e.target.closest && e.target.closest('.btn-publish');
+                    if (vPb && msgModal && msgText) { msgText.textContent = '发布成功（原型演示）'; msgModal.classList.add('active'); document.body.style.overflow = 'hidden'; return; }
+                    var vAb = e.target && e.target.closest && e.target.closest('.btn-archive');
+                    if (vAb && msgModal && msgText) { msgText.textContent = '归档成功（原型演示）'; msgModal.classList.add('active'); document.body.style.overflow = 'hidden'; return; }
+                    var btn = e.target && e.target.closest && e.target.closest('.batch-action-btn');
+                    if (!btn) return;
+                    var checked = document.querySelectorAll('input[name="bom-id"]:checked');
+                    if (checked.length === 0) {
+                        if (msgText) msgText.textContent = '请先选择要导出的记录';
+                        if (msgModal) { msgModal.classList.add('active'); document.body.style.overflow = 'hidden'; }
+                        return;
+                    }
+                    var act = btn.getAttribute('data-action');
+                    if (act === 'batch-export') {
+                        if (msgText) msgText.textContent = '导出成功（原型演示）';
+                        if (msgModal) { msgModal.classList.add('active'); document.body.style.overflow = 'hidden'; }
+                    }
+                });
+
+                var importModal = document.getElementById('mbom-list-import-modal');
+                var importBtn = document.getElementById('mbom-list-import');
+                var importOk = document.getElementById('mbom-list-import-ok');
+                var importCancel = document.getElementById('mbom-list-import-cancel');
+                var importClose = document.getElementById('mbom-list-import-close');
+                function closeImportModal() { if (importModal) importModal.classList.remove('active'); }
+                if (importBtn) importBtn.addEventListener('click', function () { if (importModal) importModal.classList.add('active'); });
+                if (importOk) importOk.addEventListener('click', function () {
+                    closeImportModal();
+                    if (msgText) msgText.textContent = '导入成功（原型演示）';
+                    if (msgModal) { msgModal.classList.add('active'); document.body.style.overflow = 'hidden'; }
+                });
+                if (importCancel) importCancel.addEventListener('click', closeImportModal);
+                if (importClose) importClose.addEventListener('click', closeImportModal);
+                if (importModal) importModal.addEventListener('click', function (ev) { if (ev.target === importModal) closeImportModal(); });
+
+                render();
+            })();
+    </script>
+    </div>
+</body>
+</html>

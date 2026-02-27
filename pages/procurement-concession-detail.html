@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>让步接收单详情 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/procurement-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">采购执行</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/procurement-concession-list.html" class="breadcrumb-item">让步接收单</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">详情</span>
+        </div>
+
+        <div class="page-header">
+            <h2 class="page-title">让步接收单详情</h2>
+            <p class="page-description">查看让步接收单详细信息，包括处理方案（如降级接收）、原等级与降级后等级、等级单价与结算金额、让步原因及使用限制等。</p>
+        </div>
+
+        <!-- 基本信息 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">基本信息</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+                    <div class="form-item">
+                        <label class="form-label">让步接收单号</label>
+                        <div class="form-value">CON-2025-001</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">关联采购订单</label>
+                        <div class="form-value">
+                            <a href="pages/procurement-order-detail.html?id=1" style="color:#1890ff;">PO-2025-001</a>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">关联处理单</label>
+                        <div class="form-value">
+                            <a href="pages/procurement-unqualified-handle-detail.html?id=1" style="color:#1890ff;">UH-2025-001</a>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">供应商</label>
+                        <div class="form-value">深圳市电子科技有限公司</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">接收状态</label>
+                        <div class="form-value">
+                            <span class="status-badge status-warning">待审批</span>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">来源</label>
+                        <div class="form-value" id="concession-detail-source">
+                            <span class="status-badge" style="background:#e6f7ff;color:#1890ff;">会审创建</span>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">申请日期</label>
+                        <div class="form-value">2025-01-22</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">申请人</label>
+                        <div class="form-value">采购-张采购</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">审批日期</label>
+                        <div class="form-value">-</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">同步状态</label>
+                        <div class="form-value">
+                            <span class="status-badge status-success">已同步</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 处理方案与结算（整单说明） -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">处理方案与结算</h3>
+            </div>
+            <div class="card-body">
+                <p style="font-size:13px;color:#595959;margin-bottom:16px;">让步接收的处理方案（如降级接收）需明确原等级与降级后等级，不同等级对应不同价格，用于结算。</p>
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                    <div class="form-item">
+                        <label class="form-label">处理方案</label>
+                        <div class="form-value">降级接收</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">结算方式</label>
+                        <div class="form-value">按降级后等级单价结算，价差从当期货款中扣除</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">质量责任</label>
+                        <div class="form-value">供应商承担质量风险，限非关键部位使用</div>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">接收日期</label>
+                        <div class="form-value">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 让步接收物料明细（含等级与价格） -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">让步接收物料明细</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table class="list-table-nowrap">
+                        <thead>
+                            <tr>
+                                <th width="50">序号</th>
+                                <th width="110">物料编码</th>
+                                <th width="140">物料名称</th>
+                                <th width="90">规格型号</th>
+                                <th width="60">单位</th>
+                                <th width="80">接收数量</th>
+                                <th width="90">处理方案</th>
+                                <th width="90">原物料等级</th>
+                                <th width="90">降级后等级</th>
+                                <th width="90">原等级单价</th>
+                                <th width="90">降级后单价</th>
+                                <th width="90">结算金额</th>
+                                <th width="120">不合格项</th>
+                                <th width="120">让步原因</th>
+                                <th>使用限制</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>MAT-001</td>
+                                <td>电子元件A</td>
+                                <td>规格A</td>
+                                <td>个</td>
+                                <td>50</td>
+                                <td>降级接收</td>
+                                <td>一级品</td>
+                                <td>二级品</td>
+                                <td>¥2.50</td>
+                                <td>¥2.00</td>
+                                <td>¥100.00</td>
+                                <td>尺寸偏差、外观缺陷</td>
+                                <td>轻微偏差，不影响使用</td>
+                                <td>仅用于非关键部位</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p style="margin-top:12px;font-size:12px;color:#8c8c8c;">结算金额 = 降级后单价 × 接收数量；价差（原等级金额 − 结算金额）从供应商货款中扣除。</p>
+            </div>
+        </div>
+
+        <!-- 备注信息 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">备注信息</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-item">
+                    <label class="form-label">备注</label>
+                    <div class="form-value" style="min-height:60px;padding:12px;background:#fafafa;border-radius:4px;">会审确定：轻微偏差不影响使用，同意降级接收。原物料等级一级品降为二级品使用，按二级品单价结算，价差从货款中扣除，仅限非关键部位使用。</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 操作按钮：仅手工创建时显示审批 -->
+        <div class="action-bar" style="margin-top:20px;">
+            <div class="action-left">
+                <button class="btn btn-primary btn-approve-concession" data-id="1" id="concession-detail-approve-btn" style="display:none;">审批</button>
+                <button class="btn btn-default" onclick="history.back();">返回</button>
+            </div>
+        </div>
+
+        <script>
+        console.log('让步接收单详情 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+        (function() {
+            var sourceEl = document.getElementById('concession-detail-source');
+            var approveBtn = document.getElementById('concession-detail-approve-btn');
+            var isManual = sourceEl && sourceEl.textContent.indexOf('手工创建') !== -1;
+            if (approveBtn && isManual) approveBtn.style.display = '';
+            document.querySelectorAll('.btn-approve-concession').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    if (confirm('确定对该让步接收单执行审批？')) alert('审批已通过，已自动推送至对应供应商的供应链协同应用（让步接收单）。');
+                });
+            });
+        })();
+        </script>
+    </div>
+</body>
+</html>

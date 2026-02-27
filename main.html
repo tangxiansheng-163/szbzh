@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设计协同系统 - PLM</title>
+    <link rel="stylesheet" href="assets/system.css">
+    <!-- 性能优化：ECharts 按需加载（仅 KPI/能耗等图表页需要），避免强刷时阻塞下载 -->
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header（顶部导航栏） -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="app-switcher-trigger" id="app-switcher-trigger" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false" aria-label="切换应用">
+                    <div class="logo-wrapper">
+                        <div class="logo-icon">P</div>
+                        <div class="logo-text">设计协同系统</div>
+                        <span class="app-switcher-arrow">▾</span>
+                    </div>
+                </div>
+                <div id="app-switcher-popover" class="app-switcher-popover" role="menu" aria-hidden="true">
+                    <div class="app-switcher-title">切换应用</div>
+                    <div class="app-switcher-list">
+                        <a href="#" class="app-switcher-item active" data-app="design-collab">
+                            <span class="app-switcher-icon">设</span>
+                            <span class="app-switcher-name">设计协同系统</span>
+                            <span class="app-switcher-check">✓</span>
+                        </a>
+                        <a href="#" class="app-switcher-item" data-app="procurement">
+                            <span class="app-switcher-icon">采</span>
+                            <span class="app-switcher-name">采购协同系统</span>
+                        </a>
+                        <a href="#" class="app-switcher-item" data-app="supply-chain">
+                            <span class="app-switcher-icon">供</span>
+                            <span class="app-switcher-name">供应链协同</span>
+                        </a>
+                        <a href="#" class="app-switcher-item" data-app="equipment">
+                            <span class="app-switcher-icon">备</span>
+                            <span class="app-switcher-name">设备管理协同</span>
+                        </a>
+                        <a href="#" class="app-switcher-item" data-app="energy">
+                            <span class="app-switcher-icon">能</span>
+                            <span class="app-switcher-name">能源管理协同</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-center">
+                <div class="header-search">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="search" id="global-search" name="search" class="search-input" placeholder="搜索单据、物料、任务..." aria-label="全局搜索">
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <a href="pages/notification-center.html" class="header-action action-badge">
+                    <span class="action-icon">🔔</span>
+                    <span class="badge">5</span>
+                </a>
+                <a href="pages/todo-list.html" class="header-action">
+                    <span class="action-icon">✅</span>
+                </a>
+                <div class="user-info">
+                    <div class="user-avatar">张</div>
+                    <div class="user-detail">
+                        <div class="user-name">张工</div>
+                        <div class="user-role">技术任务负责人</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar + Main Content -->
+        <div class="sidebar-wrapper">
+            <!-- Sidebar（左侧菜单栏） -->
+            <aside class="app-sidebar">
+                <nav class="sidebar-menu">
+                    <div class="menu-section">
+                        <div class="menu-item menu-item-parent expanded">
+                            <span class="menu-icon">🏠</span>
+                            <span class="menu-text">工作台</span>
+                            <span class="menu-arrow">▶</span>
+                        </div>
+                        <div class="submenu open" id="submenu-home">
+                            <a href="pages/my-initiated.html" class="submenu-item">我发起的</a>
+                            <a href="pages/design-task-review.html" class="submenu-item">待我审核</a>
+                            <a href="pages/notification-center.html" class="submenu-item">消息列表</a>
+                        </div>
+                    </div>
+
+                    <div class="menu-section">
+                        <div class="menu-item menu-item-parent">
+                            <span class="menu-icon">📋</span>
+                            <span class="menu-text">任务管理</span>
+                            <span class="menu-arrow">▶</span>
+                        </div>
+                        <div class="submenu" id="submenu-task">
+                            <a href="pages/tech-task-list.html" class="submenu-item">技术任务</a>
+                            <a href="pages/design-task-list.html" class="submenu-item">设计任务</a>
+                        </div>
+                    </div>
+
+                    <!-- 结算协同菜单 -->
+                    <div class="menu-section">
+                        <div class="menu-item menu-item-parent">
+                            <span class="menu-icon">💰</span>
+                            <span class="menu-text">结算协同</span>
+                            <span class="menu-arrow">▶</span>
+                        </div>
+                        <div class="submenu" id="submenu-settlement">
+                            <a href="pages/procurement-settlement-new.html" class="submenu-item">采购协同-结算管理</a>
+                            <a href="pages/supply-chain-settlement-new.html" class="submenu-item">供应链协同-结算工作台</a>
+                            <a href="pages/b-enterprise-procurement.html" class="submenu-item">B企业-供应商结算</a>
+                        </div>
+                    </div>
+
+                    <div class="menu-section">
+                        <div class="menu-item menu-item-parent">
+                            <span class="menu-icon">📊</span>
+                            <span class="menu-text">BOM管理</span>
+                            <span class="menu-arrow">▶</span>
+                        </div>
+                        <div class="submenu" id="submenu-bom">
+                            <a href="pages/ebom-list.html" class="submenu-item">EBOM列表</a>
+                            <a href="pages/mbom-list.html" class="submenu-item">MBOM列表</a>
+                            <a href="pages/sbom-list.html" class="submenu-item">SBOM列表</a>
+                        </div>
+                    </div>
+
+                    <div class="menu-section">
+                        <div class="menu-item menu-item-parent">
+                            <span class="menu-icon">📝</span>
+                            <span class="menu-text">变更管理</span>
+                            <span class="menu-arrow">▶</span>
+                        </div>
+                        <div class="submenu" id="submenu-change">
+                            <a href="pages/change-review-list.html" class="submenu-item">变更会审单</a>
+                            <a href="pages/change-request-list.html" class="submenu-item">变更申请单</a>
+                            <a href="pages/emergency-change-list.html" class="submenu-item">紧急变更</a>
+                        </div>
+                    </div>
+
+                    <div class="menu-section">
+                        <div class="menu-item menu-item-parent">
+                            <span class="menu-icon">🔗</span>
+                            <span class="menu-text">系统联动</span>
+                            <span class="menu-arrow">▶</span>
+                        </div>
+                        <div class="submenu" id="submenu-sync">
+                            <a href="pages/sync-erp.html" class="submenu-item">ERP 集成</a>
+                            <a href="pages/sync-mes.html" class="submenu-item">MES 集成</a>
+                            <a href="pages/sync-wms.html" class="submenu-item">WMS 集成</a>
+                            <a href="pages/sync-log.html" class="submenu-item">同步日志</a>
+                        </div>
+                    </div>
+
+                    <div class="menu-section">
+                        <div class="menu-item menu-item-parent">
+                            <span class="menu-icon">📁</span>
+                            <span class="menu-text">基础信息</span>
+                            <span class="menu-arrow">▶</span>
+                        </div>
+                        <div class="submenu" id="submenu-base">
+                            <a href="pages/material-list.html" class="submenu-item">物料档案</a>
+                            <a href="pages/product-structure.html" class="submenu-item">产品档案</a>
+                            <a href="pages/organization-list.html" class="submenu-item">组织架构</a>
+                            <a href="pages/user-list.html" class="submenu-item">人员管理</a>
+                            <a href="pages/role-permission.html" class="submenu-item">角色与权限</a>
+                        </div>
+                    </div>
+
+                    <div class="menu-section">
+                        <div class="menu-item menu-item-parent">
+                            <span class="menu-icon">📈</span>
+                            <span class="menu-text">考核与改进</span>
+                            <span class="menu-arrow">▶</span>
+                        </div>
+                        <div class="submenu" id="submenu-kpi">
+                            <a href="pages/kpi-dashboard.html" class="submenu-item">KPI 仪表盘</a>
+                            <a href="pages/performance-stats.html" class="submenu-item">绩效统计</a>
+                            <a href="pages/improvement-plan.html" class="submenu-item">改进计划</a>
+                        </div>
+                    </div>
+
+                    <div class="menu-section">
+                        <div class="menu-item menu-item-parent">
+                            <span class="menu-icon">⚠️</span>
+                            <span class="menu-text">预警管理</span>
+                            <span class="menu-arrow">▶</span>
+                        </div>
+                        <div class="submenu" id="submenu-alert">
+                            <a href="pages/alert-list.html" class="submenu-item">预警列表</a>
+                            <a href="pages/alert-rule-config.html" class="submenu-item">预警规则配置</a>
+                            <a href="pages/alert-handle.html" class="submenu-item">预警处理</a>
+                        </div>
+                    </div>
+
+                    <div class="menu-section">
+                        <div class="menu-item menu-item-parent">
+                            <span class="menu-icon">📑</span>
+                            <span class="menu-text">报表管理</span>
+                            <span class="menu-arrow">▶</span>
+                        </div>
+                        <div class="submenu" id="submenu-report">
+                            <a href="pages/report-dashboard.html" class="submenu-item">报表中心</a>
+                            <a href="pages/report-bom-stats.html" class="submenu-item">BOM 统计</a>
+                            <a href="pages/report-change-stats.html" class="submenu-item">变更统计</a>
+                            <a href="pages/report-custom.html" class="submenu-item">自定义报表</a>
+                        </div>
+                    </div>
+
+                    <div class="menu-section">
+                        <div class="menu-item menu-item-parent">
+                            <span class="menu-icon">⚙️</span>
+                            <span class="menu-text">系统配置</span>
+                            <span class="menu-arrow">▶</span>
+                        </div>
+                        <div class="submenu" id="submenu-config">
+                            <a href="pages/config-coding-rule.html" class="submenu-item">编码规则</a>
+                            <a href="pages/config-workflow.html" class="submenu-item">工作流配置</a>
+                            <a href="pages/config-dictionary.html" class="submenu-item">数据字典</a>
+                            <a href="pages/config-kpi-indicator.html" class="submenu-item">考核指标配置</a>
+                            <a href="pages/operation-log.html" class="submenu-item">操作日志</a>
+                            <a href="pages/system-setting.html" class="submenu-item">系统设置</a>
+                        </div>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content（右侧内容区） -->
+            <main class="app-main">
+                <div id="content-container">
+                    <div class="content-wrapper" id="default-dashboard">
+                        <div class="loading-wrapper">
+                            <div class="loading-spinner"></div>
+                            <span class="loading-text">加载中...</span>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 全局Modal弹窗 - 新建 -->
+    <div id="create-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">新建</div>
+                <div class="modal-close" data-modal="create-modal">×</div>
+            </div>
+            <div class="modal-body">
+                <!-- 动态加载表单内容 -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-modal-cancel" data-modal="create-modal">取消</button>
+                <button type="button" class="btn btn-primary btn-modal-submit" data-modal="create-modal">提交</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全局Modal弹窗 - 编辑 -->
+    <div id="edit-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">编辑</div>
+                <div class="modal-close" data-modal="edit-modal">×</div>
+            </div>
+            <div class="modal-body">
+                <!-- 动态加载表单内容 -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-modal-cancel" data-modal="edit-modal">取消</button>
+                <button type="button" class="btn btn-primary btn-modal-submit" data-modal="edit-modal">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全局Modal弹窗 - 新建/编辑采购订单 -->
+    <div id="order-create-modal" class="modal-overlay">
+        <div class="modal modal--wide">
+            <div class="modal-header">
+                <div class="modal-title">新建采购订单</div>
+                <div class="modal-close" data-modal="order-create-modal">×</div>
+            </div>
+            <div class="modal-body">
+                <!-- 动态加载采购订单新建/编辑内容（如 procurement-order-create / supply-chain-order-create） -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-close-modal="order-create-modal">取消</button>
+                <button type="button" class="btn btn-default" id="order-create-save-btn">保存</button>
+                <button type="button" class="btn btn-primary" id="order-create-submit-btn">提交审批</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 待办事项 - 不合格处理会审查看详情弹窗（大弹窗，与查看详情一致） -->
+    <div id="todo-unqualified-review-detail-modal" class="modal-overlay">
+        <div class="modal modal-xl" style="max-width:90%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;">
+            <div class="modal-header">
+                <div class="modal-title">不合格处理会审 - 待办详情</div>
+                <div class="modal-close" id="todo-unqualified-modal-close">×</div>
+            </div>
+            <div class="modal-body" id="todo-unqualified-modal-body" style="overflow-y:auto;flex:1;"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="todo-unqualified-modal-btn-close">关闭</button>
+                <button type="button" class="btn btn-primary" id="todo-unqualified-modal-btn-handle" style="display:none;">填写意见</button>
+            </div>
+        </div>
+    </div>
+    <!-- 待办事项 - 填写会审意见弹窗 -->
+    <div id="todo-fill-opinion-modal" class="modal-overlay">
+        <div class="modal" style="max-width:720px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;">
+            <div class="modal-header">
+                <div class="modal-title">填写会审意见</div>
+                <div class="modal-close" id="todo-fill-opinion-modal-close">×</div>
+            </div>
+            <div class="modal-body" id="todo-fill-opinion-modal-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="todo-fill-opinion-modal-cancel">取消</button>
+                <button type="button" class="btn btn-primary" id="todo-fill-opinion-modal-submit">提交意见</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全局Modal弹窗 - 查看详情（列表页“查看”就地弹窗） -->
+    <div id="list-view-modal" class="modal-overlay">
+        <div class="modal modal-xl" style="max-width:90%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;">
+            <div class="modal-header">
+                <div class="modal-title">查看详情</div>
+                <div class="modal-close" data-close-modal="list-view-modal">×</div>
+            </div>
+            <div class="modal-body" style="overflow-y:auto;flex:1;">
+                <!-- 动态加载详情内容 -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-close-modal="list-view-modal">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全局Modal弹窗 - 生成询价比价单（从采购计划下推） -->
+    <div class="modal-overlay" id="gen-inquiry-from-plan-modal">
+        <div class="modal modal--wide" onclick="event.stopPropagation()">
+            <div class="modal-header" style="border-top: 3px solid #722ed1;">
+                <div class="modal-title">生成询价比价单</div>
+                <div class="modal-close" data-close-modal="gen-inquiry-from-plan-modal">×</div>
+            </div>
+            <div class="modal-body">
+                <p class="page-description" style="margin-bottom:16px;">从采购计划下推生成询价单：选择供应商（可多选），填写单据起效/报价截止日期，并确认计划明细。确认后将写入询价比价列表。</p>
+                <div class="form-item" style="margin-bottom:16px;">
+                    <label class="form-label">供应商 <span style="color:#ff4d4f;">*</span> <span style="color:var(--text-tertiary);font-weight:normal;">（搜索后多选）</span></label>
+                    <div class="supplier-search-wrap" style="position:relative;max-width:520px;">
+                        <input type="text" class="form-input" id="plan-inquiry-supplier-search" placeholder="输入供应商名称或编码搜索，点击下拉项添加" autocomplete="off" style="width:100%;">
+                        <div class="supplier-dropdown" id="plan-inquiry-supplier-dropdown" style="display:none;position:absolute;left:0;right:0;top:100%;margin-top:4px;max-height:200px;overflow-y:auto;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:10;"></div>
+                    </div>
+                    <p class="form-hint" style="margin-top:8px;font-size:12px;color:var(--text-tertiary);">已选供应商：</p>
+                    <div class="supplier-selected-tags" id="plan-inquiry-supplier-selected" style="min-height:36px;margin-top:6px;padding:8px 10px;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:#fafafa;display:flex;flex-wrap:wrap;gap:8px;align-items:center;"></div>
+                </div>
+                <div class="form-item" style="display:flex;flex-wrap:wrap;gap:24px 32px;align-items:center;margin-bottom:16px;">
+                    <div class="form-item" style="margin-bottom:0;flex:0 0 auto;">
+                        <label class="form-label">单据起效日期 <span style="color:#ff4d4f;">*</span></label>
+                        <input type="date" class="form-input" id="plan-inquiry-effective-date" required style="min-width:160px;">
+                    </div>
+                    <div class="form-item" style="margin-bottom:0;flex:0 0 auto;">
+                        <label class="form-label">报价截止日期 <span style="color:#ff4d4f;">*</span></label>
+                        <input type="date" class="form-input" id="plan-inquiry-deadline" required style="min-width:160px;">
+                    </div>
+                </div>
+                <div class="table-wrapper" style="max-height: 360px; overflow: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                    <table style="width:100%; border-collapse: collapse;">
+                        <thead style="position:sticky; top:0; background:#fafafa; z-index:1;">
+                            <tr>
+                                <th style="padding:10px 12px;text-align:left;font-size:13px;font-weight:600;color:rgba(0,0,0,0.65);border-bottom:1px solid var(--border-color);">计划编号</th>
+                                <th style="padding:10px 12px;text-align:left;font-size:13px;font-weight:600;color:rgba(0,0,0,0.65);border-bottom:1px solid var(--border-color);">物料编码</th>
+                                <th style="padding:10px 12px;text-align:left;font-size:13px;font-weight:600;color:rgba(0,0,0,0.65);border-bottom:1px solid var(--border-color);">物料名称</th>
+                                <th style="padding:10px 12px;text-align:left;font-size:13px;font-weight:600;color:rgba(0,0,0,0.65);border-bottom:1px solid var(--border-color);">规格型号</th>
+                                <th style="padding:10px 12px;text-align:left;font-size:13px;font-weight:600;color:rgba(0,0,0,0.65);border-bottom:1px solid var(--border-color);">需求数量</th>
+                                <th style="padding:10px 12px;text-align:left;font-size:13px;font-weight:600;color:rgba(0,0,0,0.65);border-bottom:1px solid var(--border-color);">单位</th>
+                                <th style="padding:10px 12px;text-align:left;font-size:13px;font-weight:600;color:rgba(0,0,0,0.65);border-bottom:1px solid var(--border-color);">需求到货日期</th>
+                            </tr>
+                        </thead>
+                        <tbody id="plan-inquiry-tbody"></tbody>
+                    </table>
+                </div>
+                <p class="modal-desc" style="margin-top:12px; color:var(--text-tertiary);" id="plan-inquiry-summary">共 <strong id="plan-inquiry-row-count">0</strong> 条物料明细</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-close-modal="gen-inquiry-from-plan-modal">取消</button>
+                <button type="button" class="btn btn-primary" id="btn-confirm-plan-inquiry">确认生成</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/finance-collab-store.js"></script>
+    <script src="assets/page-loader.js"></script>
+    <script src="assets/sidebar-menu.js"></script>
+    <script src="assets/page-interactions.js"></script>
+    <script src="assets/business-logic.js"></script>
+
+    <!-- 全局函数定义（确保动态加载页面时可用） -->
+    <script>
+        // 技术任务拆解相关全局函数
+        window.designTaskRowCount = 1;
+
+        window.openDisassembleModal = function(taskCode, taskName, productCode, productName) {
+            console.log('打开拆解弹窗:', taskCode, taskName, productCode, productName);
+            window.designTaskRowCount = 1;
+
+            const modal = document.getElementById('disassemble-modal');
+            const modalBody = document.getElementById('disassemble-modal-body');
+
+            if (!modal || !modalBody) {
+                console.error('Modal元素未找到');
+                alert('弹窗组件未加载完成,请刷新页面重试');
+                return;
+            }
+
+            modalBody.innerHTML = `
+                <style>
+                    .disassemble-task-info {
+                        background: linear-gradient(135deg, #e6f7ff 0%, #f0f9ff 100%);
+                        padding: 16px;
+                        border-radius: 8px;
+                        margin-bottom: 20px;
+                        border: 1px solid #bae7ff;
+                    }
+                    .disassemble-task-info-header {
+                        display: flex;
+                        align-items: center;
+                        margin-bottom: 12px;
+                        padding-bottom: 12px;
+                        border-bottom: 1px solid #91d5ff;
+                    }
+                    .disassemble-task-info-title {
+                        font-size: 14px;
+                        font-weight: 600;
+                        color: #1890ff;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    }
+                    .disassemble-task-info-grid {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 12px 24px;
+                        font-size: 13px;
+                    }
+                    .disassemble-info-item {
+                        display: flex;
+                        align-items: center;
+                    }
+                    .disassemble-info-label {
+                        color: #8c8c8c;
+                        margin-right: 8px;
+                        min-width: 70px;
+                    }
+                    .disassemble-info-value {
+                        color: #262626;
+                        font-weight: 500;
+                    }
+                    .disassemble-task-section {
+                        margin-bottom: 20px;
+                    }
+                    .disassemble-section-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 16px;
+                        padding-bottom: 12px;
+                        border-bottom: 2px solid #f0f0f0;
+                    }
+                    .disassemble-section-title {
+                        font-size: 15px;
+                        font-weight: 600;
+                        color: #262626;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    }
+                    .disassemble-section-title::before {
+                        content: '';
+                        width: 4px;
+                        height: 16px;
+                        background: #1890ff;
+                        border-radius: 2px;
+                    }
+                    .disassemble-task-type-select {
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        padding: 12px 16px;
+                        background: #fafafa;
+                        border-radius: 6px;
+                        margin-bottom: 16px;
+                    }
+                    .disassemble-task-type-label {
+                        font-size: 13px;
+                        font-weight: 500;
+                        color: #595959;
+                    }
+                    .disassemble-tasks-table {
+                        width: 100%;
+                        border: 1px solid #f0f0f0;
+                        border-radius: 6px;
+                        overflow: hidden;
+                        background: white;
+                    }
+                    .disassemble-table-header {
+                        display: grid;
+                        grid-template-columns: 2fr 1.2fr 1.2fr 1.3fr 50px;
+                        gap: 12px;
+                        padding: 12px 16px;
+                        background: #fafafa;
+                        border-bottom: 1px solid #f0f0f0;
+                        font-size: 13px;
+                        font-weight: 600;
+                        color: #595959;
+                    }
+                    .disassemble-table-row {
+                        display: grid;
+                        grid-template-columns: 2fr 1.2fr 1.2fr 1.3fr 50px;
+                        gap: 12px;
+                        padding: 12px 16px;
+                        border-bottom: 1px solid #f0f0f0;
+                        align-items: center;
+                        background: white;
+                        transition: background 0.2s;
+                    }
+                    .disassemble-table-row:hover {
+                        background: #fafafa;
+                    }
+                    .disassemble-table-row:last-child {
+                        border-bottom: none;
+                    }
+                    .disassemble-input {
+                        width: 100%;
+                        padding: 6px 11px;
+                        border: 1px solid #d9d9d9;
+                        border-radius: 4px;
+                        font-size: 13px;
+                        transition: all 0.2s;
+                    }
+                    .disassemble-input:hover {
+                        border-color: #40a9ff;
+                    }
+                    .disassemble-input:focus {
+                        border-color: #40a9ff;
+                        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+                        outline: none;
+                    }
+                    .disassemble-select {
+                        width: 100%;
+                        padding: 6px 11px;
+                        border: 1px solid #d9d9d9;
+                        border-radius: 4px;
+                        font-size: 13px;
+                        background: white;
+                        cursor: pointer;
+                        transition: all 0.2s;
+                    }
+                    .disassemble-select:hover {
+                        border-color: #40a9ff;
+                    }
+                    .disassemble-select:focus {
+                        border-color: #40a9ff;
+                        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+                        outline: none;
+                    }
+                    .disassemble-btn-delete {
+                        width: 28px;
+                        height: 28px;
+                        border: 1px solid #ff4d4f;
+                        background: white;
+                        color: #ff4d4f;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-size: 18px;
+                        line-height: 26px;
+                        text-align: center;
+                        transition: all 0.2s;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    .disassemble-btn-delete:hover {
+                        background: #ff4d4f;
+                        color: white;
+                        transform: scale(1.1);
+                    }
+                    .disassemble-tip {
+                        background: #fffbe6;
+                        padding: 12px 16px;
+                        border-radius: 6px;
+                        font-size: 13px;
+                        color: #ad8b00;
+                        border-left: 4px solid #faad14;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    }
+                    .disassemble-tip::before {
+                        content: '💡';
+                        font-size: 16px;
+                    }
+                </style>
+
+                <div class="disassemble-task-info">
+                    <div class="disassemble-task-info-header">
+                        <div class="disassemble-task-info-title">📋 技术任务信息</div>
+                    </div>
+                    <div class="disassemble-task-info-grid">
+                        <div class="disassemble-info-item">
+                            <span class="disassemble-info-label">任务编号</span>
+                            <span class="disassemble-info-value">${taskCode}</span>
+                        </div>
+                        <div class="disassemble-info-item">
+                            <span class="disassemble-info-label">任务名称</span>
+                            <span class="disassemble-info-value">${taskName}</span>
+                        </div>
+                        <div class="disassemble-info-item">
+                            <span class="disassemble-info-label">产品编码</span>
+                            <span class="disassemble-info-value">${productCode}</span>
+                        </div>
+                        <div class="disassemble-info-item">
+                            <span class="disassemble-info-label">产品名称</span>
+                            <span class="disassemble-info-value">${productName}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="disassemble-task-section">
+                    <div class="disassemble-section-header">
+                        <div class="disassemble-section-title">设计任务列表</div>
+                        <button class="btn btn-sm btn-primary" onclick="window.addDesignTaskRow()" style="display: flex; align-items: center; gap: 4px;">
+                            <span>+</span>
+                            <span>添加设计任务</span>
+                        </button>
+                    </div>
+
+                    <div class="disassemble-task-type-select">
+                        <span class="disassemble-task-type-label">任务性质：</span>
+                        <select class="disassemble-select" id="task-nature-select" style="width: 200px;">
+                            <option value="formal">正式任务</option>
+                            <option value="sample">样品任务</option>
+                        </select>
+                        <span style="font-size: 12px; color: #8c8c8c; margin-left: 8px;">（所有设计任务统一性质）</span>
+                    </div>
+
+                    <div class="disassemble-tasks-table" id="design-tasks-container">
+                        <div class="disassemble-table-header">
+                            <span>任务名称</span>
+                            <span>设计类型</span>
+                            <span>设计人员</span>
+                            <span>计划完成日期</span>
+                            <span></span>
+                        </div>
+                        <div class="disassemble-table-row" data-row="1">
+                            <input type="text" class="disassemble-input" placeholder="请输入任务名称">
+                            <select class="disassemble-select">
+                                <option value="electrical">电气设计</option>
+                                <option value="structural">结构设计</option>
+                                <option value="software">软件设计</option>
+                                <option value="thermal">热设计</option>
+                            </select>
+                            <select class="disassemble-select">
+                                <option value="">请选择</option>
+                                <option value="zhang">张设计师</option>
+                                <option value="li">李设计师</option>
+                                <option value="wang">王设计师</option>
+                            </select>
+                            <input type="date" class="disassemble-input">
+                            <button class="disassemble-btn-delete" onclick="window.removeDesignTaskRow(1)" title="删除此行">×</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="disassemble-tip">
+                    <strong>提示：</strong>拆解完成后，系统将自动创建对应的设计任务并分配给设计人员。
+                </div>
+            `;
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            console.log('弹窗已打开');
+        }
+
+        window.addDesignTaskRow = function() {
+            console.log('添加设计任务行');
+            const container = document.getElementById('design-tasks-container');
+            if (!container) {
+                console.error('design-tasks-container 未找到');
+                return;
+            }
+
+            window.designTaskRowCount++;
+            const rowCount = window.designTaskRowCount;
+            const newRow = document.createElement('div');
+            newRow.className = 'disassemble-table-row';
+            newRow.setAttribute('data-row', rowCount);
+            newRow.innerHTML = `
+                <input type="text" class="disassemble-input" placeholder="请输入任务名称">
+                <select class="disassemble-select">
+                    <option value="electrical">电气设计</option>
+                    <option value="structural">结构设计</option>
+                    <option value="software">软件设计</option>
+                    <option value="thermal">热设计</option>
+                </select>
+                <select class="disassemble-select">
+                    <option value="">请选择</option>
+                    <option value="zhang">张设计师</option>
+                    <option value="li">李设计师</option>
+                    <option value="wang">王设计师</option>
+                </select>
+                <input type="date" class="disassemble-input">
+                <button class="disassemble-btn-delete" onclick="window.removeDesignTaskRow(${rowCount})" title="删除此行">×</button>
+            `;
+            container.appendChild(newRow);
+        }
+
+        window.removeDesignTaskRow = function(rowId) {
+            console.log('删除设计任务行:', rowId);
+            const row = document.querySelector(`.disassemble-table-row[data-row="${rowId}"]`);
+            if (row) {
+                const container = document.getElementById('design-tasks-container');
+                if (container.querySelectorAll('.disassemble-table-row').length > 1) {
+                    row.remove();
+                } else {
+                    alert('至少保留一条设计任务');
+                }
+            }
+        }
+
+        window.saveDisassemble = function() {
+            console.log('保存拆解');
+            const rows = document.querySelectorAll('.disassemble-table-row');
+            let hasError = false;
+
+            // 验证任务性质
+            const taskNature = document.getElementById('task-nature-select').value;
+            if (!taskNature) {
+                alert('请选择任务性质');
+                return;
+            }
+
+            rows.forEach((row, index) => {
+                const inputs = row.querySelectorAll('.disassemble-input');
+                const name = inputs[0].value.trim();
+                const selects = row.querySelectorAll('.disassemble-select');
+                const designer = selects[1].value;
+                const planDate = inputs[1].value;
+
+                if (!name) {
+                    alert(`请填写第${index + 1}行任务名称`);
+                    hasError = true;
+                }
+                if (!designer) {
+                    alert(`请选择第${index + 1}行设计人员`);
+                    hasError = true;
+                }
+                if (!planDate) {
+                    alert(`请选择第${index + 1}行计划完成日期`);
+                    hasError = true;
+                }
+            });
+
+            if (hasError) return;
+
+            alert(`✅ 拆解成功！已创建 ${rows.length} 个设计任务，任务性质：${taskNature === 'formal' ? '正式任务' : '样品任务'}`);
+
+            const modal = document.getElementById('disassemble-modal');
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        console.log('全局拆解函数已定义');
+    </script>
+</body>
+</html>

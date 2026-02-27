@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>角色与权限</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">基础信息</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">角色与权限</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">定义系统角色，配置功能权限与数据权限；支持用户角色分配、角色继承；实现菜单、按钮、API 的精细化授权。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>角色编码/名称</label>
+                    <input type="text" class="form-input" placeholder="角色编码、角色名称">
+                </div>
+                <div class="filter-item">
+                    <label>状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="enabled">启用</option>
+                        <option value="disabled">停用</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary" data-open-modal="role-add-modal">+ 新增角色</button>
+                <button class="btn btn-default">导出</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>角色编码</th>
+                            <th>角色名称</th>
+                            <th>描述</th>
+                            <th>关联用户数</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ROLE-001</td>
+                            <td>研发负责人</td>
+                            <td>研发部门负责人，具备技术任务、设计任务、EBOM 审核权限</td>
+                            <td>2</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="role-perm-modal">权限配置</button> <button class="btn btn-sm btn-default" data-open-modal="role-edit-modal">编辑</button></td>
+                        </tr>
+                        <tr>
+                            <td>ROLE-002</td>
+                            <td>工艺负责人</td>
+                            <td>工艺部门负责人，具备 MBOM 创建、审核、发布权限</td>
+                            <td>2</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="role-perm-modal">权限配置</button> <button class="btn btn-sm btn-default" data-open-modal="role-edit-modal">编辑</button></td>
+                        </tr>
+                        <tr>
+                            <td>ROLE-003</td>
+                            <td>BOM 专员</td>
+                            <td>BOM 数据维护与变更申请权限</td>
+                            <td>3</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="role-perm-modal">权限配置</button> <button class="btn btn-sm btn-default" data-open-modal="role-edit-modal">编辑</button></td>
+                        </tr>
+                        <tr>
+                            <td>ROLE-004</td>
+                            <td>设计人员</td>
+                            <td>设计任务执行、产出物上传权限</td>
+                            <td>5</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="role-perm-modal">权限配置</button> <button class="btn btn-sm btn-default" data-open-modal="role-edit-modal">编辑</button></td>
+                        </tr>
+                        <tr>
+                            <td>ROLE-005</td>
+                            <td>系统管理员</td>
+                            <td>系统配置、用户管理、权限管理</td>
+                            <td>1</td>
+                            <td><span class="status-badge status-success">启用</span></td>
+                            <td><button class="btn btn-sm btn-default" data-open-modal="role-perm-modal">权限配置</button> <button class="btn btn-sm btn-default" data-open-modal="role-edit-modal">编辑</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 5 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+        <div id="role-add-modal" class="modal-overlay">
+            <div class="modal" style="max-width:520px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">新增角色</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <div class="form-item"><label class="form-label required">角色编码</label><input type="text" class="form-input" placeholder="如 ROLE-006"></div>
+                    <div class="form-item"><label class="form-label required">角色名称</label><input type="text" class="form-input" placeholder="请输入"></div>
+                    <div class="form-item"><label class="form-label">描述</label><textarea class="form-textarea" rows="3" placeholder="角色职责说明"></textarea></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="role-add-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="role-add-modal" onclick="alert('✅ 角色已保存')">保存</button></div>
+            </div>
+        </div>
+        <div id="role-edit-modal" class="modal-overlay">
+            <div class="modal" style="max-width:520px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">编辑角色</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <div class="form-item"><label class="form-label required">角色编码</label><input type="text" class="form-input" value="ROLE-001" readonly></div>
+                    <div class="form-item"><label class="form-label required">角色名称</label><input type="text" class="form-input" value="研发负责人"></div>
+                    <div class="form-item"><label class="form-label">描述</label><textarea class="form-textarea" rows="3">研发部门负责人，具备技术任务、设计任务、EBOM 审核权限</textarea></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="role-edit-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="role-edit-modal" onclick="alert('✅ 已保存')">保存</button></div>
+            </div>
+        </div>
+        <div id="role-perm-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:680px;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">权限配置 - 研发负责人</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <p class="modal-desc" style="margin-bottom:12px;">勾选该角色可访问的菜单及操作权限。</p>
+                    <div style="max-height:320px;overflow-y:auto;border:1px solid #e8e8e8;border-radius:6px;padding:12px;">
+                        <div><label><input type="checkbox" checked> 设计任务</label><span style="margin-left:20px;"><label><input type="checkbox" checked> 查看</label> <label><input type="checkbox" checked> 编辑</label></span></div>
+                        <div style="margin-top:8px;"><label><input type="checkbox" checked> EBOM 管理</label><span style="margin-left:20px;"><label><input type="checkbox" checked> 查看</label> <label><input type="checkbox" checked> 新建</label> <label><input type="checkbox" checked> 审批</label></span></div>
+                        <div style="margin-top:8px;"><label><input type="checkbox" checked> 变更管理</label><span style="margin-left:20px;"><label><input type="checkbox" checked> 查看</label> <label><input type="checkbox" checked> 新建会审单</label></span></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="role-perm-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="role-perm-modal" onclick="alert('✅ 权限已保存')">保存</button></div>
+            </div>
+        </div>
+    </div>
+    <script>if(typeof PageInteractions!=='undefined')PageInteractions.initButtons();</script>
+</body>
+</html>

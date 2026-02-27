@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>故障上报 - 设备管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/equipment-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">故障上报</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">故障上报</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">快速上报设备故障，支持移动端上报、多媒体附件上传、进度跟踪、满意度评价等功能。</p>
+        </div>
+
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary" data-open-modal="fault-report-modal">+ 故障上报</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="select-all-checkbox"></th>
+                            <th width="120">上报编号</th>
+                            <th width="120">设备编码</th>
+                            <th width="150">设备名称</th>
+                            <th width="100">故障类型</th>
+                            <th width="200">故障描述</th>
+                            <th width="100">上报人</th>
+                            <th width="120">上报时间</th>
+                            <th width="90">审核状态</th>
+                            <th width="90">处理状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="fault-id" value="1"></td>
+                            <td>FR-2025-001</td>
+                            <td>EQ-001</td>
+                            <td>空压机A</td>
+                            <td>运行异常</td>
+                            <td>设备运行时噪音异常，温度偏高</td>
+                            <td>张操作</td>
+                            <td>2025-01-29 10:30</td>
+                            <td><span class="status-badge status-success">已确认</span></td>
+                            <td><span class="status-badge status-processing">处理中</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/equipment-fault-detail.html" data-id="1">查看</button>
+                                <button class="btn btn-sm btn-primary">跟踪</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="fault-id" value="2"></td>
+                            <td>FR-2025-002</td>
+                            <td>EQ-002</td>
+                            <td>数控机床</td>
+                            <td>无法启动</td>
+                            <td>设备无法正常启动，显示错误代码E001</td>
+                            <td>李操作</td>
+                            <td>2025-01-28 14:20</td>
+                            <td><span class="status-badge status-warning">待审核</span></td>
+                            <td><span class="status-badge status-warning">待处理</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/equipment-fault-detail.html" data-id="2">查看</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="fault-id" value="3"></td>
+                            <td>FR-2025-003</td>
+                            <td>EQ-003</td>
+                            <td>冷却塔</td>
+                            <td>性能下降</td>
+                            <td>冷却效果明显下降，出水温度偏高</td>
+                            <td>王操作</td>
+                            <td>2025-01-27 09:15</td>
+                            <td><span class="status-badge status-success">已确认</span></td>
+                            <td><span class="status-badge status-success">已完成</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-default btn-view" data-url="pages/equipment-fault-detail.html" data-id="3">查看</button>
+                                <button class="btn btn-sm btn-primary">评价</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">共 3 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>&gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="fault-report-modal" class="modal-overlay">
+            <div class="modal modal-xl" style="max-width:800px;max-height:90vh;overflow-y:auto;" onclick="event.stopPropagation()">
+                <div class="modal-header"><span class="modal-title">故障上报</span><button type="button" class="modal-close">×</button></div>
+                <div class="modal-body">
+                    <div class="section-title" style="margin-bottom:12px;">故障信息</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                        <div class="form-item"><label class="form-label required">设备编码</label><input type="text" class="form-input" placeholder="设备编码或扫码识别" id="fault-equipment-code" name="equipment-code"></div>
+                        <div class="form-item"><label class="form-label">设备名称</label><input type="text" class="form-input" placeholder="自动填充" readonly></div>
+                        <div class="form-item"><label class="form-label required">故障类型</label><select class="form-select" id="fault-type" name="fault-type"><option value="">请选择</option><option value="cannot-start">无法启动</option><option value="abnormal">运行异常</option><option value="performance">性能下降</option><option value="leakage">泄漏</option><option value="safety">安全隐患</option><option value="other">其他</option></select></div>
+                        <div class="form-item"><label class="form-label required">紧急程度</label><select class="form-select" id="urgency-level" name="urgency-level"><option value="normal">一般</option><option value="urgent">紧急</option><option value="critical">特级</option></select></div>
+                        <div class="form-item"><label class="form-label">故障等级</label><select class="form-select" id="fault-level" name="fault-level"><option value="minor">轻微</option><option value="moderate">中等</option><option value="severe">严重</option><option value="critical">严重</option></select></div>
+                        <div class="form-item"><label class="form-label">影响范围</label><select class="form-select" id="impact-scope" name="impact-scope"><option value="single">单台设备</option><option value="line">整条产线</option><option value="workshop">整个车间</option><option value="factory">全厂</option></select></div>
+                        <div class="form-item" style="grid-column:1/-1;"><label class="form-label required">故障描述</label><textarea class="form-textarea" rows="4" placeholder="详细描述故障现象、发生时间、影响范围、已采取的措施等" id="fault-description" name="fault-description"></textarea></div>
+                        <div class="form-item"><label class="form-label">故障发生时间</label><input type="datetime-local" class="form-input" id="fault-time" name="fault-time"></div>
+                        <div class="form-item"><label class="form-label">是否影响生产</label><select class="form-select" id="affect-production" name="affect-production"><option value="no">否</option><option value="yes">是</option></select></div>
+                    </div>
+
+                    <div class="section-title" style="margin:20px 0 12px;">附件上传</div>
+                    <div class="form-item">
+                        <label class="form-label">图片/视频</label>
+                        <input type="file" class="form-input" accept="image/*,video/*" multiple>
+                        <div style="font-size:12px;color:#8c8c8c;margin-top:4px;">支持图片、视频上传，单文件≤50MB</div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-default" data-close-modal="fault-report-modal">取消</button><button type="button" class="btn btn-primary" data-close-modal="fault-report-modal" onclick="alert('✅ 故障已上报，等待审核')">提交上报</button></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('故障上报 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+            PageInteractions.toggleSelectAll('input[name="fault-id"]');
+        }
+    </script>
+</body>
+</html>

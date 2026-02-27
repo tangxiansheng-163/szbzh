@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创建SBOM</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">BOM管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/sbom-list.html" class="breadcrumb-item">SBOM列表</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">创建SBOM</span>
+        </div>
+        <div class="page-header">
+            <p class="page-description">EBOM、MBOM、SBOM 本质均为 BOM；新建或下推后在对应阶段生成版本，在 BOM 树上做阶段专属编辑。本页用于创建 SBOM：售后基于<strong>已发布 MBOM</strong>筛选或手动创建。选择来源后<strong>生成对应阶段版本（如 V1.0）</strong>，进入 <strong>BOM 树服务编辑工作台</strong>，在树上维护<strong>维修要求、配件替代</strong>等，可简化层级，保存草稿或提交评审。</p>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form id="sbom-form">
+                    <div class="section-title">选择来源</div>
+                    <p class="form-tip" style="margin: 0 0 12px; color: #666; font-size: 13px;">确认后将<strong>生成 SBOM 版本（如 V1.0）</strong>，进入 BOM 树服务编辑工作台，维护维修要求、配件替代等。</p>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label required">SBOM来源</label>
+                                <select class="form-select" name="sbomSource" id="sbomSource" required>
+                                    <option value="mbom">从 MBOM 筛选</option>
+                                    <option value="manual">手动创建</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="mbomSourceSection">
+                        <div class="form-item">
+                            <label class="form-label required">来源MBOM</label>
+                            <select class="form-select" name="sourceMbomId" id="sourceMbomId">
+                                <option value="">请选择已发布的 MBOM</option>
+                                <option value="01-02-1001-02-V1">01-02-1001-02-V1 智能控制器</option>
+                                <option value="01-02-1002-02-V1">01-02-1002-02-V1 传感器模块</option>
+                                <option value="01-02-1003-02-V1">01-02-1003-02-V1 执行器</option>
+                            </select>
+                            <small style="color: #999; font-size: 12px;">从 MBOM 筛选维修、保养所需物料，可简化层级、补充配件替代关系</small>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label required">产品编码</label>
+                                <input type="text" class="form-input" name="productCode" id="sbomProductCode" placeholder="从 MBOM 带出或手动输入" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-item">
+                                <label class="form-label required">产品名称</label>
+                                <input type="text" class="form-input" name="productName" id="sbomProductName" placeholder="从 MBOM 带出或手动输入" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-primary" id="sbom-goto-workbench">进入 SBOM 服务编辑</button>
+                        <button type="button" class="btn btn-default btn-cancel" data-url="pages/sbom-list.html">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <style>
+            .section-title { font-size: 14px; font-weight: 600; color: rgba(0,0,0,0.85); padding: 8px 0; border-bottom: 1px solid #e8e8e8; margin-bottom: 16px; }
+        </style>
+        <script>
+            (function () {
+                var src = document.getElementById('sbomSource');
+                var mbomSec = document.getElementById('mbomSourceSection');
+                var sourceMbom = document.getElementById('sourceMbomId');
+                var productCode = document.getElementById('sbomProductCode');
+                var productName = document.getElementById('sbomProductName');
+
+                function toggle() {
+                    var v = src && src.value;
+                    var fromMbom = (v === 'mbom');
+                    if (mbomSec) mbomSec.style.display = fromMbom ? 'block' : 'none';
+                    if (sourceMbom) sourceMbom.required = fromMbom;
+                }
+                if (src) src.addEventListener('change', toggle);
+                toggle();
+
+                var productMap = {
+                    '01-02-1001-02-V1': { code: 'P001', name: '智能控制器' },
+                    '01-02-1002-02-V1': { code: 'P002', name: '传感器模块' },
+                    '01-02-1003-02-V1': { code: 'P003', name: '执行器' }
+                };
+                function maybePrefill() {
+                    if (src.value !== 'mbom' || !sourceMbom || !sourceMbom.value) return;
+                    var m = productMap[sourceMbom.value];
+                    if (m && productCode && productName) { productCode.value = m.code; productName.value = m.name; }
+                }
+                if (sourceMbom) sourceMbom.addEventListener('change', maybePrefill);
+
+                var gotoBtn = document.getElementById('sbom-goto-workbench');
+                if (gotoBtn) gotoBtn.addEventListener('click', function () {
+                    if (src.value === 'mbom' && (!sourceMbom || !sourceMbom.value)) { alert('请选择来源 MBOM'); return; }
+                    if (!productCode || !productCode.value.trim()) { alert('请输入产品编码'); return; }
+                    if (!productName || !productName.value.trim()) { alert('请输入产品名称'); return; }
+                    var q = 'from=' + encodeURIComponent(src.value) + '&product=' + encodeURIComponent(productName.value.trim());
+                    if (src.value === 'mbom' && sourceMbom && sourceMbom.value) q += '&mbomId=' + encodeURIComponent(sourceMbom.value);
+                    var url = 'pages/sbom-workbench.html?' + q;
+                    if (typeof PageLoader !== 'undefined') PageLoader.loadPage(url); else window.location.href = url;
+                });
+            })();
+        </script>
+    </div>
+</body>
+</html>

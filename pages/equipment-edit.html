@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备编辑</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <!-- 阶段选择标签 -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;border-bottom:1px solid #e8e8e8;padding-bottom:12px;">
+            <button class="btn btn-sm btn-primary" style="background:#1890ff;">基础信息</button>
+            <button class="btn btn-sm btn-default">入库信息</button>
+            <button class="btn btn-sm btn-default">安装信息</button>
+            <button class="btn btn-sm btn-default">运行信息</button>
+            <button class="btn btn-sm btn-default">财务信息</button>
+        </div>
+
+        <form class="card" style="margin:0;max-height:70vh;overflow-y:auto;">
+            <!-- 基础信息（采购阶段） -->
+            <div class="card-header" style="border-left:3px solid #1890ff;padding-left:12px;"><h3 class="card-title">基础信息 <span style="font-size:12px;color:#52c41a;font-weight:normal;">✓ 已完成</span></h3></div>
+            <div class="card-body">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                    <div class="form-item"><label class="form-label required">设备编码</label><input type="text" class="form-input" value="EQ-001" readonly style="background:#f5f5f5;"></div>
+                    <div class="form-item"><label class="form-label required">设备名称</label><input type="text" class="form-input" value="空压机A" placeholder="请输入设备标准名称"></div>
+                    <div class="form-item"><label class="form-label required">设备型号</label><input type="text" class="form-input" value="AC-2000" placeholder="请输入设备型号规格"></div>
+                    <div class="form-item"><label class="form-label required">用途分类</label><select class="form-select" id="usage-category" name="usage-category" onchange="updateSubCategory(this.value)"><option value="">请选择</option><option value="safety">安环类</option><option value="production">生产类</option><option value="energy" selected>能源类</option><option value="auxiliary">辅助类</option></select></div>
+                    <div class="form-item"><label class="form-label required">设备子类</label><select class="form-select" id="equipment-subcategory" name="equipment-subcategory"><option value="">请选择</option><option value="power" selected>供电设备</option><option value="heating">供热设备</option><option value="gas">供气设备</option><option value="water">供水设备</option></select></div>
+                    <div class="form-item"><label class="form-label required">关键等级</label><select class="form-select"><option value="">请选择</option><option value="A" selected>A类（关键）</option><option value="B">B类（重要）</option><option value="C">C类（一般）</option></select></div>
+                    <div class="form-item" style="grid-column:1/-1;"><label class="form-label required">生产厂家</label><input type="text" class="form-input" value="XX空压机有限公司" placeholder="请输入设备制造商"></div>
+                </div>
+            </div>
+
+            <!-- 采购信息 -->
+            <div class="card-header" style="border-left:3px solid #52c41a;padding-left:12px;margin-top:20px;"><h3 class="card-title">采购信息 <span style="font-size:12px;color:#52c41a;font-weight:normal;">✓ 已完成</span></h3></div>
+            <div class="card-body">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;">
+                    <div class="form-item"><label class="form-label required">购置日期</label><input type="date" class="form-input" value="2023-06-15"></div>
+                    <div class="form-item"><label class="form-label">购置金额(元)</label><input type="number" class="form-input" value="150000" placeholder="请输入购置金额" min="0" step="0.01"></div>
+                    <div class="form-item"><label class="form-label">预计到货日期</label><input type="date" class="form-input" value="2023-06-18"></div>
+                    <div class="form-item"><label class="form-label">采购合同号</label><input type="text" class="form-input" value="CG-2023-056" placeholder="请输入采购合同编号"></div>
+                </div>
+            </div>
+
+            <!-- 备注 -->
+            <div class="card-header" style="border-left:3px solid #faad14;padding-left:12px;margin-top:20px;"><h3 class="card-title">备注</h3></div>
+            <div class="card-body">
+                <div class="form-item"><textarea class="form-textarea" rows="2" placeholder="请输入采购备注信息">设备技术要求：排气压力≥0.8MPa</textarea></div>
+            </div>
+
+            <div class="form-actions" style="padding:16px 20px;border-top:1px solid #eee;margin-top:20px;">
+                <button type="button" class="btn btn-default" data-close-modal="edit-modal">取消</button>
+                <button type="submit" class="btn btn-primary" onclick="event.preventDefault();alert('✅ 基础信息已保存');if(typeof PageInteractions!=='undefined')PageInteractions.closeModal('edit-modal');">保存</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // 设备子类选项
+        var subCategories = {
+            'safety': [
+                {value: 'video', text: '视频监控'},
+                {value: 'fire', text: '火灾报警'},
+                {value: 'gas', text: '气体检测'},
+                {value: 'leak', text: '液体泄漏'},
+                {value: 'env', text: '环境监测'},
+                {value: 'other', text: '其他安防'}
+            ],
+            'production': [
+                {value: 'machining', text: '加工设备'},
+                {value: 'forming', text: '成型设备'},
+                {value: 'welding', text: '焊接设备'},
+                {value: 'assembly', text: '装配设备'},
+                {value: 'testing', text: '检测设备'},
+                {value: 'logistics', text: '物流设备'}
+            ],
+            'energy': [
+                {value: 'power', text: '供电设备'},
+                {value: 'heating', text: '供热设备'},
+                {value: 'gas', text: '供气设备'},
+                {value: 'water', text: '供水设备'}
+            ],
+            'auxiliary': [
+                {value: 'hvac', text: '通风空调'},
+                {value: 'lighting', text: '照明设备'},
+                {value: 'elevator', text: '电梯起重'},
+                {value: 'lab', text: '实验设备'},
+                {value: 'office', text: '办公设备'}
+            ]
+        };
+
+        function updateSubCategory(category) {
+            var subSelect = document.getElementById('equipment-subcategory');
+            if (!subSelect) return;
+            subSelect.innerHTML = '<option value="">请选择</option>';
+            if (category && subCategories[category]) {
+                subCategories[category].forEach(function(item) {
+                    var opt = document.createElement('option');
+                    opt.value = item.value;
+                    opt.textContent = item.text;
+                    subSelect.appendChild(opt);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

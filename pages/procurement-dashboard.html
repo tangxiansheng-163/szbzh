@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>采购概览 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <span class="breadcrumb-item active">工作台</span>
+        </div>
+        <div class="page-header">
+            <p class="page-description">采购协同工作台，快捷入口与待办概览。管理需求申请、采购计划、订单执行、合同与结算全流程。</p>
+        </div>
+
+        <div class="dashboard-stats">
+            <a href="pages/procurement-demand-list.html" class="stat-card">
+                <div class="stat-icon blue">📋</div>
+                <div class="stat-content">
+                    <div class="stat-label">需求申请</div>
+                    <div class="stat-value">18</div>
+                </div>
+            </a>
+            <a href="pages/procurement-plan-list.html" class="stat-card">
+                <div class="stat-icon green">📑</div>
+                <div class="stat-content">
+                    <div class="stat-label">采购计划</div>
+                    <div class="stat-value">12</div>
+                </div>
+            </a>
+            <a href="pages/procurement-quote-list.html" class="stat-card">
+                <div class="stat-icon blue">💰</div>
+                <div class="stat-content">
+                    <div class="stat-label">询价单</div>
+                    <div class="stat-value">6</div>
+                </div>
+            </a>
+            <a href="pages/procurement-order-list.html" class="stat-card">
+                <div class="stat-icon green">🛒</div>
+                <div class="stat-content">
+                    <div class="stat-label">采购订单</div>
+                    <div class="stat-value">32</div>
+                </div>
+            </a>
+            <a href="pages/procurement-todo.html" class="stat-card">
+                <div class="stat-icon orange">✓</div>
+                <div class="stat-content">
+                    <div class="stat-label">待办事项</div>
+                    <div class="stat-value">8</div>
+                </div>
+            </a>
+            <a href="pages/procurement-alert-list.html" class="stat-card">
+                <div class="stat-icon orange">⚠️</div>
+                <div class="stat-content">
+                    <div class="stat-label">预警待处理</div>
+                    <div class="stat-value">3</div>
+                </div>
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">我的待办</h3>
+                <a href="pages/procurement-todo.html" class="btn btn-sm btn-default">查看全部</a>
+            </div>
+            <div class="card-body dashboard-todo">
+                <a href="pages/procurement-order-detail.html?id=1" class="todo-item">
+                    <div class="todo-main">
+                        <span class="todo-title">PO-2025-001 电子元器件采购待确认</span>
+                        <span class="todo-desc">订单确认</span>
+                    </div>
+                    <span class="status-badge status-warning">待处理</span>
+                </a>
+                <a href="pages/procurement-invoice-detail.html?id=1" class="todo-item">
+                    <div class="todo-main">
+                        <span class="todo-title">INV-2025-008 设备采购发票待审核</span>
+                        <span class="todo-desc">发票审核</span>
+                    </div>
+                    <span class="status-badge status-processing">审核中</span>
+                </a>
+                <a href="pages/procurement-contract-detail.html?id=1" class="todo-item">
+                    <div class="todo-main">
+                        <span class="todo-title">CT-2025-015 原材料采购合同待跟踪</span>
+                        <span class="todo-desc">合同执行</span>
+                    </div>
+                    <span class="status-badge status-success">执行中</span>
+                </a>
+                <a href="pages/procurement-supplier-evaluation.html" class="todo-item">
+                    <div class="todo-main">
+                        <span class="todo-title">2025年1月供应商评估待完成</span>
+                        <span class="todo-desc">供应商评估</span>
+                    </div>
+                    <span class="status-badge status-warning">待评估</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">快捷入口</h3>
+            </div>
+            <div class="card-body">
+                <div class="dashboard-stats" style="margin-top:0;">
+                    <a href="pages/procurement-demand-create.html" class="stat-card">
+                        <div class="stat-icon blue">+</div>
+                        <div class="stat-content">
+                            <div class="stat-label">新建需求</div>
+                        </div>
+                    </a>
+                    <a href="pages/procurement-order-create.html" class="stat-card">
+                        <div class="stat-icon green">+</div>
+                        <div class="stat-content">
+                            <div class="stat-label">新建订单</div>
+                        </div>
+                    </a>
+                    <a href="pages/procurement-emergency.html" class="stat-card">
+                        <div class="stat-icon orange">⚠️</div>
+                        <div class="stat-content">
+                            <div class="stat-label">应急处理</div>
+                        </div>
+                    </a>
+                    <a href="pages/procurement-unqualified-handle-list.html" class="stat-card">
+                        <div class="stat-icon orange">❗</div>
+                        <div class="stat-content">
+                            <div class="stat-label">不合格处理单</div>
+                        </div>
+                    </a>
+                    <a href="pages/procurement-return-list.html" class="stat-card">
+                        <div class="stat-icon orange">↩</div>
+                        <div class="stat-content">
+                            <div class="stat-label">退货单</div>
+                        </div>
+                    </a>
+                    <a href="pages/procurement-exchange-list.html" class="stat-card">
+                        <div class="stat-icon orange">🔁</div>
+                        <div class="stat-content">
+                            <div class="stat-label">换货单</div>
+                        </div>
+                    </a>
+                    <a href="pages/procurement-concession-list.html" class="stat-card">
+                        <div class="stat-icon orange">✅</div>
+                        <div class="stat-content">
+                            <div class="stat-label">让步接收单</div>
+                        </div>
+                    </a>
+                    <a href="pages/procurement-stat-purchase.html" class="stat-card">
+                        <div class="stat-icon purple">📊</div>
+                        <div class="stat-content">
+                            <div class="stat-label">报表统计</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新建需求 - 采购</title>
+    <style>
+        .demand-create-form .card-header { padding: 20px 28px 16px; border-bottom: 1px solid #e8e8e8; }
+        .demand-create-form .card-title { font-size: 16px; font-weight: 600; margin: 0; }
+        .demand-create-form .card-body { padding: 24px 28px 28px; }
+        .demand-create-form .page-description { font-size: 13px; color: #595959; line-height: 1.6; margin-bottom: 24px; padding: 12px 16px; background: #fafafa; border-radius: 6px; border-left: 3px solid #1890ff; }
+        .demand-create-form .form-section { margin-bottom: 28px; }
+        .demand-create-form .form-section:last-of-type { margin-bottom: 0; }
+        .demand-create-form .section-title { font-size: 14px; font-weight: 600; color: rgba(0,0,0,0.85); margin: 0 0 16px 0; padding-bottom: 10px; border-bottom: 1px solid #e8e8e8; }
+        .demand-create-form .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 20px; }
+        .demand-create-form .form-item.full-width { grid-column: 1 / -1; }
+        .demand-create-form .form-item.span-2 { grid-column: span 2; }
+        .demand-create-form .form-item .form-label { display: block; margin-bottom: 6px; font-size: 13px; color: rgba(0,0,0,0.85); }
+        .demand-create-form .form-item .form-label.required::before { content: '*'; color: #ff4d4f; margin-right: 4px; }
+        .demand-create-form .form-item .form-label.hint { display: inline; margin-left: 6px; font-weight: normal; color: #8c8c8c; font-size: 12px; }
+        .demand-create-form .form-item .form-input,
+        .demand-create-form .form-item .form-select,
+        .demand-create-form .form-item .form-textarea { width: 100%; padding: 8px 12px; font-size: 13px; border-radius: 4px; border: 1px solid #d9d9d9; box-sizing: border-box; }
+        .demand-create-form .form-item textarea.form-input { min-height: 72px; resize: vertical; }
+        .demand-create-form .table-wrapper { overflow-x: auto; margin-top: 12px; border: 1px solid #e8e8e8; border-radius: 6px; background: #fff; }
+        .demand-create-form .table-wrapper table { width: 100%; min-width: 900px; border-collapse: collapse; table-layout: fixed; }
+        .demand-create-form .table-wrapper th { padding: 12px 14px; text-align: left; font-size: 13px; font-weight: 600; color: rgba(0,0,0,0.85); background: #fafafa; border-bottom: 1px solid #e8e8e8; }
+        .demand-create-form .table-wrapper td { padding: 10px 14px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+        .demand-create-form .table-wrapper td .form-input { width: 100%; min-width: 0; padding: 7px 10px; font-size: 13px; border: 1px solid #d9d9d9; border-radius: 4px; box-sizing: border-box; }
+        .demand-create-form .table-wrapper tbody tr:hover td { background: #fafafa; }
+        .demand-create-form .table-wrapper tbody tr:last-child td { border-bottom: none; }
+        .demand-create-form .btn-add-line { margin-top: 14px; }
+        .demand-create-form .form-actions { padding: 16px 28px !important; border-top: 1px solid #e8e8e8; background: #fafafa; }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <form class="card demand-create-form" style="margin:0;" id="demand-create-form">
+            <div class="card-header"><h3 class="card-title">新建采购需求单</h3></div>
+            <div class="card-body">
+                <p class="page-description">需求单号由系统自动生成。需求部门、需求人、部门主管默认带出当前用户信息，可手动修改。生产需求需填写生产订单号。</p>
+
+                <div class="form-section">
+                    <div class="section-title">基本信息</div>
+                    <div class="form-grid">
+                        <div class="form-item">
+                            <label class="form-label required">需求部门 <span class="form-label hint">可改</span></label>
+                            <select class="form-select" name="department" required title="默认当前部门">
+                                <option value="">请选择</option>
+                                <option value="production" selected>生产部</option>
+                                <option value="rd">研发部</option>
+                                <option value="quality">质量部</option>
+                                <option value="logistics">物流部</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">需求人 <span class="form-label hint">可改</span></label>
+                            <input type="text" class="form-input" name="demandPerson" value="当前用户" placeholder="默认当前用户" title="默认当前用户">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">部门主管 <span class="form-label hint">可改</span></label>
+                            <input type="text" class="form-input" name="deptSupervisor" value="部门主管" placeholder="默认部门主管" required title="默认部门主管">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">需求类型</label>
+                            <select class="form-select" name="demandType" required>
+                                <option value="production">生产需求</option>
+                                <option value="non-production">非生产需求</option>
+                                <option value="maintenance">维修需求</option>
+                                <option value="rd">研发需求</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">紧急程度</label>
+                            <select class="form-select" name="urgency" required>
+                                <option value="normal" selected>普通</option>
+                                <option value="important">重要</option>
+                                <option value="urgent">紧急</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">生产订单号</label>
+                            <input type="text" class="form-input" name="productionOrderNo" placeholder="生产需求时必填">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">预算科目</label>
+                            <input type="text" class="form-input" name="budgetSubject" placeholder="选填">
+                        </div>
+                        <div class="form-item span-2">
+                            <label class="form-label required">用途说明</label>
+                            <textarea class="form-input" name="usageDesc" rows="3" placeholder="物料用途详细说明，非生产需求需注明用途" required></textarea>
+                        </div>
+                        <div class="form-item span-2">
+                            <label class="form-label">备注</label>
+                            <textarea class="form-input" name="remark" rows="2" placeholder="其他补充说明"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">需求明细</div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:40px"></th>
+                                    <th>物料编码</th>
+                                    <th>物料名称</th>
+                                    <th>规格型号</th>
+                                    <th>需求数量</th>
+                                    <th>计量单位</th>
+                                    <th>需求到货日期</th>
+                                    <th>参考价格</th>
+                                    <th>建议供应商</th>
+                                    <th>备注</th>
+                                </tr>
+                            </thead>
+                            <tbody id="demand-create-lines">
+                                <tr class="demand-line-row">
+                                    <td><button type="button" class="btn btn-sm btn-default btn-remove-line">删</button></td>
+                                    <td><input type="text" class="form-input" placeholder="选填" name="lineCode"></td>
+                                    <td><input type="text" class="form-input" placeholder="请输入" name="lineName"></td>
+                                    <td><input type="text" class="form-input" placeholder="选填" name="lineSpec"></td>
+                                    <td><input type="number" class="form-input" min="0" step="0.0001" name="lineQty" placeholder="0"></td>
+                                    <td><input type="text" class="form-input" placeholder="如件、kg" name="lineUnit"></td>
+                                    <td><input type="date" class="form-input" name="lineRequiredDate" placeholder="需求到货日期"></td>
+                                    <td><input type="number" class="form-input" min="0" step="0.01" name="linePrice" placeholder="0"></td>
+                                    <td><input type="text" class="form-input" placeholder="选填" name="lineSupplier"></td>
+                                    <td><input type="text" class="form-input" placeholder="选填" name="lineRemark"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-default btn-add-line" id="btn-add-line">+ 添加明细行</button>
+                </div>
+            </div>
+            <div class="form-actions" style="padding:12px 24px;border-top:1px solid #e8e8e8;"><button type="button" class="btn btn-default" data-close-modal="edit-modal">取消</button><button type="submit" class="btn btn-primary">保存为草稿并提交</button></div>
+        </form>
+    </div>
+    <script>
+(function() {
+    var tbody = document.getElementById('demand-create-lines');
+    var btnAdd = document.getElementById('btn-add-line');
+    if (!tbody || !btnAdd) return;
+    var rowTemplate = tbody.querySelector('tr.demand-line-row');
+    if (!rowTemplate) return;
+
+    btnAdd.addEventListener('click', function() {
+        var clone = rowTemplate.cloneNode(true);
+        clone.classList.add('demand-line-row');
+        [].forEach.call(clone.querySelectorAll('input, select, textarea'), function(el) { el.value = ''; el.name = el.name || ''; });
+        tbody.appendChild(clone);
+    });
+
+    tbody.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('btn-remove-line')) {
+            var tr = e.target.closest('tr');
+            if (tr && tbody.querySelectorAll('tr').length > 1) tr.remove();
+        }
+    });
+})();
+    </script>
+</body>
+</html>

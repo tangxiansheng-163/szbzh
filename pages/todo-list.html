@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>待办事项列表</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <!-- 面包屑 -->
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">通知管理</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">待办事项列表</span>
+        </div>
+
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <p class="page-description">待办事项；可按状态、来源筛选</p>
+        </div>
+
+        <!-- 筛选栏 -->
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词</label>
+                    <input type="text" class="form-input" placeholder="请输入关键词">
+                </div>
+                <div class="filter-item">
+                    <label>状态</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="active">启用</option>
+                        <option value="inactive">停用</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 操作栏 -->
+        <div class="action-bar">
+            <div class="action-left">
+                <button class="btn btn-primary">+ 新增</button>
+                <button class="btn btn-default">批量导入</button>
+                <button class="btn btn-default">批量导出</button>
+            </div>
+        </div>
+
+        <!-- 数据表格 -->
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="list-table-nowrap">
+                    <thead><tr><th width="150">待办类型</th><th width="150">待办内容</th><th width="150">关联单据</th><th width="150">发起时间</th><th width="150">状态</th><th>操作</th></tr></thead>
+                    
+    <tbody>
+        <tr>
+            <td colspan="10" style="text-align: center; padding: 40px; color: #999;">
+                <div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <div class="empty-text">暂无数据</div>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+                </table>
+            </div>
+
+            <!-- 分页 -->
+            <div class="pagination">
+                <div class="pagination-info">共 0 条记录</div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">&gt;</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            console.log('待办事项列表 页面已加载');
+            if (typeof PageInteractions !== 'undefined') PageInteractions.initButtons();
+            document.querySelectorAll('.action-left .btn-primary').forEach(function(btn) {
+                if (btn.textContent.indexOf('新增') !== -1) btn.addEventListener('click', function() { alert('请选择待办类型后填写内容（原型演示）。'); });
+            });
+            document.querySelectorAll('.action-left .btn-default').forEach(function(btn) {
+                var t = btn.textContent;
+                if (t.indexOf('批量导入') !== -1) btn.addEventListener('click', function() { if (confirm('确定打开批量导入？')) alert('请选择文件上传。'); });
+                else if (t.indexOf('批量导出') !== -1) btn.addEventListener('click', function() { if (confirm('确定导出当前列表？')) alert('导出成功，文件已下载。'); });
+            });
+        </script>
+    </div>
+</body>
+</html>

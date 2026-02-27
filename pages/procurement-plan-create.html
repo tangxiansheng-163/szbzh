@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新建采购计划 - 采购</title>
+    <style>
+        .plan-create-form .card-header { padding: 20px 28px 16px; border-bottom: 1px solid #e8e8e8; }
+        .plan-create-form .card-title { font-size: 16px; font-weight: 600; margin: 0; }
+        .plan-create-form .card-body { padding: 24px 28px 28px; }
+        .plan-create-form .page-description { font-size: 13px; color: #595959; line-height: 1.6; margin-bottom: 24px; padding: 12px 16px; background: #fafafa; border-radius: 6px; border-left: 3px solid #1890ff; }
+        .plan-create-form .form-section { margin-bottom: 28px; }
+        .plan-create-form .form-section:last-of-type { margin-bottom: 0; }
+        .plan-create-form .section-title { font-size: 14px; font-weight: 600; color: rgba(0,0,0,0.85); margin: 0 0 16px 0; padding-bottom: 10px; border-bottom: 1px solid #e8e8e8; }
+        .plan-create-form .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 20px; }
+        .plan-create-form .form-item.full-width { grid-column: 1 / -1; }
+        .plan-create-form .form-item.span-2 { grid-column: span 2; }
+        .plan-create-form .form-item .form-label { display: block; margin-bottom: 6px; font-size: 13px; color: rgba(0,0,0,0.85); }
+        .plan-create-form .form-item .form-label.required::before { content: '*'; color: #ff4d4f; margin-right: 4px; }
+        .plan-create-form .form-item .form-label.hint { display: inline; margin-left: 6px; font-weight: normal; color: #8c8c8c; font-size: 12px; }
+        .plan-create-form .form-item .form-input,
+        .plan-create-form .form-item .form-select,
+        .plan-create-form .form-item .form-textarea { width: 100%; padding: 8px 12px; font-size: 13px; border-radius: 4px; border: 1px solid #d9d9d9; box-sizing: border-box; }
+        .plan-create-form .form-item textarea.form-input { min-height: 72px; resize: vertical; }
+        .plan-create-form .table-wrapper { overflow-x: auto; margin-top: 12px; border: 1px solid #e8e8e8; border-radius: 6px; background: #fff; }
+        .plan-create-form .table-wrapper table { width: 100%; min-width: 900px; border-collapse: collapse; table-layout: fixed; }
+        .plan-create-form .table-wrapper th { padding: 12px 14px; text-align: left; font-size: 13px; font-weight: 600; color: rgba(0,0,0,0.85); background: #fafafa; border-bottom: 1px solid #e8e8e8; }
+        .plan-create-form .table-wrapper td { padding: 10px 14px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+        .plan-create-form .table-wrapper td .form-input { width: 100%; min-width: 0; padding: 7px 10px; font-size: 13px; border: 1px solid #d9d9d9; border-radius: 4px; box-sizing: border-box; }
+        .plan-create-form .table-wrapper tbody tr:hover td { background: #fafafa; }
+        .plan-create-form .table-wrapper tbody tr:last-child td { border-bottom: none; }
+        .plan-create-form .btn-add-line { margin-top: 14px; }
+        .plan-create-form .form-actions { padding: 16px 28px !important; border-top: 1px solid #e8e8e8; background: #fafafa; }
+        .plan-create-form .empty-lines { padding: 20px; text-align: center; color: var(--text-tertiary); font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <form class="card plan-create-form" style="margin:0;" id="plan-create-form">
+            <div class="card-header"><h3 class="card-title">新建采购计划（人工创建）</h3></div>
+            <div class="card-body">
+                <p class="page-description">计划编号由系统自动生成。人工创建的采购计划与「需求申请」中「生成采购计划」下推的计划在列表中通过「计划来源」区分。</p>
+
+                <div class="form-section">
+                    <div class="section-title">基本信息</div>
+                    <div class="form-grid">
+                        <div class="form-item">
+                            <label class="form-label required">计划名称</label>
+                            <input type="text" class="form-input" name="planName" placeholder="如：2025年2月月度采购计划" required>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">计划类型</label>
+                            <select class="form-select" name="planType" required>
+                                <option value="月度计划">月度计划</option>
+                                <option value="季度计划">季度计划</option>
+                                <option value="年度计划">年度计划</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">计划开始日期</label>
+                            <input type="date" class="form-input" name="planStart" required>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">计划结束日期</label>
+                            <input type="date" class="form-input" name="planEnd" required>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">预算金额（元）</label>
+                            <input type="number" class="form-input" name="budgetAmount" min="0" step="0.01" placeholder="0.00" required>
+                        </div>
+                        <div class="form-item span-2">
+                            <label class="form-label">备注</label>
+                            <textarea class="form-input" name="remark" rows="2" placeholder="其他补充说明"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">计划明细</div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:40px"></th>
+                                    <th>物料编码</th>
+                                    <th>物料名称</th>
+                                    <th>规格型号</th>
+                                    <th>需求数量</th>
+                                    <th>计量单位</th>
+                                    <th>需求到货日期</th>
+                                </tr>
+                            </thead>
+                            <tbody id="plan-create-lines">
+                                <!-- 初始为空，由脚本添加第一行 -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="empty-lines" id="plan-create-lines-empty" style="display:none;padding:20px;text-align:center;color:var(--text-tertiary);font-size:13px;">暂无明细，请添加</div>
+                    <button type="button" class="btn btn-sm btn-default btn-add-line" id="btn-add-plan-line">+ 添加明细行</button>
+                </div>
+            </div>
+            <div class="form-actions" style="padding:12px 24px;border-top:1px solid #e8e8e8;"><button type="button" class="btn btn-default" data-close-modal="edit-modal">取消</button><button type="submit" class="btn btn-primary">保存并提交</button></div>
+        </form>
+    </div>
+    <script>
+(function() {
+    var form = document.getElementById('plan-create-form');
+    var tbody = document.getElementById('plan-create-lines');
+    var emptyEl = document.getElementById('plan-create-lines-empty');
+    var btnAdd = document.getElementById('btn-add-plan-line');
+    if (!form || !tbody) return;
+
+    function addLineRow() {
+        var tr = document.createElement('tr');
+        tr.className = 'plan-line-row';
+        tr.innerHTML = '<td><button type="button" class="btn btn-sm btn-default btn-remove-line">删除</button></td><td><input type="text" class="form-input" placeholder="物料编码" name="lineCode"></td><td><input type="text" class="form-input" placeholder="物料名称" name="lineName"></td><td><input type="text" class="form-input" placeholder="规格型号" name="lineSpec"></td><td><input type="number" class="form-input" min="0" step="0.0001" name="lineQty" placeholder="数量"></td><td><input type="text" class="form-input" placeholder="单位" name="lineUnit"></td><td><input type="date" class="form-input" name="lineDate"></td>';
+        tbody.appendChild(tr);
+        emptyEl.style.display = 'none';
+        tr.querySelector('.btn-remove-line').addEventListener('click', function() {
+            if (tbody.querySelectorAll('tr.plan-line-row').length > 1) {
+                tr.remove();
+                if (tbody.querySelectorAll('tr.plan-line-row').length === 0) {
+                    emptyEl.style.display = 'block';
+                }
+            } else {
+                alert('至少需要保留一条明细');
+            }
+        });
+    }
+
+    // 初始化第一行
+    addLineRow();
+
+    if (btnAdd) {
+        btnAdd.addEventListener('click', addLineRow);
+    }
+    tbody.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('btn-remove-line')) {
+            var tr = e.target.closest('tr');
+            if (tr && tbody.querySelectorAll('tr.plan-line-row').length > 1) {
+                tr.remove();
+                if (tbody.querySelectorAll('tr.plan-line-row').length === 0) {
+                    emptyEl.style.display = 'block';
+                }
+            } else {
+                alert('至少需要保留一条明细');
+            }
+        }
+    });
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var planName = (form.querySelector('[name="planName"]') && form.querySelector('[name="planName"]').value.trim()) || '';
+        var planType = (form.querySelector('[name="planType"]') && form.querySelector('[name="planType"]').value) || '月度计划';
+        var planStart = (form.querySelector('[name="planStart"]') && form.querySelector('[name="planStart"]').value) || '';
+        var planEnd = (form.querySelector('[name="planEnd"]') && form.querySelector('[name="planEnd"]').value) || '';
+        var budgetAmount = (form.querySelector('[name="budgetAmount"]') && form.querySelector('[name="budgetAmount"]').value) || '0.00';
+        if (!planName) {
+            alert('请填写计划名称');
+            form.querySelector('[name="planName"]').focus();
+            return;
+        }
+        if (!planStart || !planEnd) {
+            alert('请选择计划开始、结束日期');
+            return;
+        }
+        if (planEnd < planStart) {
+            alert('计划结束日期不能早于开始日期');
+            return;
+        }
+
+        var lines = [];
+        tbody.querySelectorAll('tr.plan-line-row').forEach(function(tr) {
+            var code = tr.querySelector('[name="lineCode"]');
+            var name = tr.querySelector('[name="lineName"]');
+            var spec = tr.querySelector('[name="lineSpec"]');
+            var qty = tr.querySelector('[name="lineQty"]');
+            var unit = tr.querySelector('[name="lineUnit"]');
+            var date = tr.querySelector('[name="lineDate"]');
+            var codeVal = code ? code.value.trim() : '';
+            var nameVal = name ? name.value.trim() : '';
+            var qtyVal = qty ? qty.value.trim() : '';
+            if (codeVal || nameVal || qtyVal) {
+                lines.push({
+                    materialCode: codeVal,
+                    materialName: nameVal,
+                    spec: spec ? spec.value.trim() : '',
+                    qty: qtyVal,
+                    unit: unit ? unit.value.trim() : '',
+                    requiredDate: date ? date.value.trim() : ''
+                });
+            }
+        });
+        if (!lines.length) {
+            alert('请至少添加一条计划明细（物料编码、物料名称或需求数量至少填一项）');
+            return;
+        }
+
+        var planCycle = planStart + ' ~ ' + planEnd;
+        var planNo = 'PP-2025-' + String(Math.floor(Math.random() * 900) + 100);
+        try {
+            sessionStorage.setItem('newPlanManual', JSON.stringify({
+                planNo: planNo,
+                planName: planName,
+                planType: planType,
+                planCycle: planCycle,
+                planAmount: '0.00',
+                budgetAmount: budgetAmount,
+                execAmount: '0.00',
+                completeRate: '0%',
+                status: 'reviewing',
+                statusText: '审核中',
+                creator: '当前用户',
+                planSource: '人工创建',
+                sourceDemandNos: [],
+                lines: lines
+            }));
+        } catch (err) {
+            console.error('保存失败:', err);
+        }
+
+        alert('采购计划已创建');
+        if (typeof PageInteractions !== 'undefined') PageInteractions.closeModal('edit-modal');
+        if (typeof PageLoader !== 'undefined' && PageLoader.loadPage) {
+            PageLoader.loadPage('pages/procurement-plan-list.html');
+        } else {
+            window.location.href = 'procurement-plan-list.html';
+        }
+    });
+})();
+    </script>
+</body>
+</html>
+                        </table>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-default btn-add-line" id="btn-add-plan-line">+ 添加明细行</button>
+                </div>
+            </div>
+            <div class="form-actions" style="padding:12px 24px;border-top:1px solid #e8e8e8;"><button type="button" class="btn btn-default" data-close-modal="edit-modal">取消</button><button type="submit" class="btn btn-primary">保存并提交</button></div>
+        </form>
+    </div>
+    <script>
+</body>
+</html>

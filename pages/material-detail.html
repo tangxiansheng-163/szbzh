@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物料档案详情</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">基础信息</span>
+            <span class="breadcrumb-separator">/</span>
+            <a href="pages/material-list.html" class="breadcrumb-item">物料档案</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">物料详情</span>
+        </div>
+
+        <div class="page-header">
+            <div class="page-header-row">
+                <div>
+                    <h2 class="page-title">M001 智能控制器主控板</h2>
+                    <p class="page-description">物料档案完整信息，物料档案是 BOM 创建的基础数据</p>
+                </div>
+                <div class="page-header-actions">
+                    <button class="btn btn-default btn-back" data-url="pages/material-list.html">← 返回列表</button>
+                    <button class="btn btn-primary btn-edit" data-url="pages/material-edit.html" data-id="1">编辑</button>
+                    <button class="btn btn-default">导出</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">基本信息</h3></div>
+            <div class="card-body">
+                <div class="form-info-grid">
+                    <div class="form-info-item"><span class="form-info-label">物料编码</span><span class="form-info-value">M001</span></div>
+                    <div class="form-info-item"><span class="form-info-label">物料名称</span><span class="form-info-value">智能控制器主控板</span></div>
+                    <div class="form-info-item"><span class="form-info-label">物料简称</span><span class="form-info-value">主控板</span></div>
+                    <div class="form-info-item"><span class="form-info-label">规格型号</span><span class="form-info-value">CTRL-MAIN-V1</span></div>
+                    <div class="form-info-item"><span class="form-info-label">物料类型</span><span class="form-info-value">零部件</span></div>
+                    <div class="form-info-item"><span class="form-info-label">物料等级</span><span class="form-info-value">A（关键）</span></div>
+                    <div class="form-info-item"><span class="form-info-label">计量单位</span><span class="form-info-value">件</span></div>
+                    <div class="form-info-item"><span class="form-info-label">采购单位</span><span class="form-info-value">件</span></div>
+                    <div class="form-info-item"><span class="form-info-label">库存单位</span><span class="form-info-value">件</span></div>
+                    <div class="form-info-item"><span class="form-info-label">状态</span><span class="form-info-value"><span class="status-badge status-success">启用</span></span></div>
+                    <div class="form-info-item"><span class="form-info-label">创建人</span><span class="form-info-value">张工</span></div>
+                    <div class="form-info-item"><span class="form-info-label">创建时间</span><span class="form-info-value">2025-01-15 10:00</span></div>
+                    <div class="form-info-item"><span class="form-info-label">修改人</span><span class="form-info-value">张工</span></div>
+                    <div class="form-info-item"><span class="form-info-label">修改时间</span><span class="form-info-value">2025-01-28 14:30</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">库存与采购</h3></div>
+            <div class="card-body">
+                <div class="form-info-grid">
+                    <div class="form-info-item"><span class="form-info-label">安全库存</span><span class="form-info-value">10</span></div>
+                    <div class="form-info-item"><span class="form-info-label">最大库存</span><span class="form-info-value">500</span></div>
+                    <div class="form-info-item"><span class="form-info-label">采购提前期</span><span class="form-info-value">7 天</span></div>
+                    <div class="form-info-item"><span class="form-info-label">参考价格</span><span class="form-info-value">120 元</span></div>
+                    <div class="form-info-item"><span class="form-info-label">价格上限</span><span class="form-info-value">—</span></div>
+                    <div class="form-info-item"><span class="form-info-label">价格下限</span><span class="form-info-value">—</span></div>
+                    <div class="form-info-item"><span class="form-info-label">标准损耗率</span><span class="form-info-value">2%</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">存储与保质</h3></div>
+            <div class="card-body">
+                <div class="form-info-grid">
+                    <div class="form-info-item"><span class="form-info-label">存储条件</span><span class="form-info-value">常温干燥</span></div>
+                    <div class="form-info-item"><span class="form-info-label">保质期</span><span class="form-info-value">365 天</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">属性信息</h3></div>
+            <div class="card-body">
+                <div class="form-info-grid">
+                    <div class="form-info-item"><span class="form-info-label">图纸编号</span><span class="form-info-value">DRW-001</span></div>
+                    <div class="form-info-item"><span class="form-info-label">材质</span><span class="form-info-value">PCB</span></div>
+                    <div class="form-info-item"><span class="form-info-label">重量</span><span class="form-info-value">0.5 kg</span></div>
+                    <div class="form-info-item"><span class="form-info-label">是否关键件</span><span class="form-info-value">是</span></div>
+                    <div class="form-info-item"><span class="form-info-label">是否合规物料</span><span class="form-info-value">是</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">替代物料</h3></div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table class="output-table">
+                        <thead><tr><th width="50">序号</th><th>替代物料编码</th><th>替代物料名称</th><th>替代类型</th><th width="80">优先级</th></tr></thead>
+                        <tbody>
+                            <tr><td>1</td><td>M001-A</td><td>智能控制器主控板（替代型）</td><td>互替</td><td>1</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="section-note" style="margin-top:12px;">互替物料可互相替代使用；优选物料为优先选用。</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">供应商</h3></div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table class="output-table">
+                        <thead><tr><th width="50">序号</th><th>供应商编码</th><th>供应商名称</th><th width="80">是否主供</th></tr></thead>
+                        <tbody>
+                            <tr><td>1</td><td>SUP-001</td><td>华强电子</td><td>是</td></tr>
+                            <tr><td>2</td><td>SUP-002</td><td>元器件供应商</td><td>否</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">技术与质量</h3></div>
+            <div class="card-body">
+                <div class="form-info-item" style="margin-bottom:12px;"><span class="form-info-label">技术参数</span><span class="form-info-value">工作电压 DC 12V，工作温度 -20°C～60°C</span></div>
+                <div class="form-info-item" style="margin-bottom:12px;"><span class="form-info-label">质量标准</span><span class="form-info-value">符合 IPC-A-600 标准</span></div>
+                <div class="form-info-item"><span class="form-info-label">备注</span><span class="form-info-value">—</span></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">库存信息</h3>
+                <span class="card-extra">数据来自 WMS 系统</span>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table class="output-table">
+                        <thead><tr><th>仓库</th><th>可用数量</th><th>占用数量</th><th>在途数量</th><th>单位</th></tr></thead>
+                        <tbody>
+                            <tr><td>原材料仓</td><td>120</td><td>30</td><td>50</td><td>件</td></tr>
+                            <tr><td>成品仓</td><td>0</td><td>0</td><td>0</td><td>件</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">关联 BOM</h3>
+                <a href="pages/ebom-list.html" class="btn btn-sm btn-default">物料反查</a>
+            </div>
+            <div class="card-body">
+                <p class="section-note" style="margin-bottom:12px;">本物料在以下 BOM 中使用，可用于变更影响分析。</p>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>BOM 编码</th><th>产品</th><th>BOM 类型</th><th>用量</th><th>操作</th></tr></thead>
+                        <tbody>
+                            <tr><td>01-02-1234-01-V1</td><td>PROD-001 智能控制器</td><td>EBOM</td><td>1</td><td><button class="btn btn-sm btn-default btn-view" data-url="pages/ebom-detail.html">查看</button></td></tr>
+                            <tr><td>01-02-1234-02-V1</td><td>PROD-001 智能控制器</td><td>MBOM</td><td>1</td><td><button class="btn btn-sm btn-default btn-view" data-url="pages/mbom-detail.html">查看</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+        .page-header-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+        .page-title{font-size:18px;font-weight:600;margin:0 0 8px 0;color:#333;}
+        .page-description{font-size:13px;color:#666;margin:0;}
+        .page-header-actions{display:flex;gap:8px;align-items:center;}
+        .card-extra{font-size:12px;color:#999;font-weight:400;}
+    </style>
+    <script>if(typeof PageInteractions!=='undefined')PageInteractions.initButtons();</script>
+</body>
+</html>

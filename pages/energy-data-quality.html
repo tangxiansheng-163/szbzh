@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据质量 - 能源管理协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="breadcrumb">
+            <a href="pages/energy-dashboard.html" class="breadcrumb-item">工作台</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">数据接收与整合</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">数据质量</span>
+        </div>
+
+        <div class="page-header">
+            <p class="page-description">监控和管理能源数据质量，包括数据完整性、准确性、及时性等质量指标。</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>数据源</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="scada">SCADA系统</option>
+                        <option value="ems">EMS系统</option>
+                        <option value="meter">电表系统</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>质量等级</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="excellent">优秀</option>
+                        <option value="good">良好</option>
+                        <option value="poor">较差</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex-direction: row; align-items: center;">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">数据质量统计</h3>
+            </div>
+            <div class="card-body">
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-label">数据完整率</div>
+                        <div class="stat-value">98.5%</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">数据准确率</div>
+                        <div class="stat-value">99.2%</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">数据及时率</div>
+                        <div class="stat-value">97.8%</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">异常数据数</div>
+                        <div class="stat-value" style="color: #ff4d4f;">12</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('数据质量 页面已加载');
+        if (typeof PageInteractions !== 'undefined') {
+            PageInteractions.initButtons();
+        }
+    </script>
+</body>
+</html>

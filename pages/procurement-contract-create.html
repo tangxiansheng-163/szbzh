@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新建采购合同 - 采购协同系统</title>
+</head>
+<body>
+    <div class="content-wrapper">
+        <form class="contract-create-form" id="contract-create-form">
+            <p class="page-description" style="margin-bottom:16px;">人工创建采购合同，填写合同基本信息与明细。合同来源为「人工创建」。</p>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px 20px; margin-bottom: 16px;">
+                <div class="form-item">
+                    <label class="form-label">合同模板 <span style="color:#ff4d4f;">*</span></label>
+                    <select class="form-select" name="contractTemplate" required>
+                        <option value="">请选择合同模板</option>
+                        <option value="framework">采购框架合同模板</option>
+                        <option value="single">单次采购合同模板</option>
+                        <option value="material">物料采购合同模板</option>
+                        <option value="custom">自定义模板</option>
+                    </select>
+                </div>
+                <div class="form-item">
+                    <label class="form-label">合同编号</label>
+                    <input type="text" class="form-input" name="contractNo" placeholder="可留空由系统生成">
+                </div>
+                <div class="form-item">
+                    <label class="form-label">合同名称 <span style="color:#ff4d4f;">*</span></label>
+                    <input type="text" class="form-input" name="contractName" required placeholder="如：年度框架采购合同">
+                </div>
+                <div class="form-item">
+                    <label class="form-label">合同类型</label>
+                    <select class="form-select" name="contractType">
+                        <option value="framework">框架合同</option>
+                        <option value="single">单次合同</option>
+                        <option value="service">服务合同</option>
+                    </select>
+                </div>
+                <div class="form-item">
+                    <label class="form-label">供应商 <span style="color:#ff4d4f;">*</span></label>
+                    <input type="text" class="form-input" name="supplier" required placeholder="供应商名称">
+                </div>
+                <div class="form-item">
+                    <label class="form-label">合同金额（元）</label>
+                    <input type="text" class="form-input" name="amount" id="contract-create-amount" readonly placeholder="根据明细自动汇总" style="background:#f5f5f5;">
+                </div>
+                <div class="form-item">
+                    <label class="form-label">签署日期</label>
+                    <input type="date" class="form-input" name="signDate">
+                </div>
+                <div class="form-item">
+                    <label class="form-label">有效期起</label>
+                    <input type="date" class="form-input" name="startDate">
+                </div>
+                <div class="form-item">
+                    <label class="form-label">有效期止</label>
+                    <input type="date" class="form-input" name="endDate">
+                </div>
+                <div class="form-item">
+                    <label class="form-label">备注</label>
+                    <input type="text" class="form-input" name="remark" placeholder="选填">
+                </div>
+            </div>
+            <div class="section-title" style="margin:16px 0 8px; font-size:13px; font-weight:600;">合同明细</div>
+            <p class="page-description" style="margin-bottom:8px; color:var(--text-tertiary); font-size:12px;">可直接在下方添加明细行，含税金额、不含税金额随数量与单价自动计算；合同金额由明细合计自动带出。</p>
+            <div style="margin-bottom:8px;">
+                <button type="button" class="btn btn-default btn-sm" id="contract-create-add-line">+ 添加行</button>
+            </div>
+            <div class="table-wrapper" style="border:1px solid var(--border-color); border-radius:var(--radius-sm); overflow-x:auto;">
+                <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                    <thead style="background:#fafafa;">
+                        <tr>
+                            <th style="padding:8px 10px; text-align:left;">操作</th>
+                            <th style="padding:8px 10px; text-align:left;">物料编码</th>
+                            <th style="padding:8px 10px; text-align:left;">物料名称</th>
+                            <th style="padding:8px 10px; text-align:left;">规格型号</th>
+                            <th style="padding:8px 10px; text-align:right;">数量</th>
+                            <th style="padding:8px 10px; text-align:left;">单位</th>
+                            <th style="padding:8px 10px; text-align:left;">需求到货日期</th>
+                            <th style="padding:8px 10px; text-align:right;">含税单价</th>
+                            <th style="padding:8px 10px; text-align:right;">税率(%)</th>
+                            <th style="padding:8px 10px; text-align:right;">含税金额</th>
+                            <th style="padding:8px 10px; text-align:right;">不含税金额</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contract-create-detail-body">
+                        <!-- 动态添加行，无数据时显示空状态 -->
+                    </tbody>
+                </table>
+            </div>
+            <p style="margin-top:8px; text-align:right; font-size:13px; font-weight:600;">合计含税金额：<strong id="contract-create-total-tax">0.00</strong>　合计不含税金额：<strong id="contract-create-total-notax">0.00</strong></p>
+            <div class="form-actions" style="padding-top:12px; border-top:1px solid #eee;">
+                <button type="button" class="btn btn-default" data-close-modal="contract-create-modal">取消</button>
+                <button type="submit" class="btn btn-primary">保存</button>
+            </div>
+        </form>
+    </div>
+    <script>
+    (function() {
+        var form = document.getElementById('contract-create-form');
+        var tbody = document.getElementById('contract-create-detail-body');
+        var totalTaxEl = document.getElementById('contract-create-total-tax');
+        var totalNotaxEl = document.getElementById('contract-create-total-notax');
+        var amountEl = document.getElementById('contract-create-amount');
+        var tdStyle = 'padding:8px 10px; font-size:13px; border-bottom:1px solid #f0f0f0;';
+        var inputStyle = 'width:100%; min-width:60px; padding:6px 8px; font-size:13px; border:1px solid #d9d9d9; border-radius:4px; box-sizing:border-box;';
+
+        function addCreateLine() {
+            var tr = document.createElement('tr');
+            tr.style.borderBottom = '1px solid #f0f0f0';
+            tr.innerHTML =
+                '<td style="' + tdStyle + '"><button type="button" class="btn btn-sm contract-create-del-line" style="padding:2px 8px;">删除</button></td>' +
+                '<td style="' + tdStyle + '"><input type="text" class="form-input contract-create-code" placeholder="物料编码" style="' + inputStyle + '"></td>' +
+                '<td style="' + tdStyle + '"><input type="text" class="form-input contract-create-name" placeholder="物料名称" style="' + inputStyle + '"></td>' +
+                '<td style="' + tdStyle + '"><input type="text" class="form-input contract-create-spec" placeholder="规格" style="' + inputStyle + '"></td>' +
+                '<td style="' + tdStyle + '; text-align:right;"><input type="text" class="form-input contract-create-qty" value="" placeholder="0" style="' + inputStyle + '; text-align:right;"></td>' +
+                '<td style="' + tdStyle + '"><input type="text" class="form-input contract-create-unit" placeholder="单位" style="' + inputStyle + '"></td>' +
+                '<td style="' + tdStyle + '"><input type="date" class="form-input contract-create-date" style="' + inputStyle + '"></td>' +
+                '<td style="' + tdStyle + '; text-align:right;"><input type="text" class="form-input contract-create-price" value="" placeholder="0" style="' + inputStyle + '; text-align:right;"></td>' +
+                '<td style="' + tdStyle + '; text-align:right;"><input type="text" class="form-input contract-create-rate" value="13" placeholder="13" style="' + inputStyle + '; text-align:right; width:50px;"></td>' +
+                '<td style="' + tdStyle + '; text-align:right;"><input type="text" class="form-input contract-create-amount-tax" readonly style="' + inputStyle + '; text-align:right; background:#f5f5f5;"></td>' +
+                '<td style="' + tdStyle + '; text-align:right;"><input type="text" class="form-input contract-create-amount-notax" readonly style="' + inputStyle + '; text-align:right; background:#f5f5f5;"></td>';
+            tbody.appendChild(tr);
+            tr.querySelector('.contract-create-del-line').addEventListener('click', function() { tr.remove(); updateCreateTotals(); });
+            ['contract-create-qty', 'contract-create-price', 'contract-create-rate'].forEach(function(cls) {
+                var el = tr.querySelector('.' + cls);
+                if (el) { el.addEventListener('input', updateCreateTotals); el.addEventListener('change', updateCreateTotals); }
+            });
+            updateCreateTotals();
+        }
+
+        function recalcCreateRow(tr) {
+            var qty = parseFloat((tr.querySelector('.contract-create-qty') && tr.querySelector('.contract-create-qty').value) || '0') || 0;
+            var price = parseFloat((tr.querySelector('.contract-create-price') && tr.querySelector('.contract-create-price').value) || '0') || 0;
+            var rate = parseFloat((tr.querySelector('.contract-create-rate') && tr.querySelector('.contract-create-rate').value) || '0') || 0;
+            var taxAmt = price * qty;
+            var notaxAmt = (rate >= 0 && rate <= 100) ? taxAmt / (1 + rate / 100) : taxAmt;
+            var taxEl = tr.querySelector('.contract-create-amount-tax');
+            var notaxEl = tr.querySelector('.contract-create-amount-notax');
+            if (taxEl) taxEl.value = taxAmt ? taxAmt.toFixed(2) : '';
+            if (notaxEl) notaxEl.value = notaxAmt ? notaxAmt.toFixed(2) : '';
+        }
+
+        function updateCreateTotals() {
+            if (!tbody || !totalTaxEl || !totalNotaxEl) return;
+            var rows = tbody.querySelectorAll('tr');
+            var sumTax = 0, sumNotax = 0;
+            rows.forEach(function(tr) {
+                recalcCreateRow(tr);
+                var taxInput = tr.querySelector('.contract-create-amount-tax');
+                var notaxInput = tr.querySelector('.contract-create-amount-notax');
+                if (taxInput && taxInput.value) sumTax += parseFloat(taxInput.value) || 0;
+                if (notaxInput && notaxInput.value) sumNotax += parseFloat(notaxInput.value) || 0;
+            });
+            totalTaxEl.textContent = sumTax.toFixed(2);
+            totalNotaxEl.textContent = sumNotax.toFixed(2);
+            if (amountEl) amountEl.value = sumTax > 0 ? sumTax.toFixed(2) : '';
+        }
+
+        document.getElementById('contract-create-add-line').addEventListener('click', addCreateLine);
+
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var tpl = form.querySelector('[name="contractTemplate"]');
+                var name = form.querySelector('[name="contractName"]');
+                var supplier = form.querySelector('[name="supplier"]');
+                if (!tpl || !tpl.value) { alert('请选择合同模板'); return; }
+                if (!name || !name.value.trim()) { alert('请填写合同名称'); return; }
+                if (!supplier || !supplier.value.trim()) { alert('请填写供应商'); return; }
+                if (typeof PageInteractions !== 'undefined') PageInteractions.closeModal('contract-create-modal');
+                alert('采购合同已保存为草稿（原型模拟）。');
+            });
+        }
+        var saveBtn = document.getElementById('contract-create-save-btn');
+        if (saveBtn && form) {
+            saveBtn.addEventListener('click', function() { form.dispatchEvent(new Event('submit', { cancelable: true })); });
+        }
+    })();
+    </script>
+</body>
+</html>
