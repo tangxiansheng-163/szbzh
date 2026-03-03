@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新建维护计划 - 设备管理</title>
+    <style>
+        .maint-plan-form .card-header { padding: 20px 28px 16px; border-bottom: 1px solid #e8e8e8; }
+        .maint-plan-form .card-title { font-size: 16px; font-weight: 600; margin: 0; }
+        .maint-plan-form .card-body { padding: 24px 28px 28px; }
+        .maint-plan-form .page-description { font-size: 13px; color: #595959; line-height: 1.6; margin-bottom: 24px; padding: 12px 16px; background: #fafafa; border-radius: 6px; border-left: 3px solid #1890ff; }
+        .maint-plan-form .form-section { margin-bottom: 28px; }
+        .maint-plan-form .form-section:last-of-type { margin-bottom: 0; }
+        .maint-plan-form .section-title { font-size: 14px; font-weight: 600; color: rgba(0,0,0,0.85); margin: 0 0 16px 0; padding-bottom: 10px; border-bottom: 1px solid #e8e8e8; }
+        .maint-plan-form .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 20px; }
+        .maint-plan-form .form-item.full-width { grid-column: 1 / -1; }
+        .maint-plan-form .form-item.span-2 { grid-column: span 2; }
+        .maint-plan-form .form-item .form-label { display: block; margin-bottom: 6px; font-size: 13px; color: rgba(0,0,0,0.85); }
+        .maint-plan-form .form-item .form-label.required::before { content: '*'; color: #ff4d4f; margin-right: 4px; }
+        .maint-plan-form .form-item .form-input,
+        .maint-plan-form .form-item .form-select,
+        .maint-plan-form .form-item .form-textarea { width: 100%; padding: 8px 12px; font-size: 13px; border-radius: 4px; border: 1px solid #d9d9d9; box-sizing: border-box; }
+        .maint-plan-form .form-item textarea.form-input { min-height: 72px; resize: vertical; }
+        .maint-plan-form .table-wrapper { overflow-x: auto; margin-top: 12px; border: 1px solid #e8e8e8; border-radius: 6px; background: #fff; }
+        .maint-plan-form .table-wrapper table { width: 100%; min-width: 700px; border-collapse: collapse; }
+        .maint-plan-form .table-wrapper th { padding: 12px 14px; text-align: left; font-size: 13px; font-weight: 600; color: rgba(0,0,0,0.85); background: #fafafa; border-bottom: 1px solid #e8e8e8; }
+        .maint-plan-form .table-wrapper td { padding: 10px 14px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+        .maint-plan-form .table-wrapper td .form-input { width: 100%; min-width: 0; padding: 7px 10px; font-size: 13px; border: 1px solid #d9d9d9; border-radius: 4px; box-sizing: border-box; }
+        .maint-plan-form .btn-add-line { margin-top: 14px; }
+        .maint-plan-form .form-actions { padding: 16px 28px !important; border-top: 1px solid #e8e8e8; background: #fafafa; }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <form class="card maint-plan-form" style="margin:0;" id="maint-plan-create-form">
+            <div class="card-header"><h3 class="card-title">新建维护计划</h3></div>
+            <div class="card-body">
+                <p class="page-description">计划编号由系统自动生成。支持创建巡检计划、保养计划、预防性维修计划，按执行周期自动生成待办任务。</p>
+
+                <div class="form-section">
+                    <div class="section-title">基本信息</div>
+                    <div class="form-grid">
+                        <div class="form-item">
+                            <label class="form-label required">计划名称</label>
+                            <input type="text" class="form-input" name="planName" placeholder="如：空压机A定期保养" required>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">计划类型</label>
+                            <select class="form-select" name="planType" required>
+                                <option value="">请选择</option>
+                                <option value="inspection">巡检计划</option>
+                                <option value="maintenance">保养计划</option>
+                                <option value="repair">维修计划</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">设备编码</label>
+                            <input type="text" class="form-input" name="equipCode" placeholder="输入或选择设备编码" required>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">设备名称</label>
+                            <input type="text" class="form-input" name="equipName" placeholder="设备名称" required>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">执行周期</label>
+                            <select class="form-select" name="cycle" required>
+                                <option value="">请选择</option>
+                                <option value="daily">每日</option>
+                                <option value="weekly">每周</option>
+                                <option value="monthly">每月</option>
+                                <option value="quarterly">每季度</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">责任人</label>
+                            <input type="text" class="form-input" name="owner" placeholder="责任人" required>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label required">计划开始日期</label>
+                            <input type="date" class="form-input" name="planStart" required>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">计划结束日期</label>
+                            <input type="date" class="form-input" name="planEnd" placeholder="选填，不填表示长期有效">
+                        </div>
+                        <div class="form-item span-2">
+                            <label class="form-label">维护内容说明</label>
+                            <textarea class="form-input" name="content" rows="2" placeholder="维护/巡检内容、注意事项等"></textarea>
+                        </div>
+                        <div class="form-item span-2">
+                            <label class="form-label">备注</label>
+                            <textarea class="form-input" name="remark" rows="2" placeholder="其他补充说明"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">维护项目明细（可选）</div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:40px"></th>
+                                    <th width="80">序号</th>
+                                    <th>维护项目</th>
+                                    <th width="150">检查标准/要求</th>
+                                </tr>
+                            </thead>
+                            <tbody id="maint-plan-lines">
+                                <tr class="maint-line-row">
+                                    <td><button type="button" class="btn btn-sm btn-default btn-remove-line">删除</button></td>
+                                    <td><input type="number" class="form-input" name="lineSeq" value="1" min="1"></td>
+                                    <td><input type="text" class="form-input" name="lineItem" placeholder="如：润滑油检查"></td>
+                                    <td><input type="text" class="form-input" name="lineStandard" placeholder="检查标准"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-default btn-add-line" id="btn-add-maint-line">+ 添加维护项目</button>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-default" data-close-modal="plan-create-modal">取消</button>
+                <button type="button" class="btn btn-default" id="btn-save-draft">保存草稿</button>
+                <button type="submit" class="btn btn-primary">保存并提交审批</button>
+            </div>
+        </form>
+    </div>
+    <script>
+(function() {
+    var form = document.getElementById('maint-plan-create-form');
+    var tbody = document.getElementById('maint-plan-lines');
+    var btnAdd = document.getElementById('btn-add-maint-line');
+    var btnDraft = document.getElementById('btn-save-draft');
+    if (!form || !tbody) return;
+
+    var lineSeq = 1;
+    function addLineRow() {
+        lineSeq++;
+        var tr = document.createElement('tr');
+        tr.className = 'maint-line-row';
+        tr.innerHTML = '<td><button type="button" class="btn btn-sm btn-default btn-remove-line">删除</button></td>' +
+            '<td><input type="number" class="form-input" name="lineSeq" value="' + lineSeq + '" min="1"></td>' +
+            '<td><input type="text" class="form-input" name="lineItem" placeholder="维护项目"></td>' +
+            '<td><input type="text" class="form-input" name="lineStandard" placeholder="检查标准"></td>';
+        tbody.appendChild(tr);
+        tr.querySelector('.btn-remove-line').addEventListener('click', function() {
+            if (tbody.querySelectorAll('tr.maint-line-row').length > 1) tr.remove();
+            else alert('至少保留一项');
+        });
+    }
+    if (btnAdd) btnAdd.addEventListener('click', addLineRow);
+
+    tbody.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('btn-remove-line')) {
+            var tr = e.target.closest('tr');
+            if (tr && tbody.querySelectorAll('tr.maint-line-row').length > 1) tr.remove();
+            else alert('至少保留一项');
+        }
+    });
+
+    function doSubmit(isDraft) {
+        var planName = (form.querySelector('[name="planName"]') && form.querySelector('[name="planName"]').value.trim()) || '';
+        var planType = (form.querySelector('[name="planType"]') && form.querySelector('[name="planType"]').value) || '';
+        var equipCode = (form.querySelector('[name="equipCode"]') && form.querySelector('[name="equipCode"]').value.trim()) || '';
+        var equipName = (form.querySelector('[name="equipName"]') && form.querySelector('[name="equipName"]').value.trim()) || '';
+        var cycle = (form.querySelector('[name="cycle"]') && form.querySelector('[name="cycle"]').value) || '';
+        var owner = (form.querySelector('[name="owner"]') && form.querySelector('[name="owner"]').value.trim()) || '';
+        var planStart = (form.querySelector('[name="planStart"]') && form.querySelector('[name="planStart"]').value) || '';
+        if (!planName) { alert('请填写计划名称'); return; }
+        if (!planType) { alert('请选择计划类型'); return; }
+        if (!equipCode || !equipName) { alert('请填写设备编码和名称'); return; }
+        if (!cycle) { alert('请选择执行周期'); return; }
+        if (!owner) { alert('请填写责任人'); return; }
+        if (!planStart && !isDraft) { alert('请选择计划开始日期'); return; }
+
+        var typeText = { inspection: '巡检计划', maintenance: '保养计划', repair: '维修计划' }[planType] || planType;
+        var cycleText = { daily: '每日', weekly: '每周', monthly: '每月', quarterly: '每季度' }[cycle] || cycle;
+        var planNo = 'MP-2025-' + String(Math.floor(Math.random() * 900) + 100);
+        var status = isDraft ? 'draft' : 'pending';
+        var statusText = isDraft ? '草稿' : '待审批';
+
+        alert(isDraft ? '✅ 已保存为草稿' : '✅ 维护计划已创建并提交审批');
+        if (typeof PageInteractions !== 'undefined') PageInteractions.closeModal('plan-create-modal');
+        if (typeof PageLoader !== 'undefined' && PageLoader.loadPage) {
+            PageLoader.loadPage('pages/equipment-maintenance-plan.html');
+        } else {
+            window.location.href = 'pages/equipment-maintenance-plan.html';
+        }
+    }
+
+    form.addEventListener('submit', function(e) { e.preventDefault(); doSubmit(false); });
+    if (btnDraft) btnDraft.addEventListener('click', function(e) { e.preventDefault(); doSubmit(true); });
+})();
+    </script>
+</body>
+</html>

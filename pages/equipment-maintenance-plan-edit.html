@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑维护计划 - 设备管理</title>
+    <style>
+        .maint-plan-edit-form .card { margin: 0 0 20px 0; border: 1px solid var(--border-color, #e8e8e8); border-radius: var(--radius-md); overflow: hidden; }
+        .maint-plan-edit-form .card-header { padding: 16px 24px; border-bottom: 1px solid #e8e8e8; background: #fafafa; }
+        .maint-plan-edit-form .card-title { margin: 0; font-size: 15px; font-weight: 600; }
+        .maint-plan-edit-form .card-body { padding: 24px; }
+        .maint-plan-edit-form .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 20px; }
+        .maint-plan-edit-form .form-item.full-width { grid-column: 1 / -1; }
+        .maint-plan-edit-form .form-item.span-2 { grid-column: span 2; }
+        .maint-plan-edit-form .form-label { display: block; margin-bottom: 6px; font-size: 13px; color: rgba(0,0,0,0.85); font-weight: 500; }
+        .maint-plan-edit-form .form-label .required { color: #ff4d4f; margin-right: 4px; }
+        .maint-plan-edit-form .form-input, .maint-plan-edit-form .form-select, .maint-plan-edit-form .form-textarea { width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid #d9d9d9; border-radius: 4px; box-sizing: border-box; }
+        .maint-plan-edit-form .form-input[readonly] { background: #f5f5f5; cursor: not-allowed; }
+        .maint-plan-edit-form .table-wrapper { overflow-x: auto; border: 1px solid #e8e8e8; border-radius: 6px; margin-top: 12px; }
+        .maint-plan-edit-form .table-wrapper table { width: 100%; min-width: 700px; border-collapse: collapse; }
+        .maint-plan-edit-form .table-wrapper th, .maint-plan-edit-form .table-wrapper td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid #f0f0f0; }
+        .maint-plan-edit-form .table-wrapper th { background: #fafafa; font-weight: 600; color: rgba(0,0,0,0.65); }
+        .maint-plan-edit-form .table-wrapper td .form-input { width: 100%; min-width: 0; padding: 7px 10px; font-size: 13px; border: 1px solid #d9d9d9; border-radius: 4px; box-sizing: border-box; }
+        .maint-plan-edit-form .form-actions { padding: 16px 24px; border-top: 1px solid #e8e8e8; background: #fafafa; display: flex; gap: 12px; justify-content: flex-end; }
+        .maint-plan-edit-form .btn-add-line { margin-top: 12px; }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper maint-plan-edit-form">
+        <form id="maint-plan-edit-form" class="maint-plan-edit-form">
+            <div class="card">
+                <div class="card-header"><h3 class="card-title">基本信息</h3></div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-item">
+                            <label class="form-label">计划编号</label>
+                            <input type="text" class="form-input" id="edit-plan-no" readonly>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">计划状态</label>
+                            <input type="text" class="form-input" id="edit-status" readonly>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">计划名称 <span class="required">*</span></label>
+                            <input type="text" class="form-input" name="planName" id="edit-plan-name" required>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">计划类型 <span class="required">*</span></label>
+                            <select class="form-select" name="planType" id="edit-plan-type" required>
+                                <option value="inspection">巡检计划</option>
+                                <option value="maintenance">保养计划</option>
+                                <option value="repair">维修计划</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">设备编码 <span class="required">*</span></label>
+                            <input type="text" class="form-input" name="equipCode" id="edit-equip-code" required>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">设备名称 <span class="required">*</span></label>
+                            <input type="text" class="form-input" name="equipName" id="edit-equip-name" required>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">执行周期 <span class="required">*</span></label>
+                            <select class="form-select" name="cycle" id="edit-cycle" required>
+                                <option value="daily">每日</option>
+                                <option value="weekly">每周</option>
+                                <option value="monthly">每月</option>
+                                <option value="quarterly">每季度</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">责任人 <span class="required">*</span></label>
+                            <input type="text" class="form-input" name="owner" id="edit-owner" required>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">计划开始日期</label>
+                            <input type="date" class="form-input" name="planStart" id="edit-plan-start">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">计划结束日期</label>
+                            <input type="date" class="form-input" name="planEnd" id="edit-plan-end">
+                        </div>
+                        <div class="form-item span-2">
+                            <label class="form-label">维护内容说明</label>
+                            <textarea class="form-input" name="content" id="edit-content" rows="2"></textarea>
+                        </div>
+                        <div class="form-item span-2">
+                            <label class="form-label">备注</label>
+                            <textarea class="form-input" name="remark" id="edit-remark" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><h3 class="card-title">维护项目明细</h3></div>
+                <div class="card-body">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="40"></th>
+                                    <th width="60">序号</th>
+                                    <th>维护项目</th>
+                                    <th width="180">检查标准/要求</th>
+                                </tr>
+                            </thead>
+                            <tbody id="edit-maint-lines"></tbody>
+                        </table>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-default btn-add-line" id="btn-add-edit-line">+ 添加维护项目</button>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-default" data-close-modal="edit-modal">取消</button>
+                <button type="submit" class="btn btn-primary">保存</button>
+            </div>
+        </form>
+    </div>
+    <script>
+(function() {
+    var id = typeof window.__modalContentId !== 'undefined' ? window.__modalContentId : (new URLSearchParams(window.location.search).get('id') || '1');
+    var mockData = {
+        '1': { planNo: 'MP-2025-001', planName: '空压机A定期保养', planType: 'maintenance', status: '已启用', equipCode: 'EQ-001', equipName: '空压机A', cycle: 'monthly', owner: '张运维', planStart: '2025-01-01', planEnd: '', content: '定期检查润滑油、滤芯更换、排气压力校准', remark: '', lines: [
+            { seq: 1, item: '润滑油液位检查', standard: '液位在标线范围内' },
+            { seq: 2, item: '滤芯更换', standard: '使用时长超过500小时需更换' },
+            { seq: 3, item: '排气压力校准', standard: '0.8±0.05 MPa' }
+        ]},
+        '2': { planNo: 'MP-2025-002', planName: '数控机床日常巡检', planType: 'inspection', status: '已启用', equipCode: 'EQ-002', equipName: '数控机床', cycle: 'daily', owner: '李运维', planStart: '2025-01-01', planEnd: '', content: '开机前外观检查、润滑点检查、异常声响监听', remark: '', lines: [
+            { seq: 1, item: '外观检查', standard: '无破损、漏油' },
+            { seq: 2, item: '润滑点检查', standard: '润滑正常' }
+        ]},
+        '3': { planNo: 'MP-2025-003', planName: '冷却塔预防性维修', planType: 'repair', status: '已暂停', equipCode: 'EQ-003', equipName: '冷却塔', cycle: 'quarterly', owner: '王运维', planStart: '2025-01-01', planEnd: '2025-12-31', content: '风机轴承检查、填料清洗、水质检测', remark: '冬季暂停', lines: [
+            { seq: 1, item: '风机轴承检查', standard: '无异响、振动' },
+            { seq: 2, item: '填料清洗', standard: '无堵塞' }
+        ]}
+    };
+    var d = mockData[id] || mockData['1'];
+    var form = document.getElementById('maint-plan-edit-form');
+    var tbody = document.getElementById('edit-maint-lines');
+    var btnAdd = document.getElementById('btn-add-edit-line');
+    if (!form || !tbody) return;
+
+    document.getElementById('edit-plan-no').value = d.planNo;
+    document.getElementById('edit-status').value = d.status;
+    document.getElementById('edit-plan-name').value = d.planName;
+    document.getElementById('edit-plan-type').value = d.planType;
+    document.getElementById('edit-equip-code').value = d.equipCode;
+    document.getElementById('edit-equip-name').value = d.equipName;
+    document.getElementById('edit-cycle').value = d.cycle;
+    document.getElementById('edit-owner').value = d.owner;
+    document.getElementById('edit-plan-start').value = d.planStart || '';
+    document.getElementById('edit-plan-end').value = d.planEnd || '';
+    document.getElementById('edit-content').value = d.content || '';
+    document.getElementById('edit-remark').value = d.remark || '';
+
+    var lineSeq = 0;
+    function renderLines() {
+        tbody.innerHTML = '';
+        (d.lines || []).forEach(function(l) {
+            lineSeq++;
+            var tr = document.createElement('tr');
+            tr.className = 'maint-edit-line-row';
+            tr.innerHTML = '<td><button type="button" class="btn btn-sm btn-default btn-remove-edit-line">删除</button></td>' +
+                '<td><input type="number" class="form-input" name="lineSeq" value="' + (l.seq || lineSeq) + '" min="1"></td>' +
+                '<td><input type="text" class="form-input" name="lineItem" value="' + (l.item || '') + '"></td>' +
+                '<td><input type="text" class="form-input" name="lineStandard" value="' + (l.standard || '') + '"></td>';
+            tbody.appendChild(tr);
+        });
+        if (tbody.querySelectorAll('tr').length === 0) {
+            lineSeq = 1;
+            var tr = document.createElement('tr');
+            tr.className = 'maint-edit-line-row';
+            tr.innerHTML = '<td><button type="button" class="btn btn-sm btn-default btn-remove-edit-line">删除</button></td>' +
+                '<td><input type="number" class="form-input" name="lineSeq" value="1" min="1"></td>' +
+                '<td><input type="text" class="form-input" name="lineItem" placeholder="维护项目"></td>' +
+                '<td><input type="text" class="form-input" name="lineStandard" placeholder="检查标准"></td>';
+            tbody.appendChild(tr);
+        }
+        tbody.querySelectorAll('.btn-remove-edit-line').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var tr = this.closest('tr');
+                if (tbody.querySelectorAll('tr').length > 1) tr.remove();
+                else alert('至少保留一项');
+            });
+        });
+    }
+    renderLines();
+
+    if (btnAdd) {
+        btnAdd.addEventListener('click', function() {
+            lineSeq++;
+            var tr = document.createElement('tr');
+            tr.className = 'maint-edit-line-row';
+            tr.innerHTML = '<td><button type="button" class="btn btn-sm btn-default btn-remove-edit-line">删除</button></td>' +
+                '<td><input type="number" class="form-input" name="lineSeq" value="' + lineSeq + '" min="1"></td>' +
+                '<td><input type="text" class="form-input" name="lineItem" placeholder="维护项目"></td>' +
+                '<td><input type="text" class="form-input" name="lineStandard" placeholder="检查标准"></td>';
+            tbody.appendChild(tr);
+            tr.querySelector('.btn-remove-edit-line').addEventListener('click', function() {
+                if (tbody.querySelectorAll('tr').length > 1) tr.remove();
+                else alert('至少保留一项');
+            });
+        });
+    }
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('✅ 维护计划已保存');
+        if (typeof PageInteractions !== 'undefined') PageInteractions.closeModal('edit-modal');
+    });
+})();
+    </script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>维护计划详情 - 设备管理</title>
+    <style>
+        .maint-detail .card { margin-bottom: 16px; }
+        .maint-detail .card:last-child { margin-bottom: 0; }
+        .maint-detail .card-header { padding: 16px 24px; border-bottom: 1px solid #e8e8e8; background: #fafafa; }
+        .maint-detail .card-title { margin: 0; font-size: 15px; font-weight: 600; }
+        .maint-detail .card-body { padding: 24px; }
+        .maint-detail .form-info-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 24px; }
+        .maint-detail .form-info-item { display: flex; flex-direction: column; gap: 4px; }
+        .maint-detail .form-info-label { font-size: 12px; color: #8c8c8c; }
+        .maint-detail .form-info-value { font-size: 14px; color: rgba(0,0,0,0.85); }
+        .maint-detail .table-wrapper { overflow-x: auto; border: 1px solid #e8e8e8; border-radius: 6px; }
+        .maint-detail .table-wrapper table { width: 100%; border-collapse: collapse; }
+        .maint-detail .table-wrapper th, .maint-detail .table-wrapper td { padding: 12px 16px; text-align: left; font-size: 13px; border-bottom: 1px solid #f0f0f0; }
+        .maint-detail .table-wrapper th { background: #fafafa; font-weight: 600; color: rgba(0,0,0,0.65); }
+        .maint-detail .table-wrapper tbody tr:last-child td { border-bottom: none; }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper maint-detail" id="maint-detail-root">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">基本信息</h3>
+                <span id="detail-status-badge" class="status-badge status-published">已启用</span>
+            </div>
+            <div class="card-body">
+                <div class="form-info-grid" id="detail-basic-info">
+                    <div class="form-info-item"><span class="form-info-label">计划编号</span><span class="form-info-value" id="detail-plan-no">MP-2025-001</span></div>
+                    <div class="form-info-item"><span class="form-info-label">计划名称</span><span class="form-info-value" id="detail-plan-name">空压机A定期保养</span></div>
+                    <div class="form-info-item"><span class="form-info-label">计划类型</span><span class="form-info-value" id="detail-plan-type">保养计划</span></div>
+                    <div class="form-info-item"><span class="form-info-label">计划状态</span><span class="form-info-value" id="detail-status">已启用</span></div>
+                    <div class="form-info-item"><span class="form-info-label">设备编码</span><span class="form-info-value" id="detail-equip-code">EQ-001</span></div>
+                    <div class="form-info-item"><span class="form-info-label">设备名称</span><span class="form-info-value" id="detail-equip-name">空压机A</span></div>
+                    <div class="form-info-item"><span class="form-info-label">执行周期</span><span class="form-info-value" id="detail-cycle">每月</span></div>
+                    <div class="form-info-item"><span class="form-info-label">责任人</span><span class="form-info-value" id="detail-owner">张运维</span></div>
+                    <div class="form-info-item"><span class="form-info-label">下次执行</span><span class="form-info-value" id="detail-next-exec">2025-02-01</span></div>
+                    <div class="form-info-item"><span class="form-info-label">创建人</span><span class="form-info-value" id="detail-creator">张运维</span></div>
+                    <div class="form-info-item"><span class="form-info-label">创建时间</span><span class="form-info-value" id="detail-create-time">2025-01-10 09:00</span></div>
+                    <div class="form-info-item" style="grid-column: 1 / -1;"><span class="form-info-label">维护内容说明</span><span class="form-info-value" id="detail-content">定期检查润滑油、滤芯更换、排气压力校准</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">维护项目明细</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="60">序号</th>
+                                <th>维护项目</th>
+                                <th width="200">检查标准/要求</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-lines">
+                            <tr><td>1</td><td>润滑油液位检查</td><td>液位在标线范围内</td></tr>
+                            <tr><td>2</td><td>滤芯更换</td><td>使用时长超过500小时需更换</td></tr>
+                            <tr><td>3</td><td>排气压力校准</td><td>0.8±0.05 MPa</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">执行记录（最近5条）</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="100">执行日期</th>
+                                <th width="100">执行人</th>
+                                <th width="100">执行结果</th>
+                                <th>备注</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-exec-records">
+                            <tr><td>2025-01-15</td><td>张运维</td><td><span class="status-badge status-success">已完成</span></td><td>正常</td></tr>
+                            <tr><td>2024-12-15</td><td>张运维</td><td><span class="status-badge status-success">已完成</span></td><td>正常</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+(function() {
+    var id = typeof window.__modalContentId !== 'undefined' ? window.__modalContentId : (new URLSearchParams(window.location.search).get('id') || '1');
+    var mockData = {
+        '1': { planNo: 'MP-2025-001', planName: '空压机A定期保养', planType: '保养计划', status: 'enabled', statusText: '已启用', equipCode: 'EQ-001', equipName: '空压机A', cycle: '每月', owner: '张运维', nextExec: '2025-02-01', creator: '张运维', createTime: '2025-01-10 09:00', content: '定期检查润滑油、滤芯更换、排气压力校准' },
+        '2': { planNo: 'MP-2025-002', planName: '数控机床日常巡检', planType: '巡检计划', status: 'enabled', statusText: '已启用', equipCode: 'EQ-002', equipName: '数控机床', cycle: '每日', owner: '李运维', nextExec: '2025-01-30', creator: '李运维', createTime: '2025-01-08 14:00', content: '开机前外观检查、润滑点检查、异常声响监听' },
+        '3': { planNo: 'MP-2025-003', planName: '冷却塔预防性维修', planType: '维修计划', status: 'paused', statusText: '已暂停', equipCode: 'EQ-003', equipName: '冷却塔', cycle: '每季度', owner: '王运维', nextExec: '2025-04-01', creator: '王运维', createTime: '2025-01-05 10:00', content: '风机轴承检查、填料清洗、水质检测' }
+    };
+    var d = mockData[id] || mockData['1'];
+    var root = document.getElementById('maint-detail-root');
+    if (!root) return;
+    var statusClass = { enabled: 'status-published', paused: 'status-warning', draft: 'status-default', pending: 'status-info', approved: 'status-success' }[d.status] || 'status-default';
+    document.getElementById('detail-plan-no').textContent = d.planNo;
+    document.getElementById('detail-plan-name').textContent = d.planName;
+    document.getElementById('detail-plan-type').textContent = d.planType;
+    document.getElementById('detail-status').textContent = d.statusText;
+    document.getElementById('detail-equip-code').textContent = d.equipCode;
+    document.getElementById('detail-equip-name').textContent = d.equipName;
+    document.getElementById('detail-cycle').textContent = d.cycle;
+    document.getElementById('detail-owner').textContent = d.owner;
+    document.getElementById('detail-next-exec').textContent = d.nextExec;
+    document.getElementById('detail-creator').textContent = d.creator;
+    document.getElementById('detail-create-time').textContent = d.createTime;
+    document.getElementById('detail-content').textContent = d.content || '-';
+    var badge = document.getElementById('detail-status-badge');
+    if (badge) { badge.textContent = d.statusText; badge.className = 'status-badge ' + statusClass; }
+})();
+    </script>
+</body>
+</html>

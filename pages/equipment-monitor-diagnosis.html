@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -1464,17 +1464,100 @@
         
         .chat-body {
             flex: 1;
-            overflow-y: auto;
             padding: 0;
             background: var(--bg-gray);
+            display: flex;
+            flex-direction: column;
+            min-height: 0; /* 防止子元素溢出弹窗 */
+        }
+
+        .chat-layout {
+            display: flex;
+            height: 100%;
+            min-height: 0;
+        }
+
+        .chat-sidebar {
+            width: 240px;
+            border-right: 1px solid var(--border-light);
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-sidebar-header {
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .chat-sidebar-title {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .chat-sidebar-new {
+            font-size: 12px;
+            border: none;
+            background: transparent;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .chat-sidebar-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 8px 8px 12px;
+        }
+
+        .chat-sidebar-item {
+            padding: 6px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 4px;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .chat-sidebar-item:hover {
+            background: #f0f5ff;
+        }
+
+        .chat-sidebar-item.active {
+            background: #e6f7ff;
+            border-left: 2px solid var(--primary);
+        }
+
+        .chat-sidebar-item-title {
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-sidebar-item-time {
+            color: var(--text-tertiary);
+            font-size: 11px;
+        }
+
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
         }
         
         .chat-messages {
-            padding: 20px;
+            padding: 16px 24px 12px 24px;
             display: flex;
             flex-direction: column;
             gap: 16px;
-            max-height: 550px;
+            flex: 1;
+            min-height: 0;
             overflow-y: auto;
         }
 
@@ -1580,26 +1663,81 @@
         
         .chat-footer {
             flex-direction: column;
-            gap: 12px;
-            padding: 16px 20px;
+            gap: 10px;
+            padding: 12px 20px 14px;
             border-top: 1px solid var(--border-light);
+            background: #fafafa;
+        }
+        
+        .chat-attachments {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            width: 100%;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        
+        .chat-attachment-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--bg-color);
+            border-radius: 16px;
+            font-size: 12px;
+            color: var(--text-primary);
+            border: 1px solid var(--border-light);
+        }
+        
+        .chat-attachment-item .remove-attach {
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .chat-attachment-item .remove-attach:hover {
+            color: var(--danger);
+        }
+        
+        .chat-attach-btn {
+            width: 44px;
+            height: 44px;
+            border: 1px solid var(--border-light);
             background: white;
+            border-radius: 50%;
+            color: var(--text-primary);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        
+        .chat-attach-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-bg);
         }
         
         .chat-input-area {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             width: 100%;
+            align-items: center;
         }
         
         .chat-input {
             flex: 1;
-            padding: 12px 16px;
+            padding: 10px 16px;
             border: 1px solid var(--border-light);
-            border-radius: 24px;
+            border-radius: 22px;
             font-size: 14px;
             outline: none;
             transition: all 0.3s ease;
+            background: #fff;
         }
         
         .chat-input:focus {
@@ -1608,8 +1746,8 @@
         }
         
         .chat-send-btn {
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             border: none;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             border-radius: 50%;
@@ -3153,9 +3291,9 @@
                         </div>
                     </div>
                     
-                    <!-- 历史诊断 -->
+                    <!-- 对话历史 -->
                     <div class="workbench-section">
-                        <div class="workbench-section-title">历史诊断</div>
+                        <div class="workbench-section-title">对话历史</div>
                         <div class="history-list" id="historyList">
                             <!-- 动态生成 -->
                         </div>
@@ -3259,34 +3397,52 @@
                 <button class="modal-close" id="chatModalClose" onclick="window.closeChatModal && window.closeChatModal()">&times;</button>
             </div>
             <div class="modal-body chat-body">
-                <div class="chat-messages" id="chatMessages">
-                    <div class="chat-message system-message">
-                        <div class="message-content">
-                            <p>👋 您好！我是设备智能诊断助手。</p>
-                            <p>我可以帮您：</p>
-                            <ul>
-                                <li>分析设备运行状态和故障原因</li>
-                                <li>提供维护建议和解决方案</li>
-                                <li>解释诊断报告和技术指标</li>
-                                <li>预测设备健康趋势</li>
-                            </ul>
-                            <p>请告诉我您想了解什么？</p>
+                <div class="chat-layout">
+                    <div class="chat-sidebar">
+                        <div class="chat-sidebar-header">
+                            <span class="chat-sidebar-title">对话历史</span>
+                            <button type="button" class="chat-sidebar-new" onclick="openAIChat()">新对话</button>
+                        </div>
+                        <div class="chat-sidebar-list" id="chatHistorySidebar"></div>
+                    </div>
+                    <div class="chat-main">
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="chat-message system-message">
+                                <div class="message-content">
+                                    <p>👋 您好！我是设备智能诊断助手。</p>
+                                    <p>我可以帮您：</p>
+                                    <ul>
+                                        <li>分析设备运行状态和故障原因</li>
+                                        <li>提供维护建议和解决方案</li>
+                                        <li>解释诊断报告和技术指标</li>
+                                        <li>预测设备健康趋势</li>
+                                    </ul>
+                                    <p>请告诉我您想了解什么？</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-footer">
+                            <div class="chat-attachments" id="chatAttachments">
+                                <!-- 附件列表 -->
+                            </div>
+                            <div class="chat-input-area">
+                                <button class="chat-attach-btn" id="chatAttachBtn" onclick="document.getElementById('chatFileInput').click()" title="上传附件">
+                                    <span>📎</span>
+                                </button>
+                                <input type="file" id="chatFileInput" style="display: none;" multiple onchange="handleFileSelect(event)">
+                                <input type="text" class="chat-input" id="chatInput" placeholder="请输入您的问题..." onkeypress="if(event.key==='Enter' && window.sendChatMessage) window.sendChatMessage()">
+                                <button class="chat-send-btn" id="chatSendBtn" onclick="window.sendChatMessage && window.sendChatMessage()">
+                                    <span>📤</span>
+                                </button>
+                            </div>
+                            <div class="chat-quick-questions">
+                                <button class="quick-question-btn" data-question="设备当前状态如何？" onclick="window.sendQuickQuestion && window.sendQuickQuestion('设备当前状态如何？')">设备状态</button>
+                                <button class="quick-question-btn" data-question="有哪些维护建议？" onclick="window.sendQuickQuestion && window.sendQuickQuestion('有哪些维护建议？')">维护建议</button>
+                                <button class="quick-question-btn" data-question="预测性分析结果是什么？" onclick="window.sendQuickQuestion && window.sendQuickQuestion('预测性分析结果是什么？')">预测分析</button>
+                                <button class="quick-question-btn" data-question="关键部件健康状况如何？" onclick="window.sendQuickQuestion && window.sendQuickQuestion('关键部件健康状况如何？')">部件健康</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="modal-footer chat-footer">
-                <div class="chat-input-area">
-                    <input type="text" class="chat-input" id="chatInput" placeholder="请输入您的问题..." onkeypress="if(event.key==='Enter' && window.sendChatMessage) window.sendChatMessage()">
-                    <button class="chat-send-btn" id="chatSendBtn" onclick="window.sendChatMessage && window.sendChatMessage()">
-                        <span>📤</span>
-                    </button>
-                </div>
-                <div class="chat-quick-questions">
-                    <button class="quick-question-btn" data-question="设备当前状态如何？" onclick="window.sendQuickQuestion && window.sendQuickQuestion('设备当前状态如何？')">设备状态</button>
-                    <button class="quick-question-btn" data-question="有哪些维护建议？" onclick="window.sendQuickQuestion && window.sendQuickQuestion('有哪些维护建议？')">维护建议</button>
-                    <button class="quick-question-btn" data-question="预测性分析结果是什么？" onclick="window.sendQuickQuestion && window.sendQuickQuestion('预测性分析结果是什么？')">预测分析</button>
-                    <button class="quick-question-btn" data-question="关键部件健康状况如何？" onclick="window.sendQuickQuestion && window.sendQuickQuestion('关键部件健康状况如何？')">部件健康</button>
                 </div>
             </div>
         </div>
@@ -3300,9 +3456,115 @@
                 name: '生产车间A',
                 icon: '🏭',
                 devices: [
-                    { id: 'EQ-001', name: '数控车床-001', type: 'production', health: 92, status: 'normal', lastDiagnosis: '2025-01-22 10:30' },
-                    { id: 'EQ-002', name: '数控车床-002', type: 'production', health: 85, status: 'warning', lastDiagnosis: '2025-01-21 14:20' },
-                    { id: 'EQ-003', name: '加工中心-001', type: 'production', health: 78, status: 'warning', lastDiagnosis: '2025-01-20 09:15' }
+                    { 
+                        id: 'EQ-001', 
+                        name: '数控车床-001', 
+                        type: 'production', 
+                        health: 92, 
+                        status: 'normal', 
+                        lastDiagnosis: '2025-01-22 10:30',
+                        model: 'DMG MORI NLX 2500',
+                        serialNumber: 'CNC-2023-00856',
+                        installationDate: '2023-06-15',
+                        totalRuntime: 4523.5,
+                        parameters: {
+                            spindleSpeed: 2450,
+                            feedRate: 150,
+                            toolWear: 18,
+                            vibration: 0.8,
+                            temperature: 42.5,
+                            power: 8.5,
+                            coolantPressure: 2.8
+                        },
+                        historicalData: [
+                            { date: '2025-01-15', health: 95, spindleSpeed: 2500, vibration: 0.6, temperature: 40.2 },
+                            { date: '2025-01-17', health: 94, spindleSpeed: 2480, vibration: 0.7, temperature: 41.0 },
+                            { date: '2025-01-19', health: 93, spindleSpeed: 2465, vibration: 0.75, temperature: 41.8 },
+                            { date: '2025-01-21', health: 92, spindleSpeed: 2450, vibration: 0.8, temperature: 42.5 }
+                        ],
+                        anomalies: [],
+                        parts: [
+                            { name: '主轴轴承', health: 96, remainingLife: 1200 },
+                            { name: '导轨系统', health: 94, remainingLife: 850 },
+                            { name: '刀具系统', health: 88, remainingLife: 320 },
+                            { name: '冷却系统', health: 91, remainingLife: 680 }
+                        ]
+                    },
+                    { 
+                        id: 'EQ-002', 
+                        name: '数控车床-002', 
+                        type: 'production', 
+                        health: 85, 
+                        status: 'warning', 
+                        lastDiagnosis: '2025-01-21 14:20',
+                        model: 'HAAS ST-30',
+                        serialNumber: 'CNC-2022-04128',
+                        installationDate: '2022-03-20',
+                        totalRuntime: 8756.2,
+                        parameters: {
+                            spindleSpeed: 1850,
+                            feedRate: 120,
+                            toolWear: 45,
+                            vibration: 2.3,
+                            temperature: 56.8,
+                            power: 12.3,
+                            coolantPressure: 2.1
+                        },
+                        historicalData: [
+                            { date: '2025-01-15', health: 91, spindleSpeed: 1900, vibration: 1.8, temperature: 52.0 },
+                            { date: '2025-01-17', health: 89, spindleSpeed: 1880, vibration: 2.0, temperature: 54.2 },
+                            { date: '2025-01-19', health: 87, spindleSpeed: 1865, vibration: 2.2, temperature: 55.5 },
+                            { date: '2025-01-21', health: 85, spindleSpeed: 1850, vibration: 2.3, temperature: 56.8 }
+                        ],
+                        anomalies: [
+                            { type: '振动异常', severity: 'warning', time: '2025-01-21 14:15', description: '主轴振动超过阈值2.0mm/s' },
+                            { type: '温度偏高', severity: 'warning', time: '2025-01-21 14:18', description: '主轴温度56.8°C，建议检查冷却系统' }
+                        ],
+                        parts: [
+                            { name: '主轴轴承', health: 78, remainingLife: 280 },
+                            { name: '导轨系统', health: 82, remainingLife: 420 },
+                            { name: '刀具系统', health: 65, remainingLife: 85 },
+                            { name: '冷却系统', health: 75, remainingLife: 310 }
+                        ]
+                    },
+                    { 
+                        id: 'EQ-003', 
+                        name: '加工中心-001', 
+                        type: 'production', 
+                        health: 78, 
+                        status: 'warning', 
+                        lastDiagnosis: '2025-01-20 09:15',
+                        model: 'FANUC RoboDrill D21MiB',
+                        serialNumber: 'CNC-2021-07895',
+                        installationDate: '2021-09-10',
+                        totalRuntime: 12458.7,
+                        parameters: {
+                            spindleSpeed: 12000,
+                            feedRate: 200,
+                            toolWear: 72,
+                            vibration: 3.8,
+                            temperature: 68.2,
+                            power: 18.5,
+                            coolantPressure: 1.8
+                        },
+                        historicalData: [
+                            { date: '2025-01-15', health: 86, spindleSpeed: 12000, vibration: 2.8, temperature: 62.0 },
+                            { date: '2025-01-17', health: 83, spindleSpeed: 12000, vibration: 3.2, temperature: 65.0 },
+                            { date: '2025-01-19', health: 80, spindleSpeed: 12000, vibration: 3.5, temperature: 67.0 },
+                            { date: '2025-01-20', health: 78, spindleSpeed: 12000, vibration: 3.8, temperature: 68.2 }
+                        ],
+                        anomalies: [
+                            { type: '振动严重', severity: 'danger', time: '2025-01-20 09:10', description: '主轴振动3.8mm/s，已超安全阈值' },
+                            { type: '温度过高', severity: 'danger', time: '2025-01-20 09:12', description: '主轴温度68.2°C，存在过热风险' },
+                            { type: '冷却不足', severity: 'warning', time: '2025-01-20 09:14', description: '冷却液压力1.8bar偏低' }
+                        ],
+                        parts: [
+                            { name: '主轴轴承', health: 62, remainingLife: 120 },
+                            { name: '导轨系统', health: 70, remainingLife: 250 },
+                            { name: '刀具系统', health: 45, remainingLife: 35 },
+                            { name: '冷却系统', health: 58, remainingLife: 180 }
+                        ]
+                    }
                 ]
             },
             {
@@ -3310,8 +3572,76 @@
                 name: '动力车间',
                 icon: '⚡',
                 devices: [
-                    { id: 'EN-001', name: '空压机-001', type: 'energy', health: 95, status: 'normal', lastDiagnosis: '2025-01-22 08:00' },
-                    { id: 'EN-002', name: '变压器-001', type: 'energy', health: 88, status: 'normal', lastDiagnosis: '2025-01-21 16:30' }
+                    { 
+                        id: 'EN-001', 
+                        name: '空压机-001', 
+                        type: 'energy', 
+                        health: 95, 
+                        status: 'normal', 
+                        lastDiagnosis: '2025-01-22 08:00',
+                        model: 'Atlas Copco GA 37',
+                        serialNumber: 'COMP-2024-01256',
+                        installationDate: '2024-01-20',
+                        totalRuntime: 1856.3,
+                        parameters: {
+                            pressure: 7.8,
+                            temperature: 65.2,
+                            oilLevel: 85,
+                            vibration: 1.2,
+                            current: 52.3,
+                            airFlow: 6.2,
+                            filterPressureDrop: 0.15
+                        },
+                        historicalData: [
+                            { date: '2025-01-15', health: 97, pressure: 8.0, temperature: 63.0, vibration: 1.0 },
+                            { date: '2025-01-17', health: 96, pressure: 7.9, temperature: 64.0, vibration: 1.1 },
+                            { date: '2025-01-19', health: 96, pressure: 7.85, temperature: 64.5, vibration: 1.15 },
+                            { date: '2025-01-22', health: 95, pressure: 7.8, temperature: 65.2, vibration: 1.2 }
+                        ],
+                        anomalies: [],
+                        parts: [
+                            { name: '电机', health: 98, remainingLife: 8000 },
+                            { name: '螺杆主机', health: 96, remainingLife: 15000 },
+                            { name: '油气分离器', health: 90, remainingLife: 2500 },
+                            { name: '空气过滤器', health: 88, remainingLife: 1800 }
+                        ]
+                    },
+                    { 
+                        id: 'EN-002', 
+                        name: '变压器-001', 
+                        type: 'energy', 
+                        health: 88, 
+                        status: 'normal', 
+                        lastDiagnosis: '2025-01-21 16:30',
+                        model: 'ABB 10kV/2000kVA',
+                        serialNumber: 'TRANS-2020-08956',
+                        installationDate: '2020-11-05',
+                        totalRuntime: 36520.8,
+                        parameters: {
+                            primaryVoltage: 10200,
+                            secondaryVoltage: 395,
+                            loadCurrent: 2850,
+                            oilTemperature: 58.5,
+                            windingTemperature: 65.2,
+                            oilLevel: 78,
+                            humidity: 12
+                        },
+                        historicalData: [
+                            { date: '2025-01-15', health: 91, oilTemperature: 54.0, windingTemperature: 61.0 },
+                            { date: '2025-01-17', health: 90, oilTemperature: 56.0, windingTemperature: 63.0 },
+                            { date: '2025-01-19', health: 89, oilTemperature: 57.5, windingTemperature: 64.2 },
+                            { date: '2025-01-21', health: 88, oilTemperature: 58.5, windingTemperature: 65.2 }
+                        ],
+                        anomalies: [
+                            { type: '油温上升', severity: 'warning', time: '2025-01-21 16:25', description: '油温较上周上升4.5°C，需关注' }
+                        ],
+                        parts: [
+                            { name: '绕组', health: 92, remainingLife: 120000 },
+                            { name: '绝缘系统', health: 86, remainingLife: 45000 },
+                            { name: '冷却系统', health: 82, remainingLife: 28000 },
+                            { name: '分接开关', health: 88, remainingLife: 62000 }
+                        ]
+                    }
                 ]
             },
             {
@@ -3319,13 +3649,83 @@
                 name: '安环设备',
                 icon: '🛡️',
                 devices: [
-                    { id: 'SF-001', name: '烟雾探测器-001', type: 'safety', health: 88, status: 'normal', lastDiagnosis: '2025-01-22 11:00' },
-                    { id: 'SF-002', name: '气体检测仪-001', type: 'safety', health: 91, status: 'normal', lastDiagnosis: '2025-01-21 10:00' }
+                    { 
+                        id: 'SF-001', 
+                        name: '烟雾探测器-001', 
+                        type: 'safety', 
+                        health: 88, 
+                        status: 'normal', 
+                        lastDiagnosis: '2025-01-22 11:00',
+                        model: 'Siemens FDOOT241',
+                        serialNumber: 'DETECT-2023-05689',
+                        installationDate: '2023-04-18',
+                        totalRuntime: 15624.5,
+                        parameters: {
+                            sensitivity: 85,
+                            responseTime: 2.8,
+                            selfTestStatus: 'pass',
+                            contaminationLevel: 22,
+                            batteryLevel: 92,
+                            communicationSignal: 98,
+                            alarmCount: 0
+                        },
+                        historicalData: [
+                            { date: '2025-01-15', health: 91, sensitivity: 88, contaminationLevel: 18 },
+                            { date: '2025-01-17', health: 90, sensitivity: 87, contaminationLevel: 20 },
+                            { date: '2025-01-19', health: 89, sensitivity: 86, contaminationLevel: 21 },
+                            { date: '2025-01-22', health: 88, sensitivity: 85, contaminationLevel: 22 }
+                        ],
+                        anomalies: [
+                            { type: '轻微污染', severity: 'warning', time: '2025-01-22 10:58', description: '探测室污染度22%，建议清洁' }
+                        ],
+                        parts: [
+                            { name: '光学传感器', health: 90, remainingLife: 28000 },
+                            { name: '电离室', health: 92, remainingLife: 36000 },
+                            { name: '电池模块', health: 88, remainingLife: 12000 },
+                            { name: '通讯模块', health: 95, remainingLife: 42000 }
+                        ]
+                    },
+                    { 
+                        id: 'SF-002', 
+                        name: '气体检测仪-001', 
+                        type: 'safety', 
+                        health: 91, 
+                        status: 'normal', 
+                        lastDiagnosis: '2025-01-21 10:00',
+                        model: 'Dräger X-am 5000',
+                        serialNumber: 'GAS-2024-02356',
+                        installationDate: '2024-03-08',
+                        totalRuntime: 7856.2,
+                        parameters: {
+                            oxygenLevel: 20.9,
+                            coLevel: 0,
+                            h2sLevel: 0,
+                            lelLevel: 0,
+                            sensorStatus: 'normal',
+                            calibrationDate: '2025-01-15',
+                            batteryLevel: 94,
+                            pumpFlow: 0.8
+                        },
+                        historicalData: [
+                            { date: '2025-01-15', health: 93, calibrationDate: '2025-01-15', batteryLevel: 98 },
+                            { date: '2025-01-17', health: 92, batteryLevel: 96 },
+                            { date: '2025-01-19', health: 92, batteryLevel: 95 },
+                            { date: '2025-01-21', health: 91, batteryLevel: 94 }
+                        ],
+                        anomalies: [],
+                        parts: [
+                            { name: 'O2传感器', health: 94, remainingLife: 18000 },
+                            { name: 'CO传感器', health: 96, remainingLife: 24000 },
+                            { name: 'H2S传感器', health: 95, remainingLife: 22000 },
+                            { name: 'LEL传感器', health: 93, remainingLife: 20000 },
+                            { name: '采样泵', health: 92, remainingLife: 16000 }
+                        ]
+                    }
                 ]
             }
         ];
 
-        // 诊断历史数据
+        // 诊断历史数据（保留供其他分析模块使用）
         const diagnosisHistory = [
             { date: '01-22 10:30', device: '数控车床-001', type: '快速诊断', result: 'good', score: 92 },
             { date: '01-22 08:00', device: '空压机-001', type: '深度诊断', result: 'good', score: 95 },
@@ -3333,14 +3733,115 @@
             { date: '01-21 10:00', device: '气体检测仪-001', type: '专项诊断', result: 'good', score: 91 },
             { date: '01-20 16:30', device: '变压器-001', type: '快速诊断', result: 'good', score: 88 }
         ];
-
+        
         // 当前状态
         let currentDevice = null;
         let selectedMode = 'quick';
         let isDiagnosing = false;
+        
+        // 聊天相关状态
+        // 结构：chatHistory[deviceId] = [{ id, title, startedAt, updatedAt, messages: [{role, content, timestamp}] }]
+        let chatHistory = {}; // 按设备 ID 存储对话会话
+        let currentAttachments = []; // 当前上传的附件
+        let currentChatSessionId = null; // 当前会话 ID
+        
+        // 从 localStorage 加载聊天历史（向后兼容旧结构）
+        function loadChatHistory() {
+            const saved = localStorage.getItem('deviceChatHistory');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    chatHistory = {};
+                    // 兼容旧版：旧结构是 chatHistory[deviceId] = [{role, content,...}]
+                    Object.keys(parsed || {}).forEach(deviceId => {
+                        const value = parsed[deviceId];
+                        if (Array.isArray(value) && value.length && value[0].role) {
+                            // 旧结构，包一层会话
+                            chatHistory[deviceId] = [{
+                                id: `session_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`,
+                                title: value.find(m => m.role === 'user')?.content?.slice(0, 30) || '历史对话',
+                                startedAt: value[0].timestamp || new Date().toISOString(),
+                                updatedAt: value[value.length - 1].timestamp || new Date().toISOString(),
+                                messages: value
+                            }];
+                        } else {
+                            chatHistory[deviceId] = value;
+                        }
+                    });
+                } catch (e) {
+                    chatHistory = {};
+                }
+            }
+        }
+        
+        // 保存聊天历史到 localStorage
+        function saveChatHistory() {
+            localStorage.setItem('deviceChatHistory', JSON.stringify(chatHistory));
+        }
+        
+        // 获取设备的对话会话列表
+        function getDeviceChatSessions(deviceId) {
+            return chatHistory[deviceId] || [];
+        }
+        
+        // 根据会话 ID 获取会话
+        function getChatSession(deviceId, sessionId) {
+            const sessions = getDeviceChatSessions(deviceId);
+            return sessions.find(s => s.id === sessionId) || null;
+        }
+        
+        // 为设备创建或获取当前会话并追加消息
+        function addChatToHistory(deviceId, role, content) {
+            if (!chatHistory[deviceId]) {
+                chatHistory[deviceId] = [];
+            }
+            const sessions = chatHistory[deviceId];
+            let session = currentChatSessionId ? sessions.find(s => s.id === currentChatSessionId) : null;
+            const now = new Date().toISOString();
+            
+            if (!session) {
+                const newId = `session_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`;
+                session = {
+                    id: newId,
+                    title: role === 'user' ? (content || '').slice(0, 30) : '新对话',
+                    startedAt: now,
+                    updatedAt: now,
+                    messages: []
+                };
+                sessions.push(session);
+                currentChatSessionId = newId;
+            }
+            
+            session.messages.push({
+                role: role,
+                content: content,
+                timestamp: now
+            });
+            
+            // 如果一开始是系统消息，后面第一条用户消息更新标题
+            if (role === 'user' && (!session.title || session.title === '新对话')) {
+                session.title = (content || '').slice(0, 30) || '用户对话';
+            }
+            
+            session.updatedAt = now;
+            
+            // 每个设备最多保留最近 20 个会话
+            if (sessions.length > 20) {
+                chatHistory[deviceId] = sessions.slice(-20);
+            }
+            
+            saveChatHistory();
+
+            // 同步刷新当前设备的对话历史侧边栏
+            if (currentDevice && currentDevice.id === deviceId) {
+                renderDeviceHistoryList(deviceId);
+                renderChatSidebarHistory(deviceId);
+            }
+        }
 
         // 初始化
         function init() {
+            loadChatHistory(); // 加载聊天历史
             renderDeviceTree();
             renderHistoryList();
             
@@ -3494,8 +3995,8 @@
             // 重置诊断状态
             resetDiagnosisState();
             
-            // 更新历史记录列表（显示当前设备的历史记录）
-            renderDeviceHistoryList(device.name);
+            // 更新历史记录列表（显示当前设备的对话历史）
+            renderDeviceHistoryList(device.id);
             
             // 更新任务列表
             updateTaskList();
@@ -3559,38 +4060,73 @@
             }
         }
 
-        // 渲染历史列表
+        // 渲染历史列表（当前设备的对话历史，如果未选择设备则为空）
         function renderHistoryList() {
             const container = document.getElementById('historyList');
-            container.innerHTML = diagnosisHistory.map(h => `
-                <div class="history-item" onclick="viewHistoryDetail('${h.device}', '${h.date}')">
-                    <span class="history-date">${h.date}</span>
-                    <span class="history-type">${h.type}</span>
-                    <span class="history-result ${h.result}">${h.score}分</span>
-                </div>
-            `).join('');
-        }
-        
-        // 渲染指定设备的历史记录
-        function renderDeviceHistoryList(deviceName) {
-            const container = document.getElementById('historyList');
-            const deviceHistory = diagnosisHistory.filter(h => h.device === deviceName);
-            
-            if (deviceHistory.length === 0) {
+            if (!currentDevice) {
                 container.innerHTML = `
                     <div class="empty-state" style="padding: 20px; text-align: center; color: var(--text-muted);">
-                        <div style="font-size: 24px; margin-bottom: 8px;">📋</div>
-                        <div style="font-size: 13px;">暂无历史诊断记录</div>
+                        <div style="font-size: 24px; margin-bottom: 8px;">💬</div>
+                        <div style="font-size: 13px;">请选择左侧设备后查看对话历史</div>
+                    </div>
+                `;
+                return;
+            }
+            renderDeviceHistoryList(currentDevice.id);
+        }
+
+        // 在对话弹窗左侧渲染对话历史列表
+        function renderChatSidebarHistory(deviceId) {
+            const bar = document.getElementById('chatHistorySidebar');
+            if (!bar) return;
+
+            const sessions = getDeviceChatSessions(deviceId)
+                .slice()
+                .sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+
+            if (sessions.length === 0) {
+                bar.innerHTML = `<div style="padding:8px 4px; font-size:12px; color: var(--text-tertiary);">暂无对话历史</div>`;
+                return;
+            }
+
+            bar.innerHTML = sessions.map(s => {
+                const time = (s.updatedAt || s.startedAt || '').slice(5, 16).replace('T', ' ');
+                const title = s.title || '未命名会话';
+                const activeClass = currentChatSessionId === s.id ? 'active' : '';
+                return `
+                    <div class="chat-sidebar-item ${activeClass}" onclick="openAIChat('${s.id}')">
+                        <div class="chat-sidebar-item-title">${title}</div>
+                        <div class="chat-sidebar-item-time">${time}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 渲染指定设备的历史记录（对话会话列表）
+        function renderDeviceHistoryList(deviceId) {
+            const container = document.getElementById('historyList');
+            const sessions = getDeviceChatSessions(deviceId)
+                .slice()
+                .sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+            
+            if (sessions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: 20px; text-align: center; color: var(--text-muted);">
+                        <div style="font-size: 24px; margin-bottom: 8px;">💬</div>
+                        <div style="font-size: 13px;">暂无对话历史，开始一次新的智能对话吧</div>
                     </div>
                 `;
             } else {
-                container.innerHTML = deviceHistory.map(h => `
-                    <div class="history-item" onclick="viewHistoryDetail('${h.device}', '${h.date}')">
-                        <span class="history-date">${h.date}</span>
-                        <span class="history-type">${h.type}</span>
-                        <span class="history-result ${h.result}">${h.score}分</span>
-                    </div>
-                `).join('');
+                container.innerHTML = sessions.map(s => {
+                    const dateText = (s.updatedAt || s.startedAt || '').slice(5, 16).replace('T', ' ');
+                    const title = s.title || '未命名会话';
+                    return `
+                        <div class="history-item" onclick="viewHistoryDetail('${deviceId}', '${s.id}')">
+                            <span class="history-date">${dateText}</span>
+                            <span class="history-type" style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${title}</span>
+                        </div>
+                    `;
+                }).join('');
             }
         }
 
@@ -3693,26 +4229,485 @@
         }
         
         // 完成诊断
-        function completeDiagnosis() {
+        async function completeDiagnosis() {
             isDiagnosing = false;
             
             // 恢复UI状态
             document.getElementById('startBtn').disabled = false;
             document.getElementById('startBtn').innerHTML = '<span>▶️</span> 重新诊断';
-            document.getElementById('aiStatus').innerHTML = '<span class="ai-status-dot"></span><span>诊断完成</span>';
+            document.getElementById('aiStatus').innerHTML = '<span class="ai-status-dot"></span><span>正在生成诊断报告</span>';
             document.getElementById('aiStatus').classList.remove('diagnosing');
-            document.getElementById('diagnosisProgress').classList.remove('show');
             
             // 更新任务状态
             document.querySelector('.task-status').className = 'task-status completed';
             document.querySelector('.task-name').textContent = currentDevice.name + ' - 诊断完成';
             document.querySelector('.task-meta').textContent = 'AI分析完成，查看结果';
             
-            // 显示结果
-            showDiagnosisResult();
+            try {
+                // 调用OpenAI API获取诊断结果
+                const diagnosisResult = await callDiagnosisAPI();
+                
+                // 显示结果
+                const resultContent = document.getElementById('resultContent');
+                resultContent.innerHTML = diagnosisResult;
+                
+                // 显示操作按钮
+                document.getElementById('resultActions').style.display = 'flex';
+                
+                document.getElementById('aiStatus').innerHTML = '<span class="ai-status-dot"></span><span>诊断完成</span>';
+            } catch (error) {
+                // 如果API调用失败，回退到模拟结果
+                console.error('Diagnosis API error:', error);
+                showDiagnosisResult();
+                
+                // 显示操作按钮
+                document.getElementById('resultActions').style.display = 'flex';
+                
+                document.getElementById('aiStatus').innerHTML = '<span class="ai-status-dot"></span><span>诊断完成</span>';
+            }
+        }
+
+        async function callDiagnosisAPI() {
+            try {
+                const apiKey = 'e41205ab1e2c4f7f917c4dc95ecbc675.SddOboKk8R2KnuH2';
+                const apiUrl = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+                
+                const deviceData = {
+                    name: currentDevice.name,
+                    type: currentDevice.type,
+                    health: currentDevice.health,
+                    status: currentDevice.status,
+                    model: currentDevice.model || '未知型号',
+                    serialNumber: currentDevice.serialNumber || '未知序列号',
+                    installationDate: currentDevice.installationDate || '未知安装日期',
+                    totalRuntime: currentDevice.totalRuntime || 0,
+                    lastDiagnosis: currentDevice.lastDiagnosis,
+                    parameters: currentDevice.parameters || {},
+                    historicalData: currentDevice.historicalData || [],
+                    anomalies: currentDevice.anomalies || [],
+                    parts: currentDevice.parts || []
+                };
+                
+                let modePrompt = '';
+                if (selectedMode === 'quick') {
+                    modePrompt = '快速诊断：提供实时健康度、即时预警、监测指标和即时处理建议';
+                } else if (selectedMode === 'deep') {
+                    modePrompt = '深度诊断：提供综合健康度、趋势风险、预测故障、AI置信度、历史趋势分析、历史运行数据分析、运行参数历史分析、关键部件生命周期分析、预测性分析、综合评估报告和预测性维护建议';
+                } else if (selectedMode === 'special') {
+                    modePrompt = '专项诊断：提供专项健康度、根因识别、专项指标、专业建议、专项分析焦点、根本原因分析、专业技术建议和专项处理方案';
+                }
+                
+                const prompt = `请为以下设备生成一份专业的设备诊断报告。
+诊断模式：${modePrompt}
+
+设备详细信息：
+设备名称: ${deviceData.name}
+设备类型: ${deviceData.type}
+型号: ${deviceData.model}
+序列号: ${deviceData.serialNumber}
+安装日期: ${deviceData.installationDate}
+总运行时间: ${deviceData.totalRuntime}小时
+当前健康度: ${deviceData.health}分
+设备状态: ${deviceData.status}
+最后诊断时间: ${deviceData.lastDiagnosis}
+
+当前运行参数：
+${JSON.stringify(deviceData.parameters, null, 2)}
+
+历史数据：
+${JSON.stringify(deviceData.historicalData, null, 2)}
+
+当前异常：
+${JSON.stringify(deviceData.anomalies, null, 2)}
+
+关键部件状态：
+${JSON.stringify(deviceData.parts, null, 2)}
+
+请直接返回HTML格式的诊断报告，使用与页面现有样式兼容的HTML标签和CSS类名。
+要求：
+1. 使用overview-cards、overview-card、analysis-section、section-title、anomaly-list、anomaly-item等类名
+2. 包含适当的图标（使用emoji）
+3. 数据要看起来真实可信
+4. 使用中文
+5. 不要包含style标签或script标签，只返回body内容的HTML`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'glm-4-flash',
+                        messages: [
+                            {
+                                role: 'user',
+                                content: prompt
+                            }
+                        ],
+                        temperature: 0.7
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.warn('API调用失败，使用假数据:', errorData);
+                    return generateFakeDiagnosisResult();
+                }
+                
+                const data = await response.json();
+                console.log('Zhipu AI diagnosis response:', data);
+                
+                let htmlContent = '';
+                
+                if (data.choices && Array.isArray(data.choices) && data.choices.length > 0) {
+                    htmlContent = data.choices[0].message?.content || '';
+                }
+                
+                if (!htmlContent) {
+                    console.warn('API返回内容为空，使用假数据');
+                    return generateFakeDiagnosisResult();
+                }
+                
+                htmlContent = htmlContent.trim();
+                if (htmlContent.startsWith('```html')) {
+                    htmlContent = htmlContent.slice(7);
+                }
+                if (htmlContent.endsWith('```')) {
+                    htmlContent = htmlContent.slice(0, -3);
+                }
+                
+                return htmlContent.trim();
+            } catch (error) {
+                console.warn('API调用出错，使用假数据:', error);
+                return generateFakeDiagnosisResult();
+            }
+        }
+
+        // 生成假诊断结果
+        function generateFakeDiagnosisResult() {
+            const health = currentDevice.health;
+            const deviceType = currentDevice.type;
             
-            // 显示操作按钮
-            document.getElementById('resultActions').style.display = 'flex';
+            if (selectedMode === 'quick') {
+                return generateFakeQuickDiagnosis(health, deviceType);
+            } else if (selectedMode === 'deep') {
+                return generateFakeDeepDiagnosis(health, deviceType);
+            } else if (selectedMode === 'special') {
+                return generateFakeSpecialDiagnosis(health, deviceType);
+            }
+            return generateFakeQuickDiagnosis(health, deviceType);
+        }
+
+        // 生成快速诊断假数据
+        function generateFakeQuickDiagnosis(health, deviceType) {
+            const realTimeMetrics = generateRealTimeMetrics(deviceType);
+            const immediateAlerts = generateImmediateAlerts(health, deviceType);
+            
+            return `
+                <div class="overview-cards">
+                    <div class="overview-card">
+                        <div class="overview-card-header">
+                            <div class="overview-card-icon" style="background: ${getHealthBg(health)}; color: ${getHealthColor(health)};">⚡</div>
+                            <span class="overview-card-title">实时健康度</span>
+                        </div>
+                        <div class="overview-card-value" style="color: ${getHealthColor(health)};">${health}</div>
+                        <div class="overview-card-trend">
+                            <span>基于实时数据</span>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-card-header">
+                            <div class="overview-card-icon" style="background: var(--warning-bg); color: var(--warning);">🚨</div>
+                            <span class="overview-card-title">即时预警</span>
+                        </div>
+                        <div class="overview-card-value" style="color: ${getRiskColor(health)};">${health < 90 ? '1' : '0'}</div>
+                        <div class="overview-card-trend">
+                            <span>需立即关注</span>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-card-header">
+                            <div class="overview-card-icon" style="background: var(--info-bg); color: var(--info);">📊</div>
+                            <span class="overview-card-title">监测指标</span>
+                        </div>
+                        <div class="overview-card-value">6</div>
+                        <div class="overview-card-trend">
+                            <span>实时监测中</span>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-card-header">
+                            <div class="overview-card-icon" style="background: var(--primary-bg); color: var(--primary);">⏱️</div>
+                            <span class="overview-card-title">响应时间</span>
+                        </div>
+                        <div class="overview-card-value">${Math.floor(15 + Math.random() * 10)}s</div>
+                        <div class="overview-card-trend">
+                            <span>快速响应</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="analysis-section">
+                    <div class="section-title">
+                        <span>📡</span> 实时数据监测
+                    </div>
+                    <div class="realtime-metrics">
+                        ${realTimeMetrics}
+                    </div>
+                </div>
+                
+                <div class="analysis-section">
+                    <div class="section-title">
+                        <span>⚠️</span> 即时预警信息
+                    </div>
+                    <div class="anomaly-list">
+                        ${immediateAlerts}
+                    </div>
+                </div>
+                
+                <div class="analysis-section">
+                    <div class="section-title">
+                        <span>🔧</span> 即时处理建议
+                    </div>
+                    <div class="anomaly-list">
+                        ${generateImmediateSuggestions(health)}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 生成深度诊断假数据
+        function generateFakeDeepDiagnosis(health, deviceType) {
+            const historicalTrends = generateHistoricalTrends(health);
+            const predictiveAnalysis = generatePredictiveAnalysis(health);
+            const comprehensiveAssessment = generateComprehensiveAssessment(health, deviceType);
+            
+            return `
+                <div class="overview-cards">
+                    <div class="overview-card">
+                        <div class="overview-card-header">
+                            <div class="overview-card-icon" style="background: ${getHealthBg(health)}; color: ${getHealthColor(health)};">🔍</div>
+                            <span class="overview-card-title">综合健康度</span>
+                        </div>
+                        <div class="overview-card-value" style="color: ${getHealthColor(health)};">${health}</div>
+                        <div class="overview-card-trend ${health >= 90 ? 'trend-up' : health >= 70 ? '' : 'trend-down'}">
+                            <span>${health >= 90 ? '↑' : health >= 70 ? '→' : '↓'}</span>
+                            <span>较上月${health >= 90 ? '提升' : health >= 70 ? '持平' : '下降'} ${Math.floor(Math.random() * 8)}%</span>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-card-header">
+                            <div class="overview-card-icon" style="background: var(--warning-bg); color: var(--warning);">📈</div>
+                            <span class="overview-card-title">趋势风险</span>
+                        </div>
+                        <div class="overview-card-value" style="color: ${getRiskColor(health)};">${getRiskLevel(health)}</div>
+                        <div class="overview-card-trend">
+                            <span>基于历史趋势</span>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-card-header">
+                            <div class="overview-card-icon" style="background: var(--info-bg); color: var(--info);">🔮</div>
+                            <span class="overview-card-title">预测故障</span>
+                        </div>
+                        <div class="overview-card-value">${health >= 90 ? '0' : health >= 70 ? '1-2' : '3-5'}</div>
+                        <div class="overview-card-trend">
+                            <span>未来90天内</span>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-card-header">
+                            <div class="overview-card-icon" style="background: var(--primary-bg); color: var(--primary);">🎯</div>
+                            <span class="overview-card-title">AI置信度</span>
+                        </div>
+                        <div class="overview-card-value">${Math.floor(88 + Math.random() * 10)}%</div>
+                        <div class="overview-card-trend trend-up">
+                            <span>↑</span>
+                            <span>历史数据充足</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="analysis-section">
+                    <div class="section-title">
+                        <span>📊</span> 历史趋势分析
+                    </div>
+                    <div class="trend-chart">
+                        ${historicalTrends}
+                    </div>
+                </div>
+                
+                <div class="analysis-section">
+                    <div class="section-title">
+                        <span>📈</span> 历史运行数据分析
+                    </div>
+                    <div class="runtime-analysis">
+                        ${generateRuntimeAnalysis(health, deviceType)}
+                    </div>
+                </div>
+                
+                <div class="analysis-section">
+                    <div class="section-title">
+                        <span>📊</span> 运行参数历史分析
+                    </div>
+                    <div class="parameter-analysis">
+                        ${generateParameterAnalysis(health, deviceType)}
+                    </div>
+                </div>
+                
+                <div class="analysis-section">
+                    <div class="section-title">
+                        <span>🔩</span> 关键部件生命周期分析
+                    </div>
+                    <div class="parts-lifecycle">
+                        ${generatePartsLifecycleAnalysis(health, deviceType)}
+                    </div>
+                </div>
+                
+                <div class="analysis-section">
+                    <div class="section-title">
+                        <span>🔮</span> 预测性分析
+                    </div>
+                    <div class="anomaly-list">
+                        ${predictiveAnalysis}
+                    </div>
+                </div>
+                
+                <div class="analysis-section">
+                    <div class="section-title">
+                        <span>📋</span> 综合评估报告
+                    </div>
+                    <div class="anomaly-list">
+                        ${comprehensiveAssessment}
+                    </div>
+                </div>
+                
+                <div class="analysis-section">
+                    <div class="section-title">
+                        <span>🎯</span> 预测性维护建议
+                    </div>
+                    <div class="anomaly-list">
+                        ${generatePredictiveMaintenanceSuggestions(health, deviceType)}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 生成专项诊断假数据
+        function generateFakeSpecialDiagnosis(health, deviceType) {
+            const specialFocusAreas = generateSpecialFocusAreas(deviceType);
+            const rootCauseAnalysis = generateRootCauseAnalysis(health, deviceType);
+            const professionalRecommendations = generateProfessionalRecommendations(health, deviceType);
+            
+            return `
+                <div class="overview-cards">
+                    <div class="overview-card">
+                        <div class="overview-card-header">
+                            <div class="overview-card-icon" style="background: ${getHealthBg(health)}; color: ${getHealthColor(health)};">🎯</div>
+                            <span class="overview-card-title">专项健康度</span>
+                        </div>
+                        <div class="overview-card-value" style="color: ${getHealthColor(health)};">${health}</div>
+                        <div class="overview-card-trend">
+                            <span>专项分析</span>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-card-header">
+                            <div class="overview-card-icon" style="background: var(--warning-bg); color: var(--warning);">🔍</div>
+                            <span class="overview-card-title">根因识别</span>
+                        </div>
+                        <div class="overview-card-value" style="color: ${getRiskColor(health)};">${health < 85 ? '已识别' : '未识别'}</div>
+                        <div class="overview-card-trend">
+                            <span>根本原因</span>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-card-header">
+                            <div class="overview-card-icon" style="background: var(--info-bg); color: var(--info);">⚡</div>
+                            <span class="overview-card-title">专项指标</span>
+                        </div>
+                        <div class="overview-card-value">${Math.floor(8 + Math.random() * 4)}</div>
+                        <div class="overview-card-trend">
+                            <span>深度监测</span>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-card-header">
+                            <div class="overview-card-icon" style="background: var(--primary-bg); color: var(--primary);">👨‍🔧</div>
+                            <span class="overview-card-title">专业建议</span>
+                        </div>
+                        <div class="overview-card-value">${Math.floor(3 + Math.random() * 3)}</div>
+                        <div class="overview-card-trend">
+                            <span>专家建议</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="analysis-section">
+                    <div class="section-title">
+                        <span>🎯</span> 专项分析焦点
+                    </div>
+                    <div class="special-focus">
+                        ${specialFocusAreas}
+                    </div>
+                </div>
+                
+                <div class="analysis-section">
+                    <div class="section-title">
+                        <span>🔍</span> 根本原因分析
+                    </div>
+                    <div class="anomaly-list">
+                        ${rootCauseAnalysis}
+                    </div>
+                </div>
+                
+                <div class="analysis-section">
+                    <div class="section-title">
+                        <span>👨‍🔧</span> 专业技术建议
+                    </div>
+                    <div class="anomaly-list">
+                        ${professionalRecommendations}
+                    </div>
+                </div>
+                
+                <div class="analysis-section">
+                    <div class="section-title">
+                        <span>📋</span> 专项处理方案
+                    </div>
+                    <div class="anomaly-list">
+                        ${generateSpecialTreatmentPlan(health, deviceType)}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 获取健康度背景色
+        function getHealthBg(health) {
+            if (health >= 90) return 'var(--success-bg)';
+            if (health >= 70) return 'var(--warning-bg)';
+            return 'var(--danger-bg)';
+        }
+
+        // 获取健康度颜色
+        function getHealthColor(health) {
+            if (health >= 90) return 'var(--success)';
+            if (health >= 70) return 'var(--warning)';
+            return 'var(--danger)';
+        }
+
+        // 获取风险颜色
+        function getRiskColor(health) {
+            if (health >= 90) return 'var(--success)';
+            if (health >= 70) return 'var(--warning)';
+            return 'var(--danger)';
+        }
+
+        // 获取风险等级
+        function getRiskLevel(health) {
+            if (health >= 90) return '低';
+            if (health >= 70) return '中';
+            return '高';
         }
 
         // 显示诊断结果
@@ -5945,28 +6940,90 @@ ${health >= 90 ? '能耗表现良好，建议保持当前运行状态' : '检测
         }
 
         // 打开AI对话
-        function openAIChat() {
+        // 如果传入 sessionId，则加载该会话历史；否则打开一个全新的会话
+        function openAIChat(sessionId) {
             if (!currentDevice) {
                 alert('请先选择要咨询的设备');
                 return;
             }
             
-            // 更新设备名称显示
             document.getElementById('chatDeviceName').textContent = currentDevice.name;
-            
-            // 显示对话弹窗
             document.getElementById('chatModal').classList.add('show');
             
-            // 清空之前的对话（保留系统欢迎消息）
             const chatMessages = document.getElementById('chatMessages');
             const systemMessage = chatMessages.querySelector('.system-message');
             chatMessages.innerHTML = '';
             chatMessages.appendChild(systemMessage);
             
-            // 聚焦输入框
+            // 清空附件
+            currentAttachments = [];
+            updateAttachmentsDisplay();
+            
+            // 设置当前会话
+            currentChatSessionId = sessionId || null;
+
+            // 左侧对话历史
+            renderChatSidebarHistory(currentDevice.id);
+            
+            // 如果是从历史进入，加载该会话的全部对话
+            if (sessionId) {
+                const session = getChatSession(currentDevice.id, sessionId);
+                if (session && Array.isArray(session.messages)) {
+                    const historyNotice = document.createElement('div');
+                    historyNotice.className = 'chat-message system-message';
+                    historyNotice.style.textAlign = 'center';
+                    historyNotice.style.color = 'var(--text-secondary)';
+                    historyNotice.style.fontSize = '12px';
+                    historyNotice.style.padding = '8px';
+                    historyNotice.innerHTML = `——— 对话开始于 ${session.startedAt.slice(5, 16).replace('T', ' ')} ———`;
+                    chatMessages.appendChild(historyNotice);
+
+                    session.messages.forEach(msg => {
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = `chat-message ${msg.role === 'user' ? 'user' : 'system'}-message`;
+                        messageDiv.innerHTML = `
+                            <div class="message-avatar ${msg.role === 'user' ? 'user' : 'system'}">${msg.role === 'user' ? '👤' : '🤖'}</div>
+                            <div class="message-content">${msg.content}</div>
+                        `;
+                        chatMessages.appendChild(messageDiv);
+                    });
+                }
+            }
+            
             setTimeout(() => {
                 document.getElementById('chatInput').focus();
             }, 100);
+            
+            const deviceInfo = `设备基本信息：
+设备名称：${currentDevice.name}
+设备类型：${getDeviceTypeName(currentDevice.type)}
+型号：${currentDevice.model || '未知'}
+序列号：${currentDevice.serialNumber || '未知'}
+当前健康度：${currentDevice.health}分
+设备状态：${currentDevice.status === 'normal' ? '正常运行' : currentDevice.status === 'warning' ? '预警状态' : '异常状态'}
+总运行时间：${currentDevice.totalRuntime || 0}小时
+最后诊断时间：${currentDevice.lastDiagnosis || '未诊断'}
+
+当前运行参数：
+${JSON.stringify(currentDevice.parameters || {}, null, 2)}
+
+关键部件状态：
+${(currentDevice.parts || []).map(p => `• ${p.name}: 健康度${p.health}分，剩余寿命${p.remainingLife}小时`).join('\n')}
+
+${currentDevice.anomalies && currentDevice.anomalies.length > 0 ? `当前异常：
+${currentDevice.anomalies.map(a => `• [${a.severity === 'danger' ? '严重' : a.severity === 'warning' ? '警告' : '提示'}] ${a.type}: ${a.description}`).join('\n')}` : '当前无异常记录'}`;
+            
+            addChatMessage(`您好！我是设备智能诊断助手。当前您选择的设备是 **${currentDevice.name}**。
+
+${deviceInfo}
+
+请问有什么可以帮您？您可以询问：
+• 设备当前运行状态
+• 维护建议
+• 故障预测
+• 部件健康状况
+• 运行参数分析
+等任何问题。`, 'system');
         }
         
         // 关闭AI对话弹窗
@@ -5975,27 +7032,167 @@ ${health >= 90 ? '能耗表现良好，建议保持当前运行状态' : '检测
         }
         
         // 发送对话消息
-        function sendChatMessage() {
+        async function sendChatMessage() {
             const input = document.getElementById('chatInput');
             const message = input.value.trim();
             
             if (!message) return;
+
+            // 将当前附件整理成一段描述，加入上下文与历史
+            let attachmentNote = '';
+            if (currentAttachments && currentAttachments.length > 0) {
+                const names = currentAttachments.map(a => a.name).join('、');
+                attachmentNote = `\n\n[本条对话关联的附件]: ${names}`;
+            }
+            const fullUserMessage = message + attachmentNote;
             
-            // 添加用户消息
-            addChatMessage(message, 'user');
-            
-            // 清空输入框
+            addChatMessage(fullUserMessage, 'user');
+            if (currentDevice) {
+                addChatToHistory(currentDevice.id, 'user', fullUserMessage);
+            }
+
+            // 发送后清空输入框和附件展示
             input.value = '';
-            
-            // 显示AI正在输入
+            currentAttachments = [];
+            updateAttachmentsDisplay();
+
             showTypingIndicator();
             
-            // 模拟AI回复
-            setTimeout(() => {
+            try {
+                const apiKey = 'e41205ab1e2c4f7f917c4dc95ecbc675.SddOboKk8R2KnuH2';
+                const apiUrl = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+                
+                const deviceContext = `当前对话基于的设备信息：
+设备名称：${currentDevice.name}
+设备类型：${getDeviceTypeName(currentDevice.type)}
+型号：${currentDevice.model || '未知'}
+当前健康度：${currentDevice.health}分
+设备状态：${currentDevice.status === 'normal' ? '正常运行' : currentDevice.status === 'warning' ? '预警状态' : '异常状态'}
+总运行时间：${currentDevice.totalRuntime || 0}小时
+
+当前运行参数：
+${JSON.stringify(currentDevice.parameters || {}, null, 2)}
+
+关键部件状态：
+${(currentDevice.parts || []).map(p => `• ${p.name}: 健康度${p.health}分，剩余寿命${p.remainingLife}小时`).join('\n')}
+
+${currentDevice.anomalies && currentDevice.anomalies.length > 0 ? `当前异常：
+${currentDevice.anomalies.map(a => `• [${a.severity === 'danger' ? '严重' : a.severity === 'warning' ? '警告' : '提示'}] ${a.type}: ${a.description}`).join('\n')}` : '当前无异常记录'}
+
+${attachmentNote ? attachmentNote + '\n' : ''}请基于以上设备信息回答用户的问题，回答要专业、简洁，使用中文。`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'glm-4-flash',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: '您是设备智能诊断助手，专门为用户提供设备状态分析、维护建议、故障预测等专业咨询服务。请基于提供的设备信息，用简洁专业的中文回答用户问题。'
+                            },
+                            {
+                                role: 'user',
+                                content: deviceContext + '\n\n用户问题：' + message
+                            }
+                        ],
+                        temperature: 0.7
+                    })
+                });
+                
                 removeTypingIndicator();
-                const response = generateAIResponse(message);
-                addChatMessage(response, 'system');
-            }, 1000 + Math.random() * 1000);
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.warn('API调用失败，使用本地回复:', errorData);
+                    addChatMessage(generateAIResponse(message), 'system');
+                    return;
+                }
+                
+                const data = await response.json();
+                console.log('Zhipu AI response:', data);
+                
+                let aiResponse = '';
+                
+                if (data.choices && Array.isArray(data.choices) && data.choices.length > 0) {
+                    aiResponse = data.choices[0].message?.content || '';
+                }
+                
+                if (!aiResponse) {
+                    console.warn('API返回内容为空，使用本地回复');
+                    const fallback = generateAIResponse(message);
+                    addChatMessage(fallback, 'system');
+                    if (currentDevice) {
+                        addChatToHistory(currentDevice.id, 'system', fallback);
+                    }
+                    return;
+                }
+                
+                addChatMessage(aiResponse, 'system');
+                if (currentDevice) {
+                    addChatToHistory(currentDevice.id, 'system', aiResponse);
+                }
+            } catch (error) {
+                removeTypingIndicator();
+                console.warn('API调用出错，使用本地回复:', error);
+                const fallback = generateAIResponse(message);
+                addChatMessage(fallback, 'system');
+                if (currentDevice) {
+                    addChatToHistory(currentDevice.id, 'system', fallback);
+                }
+            }
+        }
+        
+        // 处理文件选择
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files.length === 0) return;
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                // 限制文件大小为 10MB
+                if (file.size > 10 * 1024 * 1024) {
+                    alert(`文件 ${file.name} 超过 10MB 限制`);
+                    continue;
+                }
+                
+                currentAttachments.push({
+                    file: file,
+                    name: file.name,
+                    size: file.size,
+                    type: file.type
+                });
+            }
+            
+            updateAttachmentsDisplay();
+            event.target.value = ''; // 清空 input，允许重复选择同一文件
+        }
+        
+        // 更新附件显示
+        function updateAttachmentsDisplay() {
+            const container = document.getElementById('chatAttachments');
+            if (!container) return;
+            
+            if (currentAttachments.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            container.innerHTML = currentAttachments.map((attach, index) => `
+                <div class="chat-attachment-item">
+                    <span>📎 ${attach.name}</span>
+                    <span class="remove-attach" onclick="removeAttachment(${index})">&times;</span>
+                </div>
+            `).join('');
+        }
+        
+        // 移除附件
+        function removeAttachment(index) {
+            currentAttachments.splice(index, 1);
+            updateAttachmentsDisplay();
         }
         
         // 发送快捷问题
@@ -6337,55 +7534,20 @@ ${health >= 90 ? '能耗表现良好，建议保持当前运行状态' : '检测
                     <p>我会根据设备数据为您提供专业的分析和建议。</p>`;
         }
 
-        // 查看历史详情
-        function viewHistoryDetail(device, date) {
-            // 查找对应的历史记录
-            const historyItem = diagnosisHistory.find(h => h.device === device && h.date === date);
-            const score = historyItem ? historyItem.score : 85;
-            const type = historyItem ? historyItem.type : '快速诊断';
-
-            const content = `
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <div style="font-size: 48px; margin-bottom: 8px;">${score >= 90 ? '🟢' : score >= 80 ? '🟡' : '🔴'}</div>
-                    <div style="font-size: 32px; font-weight: bold; color: ${score >= 90 ? 'var(--success)' : score >= 80 ? 'var(--warning)' : 'var(--danger)'};">${score}分</div>
-                    <div style="color: var(--text-secondary); margin-top: 8px;">${getHealthLevel(score)}</div>
-                </div>
-
-                <h3>📋 诊断信息</h3>
-                <table class="comparison-table">
-                    <tr>
-                        <td style="text-align: left;"><strong>设备名称</strong></td>
-                        <td>${device}</td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: left;"><strong>诊断时间</strong></td>
-                        <td>2025-${date}</td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: left;"><strong>诊断类型</strong></td>
-                        <td><span class="highlight">${type}</span></td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: left;"><strong>诊断结果</strong></td>
-                        <td style="color: ${score >= 90 ? 'var(--success)' : score >= 80 ? 'var(--warning)' : 'var(--danger)'};">${score >= 90 ? '健康良好' : score >= 80 ? '需要关注' : '需要维护'}</td>
-                    </tr>
-                </table>
-
-                <h3>🔍 诊断详情</h3>
-                <ul>
-                    <li>设备运行状态：${score >= 90 ? '正常' : score >= 80 ? '轻微异常' : '异常'}</li>
-                    <li>关键部件健康度：${score - 5}分</li>
-                    <li>运行效率：${Math.floor(80 + score / 10)}%</li>
-                    <li>能耗水平：${score >= 85 ? '正常' : '偏高'}</li>
-                </ul>
-
-                <h3>💡 建议措施</h3>
-                <div style="background: ${score >= 90 ? '#f6ffed' : score >= 80 ? '#fffbe6' : '#fff2f0'}; border: 1px solid ${score >= 90 ? '#b7eb8f' : score >= 80 ? '#ffe58f' : '#ffccc7'}; border-radius: 8px; padding: 12px;">
-                    ${score >= 90 ? '✅ 设备状态良好，继续保持当前维护策略' : score >= 80 ? '⚠️ 建议加强监控，关注关键指标变化' : '🔴 建议尽快安排维护，避免故障扩大'}
-                </div>
-            `;
-
-            openToolModal(`📊 ${device} 诊断详情`, content);
+        // 查看历史详情：从对话历史中打开指定会话并继续对话
+        function viewHistoryDetail(deviceId, sessionId) {
+            // 如果当前设备不是目标设备，先在设备树中切换过去
+            if (!currentDevice || currentDevice.id !== deviceId) {
+                for (const group of deviceGroups) {
+                    const found = (group.devices || []).find(d => d.id === deviceId);
+                    if (found) {
+                        selectDevice(found);
+                        break;
+                    }
+                }
+            }
+            // 打开 AI 对话弹窗并加载该会话
+            openAIChat(sessionId);
         }
 
         // 批量诊断
