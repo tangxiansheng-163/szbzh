@@ -163,6 +163,7 @@ const PageLoader = (function() {
             let wrapperHtml = null;
             let scriptCodes = null;
             let externalScripts = [];
+            let externalStylesheets = [];
             let pageStyles = [];
             // 强制刷新，不使用缓存
             cached = null;
@@ -170,6 +171,7 @@ const PageLoader = (function() {
                 wrapperHtml = cached.wrapperHtml;
                 scriptCodes = cached.scriptCodes;
                 externalScripts = cached.externalScripts || [];
+                externalStylesheets = cached.externalStylesheets || [];
                 pageStyles = cached.pageStyles || [];
             } else {
                 // 获取页面内容
@@ -184,12 +186,22 @@ const PageLoader = (function() {
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
 
-            // 提取页面样式（<style> 标签）
+            // 解析页面 URL 作为资源路径的基准（用于 ../assets/ 等相对路径）
+            const pageBaseUrl = new URL(url, window.location.href);
+
+            // 提取页面样式：<style> 标签 + <link rel="stylesheet"> 外部样式
             const styleTags = doc.querySelectorAll('style');
-            pageStyles = []; // 使用外部已声明的变量
+            pageStyles = [];
             styleTags.forEach(style => {
                 if (style.innerHTML) {
                     pageStyles.push(style.innerHTML);
+                }
+            });
+            const linkTags = doc.querySelectorAll('link[rel="stylesheet"][href]');
+            linkTags.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href) {
+                    externalStylesheets.push(new URL(href, pageBaseUrl).href);
                 }
             });
 
@@ -220,9 +232,10 @@ const PageLoader = (function() {
             externalScripts = [];
             scripts.forEach(script => {
                 if (script.src) {
-                    // 外部脚本，记录 src
-                    externalScripts.push(script.src);
-                    console.log('提取外部脚本:', script.src);
+                    // 外部脚本，解析为绝对 URL（基于页面 URL）避免 SPA 下相对路径 404
+                    const absoluteSrc = new URL(script.src, pageBaseUrl).href;
+                    externalScripts.push(absoluteSrc);
+                    console.log('提取外部脚本:', script.src, '->', absoluteSrc);
                 } else {
                     // inline 脚本 - 使用 textContent 获取内容
                     const code = script.textContent || script.innerHTML;
@@ -241,7 +254,7 @@ const PageLoader = (function() {
             // 调试：检查 wrapperHtml 是否包含弹窗
             console.log('wrapperHtml 包含 category-add-modal:', wrapperHtml.includes('category-add-modal'));
             
-            __pageCache.set(url, { wrapperHtml, scriptCodes, externalScripts, pageStyles, ts: Date.now() });
+            __pageCache.set(url, { wrapperHtml, scriptCodes, externalScripts, externalStylesheets, pageStyles, ts: Date.now() });
             }
 
             // 更新内容 - 先生成新的页面 ID，标记旧页面无效
@@ -253,9 +266,10 @@ const PageLoader = (function() {
             try {
                 contentContainer.querySelectorAll('script[data-dynamic-script]').forEach(function (s) { s.remove(); });
             } catch (e) {}
-            // 清理上一次注入的页面样式
+            // 清理上一次注入的页面样式和外部样式链接
             try {
                 document.querySelectorAll('style[data-page-style]').forEach(function (s) { s.remove(); });
+                document.querySelectorAll('link[data-page-style-link]').forEach(function (l) { l.remove(); });
             } catch (e) {}
 
             // 注入页面样式
@@ -264,6 +278,16 @@ const PageLoader = (function() {
                 styleElement.setAttribute('data-page-style', 'true');
                 styleElement.textContent = pageStyles.join('\n');
                 document.head.appendChild(styleElement);
+            }
+            // 注入外部样式表
+            if (externalStylesheets && externalStylesheets.length > 0) {
+                externalStylesheets.forEach(function (href) {
+                    var link = document.createElement('link');
+                    link.setAttribute('rel', 'stylesheet');
+                    link.setAttribute('href', href);
+                    link.setAttribute('data-page-style-link', 'true');
+                    document.head.appendChild(link);
+                });
             }
 
             contentContainer.innerHTML = wrapperHtml;
