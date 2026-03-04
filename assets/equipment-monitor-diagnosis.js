@@ -306,15 +306,24 @@
             try {
                 const parsed = JSON.parse(saved);
                 chatHistory = {};
-                Object.keys(parsed || {}).forEach(deviceId => {
-                    const value = parsed[deviceId];
+                Object.keys(parsed || {}).forEach(function(deviceId) {
+                    var value = parsed[deviceId];
                     // 旧结构：纯消息数组，需要包装成单个会话
                     if (Array.isArray(value) && value.length && value[0].role && !value[0].messages) {
-                        const firstTs = value[0].timestamp || new Date().toISOString();
-                        const lastTs = value[value.length - 1].timestamp || firstTs;
+                        var firstTs = value[0].timestamp || new Date().toISOString();
+                        var lastTs = value[value.length - 1].timestamp || firstTs;
+                        // 查找第一条用户消息作为标题来源（兼容不支持可选链的浏览器）
+                        var firstUserMsg = null;
+                        for (var i = 0; i < value.length; i++) {
+                            if (value[i] && value[i].role === 'user') {
+                                firstUserMsg = value[i];
+                                break;
+                            }
+                        }
+                        var titleText = (firstUserMsg && firstUserMsg.content ? firstUserMsg.content : '历史对话');
                         chatHistory[deviceId] = [{
-                            id: `session_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`,
-                            title: (value.find(m => m.role === 'user')?.content || '历史对话').slice(0, 30),
+                            id: 'session_' + Date.now() + '_' + Math.random().toString(16).slice(2, 8),
+                            title: titleText.slice(0, 30),
                             startedAt: firstTs,
                             updatedAt: lastTs,
                             messages: value
@@ -888,7 +897,12 @@ ${JSON.stringify(deviceData.parts, null, 2)}
                 let htmlContent = '';
                 
                 if (data.choices && Array.isArray(data.choices) && data.choices.length > 0) {
-                    htmlContent = data.choices[0].message?.content || '';
+                    const firstChoice = data.choices[0];
+                    if (firstChoice && firstChoice.message && typeof firstChoice.message.content === 'string') {
+                        htmlContent = firstChoice.message.content;
+                    } else {
+                        htmlContent = '';
+                    }
                 }
                 
                 if (!htmlContent) {
@@ -3693,7 +3707,12 @@ ${currentDevice.anomalies.map(a => `• [${a.severity === 'danger' ? '严重' : 
                 let aiResponse = '';
                 
                 if (data.choices && Array.isArray(data.choices) && data.choices.length > 0) {
-                    aiResponse = data.choices[0].message?.content || '';
+                    const firstChoice = data.choices[0];
+                    if (firstChoice && firstChoice.message && typeof firstChoice.message.content === 'string') {
+                        aiResponse = firstChoice.message.content;
+                    } else {
+                        aiResponse = '';
+                    }
                 }
                 
                 if (!aiResponse) {

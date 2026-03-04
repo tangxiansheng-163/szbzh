@@ -292,10 +292,11 @@ const PageLoader = (function() {
 
             contentContainer.innerHTML = wrapperHtml;
             
-            // 调试：检查弹窗元素是否存在
+            // 调试：检查弹窗元素是否存在（避免使用可选链，兼容老浏览器）
             console.log('contentContainer 子元素数量:', contentContainer.children.length);
-            console.log('contentContainer 第一个子元素:', contentContainer.children[0]?.tagName);
-            console.log('contentContainer 第一个子元素 ID:', contentContainer.children[0]?.id);
+            var firstChild = contentContainer.children.length > 0 ? contentContainer.children[0] : null;
+            console.log('contentContainer 第一个子元素:', firstChild ? firstChild.tagName : null);
+            console.log('contentContainer 第一个子元素 ID:', firstChild ? firstChild.id : null);
             
             // 在 contentContainer 内查找弹窗
             var modalInContainer = contentContainer.querySelector('#category-add-modal');
