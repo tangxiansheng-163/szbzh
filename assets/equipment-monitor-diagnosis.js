@@ -447,10 +447,17 @@
                 sendBtn.addEventListener('click', sendChatMessage);
             }
             
-            // 输入框回车事件
+            // 输入框：自动高度 + 回车事件
             const chatInput = document.getElementById('chatInput');
             if (chatInput) {
-                chatInput.addEventListener('keypress', handleChatKeyPress);
+                chatInput.addEventListener('keydown', handleChatKeyPress);
+                chatInput.addEventListener('input', function () {
+                    autoResizeChatInput();
+                    updateSendButtonState();
+                });
+                // 首次进入时初始化高度和按钮状态
+                autoResizeChatInput();
+                updateSendButtonState();
             }
             
             // 快捷问题按钮
@@ -3645,6 +3652,8 @@ ${deviceInfo}
                 renderChatSidebarHistory(currentDevice.id);
             }
             input.value = '';
+            // 触发 input 事件，重置高度和发送按钮状态
+            input.dispatchEvent(new Event('input'));
             showTypingIndicator();
             
             try {
@@ -3792,15 +3801,38 @@ ${currentDevice.anomalies.map(a => `• [${a.severity === 'danger' ? '严重' : 
             updateAttachmentsDisplay();
         }
         
+        // 自动调整对话输入框高度
+        function autoResizeChatInput() {
+            const input = document.getElementById('chatInput');
+            if (!input) return;
+            input.style.height = 'auto';
+            var maxHeight = 120;
+            var newHeight = input.scrollHeight;
+            if (newHeight > maxHeight) {
+                newHeight = maxHeight;
+            }
+            input.style.height = newHeight + 'px';
+        }
+        
+        // 根据输入内容更新发送按钮状态
+        function updateSendButtonState() {
+            const input = document.getElementById('chatInput');
+            const sendBtn = document.getElementById('chatSendBtn');
+            if (!input || !sendBtn) return;
+            var hasText = input.value && input.value.replace(/\s+/g, '').length > 0;
+            sendBtn.disabled = !hasText;
+        }
+        
         // 发送快捷问题
         function sendQuickQuestion(question) {
             document.getElementById('chatInput').value = question;
             sendChatMessage();
         }
         
-        // 处理回车键
+        // 处理回车键（Enter 发送，Shift+Enter 换行）
         function handleChatKeyPress(event) {
-            if (event.key === 'Enter') {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
                 sendChatMessage();
             }
         }
