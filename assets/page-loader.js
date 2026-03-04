@@ -230,22 +230,25 @@ const PageLoader = (function() {
             
             scriptCodes = [];
             externalScripts = [];
-            scripts.forEach(script => {
-                if (script.src) {
-                    // 外部脚本，解析为绝对 URL（基于页面 URL）避免 SPA 下相对路径 404
-                    const absoluteSrc = new URL(script.src, pageBaseUrl).href;
+            scripts.forEach(function(script) {
+                var hasSrc = script.getAttribute && script.getAttribute('src');
+                if (hasSrc) {
+                    // 外部脚本：使用原始 src 属性 + 页面 URL 解析为绝对 URL
+                    // 这样可以正确保留仓库子路径（如 /szbzh/），避免浏览器自动解析成站点根路径导致 404
+                    var rawSrc = script.getAttribute('src');
+                    var absoluteSrc = new URL(rawSrc, pageBaseUrl).href;
                     externalScripts.push(absoluteSrc);
-                    console.log('提取外部脚本:', script.src, '->', absoluteSrc);
+                    console.log('提取外部脚本:', rawSrc, '->', absoluteSrc);
                 } else {
                     // inline 脚本 - 使用 textContent 获取内容
-                    const code = script.textContent || script.innerHTML;
+                    var code = script.textContent || script.innerHTML;
                     if (code && code.trim()) {
                         scriptCodes.push(code);
                         console.log('提取 inline 脚本，长度:', code.length);
                     }
                 }
                 // 从 DOM 中移除脚本，避免重复执行
-                script.remove();
+                script.parentNode && script.parentNode.removeChild(script);
             });
             console.log('共提取 inline 脚本:', scriptCodes.length, '个，外部脚本:', externalScripts.length, '个');
 
