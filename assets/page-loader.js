@@ -233,12 +233,33 @@ const PageLoader = (function() {
             scripts.forEach(function(script) {
                 var hasSrc = script.getAttribute && script.getAttribute('src');
                 if (hasSrc) {
-                    // 外部脚本：使用原始 src 属性 + 页面 URL 解析为绝对 URL
-                    // 这样可以正确保留仓库子路径（如 /szbzh/），避免浏览器自动解析成站点根路径导致 404
-                    var rawSrc = script.getAttribute('src');
-                    var absoluteSrc = new URL(rawSrc, pageBaseUrl).href;
-                    externalScripts.push(absoluteSrc);
-                    console.log('提取外部脚本:', rawSrc, '->', absoluteSrc);
+                    // 外部脚本：基于页面 URL 计算最终地址，并在 GitHub Pages 场景下补全仓库前缀（如 /szbzh/）
+                    var rawSrc = script.getAttribute('src') || '';
+                    var absolute = new URL(rawSrc, pageBaseUrl);
+                    var absoluteHref = absolute.href;
+
+                    try {
+                        var origin = window.location.origin || (window.location.protocol + '//' + window.location.host);
+                        var currentPath = window.location.pathname || '';
+                        // 只在相同域名下处理（GitHub Pages 等静态托管场景）
+                        if (absolute.origin === origin) {
+                            // 从当前路径中提取仓库前缀，例如 /szbzh/main.html -> szbzh
+                            var repoMatch = currentPath.match(/^\/([^\/]+)\//);
+                            if (repoMatch && repoMatch[1]) {
+                                var repoPrefix = '/' + repoMatch[1];
+                                // 如果脚本路径缺少仓库前缀（例如 /assets/xxx.js），则补全为 /szbzh/assets/xxx.js
+                                if (absolute.pathname.indexOf(repoPrefix + '/') !== 0 &&
+                                    absolute.pathname.indexOf('/assets/') === 0) {
+                                    absoluteHref = origin + repoPrefix + absolute.pathname;
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('修正脚本URL时出错:', e);
+                    }
+
+                    externalScripts.push(absoluteHref);
+                    console.log('提取外部脚本:', rawSrc, '->', absoluteHref);
                 } else {
                     // inline 脚本 - 使用 textContent 获取内容
                     var code = script.textContent || script.innerHTML;
