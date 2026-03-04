@@ -288,10 +288,33 @@
         let selectedMode = 'quick';
         let isDiagnosing = false;
         
-        // 聊天相关状态（按设备 ID -> 会话列表）
+            // 聊天相关状态（按设备 ID -> 会话列表）
         let chatHistory = {};              // { [deviceId]: ChatSession[] }
         let currentAttachments = [];       // 当前上传的附件
         let currentChatSessionId = null;   // 当前对话会话 ID
+        let currentAgentId = 'diagnosis';  // 当前选中的智能体
+
+        // 不同智能体对应的快捷问题
+        const agentQuickQuestions = {
+            diagnosis: [
+                '设备状态',
+                '故障风险',
+                '报警原因',
+                '关键参数'
+            ],
+            maintenance: [
+                '维保周期',
+                '检修重点',
+                '备件建议',
+                '停机影响'
+            ],
+            energy: [
+                '能耗水平',
+                '节能空间',
+                '异常原因',
+                '降耗建议'
+            ]
+        };
         
         /**
          * 从 localStorage 加载聊天历史
@@ -483,6 +506,52 @@
             if (toolModalClose) {
                 toolModalClose.addEventListener('click', closeToolModal);
             }
+
+            // 智能体切换（下拉）
+            const trigger = document.getElementById('agentSwitchTrigger');
+            const dropdown = document.getElementById('agentDropdown');
+            if (trigger && dropdown) {
+                trigger.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('open');
+                });
+
+                const options = dropdown.querySelectorAll('.agent-option[data-agent]');
+                options.forEach(function (opt) {
+                    opt.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        const agentId = this.getAttribute('data-agent');
+                        const icon = this.getAttribute('data-icon');
+                        const name = this.getAttribute('data-name');
+                        selectChatAgent(agentId, icon, name);
+                        dropdown.classList.remove('open');
+                    });
+                });
+
+                // 点击弹窗其它区域时关闭
+                document.addEventListener('click', function (e) {
+                    if (!dropdown.classList.contains('open')) return;
+                    if (!dropdown.contains(e.target) && !trigger.contains(e.target)) {
+                        dropdown.classList.remove('open');
+                    }
+                });
+            }
+
+            // 快捷问题点击（事件委托）
+            const quickContainer = document.getElementById('chatQuickQuestions');
+            if (quickContainer) {
+                quickContainer.addEventListener('click', function (e) {
+                    const btn = e.target.closest('.quick-question-btn[data-question]');
+                    if (!btn) return;
+                    const q = btn.getAttribute('data-question');
+                    if (q) {
+                        sendQuickQuestion(q);
+                    }
+                });
+            }
+
+            // 初始渲染一次快捷问题
+            renderQuickQuestionsForAgent(currentAgentId);
 
             // 工具弹窗关闭按钮（底部）
             const toolModalCloseBtn = document.getElementById('toolModalCloseBtn');
@@ -3679,6 +3748,8 @@ ${currentDevice.anomalies.map(a => `• [${a.severity === 'danger' ? '严重' : 
 
 请基于以上设备信息回答用户的问题，回答要专业、简洁，使用中文。`;
                 
+                const systemPrompt = getAgentSystemPrompt(currentAgentId);
+
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
@@ -3690,7 +3761,7 @@ ${currentDevice.anomalies.map(a => `• [${a.severity === 'danger' ? '严重' : 
                         messages: [
                             {
                                 role: 'system',
-                                content: '您是设备智能诊断助手，专门为用户提供设备状态分析、维护建议、故障预测等专业咨询服务。请基于提供的设备信息，用简洁专业的中文回答用户问题。'
+                                content: systemPrompt
                             },
                             {
                                 role: 'user',
@@ -3801,12 +3872,12 @@ ${currentDevice.anomalies.map(a => `• [${a.severity === 'danger' ? '严重' : 
             updateAttachmentsDisplay();
         }
         
-        // 自动调整对话输入框高度
+        // 自动调整对话输入框高度（最多约 2 行，高度上限与 CSS 保持一致）
         function autoResizeChatInput() {
             const input = document.getElementById('chatInput');
             if (!input) return;
             input.style.height = 'auto';
-            var maxHeight = 120;
+            var maxHeight = 56;
             var newHeight = input.scrollHeight;
             if (newHeight > maxHeight) {
                 newHeight = maxHeight;
@@ -3821,12 +3892,35 @@ ${currentDevice.anomalies.map(a => `• [${a.severity === 'danger' ? '严重' : 
             if (!input || !sendBtn) return;
             var hasText = input.value && input.value.replace(/\s+/g, '').length > 0;
             sendBtn.disabled = !hasText;
+            if (hasText) {
+                sendBtn.classList.add('send-enabled');
+                sendBtn.classList.remove('send-disabled');
+            } else {
+                sendBtn.classList.add('send-disabled');
+                sendBtn.classList.remove('send-enabled');
+            }
         }
         
         // 发送快捷问题
         function sendQuickQuestion(question) {
             document.getElementById('chatInput').value = question;
             sendChatMessage();
+        }
+
+        // 根据智能体渲染对应的快捷问题
+        function renderQuickQuestionsForAgent(agentId) {
+            const container = document.getElementById('chatQuickQuestions');
+            if (!container) return;
+            const list = agentQuickQuestions[agentId] || [];
+            if (!list.length) {
+                container.innerHTML = '';
+                return;
+            }
+            container.innerHTML = list.map(function (q) {
+                return '<button type="button" class="quick-question-btn" data-question="' + q + '">' +
+                    q +
+                    '</button>';
+            }).join('');
         }
         
         // 处理回车键（Enter 发送，Shift+Enter 换行）
@@ -3835,6 +3929,41 @@ ${currentDevice.anomalies.map(a => `• [${a.severity === 'danger' ? '严重' : 
                 event.preventDefault();
                 sendChatMessage();
             }
+        }
+
+        // 智能体系统提示文案
+        function getAgentSystemPrompt(agentId) {
+            var basePrompt = '您是设备智能诊断助手，专门为用户提供设备状态分析、维护建议、故障预测等专业咨询服务。请基于提供的设备信息，用简洁专业的中文回答用户问题。';
+            if (agentId === 'maintenance') {
+                return '您是设备维保策略专家，重点从维护计划、备件更换、停机安排等角度给出可执行的维保建议。请结合提供的设备与故障信息，用清晰步骤给出维保方案和注意事项。';
+            }
+            if (agentId === 'energy') {
+                return '您是设备能效分析专家，重点关注能耗、效率、运行工况对能耗的影响，以及节能改进方案。请结合提供的设备参数和历史数据，给出节能诊断与优化建议。';
+            }
+            return basePrompt;
+        }
+
+        // 选择智能体
+        function selectChatAgent(agentId, icon, name) {
+            if (!agentId || agentId === currentAgentId) return;
+            currentAgentId = agentId;
+
+            // 更新触发器上的图标和名称
+            var iconNode = document.getElementById('currentAgentIcon');
+            var nameNode = document.getElementById('currentAgentName');
+            if (iconNode && icon) {
+                iconNode.textContent = icon;
+            } else if (iconNode) {
+                iconNode.textContent = agentId === 'maintenance' ? '🛠️' : agentId === 'energy' ? '⚡' : '🩺';
+            }
+            if (nameNode && name) {
+                nameNode.textContent = name;
+            } else if (nameNode) {
+                nameNode.textContent = agentId === 'maintenance' ? '维保建议' : agentId === 'energy' ? '能效分析' : '故障诊断';
+            }
+
+            // 根据智能体刷新快捷问题
+            renderQuickQuestionsForAgent(agentId);
         }
         
         // 添加聊天消息

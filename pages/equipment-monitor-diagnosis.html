@@ -304,6 +304,33 @@
                             </div>
                         </div>
                         <div class="chat-footer">
+                            <div class="chat-agent-switch" id="chatAgentSwitch">
+                                <div class="agent-switch-trigger" id="agentSwitchTrigger" title="切换智能体">
+                                    <span class="agent-icon" id="currentAgentIcon">🩺</span>
+                                    <span class="agent-name" id="currentAgentName">故障诊断</span>
+                                    <span class="agent-arrow">▾</span>
+                                </div>
+                                <div class="chat-quick-questions" id="chatQuickQuestions">
+                                    <!-- 智能体对应的快捷问题，由脚本渲染 -->
+                                </div>
+                                <div class="agent-dropdown" id="agentDropdown">
+                                    <button type="button" class="agent-option" data-agent="diagnosis" data-icon="🩺" data-name="故障诊断">
+                                        <span class="agent-option-icon">🩺</span>
+                                        <span class="agent-option-main">故障诊断</span>
+                                        <span class="agent-option-desc">定位故障原因与风险</span>
+                                    </button>
+                                    <button type="button" class="agent-option" data-agent="maintenance" data-icon="🛠️" data-name="维保建议">
+                                        <span class="agent-option-icon">🛠️</span>
+                                        <span class="agent-option-main">维保建议</span>
+                                        <span class="agent-option-desc">制定维护计划和措施</span>
+                                    </button>
+                                    <button type="button" class="agent-option" data-agent="energy" data-icon="⚡" data-name="能效分析">
+                                        <span class="agent-option-icon">⚡</span>
+                                        <span class="agent-option-main">能效分析</span>
+                                        <span class="agent-option-desc">评估能耗与节能空间</span>
+                                    </button>
+                                </div>
+                            </div>
                             <div class="chat-attachments" id="chatAttachments">
                                 <!-- 附件列表 -->
                             </div>
@@ -312,17 +339,11 @@
                                     <span>📎</span>
                                 </button>
                                 <input type="file" id="chatFileInput" style="display: none;" multiple onchange="handleFileSelect(event)">
-                                <!-- 多行输入框：回车发送，Shift+Enter 换行，自动增高 -->
-                                <textarea class="chat-input" id="chatInput" rows="1" placeholder="请输入您想咨询的问题，Enter 发送，Shift+Enter 换行"></textarea>
-                                <button class="chat-send-btn" id="chatSendBtn">
-                                    <span>📤</span>
+                                <!-- 多行输入框：自动增高，Enter 发送，Shift+Enter 换行 -->
+                                <textarea class="chat-input" id="chatInput" rows="1" placeholder="请输入您的问题..."></textarea>
+                                <button class="chat-send-btn" id="chatSendBtn" title="发送">
+                                    <span class="chat-send-icon">发</span>
                                 </button>
-                            </div>
-                            <div class="chat-quick-questions">
-                                <button type="button" class="quick-question-btn" data-question="设备当前状态如何？">设备状态</button>
-                                <button type="button" class="quick-question-btn" data-question="有哪些维护建议？">维护建议</button>
-                                <button type="button" class="quick-question-btn" data-question="预测性分析结果是什么？">预测分析</button>
-                                <button type="button" class="quick-question-btn" data-question="关键部件健康状况如何？">部件健康</button>
                             </div>
                         </div>
                     </div>
