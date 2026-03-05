@@ -56,6 +56,12 @@
             font-weight: 600; 
             color: #262626;
         }
+        .panel-hint {
+            padding: 0 16px 10px;
+            font-size: 12px;
+            color: #8c8c8c;
+            border-bottom: 1px solid #f0f0f0;
+        }
         .search-box { padding: 12px; border-bottom: 1px solid #f0f0f0; }
         .search-box input { 
             width: 100%; 
@@ -473,6 +479,7 @@
             <!-- 左侧设备树 -->
             <div class="left-panel">
                 <div class="panel-header">设备列表</div>
+                <div class="panel-hint">勾选同类型多台设备可横向对比</div>
                 
                 <!-- 搜索框 -->
                 <div class="search-box">
@@ -2005,6 +2012,7 @@
         
         // 将函数绑定到 window 对象，确保 HTML 中的 onclick 可以访问
         window.toggleCategory = toggleCategory;
+        window.toggleDeviceSelection = toggleDeviceSelection;
         window.selectDevice = selectDevice;
         window.selectParam = selectParam;
         window.changeTimeRange = changeTimeRange;
