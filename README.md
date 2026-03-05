@@ -82,6 +82,16 @@ http://localhost:8080/main.html
 **Windows**: `Ctrl + Shift + R` 或 `Ctrl + F5`
 **Mac**: `Cmd + Shift + R`
 
+### 4. GitHub Pages 在线预览
+
+推送代码到 `main` 分支后，GitHub Actions 会自动部署到 GitHub Pages。
+
+- **预览地址**：https://tangxiansheng-163.github.io/szbzh/
+- **入口页**：https://tangxiansheng-163.github.io/szbzh/main.html
+
+**首次使用需在仓库中开启 Pages（仅一次）**：  
+仓库 → **Settings** → **Pages** → **Build and deployment** → **Source** 选择 **GitHub Actions**，保存后每次推送到 `main` 会自动发布。
+
 ---
 
 ## 文件结构
