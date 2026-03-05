@@ -1334,6 +1334,18 @@ const PageInteractions = {
                     return;
                 }
                 
+                // 能源管理协同：外链，新窗口打开
+                if (appId === 'energy') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    appPopover.classList.remove('show');
+                    appTrigger.setAttribute('aria-expanded', 'false');
+                    appPopover.setAttribute('aria-hidden', 'true');
+                    if (document.activeElement) document.activeElement.blur();
+                    window.open('https://xiaoxiao98700.github.io/nengyuanguanli/', '_blank', 'noopener,noreferrer');
+                    return;
+                }
+                
                 // 阻止默认行为（防止链接跳转）
                 e.preventDefault();
                 e.stopPropagation();
